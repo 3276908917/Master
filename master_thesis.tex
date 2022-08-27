@@ -1,0 +1,39 @@
+\documentclass[11pt]{article}
+\usepackage{reports}
+
+\newcommand*{\instr}{Andreas Burkert}
+\newcommand*{\term}{15.08.2022}
+\newcommand*{\coursenum}{Gravitational Dynamics}
+\newcommand*{\hwnum}{Hausarbeit}
+
+\usepackage{pdfpages}
+\usepackage{bm}
+\usepackage{listings}
+
+\usepackage{titling}
+
+\graphicspath{{./res/}}
+
+% One plot per week requirement
+% You have two weeks after the semester ends,
+% in order to finalize the Hausarbeit.
+
+\begin{document}
+
+\fontsize{12}{15}
+
+\begin{center}
+Lukas Finkbeiner: Master's Thesis
+\end{center}
+
+This is a master's thesis. I hope to defend it to your satisfaction.
+
+\textit{What is a Boltzmann solver? What is the MCMC?}
+
+In order to constrain cosmological parameters based on the application of this method to \textcolor{red}{LSS data sets} [vague], we must call a Boltzmann solver for each point in our parameter space. This multitude of calls represents an enormous computational, and therefore time, cost.
+
+Emulators have been recently proposed as a solution to this bottleneck. \textit{What is an emulator? How do we train it?} (Arico et al. 2021, Mancini et al. 2021).
+
+These emulators sample parameters organized into two categories: purely evolution parameters, and paramateres that affect both the evolution and the shape of the power spectrum. \textcolor{orange}{Is there no pure shape category? Why does it help to have these categories in the first place?} Conventional emulator calibration entails the historical units of Mpc / $h$, but if we use instead units of Mpc, then we can 
+
+\end{document}

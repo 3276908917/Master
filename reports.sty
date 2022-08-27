@@ -1,0 +1,55 @@
+% Compiled by Aditya Baradwaj (abaradwaj@berkeley.edu),
+% with significant inspiration taken from CS 70's header.sty file,
+% which was compiled and cleaned by Alvin Wan (http://alvinwan.com)
+
+% Packages Needed
+
+\usepackage{tabto, fancyhdr, mathtools, amssymb}
+
+\usepackage{xcolor, bbold, graphics, graphicx}
+\usepackage{amsmath, verbatim}
+\usepackage{hyperref, caption, subcaption}
+
+\usepackage[shortlabels]{enumitem}
+\usepackage[a4paper, margin=2cm]{geometry}
+\newcommand*{\Question}[1]{\section{#1}}
+\newenvironment{Parts}{\begin{enumerate}[a]}{\end{enumerate}}
+% I call it Sartres because it's a pun on subparts: you abbreviate it, then you get the French existentialist philosopher
+\newenvironment{Sartres}{\begin{enumerate}[i]}{\end{enumerate}}
+% Decimal-parts. Concatenation
+\newenvironment{Darts}{\begin{enumerate}[1]}{\end{enumerate}}
+\newcommand*{\Part}{\item}
+
+\begin{comment}
+
+\pagestyle{fancy}
+
+\DeclarePairedDelimiter{\ceil}{\lceil}{\rceil}
+\DeclarePairedDelimiter{\floor}{\lfloor}{\rfloor}
+\headheight=36pt
+
+\renewcommand{\headrulewidth}{3pt}
+\chead{\rule{\textwidth}{4pt} \vspace{0pt}\\}
+\lhead{\small
+\coursenum    \tabto{120pt} \hwnum
+\\ \term \tabto{120pt}   \instr}
+\rhead{
+\small
+    Summer 2022 \\
+	Lukas Finkbeiner
+}
+\end{comment}
+
+% Commands for questions, parts
+\newcommand{\question}[1]{\section{#1}}
+\newenvironment{subparts}{\begin{enumerate}[(a)]
+\newcommand\subpart{\item}}{\end{enumerate}}
+
+% Additional commands
+\newcommand*{\True}{\textsc{True}}
+\newcommand*{\False}{\textsc{False}}
+\newenvironment{Subparagraph}[0]{\begin{adjustwidth}{1.5em}{0pt}}{\end{adjustwidth}}
+
+% Feel free to add commands here
+\def\defeq{\mathrel{\mathop:}=}
+
