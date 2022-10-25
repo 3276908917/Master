@@ -1,0 +1,107 @@
+\documentclass[11pt]{article}
+\usepackage{reports}
+
+\newcommand*{\instr}{Andreas Burkert}
+\newcommand*{\term}{15.08.2022}
+\newcommand*{\coursenum}{Gravitational Dynamics}
+\newcommand*{\hwnum}{Hausarbeit}
+
+\usepackage{pdfpages}
+\usepackage{bm}
+\usepackage{listings}
+
+\usepackage{titling}
+\usepackage[normalem]{ulem}
+
+\graphicspath{{./res/}}
+
+% One plot per week requirement
+% You have two weeks after the semester ends,
+% in order to finalize the Hausarbeit.
+
+\begin{document}
+
+\fontsize{12}{15}
+
+This paragraph was written at 11:35 am, 18.10.22. I entered the institute at around 11:10 am.
+
+To better prepare for Garching visits:
+
+* \sout{Scratch paper}
+
+* \sout{Dedicated mouse (we need to search around for this)}
+
+Tasks to handle:
+
+> Explain the master thesis situation to Ariel.
+
+> Respond to administrative emails and fill out forms as necessary until you have a computer account, internet access, a keycard, and a nametag. (Right now we're waiting on Frau Kestler to provide a pre-signed contract).
+
+* Clone the master thesis repo to this computer and begin crunching your notes into a master thesis write-up. That is to say, you can begin to write up the introduction and background components to your final report.
+
+---
+
+Notes on ``Redshift-Space Distortions, Pairwise Velocities and Nonlinearities''
+
+Peculiar velocities are sourced by gravitational potentials, and gravitational potentials are mostly sourced by dark matter. Therefore, RSD observations are measurements of dark matter content in the Universe.
+
+---
+
+Notes on FECS, Chapter 1
+
+The covariant derivative $\nabla_\mu$ is defined as:
+
+\begin{equation}
+	\nabla_\mu V^\nu = \partial_\mu V^\nu + \Gamma^\nu_{\mu \rho} V^\rho
+\end{equation}
+
+and
+
+\begin{equation}
+	\nabla_\mu Y_\nu = \partial_\mu Y_\nu - \Gamma^\rho_{\mu \nu} Y_\rho
+\end{equation}
+
+``The metric contains all the geometric information of the manifold'' p. 13.
+
+At the bottom of page 13 it is stated that metric compatibility implies $\nabla_\rho g_{\mu \nu} = 0$ and $\nabla_\rho  g^{\mu \nu} = 0$. \textcolor{orange}{Isn't this trivial? I mean, the metric must be a constant tensor object since we are using it to continually refer to the same manifold. How could the derivatives of a constant tensor object ever be anything but zero?} \textcolor{red}{No! (So you must learn this concept. Maybe when we have internet again we can look up metric derivatives.)} See this quote from the following page: ``It is possible to show that on every point in a given manifold it is possible to find a coordinate system in which the first derivatives of the metric tensor vanish at that point.''
+
+By convention, $\mathbb{R}^2$ and $\mathbb{R}^3$ refer to spaces without curvature--that is to say, they are implicitly subject to Euclidean geometry.
+
+It is difficult to gauge the intrinsic curvature of a surface from the metric tensor because non-constant terms could be artefacts of the coordinate system used. For intrinsic curvature, we examine the Riemann curvature tensor instead. All of the Riemann tensor terms vanish every iff the space is flat.
+
+Under the Lorentzian sign convention, the definition of proper time is
+
+\begin{equation}
+	d\tau^2 = -ds^2
+\end{equation}
+
+\textcolor{red}{Although I don't quite understand this definition. Take, for example, the twin paradox. The twin who never accelerated measured much more time. The twin who accelerated twice measured much less time. So the accelerating twin's trajectory was spatially much longer--shouldn't that extra length feed back into the proper time under this definition? Basically, I'm saying that my intuition tells me that more time passes with trajectories involving less spatial position change, as long as we hold the amount of time passed as fixed.} The resolution cannot have anything to do with the separation infinitesimal being timelike or spacelike, because we square it.
+
+Simple mnemonic: for any timelike separation vector, the passage of time contributes the dominant component of the vector length.
+
+The energy of a particle is given by the timelike component of its four-momentum, $p^0$. In the particle rest-frame, $p^0 = m$.
+
+---
+
+To-do:
+
+* \textcolor{green}{Meet with Agne at 9:30 am tomorrow.}
+
+* Reproduce the plots that Ariel showed you. To recapitulate, we want ratio plots $P_\nu / P_0$ (each with a few different lines) where each $P_\nu$ line represents a different massive-neutrino cosmology and the corresponding $P_0$ line represents the same cosmology except for the absence of massive neutrinos.
+
+To keep the $\omega_\text{matter}$ values consistent within each pair of lines, you will need to define some $\omega_c$ for the massless neutrino models which picks up the mass lost by depriving the neutrinos of mass.
+
+The $\sigma_{12}$ values also need to be consistent within each pair. How do you decide the value? (Maybe we could let the massive neutrino cosmology determine the baseline amplitude since it's counterpart massless cosmology is engineered anyway). Anyway, because the $\sigma_{12}$ values need to be the same, the $z$ value must change--specifically, you should vary the redshift stamp of the power spectrum until both the massive-neutrino and massless-neutrino models share a value of $\sigma_{12}$.
+
+One set of ratios was like a flat line but with a perhaps 0.1\% variation about the central line. The other set of ratios was much more interesting, it started flat but at increasing values $k$ (these were all logarithmic plots on the $x$ i.e. $k$ axis, but linear on the $y$ i.e. ratio axis) it began to drop off, with a minor oscillation appearing as well. \textcolor{red}{What was the difference between the two plots?}
+
+I'm less certain about this, but I think that each pair of lines in each plot was characterized by some unique neutrino mass.
+
+% If I am the last person to leave, I ought to lock the doors.
+
+% Don't forget to close the door when you re-enter. It's what they've always done.
+
+% We should be counting to TJoInx4r but for some reason we get stuck at 20EoG419
+% alpha beta psychedelic funking
+
+\end{document}
