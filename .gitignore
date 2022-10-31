@@ -1,6 +1,9 @@
 ## Ad-hoc stuff
 *-checkpoint.ipynb
 
+## VIM trash
+*~
+
 ## Core latex/pdflatex auxiliary files:
 *.aux
 *.lof
@@ -306,3 +309,4 @@ TSWLatexianTemp*
 # Ad-hoc stuff, part 2
 CAMB_demo/planck_2018.ini
 *.pdf
+*.pyc
