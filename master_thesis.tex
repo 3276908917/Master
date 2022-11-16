@@ -30,18 +30,48 @@ This is a master's thesis. I hope to defend it to your satisfaction.
 
 \textit{What is a Boltzmann solver? What is the MCMC?}
 
-In order to constrain cosmological parameters based on the application of this method to \textcolor{red}{LSS data sets} [vague], we must call a Boltzmann solver for each point in our parameter space. This multitude of calls represents an enormous computational, and therefore time, cost.
+In order to constrain cosmological parameters based on the application of this
+method to \textcolor{red}{LSS data sets} [vague], we must call a Boltzmann
+solver for each point in our parameter space. This multitude of calls
+represents an enormous computational, and therefore time, cost.
 
-Emulators have been recently proposed as a solution to this bottleneck. \textit{What is an emulator? How do we train it?} (Arico et al. 2021, Mancini et al. 2021).
+Emulators have been recently proposed as a solution to this bottleneck.
+\textit{What is an emulator? How do we train it?} (Arico et al. 2021, Mancini
+et al. 2021).
 
-These emulators sample parameters organized into two categories: purely evolution parameters, and paramateres that affect both the evolution and the shape of the power spectrum. \textcolor{orange}{Is there no pure shape category? Why does it help to have these categories in the first place?} Conventional emulator calibration entails the historical units of Mpc / $h$, but if we use instead units of Mpc, then we can 
+These emulators sample parameters organized into two categories: purely
+evolution parameters, and paramaters that affect both the evolution and the
+shape of the power spectrum. \textcolor{orange}{Is there no pure shape
+category? Why does it help to have these categories in the first place?}
+Conventional emulator calibration entails the historical units of Mpc / $h$,
+but if we use instead units of Mpc, then we can \textcolor{red}{???} 
 
-From Kiakotou 2008: ``Neutrinos with mosses on the eV scale or below will be a hot component of the dark matter and will free-stream out of overdensities and thus wipe out small-scale structures.''
+From Kiakotou 2008: ``Neutrinos with masses on the eV scale or below will be a
+hot component of the dark matter and will free-stream out of overdensities and
+thus wipe out small-scale structures.''
 
-The following is a giant dumpster for notes that I took on paper. I hope to eventually organize these into a coherent story.
+The following is a giant dumpster for notes that I took on paper. I hope to
+eventually organize these into a coherent story.
 
-* Talk about CAMB and CLASS. Are there any important ways in which they distinguish themselves? Why do we use both of them in modern papers? Anyway, the reason that we don't use CMBFast (as well as other older codes?) is because it is no longer maintained.
+* Talk about CAMB and CLASS. Are there any important ways in which they
+distinguish themselves? Why do we use both of them in modern papers? Anyway,
+the reason that we don't use CMBFast (as well as other older codes?) is
+because it is no longer maintained.
 
-* Emulators interpolate across a high-dimensional parameter space. The primary limitation is that the emulator has to be built with every possible parameter in mind that an end-user could wish to vary. There are a large number of different cosmological parameters discussed in the modern literature. The solution, proposed as evolution mapping, consists in categorizing the different cosmological parameters in terms of their impacts on the power spectrum. By clearly expressing degeneracies and dependencies in this way, we can capture a large number of hypothetical parameters with a relatively simple and unchanging emulator. \textcolor{orange}{This is just my impression of the project so far! This is a fairly foundational paragraph to the kind of work that we are trying to do, so we should get Ariel's feedback on this formulation very early on in the thesis-writing process!}
+* Emulators interpolate across a high-dimensional parameter space. The primary
+limitation is that the emulator has to be built with every possible parameter
+in mind that an end-user could wish to vary. There are a large number of
+different cosmological parameters discussed in the modern literature. The
+solution, proposed as evolution mapping, consists in categorizing the
+different cosmological parameters in terms of their impacts on the power
+spectrum. By clearly expressing degeneracies and dependencies in this way, we
+can capture a large number of hypothetical parameters with a relatively simple
+and unchanging emulator. \textcolor{orange}{This is just my impression of the
+project so far! This is a fairly foundational paragraph to the kind of work
+that we are trying to do, so we should get Ariel's feedback on this
+formulation very early on in the thesis-writing process!}
+
+% Here is a test to make sure that the LaTeX compiler is actually doing
+% anything.
 
 \end{document}
