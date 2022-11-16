@@ -3,6 +3,7 @@
 *checkpoints
 communications
 machines
+*.tar
 
 ## VIM trash
 *~
