@@ -1,0 +1,28 @@
+24/11/2022 9:45 am
+We've been slowly bringing our results more in line with Ariel's. Positive steps so far:
+* Multiplied the x axis by h to agree on units
+* Evaluated the curves only at the redshifts given in the file
+* Stick to linear, rather than non-linear spectra
+* Double check that the neutrinos are really registered.
+    Our problem was setting neutrino values directly; for some reason CAMB ignores these fields.
+* Confirm that that to which you are comparing is looking at the same constituents
+    as you are. For example, I had the problem of looking at the full matter power spectrum
+    when I was supposed to look just at the matter power spectrum in baryons and CDM.
+
+Still, there's a little disagreement at the small scales:
+    it seems like my spectra there are too low in amplitude
+
+What else could be the problem?
+
+* Effective number of neutrinos 2.046?
+* Power spectrum of baryons + CDM?
+
+Speculation
+* Does "accurate_massive_neutrinos" have anything to do with it?
+    (model.py)
+
+Questions
+* What is the difference between get_matter_power_spectrum
+    (assuming the CAMBparams object has NonLinear = NonLinear_none)
+    and get_linear_matter_power_spectrum
+    (results.py)
