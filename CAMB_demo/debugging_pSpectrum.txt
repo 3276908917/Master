@@ -15,14 +15,17 @@ Still, there's a little disagreement at the small scales:
 What else could be the problem?
 
 * Effective number of neutrinos 2.046?
-* Power spectrum of baryons + CDM?
 
 Speculation
-* Does "accurate_massive_neutrinos" have anything to do with it?
+$ Does "accurate_massive_neutrinos" have anything to do with it?
     (model.py)
+    The answer is: no!
 
 Questions
 * What is the difference between get_matter_power_spectrum
     (assuming the CAMBparams object has NonLinear = NonLinear_none)
     and get_linear_matter_power_spectrum
     (results.py)
+    Well, for one, the arguments aren't quite the same. That's pretty strange.
+    I *would* try to compare the two function outputs, but because the parameter
+    lists disagree, that would be a slight time investment.
