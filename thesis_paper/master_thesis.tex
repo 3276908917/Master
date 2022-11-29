@@ -28,7 +28,9 @@ Lukas Finkbeiner: Master's Thesis
 
 This is a master's thesis. I hope to defend it to your satisfaction.
 
-\section{Introduction: overarching themes and goals}
+\begin{centering}
+\section*{Introduction: overarching themes and goals}
+\end{centering}
 
 \textit{What is a Boltzmann solver? What is the MCMC?}
 
@@ -65,7 +67,11 @@ Why does it help to have these categories in the first place?}\footnote{
     (I think it's $\sigma_{12}$, but obviously we should double check that)
 }
 
-\section*{The Glory of $\sigma_{12}$}\footnote{
+\begin{centering}
+\section*{The Glory of $\sigma_{12}$}
+\end{centering}
+
+\footnote{
     I have two primary objectives for this section: explain the unit system
     we are using (ditch $h$ factor because it messes up everything--but
     only briefly summarize the main arguments of Sanchez 2020), and briefly
@@ -78,12 +84,55 @@ Why does it help to have these categories in the first place?}\footnote{
 Conventional emulator calibration entails the historical units of Mpc / $h$,
 but if we use instead units of Mpc, then we can \textcolor{red}{???} 
 
+\begin{centering}
+\section*{Neutrinos and Their Cosmological Impact}
+\end{centering}
+
+\footnote{
+    Here I am violating my traditional rule of ordering sections by
+    increasing complexity, because I consider the $\sigma_{12}$ argument
+    decidedly more esoteric than a summary of the relevant points of neutrino
+    physics. I think we should stick with this structure though, in the
+    interest of narrative. Specifically, neutrinos represent a wrench in the
+    plan. For that development to make sense, we first need to establish what
+    the ``plan'' is: evolution mapping.
+}
+
 From Kiakotou 2008: ``Neutrinos with masses on the eV scale or below will be a
 hot component of the dark matter and will free-stream out of overdensities and
 thus wipe out small-scale structures.''
 
-The following is a giant dumpster for notes that I took on paper. I hope to
-eventually organize these into a coherent story.
+\begin{centering}
+\section*{CAMB, Initial Setup}
+\end{centering}
+
+\footnote{
+    At this point, we've built suspense in the reader: we have a goal and
+    we have an idea about how to get to that goal. Therefore, now is the
+    appropriate time to divert into laying the technical groundwork which
+    will allow us to explore our idea through concrete implementations and
+    to test our idea with plots and numbers.
+}
+
+To introduce the reader to the scope of CAMB, we will now introduce
+some basic simulated power spectra along with a summary of the dynamic
+parameters which will be of greatest interest to us.
+
+Neutrino mass hierarchy: the options are degenerate, normal, and inverted.
+The CAMB documentation annotates this parameter as ``(1 or 2 eigenstate
+approximation),'' but this is somewhat unclear. Is the degenerate
+hierarchy the single mass eigenstate approximation? Do both normal
+and inverted hierarchies involve two eigenstates?
+
+\begin{centering}
+\section*{Dumpster}
+\end{centering}
+
+\footnote{
+    The following is a giant dumpster (\textit{NOT} a graveyard) for notes
+    that I took on paper, as well as possible directions in which to take the
+    report. I hope to eventually organize these into a coherent story.
+}
 
 * Talk about CAMB and CLASS. Are there any important ways in which they
 distinguish themselves? Why do we use both of them in modern papers? Anyway,
@@ -103,13 +152,5 @@ project so far! This is a fairly foundational paragraph to the kind of work
 that we are trying to do, so we should get Ariel's feedback on this
 formulation very early on in the thesis-writing process!}
 
-Properties of initial setup, and what they mean:
-
-Neutrino mass hierarchy: the options are degenerate, normal, and inverted.
-The CAMB documentation annotates this parameter as ``(1 or 2 eigenstate
-approximation),''but
-
-% Here is a test to make sure that the LaTeX compiler is actually doing
-% anything.
 
 \end{document}
