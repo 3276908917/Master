@@ -28,21 +28,53 @@ Lukas Finkbeiner: Master's Thesis
 
 This is a master's thesis. I hope to defend it to your satisfaction.
 
+\section{Introduction: overarching themes and goals}
+
 \textit{What is a Boltzmann solver? What is the MCMC?}
 
 In order to constrain cosmological parameters based on the application of this
-method to \textcolor{red}{LSS data sets} [vague], we must call a Boltzmann
-solver for each point in our parameter space. This multitude of calls
-represents an enormous computational, and therefore time, cost.
+method to \textcolor{red}{LSS data sets}\footnote{
+	Vague--you should instead mention the precise names of the data sets,
+	and you should even have a dedicated section of the paper wherein you
+	summarize the goals, instrumentation, targets, and state-of-the-art
+	analyses of these data sets
+}, we must call a Boltzmann solver for each point in our parameter space. This
+multitude of calls represents an enormous computational, and therefore time,
+cost.
 
 Emulators have been recently proposed as a solution to this bottleneck.
 \textit{What is an emulator? How do we train it?} (Arico et al. 2021, Mancini
 et al. 2021).
 
 These emulators sample parameters organized into two categories: purely
-evolution parameters, and paramaters that affect both the evolution and the
+\textit{evolution} parameters, and \textit{shape} parameters that
+affect both the evolution and the
 shape of the power spectrum. \textcolor{orange}{Is there no pure shape
-category? Why does it help to have these categories in the first place?}
+category?\footnote{
+    I've almost certainly misremembered this.
+    The main \textit{problem} with neutrinos (i.e. why they \textit{don't}
+    play nicely with the categories that I am trying to describe here)
+    is that they affect \textit{both} shape and evolution! As far as we know,
+    the physical density in neutrinos is the \textit{only} parameter that
+    is poorly behaved in this way.
+}
+Why does it help to have these categories in the first place?}\footnote{
+    As I understand it, we split the parameters up this way because
+    one category of parameters (I think the evolution parameters)
+    can be entirely funneled through just one parameter
+    (I think it's $\sigma_{12}$, but obviously we should double check that)
+}
+
+\section*{The Glory of $\sigma_{12}$}\footnote{
+    I have two primary objectives for this section: explain the unit system
+    we are using (ditch $h$ factor because it messes up everything--but
+    only briefly summarize the main arguments of Sanchez 2020), and briefly
+    summarize why we can funnel all of the evolution parameters through
+    $\sigma_{12}$ in this way. Unfortunately, this second objective will
+    almost certainly require you to bust out a few equations, and even to
+    manipulate them a little to tease out relations essential to this paper.
+}
+
 Conventional emulator calibration entails the historical units of Mpc / $h$,
 but if we use instead units of Mpc, then we can \textcolor{red}{???} 
 
@@ -70,6 +102,12 @@ and unchanging emulator. \textcolor{orange}{This is just my impression of the
 project so far! This is a fairly foundational paragraph to the kind of work
 that we are trying to do, so we should get Ariel's feedback on this
 formulation very early on in the thesis-writing process!}
+
+Properties of initial setup, and what they mean:
+
+Neutrino mass hierarchy: the options are degenerate, normal, and inverted.
+The CAMB documentation annotates this parameter as ``(1 or 2 eigenstate
+approximation),''but
 
 % Here is a test to make sure that the LaTeX compiler is actually doing
 % anything.
