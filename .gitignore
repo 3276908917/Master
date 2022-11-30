@@ -4,6 +4,7 @@
 communications
 machines
 *.tar
+*.kate-swp
 
 ## VIM trash
 *~
