@@ -88,6 +88,51 @@ To better prepare for Garching visits:
 
 * \sout{Dedicated mouse (we need to search around for this)}
 
+\section{Lessons in Appaisal}
+
+    If something funny is happening only with models 1 and 2, then you should
+    strongly suspect that your conversion away from $h$ units has a hiccup
+    somewhere.
+
+    \subsection{Ratio of massive and massless power spectra}
+
+        If the curves for the different models are not appropriately aligned,
+        but instead appear with a sort of k-axis offset, check your $h$
+        conversion for the k-axis. Intuition: since you're taking ratios, you
+        don't need to worry about h mistakes in your y-axis (i.e. the cubic
+        $h$ factors in the power spectra already cancel themselves out).
+        Therefore, the error lies in the k-axes for the curves of different
+        models being scaled by different $h$ values.
+
+        If you're comparing curves at one red-shift (that is nonzero!) and the
+        curves seem to blur out a little (i.e. the different models slightly
+        but fairly universally disagree), then double-check that you are
+        comparing like redshifts to like. If $z \neq 0$, then $z$ will have
+        to change from one model to the next if you want to control for
+        amplitude.
+
+        If your curves at any point exceed unity, you are getting something for
+        nothing. In my particular case, that  meant that I was subtracting CDM
+        physical density without adding it back in in the form of neutrinos.
+        Conceivably, this principle could also be used if the power spectra at
+        large scales also \textit{under}shoots unity, for example if I add
+        neutrinos without subtracting CDM physical density.
+
+        If the curve shape at the lowest scales disagrees dramatically, there
+        is a good chance that you are computing the non-linear power spectrum,
+        when we're truly interested in the linear power spectrum.
+
+    \subsection{Suspicions that Require More Testing}
+
+        When I switched from the degenerate to either the normal or inverted
+        neutrino mass hierarchy, the ratios of massless and massive power
+        spectra exhibited behavior reminiscent of the k-axis $h$ misconversion.
+        Not identical, though: the curves were also just barely-visibally
+        shifted along the y axis. Is this perhaps an unambiguous sign of
+        hierarchy disagreement? If so, what could possibly be the intuition
+        behind the behavior of the plot?
+
+
 \section{Meetings: Principles}
 
 ``When in doubt, try re-binning.''
