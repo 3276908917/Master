@@ -32,21 +32,45 @@ This is a master's thesis. I hope to defend it to your satisfaction.
 \section{Introduction: overarching themes and goals}
 \end{centering}
 
-\textit{What is a Boltzmann solver? What is the MCMC?}
+\footnote{
+    Some of my ideas for this section strike me as perhaps too introductory.
+    The master's thesis is supposed to read like a scientific paper, right?
+    But those never start off by talking about LSS nor why it's interesting,
+    they just jump right into the novel techniques.
+}
 
-In order to constrain cosmological parameters based on the application of this
-method to \textcolor{red}{LSS data sets}\footnote{
-	Vague--you should instead mention the precise names of the data sets,
-	and you should even have a dedicated section of the paper wherein you
-	summarize the goals, instrumentation, targets, and state-of-the-art
-	analyses of these data sets
-}, we must call a Boltzmann solver for each point in our parameter space. This
-multitude of calls represents an enormous computational, and therefore time,
-cost.
+We want to study the large-scale structure of the Universe. From our
+observations thereof, we want to find the best-fit parameters, such as
+the Universe's density in cold dark matter.
 
-Emulators have been recently proposed as a solution to this bottleneck.
-\textit{What is an emulator? How do we train it?} (Arico et al. 2021, Mancini
-et al. 2021).
+If we have a particular cosmology (some specific configuration of these various
+parameters) that we would like to explore, it would be helpful to know what
+this Universe looks like in the ways that correspond to the capabilities of
+our instruments. For example, for any given proposed model, we should like to
+know what the power spectrum\footnote{It's a little weird that I'm assuming
+familiarity with the power spectrum, given the simplicity used elsewhere.
+But I think it's okay.} would look like
+in such a Universe so that we
+can compare it to the power spectrum that we measure in our own.
+
+To output these kinds of observables based on some proposed model, we task
+Boltzmann solvers.
+
+\begin{centering}
+\section{Boltzmann Solvers and CAMB}
+\end{centering}
+
+This is just a theoretical discussion of these solvers. The hands-on stuff
+comes a couple sections later.
+
+* Talk about CAMB and CLASS. Are there any important ways in which they
+distinguish themselves? Why do we use both of them in modern papers? Anyway,
+the reason that we don't use CMBFast (as well as other older codes?) is
+because it is no longer maintained.
+
+\begin{centering}
+\section{Emulators}
+\end{centering}
 
 These emulators sample parameters organized into two categories: purely
 \textit{evolution} parameters, and \textit{shape} parameters that
@@ -67,8 +91,43 @@ Why does it help to have these categories in the first place?}\footnote{
     (I think it's $\sigma_{12}$, but obviously we should double check that)
 }
 
+In order to constrain cosmological parameters based on the application of this
+method to \textcolor{red}{LSS data sets}\footnote{
+	Vague--you should instead mention the precise names of the data sets,
+	and you should even have a dedicated section of the paper wherein you
+	summarize the goals, instrumentation, targets, and state-of-the-art
+	analyses of these data sets
+}, we must call a Boltzmann solver for each point in our parameter space. This
+multitude of calls represents an enormous computational, and therefore time,
+cost.
+
+Therefore, we would like to build a machine that can predict what the power
+spectrum should look like (for any given combination of the input parameters)
+based on a relatively small number of input simulations. Emulators have been
+recently  proposed as such a solution.
+
+\textit{What is an emulator? How do we train it?} (Arico et al. 2021, Mancini
+et al. 2021).
+
+Emulators interpolate across a high-dimensional parameter space. The primary
+limitation is that the emulator has to be built with every possible parameter
+in mind that an end-user could wish to vary. There are a large number of
+different cosmological parameters discussed in the modern literature. The
+solution, proposed as evolution mapping, consists in categorizing the
+different cosmological parameters in terms of their impacts on the power
+spectrum. By clearly expressing degeneracies and dependencies in this way, we
+can capture a large number of hypothetical parameters with a relatively simple
+and unchanging emulator. \textcolor{orange}{This is just my impression of the
+project so far! This is a fairly foundational paragraph to the kind of work
+that we are trying to do, so we should get Ariel's feedback on this
+formulation very early on in the thesis-writing process!}
+Now, for a point of suspense: there are so many different cosmological
+parameters that we investigate. What is the point of building an emulator if
+you just have to train a new one each time you take interest in a new
+parameter?
+
 \begin{centering}
-\section{The Glory of Sigma 12}
+\section{Sigma 12 and Evolution Mapping}
 \end{centering}
 
 \footnote{
@@ -83,6 +142,10 @@ Why does it help to have these categories in the first place?}\footnote{
 
 Conventional emulator calibration entails the historical units of Mpc / $h$,
 but if we use instead units of Mpc, then we can \textcolor{red}{???} 
+
+Now, for the hiccup: this scheme is broken by one parameter, the Universe's
+density in neutrinos. (In the next section: why this is so and what we can do
+about it.)
 
 \begin{centering}
 \section{Neutrinos and Their Cosmological Impact}
@@ -134,23 +197,14 @@ and inverted hierarchies involve two eigenstates?
     report. I hope to eventually organize these into a coherent story.
 }
 
-* Talk about CAMB and CLASS. Are there any important ways in which they
-distinguish themselves? Why do we use both of them in modern papers? Anyway,
-the reason that we don't use CMBFast (as well as other older codes?) is
-because it is no longer maintained.
-
-* Emulators interpolate across a high-dimensional parameter space. The primary
-limitation is that the emulator has to be built with every possible parameter
-in mind that an end-user could wish to vary. There are a large number of
-different cosmological parameters discussed in the modern literature. The
-solution, proposed as evolution mapping, consists in categorizing the
-different cosmological parameters in terms of their impacts on the power
-spectrum. By clearly expressing degeneracies and dependencies in this way, we
-can capture a large number of hypothetical parameters with a relatively simple
-and unchanging emulator. \textcolor{orange}{This is just my impression of the
-project so far! This is a fairly foundational paragraph to the kind of work
-that we are trying to do, so we should get Ariel's feedback on this
-formulation very early on in the thesis-writing process!}
+\textit{What is the MCMC?} Monte Carlo Markov Chain is a way of exploring this
+parameter space in the interests of finding the best fit parameters, right?
+Should this definition come
+when we're trying to use our emulator to make conclusions about our data?
+So, the paper that Ariel gave me on this talks about fitting to the WMAP
+CMB data with MCMC running on some likelihood function. Is there ever a point
+at which I'm actually making a conclusion about the world, or am I just
+constructing a tool here by studying the redshift dependence of neutrinos? 
 
 \begin{centering}
 \section{Meta / Lessons Learned}
