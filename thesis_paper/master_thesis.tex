@@ -1,10 +1,14 @@
 \documentclass[11pt]{article}
 \usepackage{reports}
 
-\newcommand*{\instr}{Andreas Burkert}
-\newcommand*{\term}{15.08.2022}
-\newcommand*{\coursenum}{Gravitational Dynamics}
-\newcommand*{\hwnum}{Hausarbeit}
+% The following block isn't actually used on the output.
+% But it's easier to simply fill it out than to try
+% to edit the rather fragile reports.sty file.
+\newcommand*{\instr}{Ariel S\'{a}nchez}
+\newcommand*{\term}{31.07.2023}
+\newcommand*{\coursenum}{Master's Thesis}
+\newcommand*{\hwnum}{Redshift Dependence of Neutrino Damping on the Power
+Spectrum}
 
 \usepackage{pdfpages}
 \usepackage{bm}
@@ -27,6 +31,8 @@ Lukas Finkbeiner: Master's Thesis
 \end{center}
 
 This is a master's thesis. I hope to defend it to your satisfaction.
+
+\tableofcontents
 
 \begin{centering}
 \section{Introduction: overarching themes and goals}
@@ -72,24 +78,6 @@ because it is no longer maintained.
 \section{Emulators}
 \end{centering}
 
-These emulators sample parameters organized into two categories: purely
-\textit{evolution} parameters, and \textit{shape} parameters that
-affect both the evolution and the
-shape of the power spectrum. \textcolor{orange}{Is there no pure shape
-category?\footnote{
-    I've almost certainly misremembered this.
-    The main \textit{problem} with neutrinos (i.e. why they \textit{don't}
-    play nicely with the categories that I am trying to describe here)
-    is that they affect \textit{both} shape and evolution! As far as we know,
-    the physical density in neutrinos is the \textit{only} parameter that
-    is poorly behaved in this way.
-}
-Why does it help to have these categories in the first place?}\footnote{
-    As I understand it, we split the parameters up this way because
-    one category of parameters (I think the evolution parameters)
-    can be entirely funneled through just one parameter
-    (I think it's $\sigma_{12}$, but obviously we should double check that)
-}
 
 In order to constrain cosmological parameters based on the application of this
 method to \textcolor{red}{LSS data sets}\footnote{
@@ -143,6 +131,33 @@ parameter?
 Conventional emulator calibration entails the historical units of Mpc / $h$,
 but if we use instead units of Mpc, then we can \textcolor{red}{???} 
 
+(S\'{a}nchez et al, 2021) proposes to divide up the full set of cosmological
+parameters into two categories: purely
+\textit{evolution} parameters, and \textit{shape} parameters that
+affect both the evolution and the
+shape of the power spectrum. \textcolor{orange}{Is there no pure shape
+category?\footnote{
+    I've almost certainly misremembered this.
+    The main \textit{problem} with neutrinos (i.e. why they \textit{don't}
+    play nicely with the categories that I am trying to describe here)
+    is that they affect \textit{both} shape and evolution! As far as we know,
+    the physical density in neutrinos is the \textit{only} parameter that
+    is poorly behaved in this way.
+}
+Why does it help to have these categories in the first place?}\footnote{
+    As I understand it, we split the parameters up this way because
+    one category of parameters (I think the evolution parameters)
+    can be entirely funneled through just one parameter
+    (I think it's $\sigma_{12}$, but obviously we should double check that)
+}
+
+Why is this scheme important? Evolution mapping\footnote{I think we need to
+double check our language here, I think evolution mapping refers to more than
+just the categorization scheme} greatly simplifies the emulator
+scheme, because we can
+funnel all of the evolution parameters through $\sigma_{12}$, so we've
+collapsed that entire category to just one parameter.
+
 Now, for the hiccup: this scheme is broken by one parameter, the Universe's
 density in neutrinos. (In the next section: why this is so and what we can do
 about it.)
@@ -168,6 +183,11 @@ thus wipe out small-scale structures.''
 \begin{centering}
 \section{CAMB, Initial Setup}
 \end{centering}
+
+CAMB is a Fortran code with a Python wrapper\footnote{
+\url{https://github.com/cmbant/CAMB}
+}which we will be using for the
+entirety of this project.
 
 \footnote{
     At this point, we've built suspense in the reader: we have a goal and
