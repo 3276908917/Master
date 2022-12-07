@@ -1,3 +1,7 @@
+% Some miscellaneous notes:
+% I will indicate with my sigil the yellow-folder note pages that I've already
+% digitized.
+
 \documentclass[11pt]{article}
 \usepackage{reports}
 
@@ -10,7 +14,6 @@
 \newcommand*{\hwnum}{Redshift Dependence of Neutrino Damping on the Power
 Spectrum}
 
-
 \usepackage{pdfpages}
 \usepackage{bm}
 \usepackage{listings}
@@ -20,21 +23,15 @@ Spectrum}
 \setcounter{biblatexAvailable}{0}
 
 \IfFileExists{biblatex.sty} {
-    \usepackage[
-        backend=biber,
-        style=alphabetic,
-        sorting=ynt
-    ]{biblatex}
+    \usepackage[style=authoryear]{biblatex}
     \addbibresource{master_thesis.bib}
 }
 
-\newcommand{\cbib}[1]{
-    \IfFileExists{biblatex.sty} {
-        \cite{#1}
-    }{
-        (citation ``#1'' cannot be linked in the current environment)
-    }
-}
+% This formatting sucks but I don't want to output extra spaces.
+\newcommand{\cbib}[1]
+{\IfFileExists{biblatex.sty}
+{\cite{#1}}
+{[citation ``#1'' cannot be linked in the current environment]}}
 
 \graphicspath{{./res/}}
 
@@ -94,7 +91,6 @@ because it is no longer maintained.
 \section{Emulators}
 \end{centering}
 
-
 In order to constrain cosmological parameters based on the application of this
 method to \textcolor{red}{LSS data sets}\footnote{
 	Vague--you should instead mention the precise names of the data sets,
@@ -110,8 +106,7 @@ spectrum should look like (for any given combination of the input parameters)
 based on a relatively small number of input simulations. Emulators have been
 recently  proposed as such a solution.
 
-\textit{What is an emulator? How do we train it?} (Arico et al. 2021, Mancini
-et al. 2021).
+\textit{What is an emulator? How do we train it?} (\cbib{Arico}, \cbib{Mancini}).
 
 Emulators interpolate across a high-dimensional parameter space. The primary
 limitation is that the emulator has to be built with every possible parameter
@@ -127,7 +122,9 @@ that we are trying to do, so we should get Ariel's feedback on this
 formulation very early on in the thesis-writing process!}
 
 Now, I would like to briefly introduce the particular emulation suite with
-which this paper will deal.
+which this paper will deal. COMET implements evolution mapping as introduced
+by \cbib{San20} and \cbib{San21}, and which we will summarize in the next
+section.\footnote{Clunky to look ahead like this, can we reorganize?}
 
 Now, for a point of suspense: there are so many different cosmological
 parameters that we investigate. What is the point of building an emulator if
@@ -150,9 +147,13 @@ solution to this problem.
 }
 
 Conventional emulator calibration entails the historical units of Mpc / $h$,
-but if we use instead units of Mpc, then we can \textcolor{red}{???} 
+but if we use instead units of Mpc, then we can distill all of the evolution
+parameters into one parameter, $\sigma_{12}$. Since $h$ is already its own
+(shape!) parameter, the conventional $\sigma_8$ parameter is truly a mixture
+of two parameters. This presents a host of misleading results  and statistical
+ambiguities (\cbib{San20}) which are outside of the scope of this work.
 
-(S\'{a}nchez et al, 2021) proposes to divide up the full set of cosmological
+(\cbib{San21}) proposes to divide up the full set of cosmological
 parameters into two categories: \textit{evolution} parameters $\mathcal{O}_E$
 (such as $\omega_b$, $\omega_c$, and $\eta_s$)
 affect the amplitude of the power spectrum at a particular redshift, while
@@ -202,7 +203,7 @@ about it.)
     the ``plan'' is: evolution mapping.
 }
 
-From Kiakotou 2008: ``Neutrinos with masses on the eV scale or below will be a
+(\cbib{Kiakotou}): ``Neutrinos with masses on the eV scale or below will be a
 hot component of the dark matter and will free-stream out of overdensities and
 thus wipe out small-scale structures.''
 
@@ -221,16 +222,9 @@ $k$ but if $\omega_\nu$ is really a problem, then shape should also refer
 to $P(k)$ through all values $z$? I don't quite understand this, but
 \textcolor{green}{maybe we can ask Ariel}.
 
-
 \begin{centering}
 \section{CAMB, Initial Setup}
 \end{centering}
-
-CAMB is a Fortran code with a Python wrapper\footnote{
-\url{https://github.com/cmbant/CAMB}
-}which we will be using for the
-entirety of this project.
-
 \footnote{
     At this point, we've built suspense in the reader: we have a goal and
     we have an idea about how to get to that goal. Therefore, now is the
@@ -238,6 +232,11 @@ entirety of this project.
     will allow us to explore our idea through concrete implementations and
     to test our idea with plots and numbers.
 }
+
+CAMB is a Fortran code with a Python wrapper\footnote{
+\url{https://github.com/cmbant/CAMB}
+}which we will be using for the
+entirety of this project.
 
 To introduce the reader to the scope of CAMB, we will now introduce
 some basic simulated power spectra along with a summary of the dynamic
@@ -248,6 +247,10 @@ The CAMB documentation annotates this parameter as ``(1 or 2 eigenstate
 approximation),'' but this is somewhat unclear. Is the degenerate
 hierarchy the single mass eigenstate approximation? Do both normal
 and inverted hierarchies involve two eigenstates?
+
+I guess we could already start putting a couple of plots here from my existing
+notebooks. I mean, I'm sure none of these plots will survive to the final
+version, but they might help to guide my discussion for a little while.
 
 \begin{centering}
 \section{Dumpster}
@@ -266,7 +269,7 @@ when we're trying to use our emulator to make conclusions about our data?
 So, the paper that Ariel gave me on this talks about fitting to the WMAP
 CMB data with MCMC running on some likelihood function. Is there ever a point
 at which I'm actually making a conclusion about the world, or am I just
-constructing a tool here by studying the redshift dependence of neutrinos? 
+constructing a tool here by studying the redshift dependence of neutrinos?
 
 \begin{centering}
 \section{Meta / Lessons Learned}
@@ -276,8 +279,6 @@ constructing a tool here by studying the redshift dependence of neutrinos?
 notes: I think that these lessons might actually be a great guide for writing
 the paper, and I could talk about the intuition behind them.
 }
-
-\cbib{Kiakotou}
 
 \IfFileExists{biblatex.sty} {
     \printbibliography
