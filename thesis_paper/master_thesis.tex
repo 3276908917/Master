@@ -118,6 +118,11 @@ recently  proposed as such a solution.
 
 \textit{What is an emulator? How do we train it?}
 (\cbib{Arico}, \cbib{Mancini}).
+At the most basic level, an emulator is an interpolation scheme.
+
+Most emulators are based on a Gaussian Process (GP). (Don't spend too much time
+on this but maybe briefly descripe what GP does and why we choose it instead
+of another process.)
 
 Emulators interpolate across a high-dimensional parameter space. The primary
 limitation is that the emulator has to be built with every possible parameter
@@ -218,6 +223,11 @@ the predictions while avoiding the need to sample the redshift evolution of
 $P_L(k|z) P_L(k|z)$ explicitly would greatly simplify the calibration
 procedure.''
 
+''The time evolution of $\Delta_L^2(k)$ in models with identical shape
+parameters
+but different evolution parameters can be mapped from one to the other by
+relabelling the redshifts that correspond to the same clustering amplitude.
+
 Now, for the hiccup: this scheme is broken by one parameter, the Universe's
 density in neutrinos. (In the next section: why this is so and what we can do
 about it.)
@@ -313,6 +323,11 @@ So, the paper that Ariel gave me on this talks about fitting to the WMAP
 CMB data with MCMC running on some likelihood function. Is there ever a point
 at which I'm actually making a conclusion about the world, or am I just
 constructing a tool here by studying the redshift dependence of neutrinos?
+
+``The deviatons between the non-linear power spectra of models with identical
+$\Delta_L^2 (k)$ caused by their different structure formation histories are
+described in terms of the suppression factor $g(a) = D(a) / a$''
+(\cbib{San21}).
 
 \begin{centering}
 \section{Meta / Lessons Learned}
