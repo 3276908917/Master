@@ -10,17 +10,33 @@
 \newcommand*{\hwnum}{Redshift Dependence of Neutrino Damping on the Power
 Spectrum}
 
+
 \usepackage{pdfpages}
 \usepackage{bm}
 \usepackage{listings}
-
 \usepackage{titling}
 
-\graphicspath{{./res/}}
+\newcounter{biblatexAvailable}
+\setcounter{biblatexAvailable}{0}
 
-% One plot per week requirement
-% You have two weeks after the semester ends,
-% in order to finalize the Hausarbeit.
+\IfFileExists{biblatex.sty} {
+    \usepackage[
+        backend=biber,
+        style=alphabetic,
+        sorting=ynt
+    ]{biblatex}
+    \addbibresource{master_thesis.bib}
+}
+
+\newcommand{\cbib}[1]{
+    \IfFileExists{biblatex.sty} {
+        \cite{#1}
+    }{
+        (citation ``#1'' cannot be linked in the current environment)
+    }
+}
+
+\graphicspath{{./res/}}
 
 \begin{document}
 
@@ -259,6 +275,12 @@ constructing a tool here by studying the redshift dependence of neutrinos?
 \footnote{The reason I am putting this content here rather than in pretty
 notes: I think that these lessons might actually be a great guide for writing
 the paper, and I could talk about the intuition behind them.
+}
+
+\cbib{Kiakotou}
+
+\IfFileExists{biblatex.sty} {
+    \printbibliography
 }
 
 \end{document}
