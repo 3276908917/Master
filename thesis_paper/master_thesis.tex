@@ -53,7 +53,9 @@ This is a master's thesis. I hope to defend it to your satisfaction.
 
 ``The goal of this project is to produce an emulator of the linear-theory
 power spectrum based on evolution mapping'' (A. G. S\'{a}nchez, private
-communication).
+communication). In particular, this paper seeks to extend the evolution mapping
+scheme of \cbib{San21} to massive-neutrino cosmologies by applying a correction
+factor to results from emulators built on massless-neutrino simulations. 
 
 \begin{centering}
 \section{The Importance of Simulation and Emulation}
@@ -114,7 +116,8 @@ spectrum should look like (for any given combination of the input parameters)
 based on a relatively small number of input simulations. Emulators have been
 recently  proposed as such a solution.
 
-\textit{What is an emulator? How do we train it?} (\cbib{Arico}, \cbib{Mancini}).
+\textit{What is an emulator? How do we train it?}
+(\cbib{Arico}, \cbib{Mancini}).
 
 Emulators interpolate across a high-dimensional parameter space. The primary
 limitation is that the emulator has to be built with every possible parameter
@@ -198,6 +201,23 @@ scheme, because we can
 funnel all of the evolution parameters through $\sigma_{12}$, so we've
 collapsed that entire category to just one parameter.
 
+From my original assignment email:
+``If the dependence of the transfer function, $T(k)$, on the relevant physical
+density parameters is emulated, it is possible to obtain a prediction for the
+full power spectrum in Mpc units for any choice of evolution parameters and
+redshift. The full shape of $P_L(k|z)$ can be obtained from the output of the
+emulator of $T(k)$ and $n_s$ (and any additional shape parameter controlling
+the scale dependence of the primordial power spectrum). The correct amplitude
+of $P_L(k|z)$ can be obtained by computing the value of $\sigma_{12}(z)$ in
+terms of the desired normalization at $z=0$ and the growth factor $D(z)$ for
+the cosmology being considered. Such a recipe would be valid for a wide range
+of evolution cosmological parameters, including non-standard models, as long as
+the corresponding linear growth factor is scale-independent. The smaller number
+of parameters required to emulate $T(k)$ would increase the overall accuracy of
+the predictions while avoiding the need to sample the redshift evolution of
+$P_L(k|z) P_L(k|z)$ explicitly would greatly simplify the calibration
+procedure.''
+
 Now, for the hiccup: this scheme is broken by one parameter, the Universe's
 density in neutrinos. (In the next section: why this is so and what we can do
 about it.)
@@ -222,7 +242,11 @@ thus wipe out small-scale structures.''
 
 Remember what the point of this section is: why is $\omega_\nu$ bad for the
 evolution mapping scheme? Because neutrinos exhibit redshift-dependent
-damping of the power-spectrum.
+damping of the power-spectrum, and therefore affect both the shape and the
+amplitude of the power spectrum. Whenever massive neutrinos are present,
+the growth factor becomes scale-dependent, which disrupts the
+evolution-mapping scheme.
+
 Why? I \textcolor{orange}{think} that it's because all neutrinos start off as
 relativistic particles in the early Universe, acting as a type of radiation.
 But as the Universe continues to expand and cool, the neutrinos behave
@@ -234,6 +258,12 @@ only ever consider the shape of the power spectrum at one redshift. By
 $k$ but if $\omega_\nu$ is really a problem, then shape should also refer
 to $P(k)$ through all values $z$? I don't quite understand this, but
 \textcolor{green}{maybe we can ask Ariel}.
+
+One proposed solution is to treat the neutrinos as a small correction factor
+to the results from an anologous cosmology with the same $\omega_m$ but with
+$\omega_\nu = 0$. This of course limits the applicability of our emulator to
+cosmologies with very small $\omega_\nu$, but this constraint agrees with
+current observations (\textcolor{orange}{which?}).
 
 \begin{centering}
 \section{CAMB, Initial Setup}
