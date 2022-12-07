@@ -27,7 +27,7 @@ Spectrum}
     \addbibresource{master_thesis.bib}
 }
 
-% This formatting sucks but I don't want to output extra spaces.
+% This code formatting sucks but I don't want to output extra spaces.
 \newcommand{\cbib}[1]
 {\IfFileExists{biblatex.sty}
 {\cite{#1}}
@@ -48,7 +48,15 @@ This is a master's thesis. I hope to defend it to your satisfaction.
 \tableofcontents
 
 \begin{centering}
-\section{Introduction: overarching themes and goals}
+\section{Abstract? Summary of Introduction}
+\end{centering}
+
+``The goal of this project is to produce an emulator of the linear-theory
+power spectrum based on evolution mapping'' (A. G. S\'{a}nchez, private
+communication).
+
+\begin{centering}
+\section{The Importance of Simulation and Emulation}
 \end{centering}
 
 \footnote{
@@ -151,14 +159,19 @@ but if we use instead units of Mpc, then we can distill all of the evolution
 parameters into one parameter, $\sigma_{12}$. Since $h$ is already its own
 (shape!) parameter, the conventional $\sigma_8$ parameter is truly a mixture
 of two parameters. This presents a host of misleading results  and statistical
-ambiguities (\cbib{San20}) which are outside of the scope of this work.
+ambiguities (\cbib{San20}) which are outside of the scope of this work but
+which prompt us to abandon $\sigma_8$.
+Similarly, throughout this paper we will refrain from using the conventional
+fractional density parameters $\Omega_i$ in favor of the physical density
+parameters $\omega_i = \Omega_i h^2$ which similarly eliminate the
+dependence on $h$.
 
 (\cbib{San21}) proposes to divide up the full set of cosmological
 parameters into two categories: \textit{evolution} parameters $\mathcal{O}_E$
 (such as $\omega_b$, $\omega_c$, and $\eta_s$)
 affect the amplitude of the power spectrum at a particular redshift, while
 \textit{shape} parameters $\mathcal{O}_S$
-(such as $\omega_\kappa$, $\omega_\text{DE}$, w(a))
+(such as $\omega_K$, $\omega_\text{DE}$, w(a))
 affect the shape of the power
 spectrum. \textcolor{orange}{One paper made it sound like shape parameters
 affect both shape and amplitude. Was it one of the S\'{a}nchez papers? I think
