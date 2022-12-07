@@ -69,7 +69,7 @@ Boltzmann solvers.
 This is just a theoretical discussion of these solvers. The hands-on stuff
 comes a couple sections later.
 
-* Talk about CAMB and CLASS. Are there any important ways in which they
+Talk about CAMB and CLASS. Are there any important ways in which they
 distinguish themselves? Why do we use both of them in modern papers? Anyway,
 the reason that we don't use CMBFast (as well as other older codes?) is
 because it is no longer maintained.
@@ -109,10 +109,15 @@ and unchanging emulator. \textcolor{orange}{This is just my impression of the
 project so far! This is a fairly foundational paragraph to the kind of work
 that we are trying to do, so we should get Ariel's feedback on this
 formulation very early on in the thesis-writing process!}
+
+Now, I would like to briefly introduce the particular emulation suite with
+which this paper will deal.
+
 Now, for a point of suspense: there are so many different cosmological
 parameters that we investigate. What is the point of building an emulator if
 you just have to train a new one each time you take interest in a new
-parameter?
+parameter? This is supposed to be a segue into evolution mapping, a proposed
+solution to this problem.
 
 \begin{centering}
 \section{Sigma 12 and Evolution Mapping}
@@ -132,12 +137,17 @@ Conventional emulator calibration entails the historical units of Mpc / $h$,
 but if we use instead units of Mpc, then we can \textcolor{red}{???} 
 
 (S\'{a}nchez et al, 2021) proposes to divide up the full set of cosmological
-parameters into two categories: purely
-\textit{evolution} parameters, and \textit{shape} parameters that
-affect both the evolution and the
-shape of the power spectrum. \textcolor{orange}{Is there no pure shape
-category?\footnote{
-    I've almost certainly misremembered this.
+parameters into two categories: \textit{evolution} parameters $\mathcal{O}_E$
+(such as $\omega_b$, $\omega_c$, and $\eta_s$)
+affect the amplitude of the power spectrum at a particular redshift, while
+\textit{shape} parameters $\mathcal{O}_S$
+(such as $\omega_\kappa$, $\omega_\text{DE}$, w(a))
+affect the shape of the power
+spectrum. \textcolor{orange}{One paper made it sound like shape parameters
+affect both shape and amplitude. Was it one of the S\'{a}nchez papers? I think
+I misunderstood it, but we have to confirm that we can now understand what was
+meant.\footnote{
+    I'm certain that I misread this second description, for the following.
     The main \textit{problem} with neutrinos (i.e. why they \textit{don't}
     play nicely with the categories that I am trying to describe here)
     is that they affect \textit{both} shape and evolution! As far as we know,
@@ -179,6 +189,22 @@ about it.)
 From Kiakotou 2008: ``Neutrinos with masses on the eV scale or below will be a
 hot component of the dark matter and will free-stream out of overdensities and
 thus wipe out small-scale structures.''
+
+Remember what the point of this section is: why is $\omega_\nu$ bad for the
+evolution mapping scheme? Because neutrinos exhibit redshift-dependent
+damping of the power-spectrum.
+Why? I \textcolor{orange}{think} that it's because all neutrinos start off as
+relativistic particles in the early Universe, acting as a type of radiation.
+But as the Universe continues to expand and cool, the neutrinos behave
+increasingly like dark matter.
+In this way, the physical density in neutrinos impacts both the shape and the
+evolution. What I don't understand is why we say that this is so when we
+only ever consider the shape of the power spectrum at one redshift. By
+``shape'' I was assuming that S\'{a}nchez meant the shape of $P(k)$ versus
+$k$ but if $\omega_\nu$ is really a problem, then shape should also refer
+to $P(k)$ through all values $z$? I don't quite understand this, but
+\textcolor{green}{maybe we can ask Ariel}.
+
 
 \begin{centering}
 \section{CAMB, Initial Setup}
@@ -234,9 +260,5 @@ constructing a tool here by studying the redshift dependence of neutrinos?
 notes: I think that these lessons might actually be a great guide for writing
 the paper, and I could talk about the intuition behind them.
 }
-
-\textcolor{orange}{Re-read all of the Minerva messages (even Slack!) with
-Ariel and codify every time Ariel immediately identified a plot as mistaken.
-That's gold! That's exactly the kind of skill that I want and need to develop!}
 
 \end{document}
