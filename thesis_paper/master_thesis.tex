@@ -139,7 +139,10 @@ in mind that an end-user could wish to vary. Yet there is a large number of
 different cosmological parameters discussed in the modern literature.
 ``Currently available emulators only sample a few cosmological parameters,
 often with restrictive ranges, and are not applicable to more general parameter
-spces'' (\cbib{San21}).
+spces'' (\cbib{San21}). ``Due to the high computational cost of the required
+simulations, [...] current emulators leave out parameters such as the curvature
+of the Universe or dynamic energy models beyond the standard CPL
+parametrization'' (\cbib{San21}).
 
 Now, for a point of suspense: there are so many different cosmological
 parameters that we investigate. What is the point of building an emulator if
@@ -203,6 +206,7 @@ We take, as the evolution mapping relation for the power spectrum, equation 13
 from \cbib{San21}:
 
 \begin{equation}
+\label{eq: evMapping_pSpectrum}
     \Delta^2_L (k | z, \Theta_s, \Theta_e)
     =
     \Delta_L^2 (k | \Theta_s, \sigma_{12} \left( z, \Theta_s, \Theta_e \right))
@@ -215,6 +219,10 @@ scheme, because we can
 funnel all of the evolution parameters through $\sigma_{12}$, so we've
 collapsed that entire category to just one parameter. Fewer parameters means
 that we get a faster emulator.
+
+``At the linear level, all models characterized by identical shape parameters
+and the same values of the parameter combinations $b \sigma_{12}(z)$ and
+$f \sigma_{12}(z)$ will be identical'' (\cbib{San21}).
 
 Anticipating a counterargument: ``For a general cosmology, $h$ is a combination
 of shape and evolution parameters. However, for a $\Lambda$CDM Universe, fixing
@@ -292,6 +300,17 @@ $k$ but if $\omega_\nu$ is really a problem, then shape should also refer
 to $P(k)$ through all values $z$? I don't quite understand this, but
 \textcolor{green}{maybe we can ask Ariel}.
 
+``The scale where the suppression of power (from neutrino free-streaming) sets
+in is controlled by the comoving Hubble radius at the time when the neutrinos
+became non-relativistic, corresponding to a comoving wave number
+$k_{fs} = 0.10 \Omega_m h \sqrt{f_\nu}$.
+
+``The popular heuristic formula for the linear theory suppression of the matter
+fluctuations by free-streaming $\nu$, $\Delta P(k) / P(k) \approx -8 f_\nu$, is
+valid only on very small scales $k > 0.8 h$ / Mpc, However, it is not of
+practical use as this is in the strongly nonlinear regime of matter
+clustering'' (\cbib{Kiakotou}).
+
 One proposed solution is to treat the neutrinos as a small correction factor
 to the results from an anologous cosmology with the same $\omega_m$ but with
 $\omega_\nu = 0$. This of course limits the applicability of our emulator to
@@ -339,6 +358,18 @@ by \cbib{San20} and \cbib{San21}, introduced in section
 \ref{sec: sigma_and_evMapping}.
 
 \begin{centering}
+\section{Conclusion and Thoughts for the Future}
+\end{centering}
+
+``A relation similar to eq. 13 [here reproduced as equation
+\ref{eq: evMapping_pSpectrum}] must be valid
+for higher-order N-point statistics, geometrical and topological descriptors
+such as Minkowski functionals, or the full probability distribution function of
+the density field'' (\cbib{San21}). So, the correction factors that we have
+introduced in this paper shall surely maintain relevance as we expand our
+emulators to handle other cosmological statistics.
+
+\begin{centering}
 \section{Dumpster}
 \end{centering}
 
@@ -372,6 +403,27 @@ described in terms of the suppression factor $g(a) = D(a) / a$''
 of most of the shape parameters. However, they only provide weak constraints on
 the evolution parameters for general cosmologies. The inverse is true for LSS
 measurements.
+
+``A good approximation even for non-standard cosmologies: perturbation theory
+kernels are independent of cosmology'' (\cbib{San21}).
+
+``The fundamental assumption of single-stream flow of common perturbation
+theory approaches eventually breaks down due to shell crossings on small
+scales'' (\cbib{San21}). Actually I have no idea what this quote means, but
+since \cbib{San21} is so important to this paper, I feel like \textcolor
+{orange}{I ought to}.
+
+``Several studies have shown that $f(\sigma)$ cannot be described by a
+universal function at high accuracy as its amplitude and shape are cosmology
+and redshift dependent'' (\cbib{San21}).
+
+``When using the MCMC technique, the values of all evolution parameters are
+treated as slow quantities that require a new call to a Boltzmann solver every
+time their values are changed'' (\cbib{San21}).
+
+``As a rule of thumb, the present-epoch matter power spectrum is considered to
+be in the linear regime for comoving wave numbers $k < $ 0.10--0.15 $h$
+Mpc$^{-1}$'' (\cbib{Kiakotou}).
 
 \begin{centering}
 \section{Meta / Lessons Learned}

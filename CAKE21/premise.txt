@@ -1,0 +1,43 @@
+This is the wiki page of the **Cosmology Advanced Knowledge Exchange (CAKE) workshop** of the OPINAS LSS group.
+
+_Yes, we can have our cake and eat it too._
+
+### Goal of the workshop
+
+The goal of the workshop is to **_produce an emulator of the linear-theory power spectrum based on evolution mapping_** ([arXiv:2108.12710](https://arxiv.org/abs/2108.12710)).
+
+### Background
+
+A general description of the problem can be found [here](background).
+
+### Preparing for the workshop
+
+A few things to [read and know before the workshop](preparation).
+
+### Summary of the workshop
+
+WP1: The goal was to generate an emulator for the linear theory power spectrum, trained on CAMB or CLASS. To this end, we generated the following Python modules
+
+- CAMB wrapper: Computes the transfer function based on CAMB Python as a function of the physical baryon ($`\Omega_{\rm b} h^2`$) and CDM ($`\Omega_{\rm c} h^2`$) density parameters from the LHC.
+- Latin Hypercube Module: Generates $`\Omega_{\rm b} h^2`$ and $`\Omega_{\rm c} h^2`$ values on a Latin Hypercube
+- The transfer grid module: Module for the storage and access of transfer functions for the different values of cosmological parameters
+- The training module: module for training the emulator
+
+We set the code up, and the individual parts work. Next time we can actually train the emulator. We used a CI/CD pipeline to run tests and generate documentation automatically. The documentation for this project is [here](https://arielsan.pages.mpcdf.de/cake-workshop-2021/index.html)
+
+WP2: The goal of the second WP was to try to parameterize the effect of neutrinos on the matter power spectrum and in particular in the context of evolution mapping. The neutrino energy density is considered both a shape and an evolution parameter, due to the scale dependence introduced in the growth factor by the neutrino free streaming. This dependence is seen when using the redshift as a time variable, but evolution mapping shows that $`\sigma_{12}`$ can often be used as a better clock for the cosmic structure formation.
+
+Hence, as a first attempt, we looked at the neutrinos free streaming damping in the Aletheia simulations for which we have snapshots corresponding to the same $`\sigma_{12}`$, but different z. [Pk_ratio_to_nuCDM_z4.pdf](uploads/8af09726cbdd03a3a9f3b14f5a3cb801/Pk_ratio_to_nuCDM_z4.pdf) We thought this plot was showing how the neutrino damping is identical for models with the same $`\sigma_{12}`$, even at different redshifts. But actually, now that I look better at it, the small differences that we see between the different models perfectly correlates with the redshift difference in the models:
+| Model | z |
+|-------|---|
+| 0 | 2.000000 |
+| 1 | 1.760980 |
+| 2 | 2.231260 |
+| 3 | 2.100420 |
+| 4 | 1.922590 |
+| 5 | 1.972600 |
+| 6 | 2.031470 |
+| 7 | 1.938160 |
+| 8 | 2.019714 |
+
+[not_going_well.pdf](uploads/ed2fec26dbf141e33d2646050db8fcbd/not_going_well.pdf)
