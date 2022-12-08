@@ -117,12 +117,17 @@ recently  proposed as such a solution.
 \textit{What is an emulator? How do we train it?}
 (\cbib{Arico}, \cbib{Mancini}).
 At the most basic level, an emulator is an interpolation scheme. ``As the
-response of the non-linear power spectrum to changes in cosmological parameters
+response of the \uline{non-linear} power spectrum to changes in cosmological
+parameters
 is smooth, it is possible to build accurate interpolation schemes or emulators,
 calibrated on a relatively small number of high-resolution simulations. \sout{
 This
 technique can also be applied to additional statistics of the density field
 such as the halo mass func}'' (\cbib{San21}).
+\textcolor{orange}{I underlined ``non-linear'' in the above paragraph because
+our focus here, at least at the beginning, is on the \textit{linear} power
+spectrum. I imagine the response of the linear power spectrum is also smooth,
+but we should make sure of this.}
 
 Most emulators are based on a Gaussian Process (GP). (Don't spend too much time
 on this but maybe briefly descripe what GP does and why we choose it instead
@@ -132,6 +137,9 @@ Emulators interpolate across a high-dimensional parameter space. The primary
 limitation is that the emulator has to be built with every possible parameter
 in mind that an end-user could wish to vary. Yet there is a large number of
 different cosmological parameters discussed in the modern literature.
+``Currently available emulators only sample a few cosmological parameters,
+often with restrictive ranges, and are not applicable to more general parameter
+spces'' (\cbib{San21}).
 
 Now, for a point of suspense: there are so many different cosmological
 parameters that we investigate. What is the point of building an emulator if
@@ -214,12 +222,17 @@ the corresponding linear growth factor is scale-independent. The smaller number
 of parameters required to emulate $T(k)$ would increase the overall accuracy of
 the predictions while avoiding the need to sample the redshift evolution of
 $P_L(k|z) P_L(k|z)$ explicitly would greatly simplify the calibration
-procedure.''
+procedure'' (A. G. S\'{a}nchez, private communication).
 
-''The time evolution of $\Delta_L^2(k)$ in models with identical shape
+\textcolor{orange}{I believe that $P_L(k|z) P_L(k|z)$ is a typo in the above
+paragraph, but I don't know how else to transcribe Ariel's email. Maybe he
+made a mistake?}
+
+``The time evolution of $\Delta_L^2(k)$ in models with identical shape
 parameters
 but different evolution parameters can be mapped from one to the other by
-relabelling the redshifts that correspond to the same clustering amplitude.
+relabelling the redshifts that correspond to the same clustering amplitude''
+(\cbib{San21}).
 
 Now, for the hiccup: this scheme is broken by one parameter, the Universe's
 density in neutrinos. (In the next section: why this is so and what we can do
