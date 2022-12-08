@@ -129,9 +129,30 @@ our focus here, at least at the beginning, is on the \textit{linear} power
 spectrum. I imagine the response of the linear power spectrum is also smooth,
 but we should make sure of this.}
 
-Most emulators are based on a Gaussian Process (GP). (Don't spend too much time
-on this but maybe briefly descripe what GP does and why we choose it instead
-of another process.)
+Most emulators are based on a Gaussian Process (GP). A GP is a Gaussian
+distribution over functions\footnote
+{A GP is the limit of a one-hidden-layer neural network as the number of
+neurons approaches infinity.}, which can be interpreted
+as the infinite-dimensional generalization of the multivariate normal
+distribution. The inference of continuous values with a GP prior
+is known as Gaussian process regression, or Kriging. GP regression is a
+powerful non-linear multivariate interpolation tool. The computational
+complexity of inference and likelihood evaluation within GP regression is cubic
+in the number of points. This makes GP regression an excellent companion to
+Latin hypercube sampling (LHS), which demands sparsity.
+\textcolor{orange}{Try paraphrasing more deeply, since the above block is still
+technically plagiarism even though it wasn't a direct quote. Also, since
+``sparsity'' already has a technical meaning,
+we should try a different term here.}
+``GP-based emulators require fewer training samples than
+neural networks but provide smaller speedups. GP's allow natural propagation of
+uncertainty in predictions to the final posterior distribution, neural
+networks lack this feature'' (\cbib{Mancini}). Actually, that `quote' really
+doesn't sound like a direct quote from a paper. \textcolor{orange}{Am I sure I
+didn't just write a note in English?}
+
+In GP regression, one makes the assumption that one's data are all Gaussian-
+distributed. What are the consequences of this being a bad assumption?
 
 Emulators interpolate across a high-dimensional parameter space. The primary
 limitation is that the emulator has to be built with every possible parameter
@@ -356,6 +377,18 @@ suite with
 which this paper will deal. COMET implements evolution mapping as introduced
 by \cbib{San20} and \cbib{San21}, introduced in section
 \ref{sec: sigma_and_evMapping}.
+
+\begin{centering}
+\section{Analysis}
+\end{centering}
+
+``Applying the emulator to a complete inference analysis from a simulated
+survey is a necessary step to ensure that the tool can be safely applied in
+practical analyses. Checking residuals in the testing set between predicted and
+real spectra is not a sufficient accuracy test. While an emulator may be
+performing with e.g. sub-percent accuracy at the level of residuals, this may
+still not be enough to retrieve unbiased cosmological contours''
+(\cbib{Mancini}).
 
 \begin{centering}
 \section{Conclusion and Thoughts for the Future}
