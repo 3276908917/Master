@@ -199,6 +199,15 @@ Why does it help to have these categories in the first place?}\footnote{
     (I think it's $\sigma_{12}$, but obviously we should double check that)
 }
 
+We take, as the evolution mapping relation for the power spectrum, equation 13
+from \cbib{San21}:
+
+\begin{equation}
+    \Delta^2_L (k | z, \Theta_s, \Theta_e)
+    =
+    \Delta_L^2 (k | \Theta_s, \sigma_{12} \left( z, \Theta_s, \Theta_e \right))
+\end{equation}
+
 Why is this scheme important? Evolution mapping\footnote{I think we need to
 double check our language here, I think evolution mapping refers to more than
 just the categorization scheme} greatly simplifies the emulator
@@ -206,6 +215,12 @@ scheme, because we can
 funnel all of the evolution parameters through $\sigma_{12}$, so we've
 collapsed that entire category to just one parameter. Fewer parameters means
 that we get a faster emulator.
+
+Anticipating a counterargument: ``For a general cosmology, $h$ is a combination
+of shape and evolution parameters. However, for a $\Lambda$CDM Universe, fixing
+the values of the shape parameters $\omega_b$ and $\omega_c$ and varying $h$
+corresponds to assuming different values of the purely evolutionary parameter
+$\omega_\text{DE}$'' (\cbib{San21}).
 
 From my original assignment email:
 ``If the dependence of the transfer function, $T(k)$, on the relevant physical
@@ -231,7 +246,8 @@ made a mistake?}
 ``The time evolution of $\Delta_L^2(k)$ in models with identical shape
 parameters
 but different evolution parameters can be mapped from one to the other by
-relabelling the redshifts that correspond to the same clustering amplitude''
+relabelling the redshifts that correspond to the same clustering amplitude
+(i.e. $\sigma_{12}(z)$)''.
 (\cbib{San21}).
 
 Now, for the hiccup: this scheme is broken by one parameter, the Universe's
@@ -248,7 +264,8 @@ about it.)
     decidedly more esoteric than a summary of the relevant points of neutrino
     physics. I think we should stick with this structure though, in the
     interest of narrative. Specifically, neutrinos represent a wrench in the
-    plan. For that development to make sense, we first need to establish what
+    plan. For that development to make sense, we first need to have established
+    what
     the ``plan'' is: evolution mapping.
 }
 
@@ -329,6 +346,12 @@ by \cbib{San20} and \cbib{San21}, introduced in section
     The following is a giant dumpster (\textit{NOT} a graveyard) for notes
     that I took on paper, as well as possible directions in which to take the
     report. I hope to eventually organize these into a coherent story.
+
+    What with the introduction of so many
+    sections, this dumpster acts as a miscellaneous
+    temporary storage location. If the note appears here, that implies that I
+    didn't know where else to put it. So, it may be that many of these notes
+    are ultimately deemed insufficiently relevant to the report...
 }
 
 \textit{What is the MCMC?} Monte Carlo Markov Chain is a way of exploring this
@@ -344,6 +367,11 @@ constructing a tool here by studying the redshift dependence of neutrinos?
 $\Delta_L^2 (k)$ caused by their different structure formation histories are
 described in terms of the suppression factor $g(a) = D(a) / a$''
 (\cbib{San21}).
+
+``Present-day measurements of the CMB alone can accurately constrain the values
+of most of the shape parameters. However, they only provide weak constraints on
+the evolution parameters for general cosmologies. The inverse is true for LSS
+measurements.
 
 \begin{centering}
 \section{Meta / Lessons Learned}
