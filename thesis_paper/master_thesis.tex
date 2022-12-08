@@ -18,9 +18,7 @@ Spectrum}
 \usepackage{bm}
 \usepackage{listings}
 \usepackage{titling}
-
-\newcounter{biblatexAvailable}
-\setcounter{biblatexAvailable}{0}
+\usepackage[normalem]{ulem} 
 
 \IfFileExists{biblatex.sty} {
     \usepackage[style=authoryear]{biblatex}
@@ -118,7 +116,13 @@ recently  proposed as such a solution.
 
 \textit{What is an emulator? How do we train it?}
 (\cbib{Arico}, \cbib{Mancini}).
-At the most basic level, an emulator is an interpolation scheme.
+At the most basic level, an emulator is an interpolation scheme. ``As the
+response of the non-linear power spectrum to changes in cosmological parameters
+is smooth, it is possible to build accurate interpolation schemes or emulators,
+calibrated on a relatively small number of high-resolution simulations. \sout{
+This
+technique can also be applied to additional statistics of the density field
+such as the halo mass func}'' (\cbib{San21}).
 
 Most emulators are based on a Gaussian Process (GP). (Don't spend too much time
 on this but maybe briefly descripe what GP does and why we choose it instead
@@ -126,21 +130,8 @@ of another process.)
 
 Emulators interpolate across a high-dimensional parameter space. The primary
 limitation is that the emulator has to be built with every possible parameter
-in mind that an end-user could wish to vary. There are a large number of
-different cosmological parameters discussed in the modern literature. The
-solution, proposed as evolution mapping, consists in categorizing the
-different cosmological parameters in terms of their impacts on the power
-spectrum. By clearly expressing degeneracies and dependencies in this way, we
-can capture a large number of hypothetical parameters with a relatively simple
-and unchanging emulator. \textcolor{orange}{This is just my impression of the
-project so far! This is a fairly foundational paragraph to the kind of work
-that we are trying to do, so we should get Ariel's feedback on this
-formulation very early on in the thesis-writing process!}
-
-Now, I would like to briefly introduce the particular emulation suite with
-which this paper will deal. COMET implements evolution mapping as introduced
-by \cbib{San20} and \cbib{San21}, and which we will summarize in the next
-section.\footnote{Clunky to look ahead like this, can we reorganize?}
+in mind that an end-user could wish to vary. Yet there is a large number of
+different cosmological parameters discussed in the modern literature.
 
 Now, for a point of suspense: there are so many different cosmological
 parameters that we investigate. What is the point of building an emulator if
@@ -150,6 +141,7 @@ solution to this problem.
 
 \begin{centering}
 \section{Sigma 12 and Evolution Mapping}
+\label{sec: sigma_and_evMapping}
 \end{centering}
 
 \footnote{
@@ -204,7 +196,8 @@ double check our language here, I think evolution mapping refers to more than
 just the categorization scheme} greatly simplifies the emulator
 scheme, because we can
 funnel all of the evolution parameters through $\sigma_{12}$, so we've
-collapsed that entire category to just one parameter.
+collapsed that entire category to just one parameter. Fewer parameters means
+that we get a faster emulator.
 
 From my original assignment email:
 ``If the dependence of the transfer function, $T(k)$, on the relevant physical
@@ -306,6 +299,16 @@ notebooks. I mean, I'm sure none of these plots will survive to the final
 version, but they might help to guide my discussion for a little while.
 
 \begin{centering}
+\section{COMET}
+\end{centering}
+
+With this section, we would like to briefly introduce the particular emulation
+suite with
+which this paper will deal. COMET implements evolution mapping as introduced
+by \cbib{San20} and \cbib{San21}, introduced in section
+\ref{sec: sigma_and_evMapping}.
+
+\begin{centering}
 \section{Dumpster}
 \end{centering}
 
@@ -333,9 +336,12 @@ described in terms of the suppression factor $g(a) = D(a) / a$''
 \section{Meta / Lessons Learned}
 \end{centering}
 
-\footnote{The reason I am putting this content here rather than in pretty
-notes: I think that these lessons might actually be a great guide for writing
-the paper, and I could talk about the intuition behind them.
+\footnote{Normally, meta comments go in the pretty notes file. This is an
+exceptional case for any lessons that specifically guide the writing of this
+this paper, and in the final report I hope that I could talk about the
+intuition behind these kinds of lessons. For example, I plan to eventually
+migrate some of the cases from the ``Lessons in Appraisal'' section of the
+pretty notes to this area.
 }
 
 \IfFileExists{biblatex.sty} {
