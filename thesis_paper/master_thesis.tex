@@ -90,6 +90,14 @@ Boltzmann solvers.
 This is just a theoretical discussion of these solvers. The hands-on stuff
 comes a couple sections later.
 
+``Boltzmann codes account for the baryonic and radiation components of the
+energy density as well as for relativistic effects'' (\cbib{Zennaro}).
+
+``In the Newtonian framework often employed in simulations, radiation (photon)
+perturbations are neglected, leading to inaccuracies in the power spectrum on
+large scales'' (\cbib{Zennaro}). By contrast, Boltzmann solvers do not suffer
+from this limitation, right?
+
 Talk about CAMB and CLASS. Are there any important ways in which they
 distinguish themselves? Why do we use both of them in modern papers? Anyway,
 the reason that we don't use CMBFast (as well as other older codes?) is
@@ -146,7 +154,7 @@ technically plagiarism even though it wasn't a direct quote. Also, since
 we should try a different term here.}
 ``GP-based emulators require fewer training samples than
 neural networks but provide smaller speedups. GP's allow natural propagation of
-uncertainty in predictions to the final posterior distribution, neural
+uncertainty in predictions to the final posterior distribution; neural
 networks lack this feature'' (\cbib{Mancini}). Actually, that `quote' really
 doesn't sound like a direct quote from a paper. \textcolor{orange}{Am I sure I
 didn't just write a note in English?}
@@ -302,6 +310,21 @@ about it.)
 hot component of the dark matter and will free-stream out of overdensities and
 thus wipe out small-scale structures.''
 
+The evolution of neutrino density, like that of photon density, depends on the
+momentum distribution.
+
+\begin{equation}
+    p_{\nu, i}(z)
+    =
+    \frac{(k_B T_{\nu, 0})^4}{\pi^2}
+    \,
+    (1 + z)^4
+    \,
+    \mathcal{F} \left[ \frac{m_{\nu, i}}{k_B T_{\nu, 0} (1 + z)} \right]
+\end{equation}
+
+where $i$ indexes the neutrino species?? (\cbib{Zennaro})
+
 Remember what the point of this section is: why is $\omega_\nu$ bad for the
 evolution mapping scheme? Because neutrinos exhibit redshift-dependent
 damping of the power-spectrum, and therefore affect both the shape and the
@@ -427,7 +450,14 @@ CMB data with MCMC running on some likelihood function. Is there ever a point
 at which I'm actually making a conclusion about the world, or am I just
 constructing a tool here by studying the redshift dependence of neutrinos?
 
-``The deviatons between the non-linear power spectra of models with identical
+``Perturbation theory breaks down at small scales and low $z$, at least for
+nonlinear evolution of structures'' (\cbib{Zennaro}).
+
+$f(k) \equiv \frac{d \ln D(k, a)}{d \ln a}$ where $\delta(a) = \delta_i D(a)$.
+
+GR predicts that $f(k) \approx \Omega_m^{0.55}$ (\cbib{Zennaro}).
+
+``The deviations between the non-linear power spectra of models with identical
 $\Delta_L^2 (k)$ caused by their different structure formation histories are
 described in terms of the suppression factor $g(a) = D(a) / a$''
 (\cbib{San21}).
