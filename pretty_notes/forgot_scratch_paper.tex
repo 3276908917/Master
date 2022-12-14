@@ -177,6 +177,15 @@ The dimensionless power spectrum: $\Delta_L^2(k) = \frac{k^3 P_L(k)}{2 \pi^2}$.
 
 $D(z)$: see linear growth factor.
 
+The Fisher information matrix: ``the covariance matrix of the log-likelihood
+gradient with respect to the parameters when we evaluate that gradient at the
+true parameter vector and the randomness comes from that true parameter
+vector'' (``Mutual Information'').
+
+The free-streaming scale:
+$k_\text{fs}^2 \equiv 3/2 \Omega_m(a) a^2 H^2 / c_s^2$
+(Zennaro et al, 2017)
+
 $f(z)$: see logarithmic growth rate.
 
 Growth factor $D(z)$: see linear growth factor.
@@ -238,7 +247,10 @@ of redshift, i.e. time elapsed since the initial density field represented
 the actual density field. From Kiakotou et al 2008: ``the growth factor
 affects the matter power spectrum by changing the amplitude.''
 
-Logarithmic growth rate: $f(z) = \frac{d \ln D(z)}{d \ln a}$
+Logarithmic growth rate: $f(z) = \frac{d \ln D(z)}{d \ln a}$. Zennaro et al,
+2017 says that you can compute this numerically by taking the derivative of the
+power spectrum at the initial redshift. \textcolor{orange}{But what is the
+initial redshift? $z=z_\text{max}$ for the given simulation?}
 
 Neutrino mixing: the neutrino mass and flavor eigenstates mix and give rise
 to neutrino oscillations. Conceptually, this mixing is the same as  one would

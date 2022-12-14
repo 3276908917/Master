@@ -310,6 +310,13 @@ about it.)
 hot component of the dark matter and will free-stream out of overdensities and
 thus wipe out small-scale structures.''
 
+''In general, a larger density of relativistic species leads to a smaller
+growth of matter fluctuations'' (\cbib{Zennaro}).
+
+``Thermal velocities dominate neutrino dynamics during the first time-steps
+(after $z=99$), having a dispersion roughly five orders of magnitude larger
+than the dispersion of peculiar neutrino velocities.''
+
 The evolution of neutrino density, like that of photon density, depends on the
 momentum distribution.
 
@@ -323,7 +330,17 @@ momentum distribution.
     \mathcal{F} \left[ \frac{m_{\nu, i}}{k_B T_{\nu, 0} (1 + z)} \right]
 \end{equation}
 
-where $i$ indexes the neutrino species?? (\cbib{Zennaro})
+where $i$ indexes the neutrino species and
+
+\begin{equation}
+    \mathcal{F}(y) \equiv \int_0^\infty \frac{x^2 \sqrt{x^2 + y^2}}{1 + e^x}
+\end{equation}
+
+ (\cbib{Zennaro})
+
+``The two-fluid approximation consists in assuming that neutrino perturbations
+are well described by two variables: density and velocity divergence''
+(\cbib{Zennaro}).
 
 Remember what the point of this section is: why is $\omega_\nu$ bad for the
 evolution mapping scheme? Because neutrinos exhibit redshift-dependent
@@ -443,12 +460,30 @@ emulators to handle other cosmological statistics.
 
 \textit{What is the MCMC?} Monte Carlo Markov Chain is a way of exploring this
 parameter space in the interests of finding the best fit parameters, right?
+It is esesntially a random walk in parameter space (\cbib{Verde}).
 Should this definition come
 when we're trying to use our emulator to make conclusions about our data?
 So, the paper that Ariel gave me on this talks about fitting to the WMAP
 CMB data with MCMC running on some likelihood function. Is there ever a point
 at which I'm actually making a conclusion about the world, or am I just
 constructing a tool here by studying the redshift dependence of neutrinos?
+
+``A properly derived and implemented MCMC draws from the joint posterior
+density $\mathcal{P}(\alpha | x)$ once it has converged to the stationary
+distribution'' (\cbib{Verde}).
+
+``The MCMC method scales approximately linearly with the number of parameters''
+(\cbib{Verde}).
+
+There are always areas of the target distribution that have not been covered by
+a finite Markov chain. If the chain does not move rapidly throughout the
+support of the target distribution because of poor \textit{mixing}, a full
+exploration of the likelihood surface might take a prohibitive amount of time.
+Degeneracies and poor parameter choices slow the rate of the convergence and
+mixing, because the chain spends time exploring degeneracy directions
+(\cbib{Verde}). Therefore, our evolution mapping approach comes in handy here
+as well, because we eliminate the degeneracies of evolution parameters with
+each other!
 
 ``Perturbation theory breaks down at small scales and low $z$, at least for
 nonlinear evolution of structures'' (\cbib{Zennaro}).
@@ -487,6 +522,9 @@ time their values are changed'' (\cbib{San21}).
 ``As a rule of thumb, the present-epoch matter power spectrum is considered to
 be in the linear regime for comoving wave numbers $k < $ 0.10--0.15 $h$
 Mpc$^{-1}$'' (\cbib{Kiakotou}).
+
+``Nonlinearities introduce a coupling between large and small scales''
+(Zennaro et al, 2017).
 
 \begin{centering}
 \section{Meta / Lessons Learned}
