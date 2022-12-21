@@ -1,4 +1,4 @@
-Ariel needs to get back to me about the seminar.
+$ Ariel needs to get back to me about the seminar.
 
 Andrea needs to give me the summary of the results of last year's
 	workshop
