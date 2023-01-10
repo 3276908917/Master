@@ -1,3 +1,11 @@
+## We may actually want to rewrite this later if we use the CAKE code as a
+# starting point for our own project. Right now, though, I want to avoid
+# bloating the repo with plagiarism.
+
+# Looks like we've already pretty much reached that point!
+
+#CAKE21/repo
+
 ## Misc ad-hoc stuff
 *-checkpoint.ipynb
 *checkpoints
@@ -5,6 +13,7 @@
 # Ignore generated media and heavy analyses
 communications
 machines
+cake-workshop-2021
 
 # Ignore data files
 *.tar
