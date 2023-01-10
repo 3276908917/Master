@@ -310,7 +310,7 @@ about it.)
 hot component of the dark matter and will free-stream out of overdensities and
 thus wipe out small-scale structures.''
 
-''In general, a larger density of relativistic species leads to a smaller
+``In general, a larger density of relativistic species leads to a smaller
 growth of matter fluctuations'' (\cbib{Zennaro}).
 
 ``Thermal velocities dominate neutrino dynamics during the first time-steps
@@ -409,6 +409,45 @@ notebooks. I mean, I'm sure none of these plots will survive to the final
 version, but they might help to guide my discussion for a little while.
 
 \begin{centering}
+\section{MCMC}
+\end{centering}
+
+\textit{What is the MCMC?} Monte Carlo Markov Chain is a way of exploring this
+parameter space in the interests of finding the best fit parameters, right?
+It is esesntially a random walk in parameter space (\cbib{Verde}).
+Should this definition come
+when we're trying to use our emulator to make conclusions about our data?
+So, the paper that Ariel gave me on this talks about fitting to the WMAP
+CMB data with MCMC running on some likelihood function. Is there ever a point
+at which I'm actually making a conclusion about the world, or am I just
+constructing a tool here by studying the redshift dependence of neutrinos?
+
+``A properly derived and implemented MCMC draws from the joint posterior
+density $\mathcal{P}(\alpha | x)$ once it has converged to the stationary
+distribution'' (\cbib{Verde}).
+
+``The MCMC method scales approximately linearly with the number of parameters''
+(\cbib{Verde}).
+
+There are always areas of the target distribution that have not been covered by
+a finite Markov chain. If the chain does not move rapidly throughout the
+support of the target distribution because of poor \textit{mixing}, a full
+exploration of the likelihood surface might take a prohibitive amount of time.
+Degeneracies and poor parameter choices slow the rate of the convergence and
+mixing, because the chain spends time exploring degeneracy directions
+(\cbib{Verde}). Therefore, our evolution mapping approach comes in handy here
+as well, because we eliminate the degeneracies of evolution parameters with
+each other!
+
+One of the advantages associated with the MCMC technique is the increased
+robustness that follows from the averaging of a large number of points. By
+contrast, ``grid-based likelihood calculations and methods that numerically
+calculate the Fisher matrix'' are typically more sensitive (\cbib{Verde}).
+
+\textcolor{orange}{Do you want to discuss the Metropolis-Hastings algorithm at
+all? Maybe just a brief outline as a motivation?}
+
+\begin{centering}
 \section{COMET}
 \end{centering}
 
@@ -458,33 +497,6 @@ emulators to handle other cosmological statistics.
     are ultimately deemed insufficiently relevant to the report...
 }
 
-\textit{What is the MCMC?} Monte Carlo Markov Chain is a way of exploring this
-parameter space in the interests of finding the best fit parameters, right?
-It is esesntially a random walk in parameter space (\cbib{Verde}).
-Should this definition come
-when we're trying to use our emulator to make conclusions about our data?
-So, the paper that Ariel gave me on this talks about fitting to the WMAP
-CMB data with MCMC running on some likelihood function. Is there ever a point
-at which I'm actually making a conclusion about the world, or am I just
-constructing a tool here by studying the redshift dependence of neutrinos?
-
-``A properly derived and implemented MCMC draws from the joint posterior
-density $\mathcal{P}(\alpha | x)$ once it has converged to the stationary
-distribution'' (\cbib{Verde}).
-
-``The MCMC method scales approximately linearly with the number of parameters''
-(\cbib{Verde}).
-
-There are always areas of the target distribution that have not been covered by
-a finite Markov chain. If the chain does not move rapidly throughout the
-support of the target distribution because of poor \textit{mixing}, a full
-exploration of the likelihood surface might take a prohibitive amount of time.
-Degeneracies and poor parameter choices slow the rate of the convergence and
-mixing, because the chain spends time exploring degeneracy directions
-(\cbib{Verde}). Therefore, our evolution mapping approach comes in handy here
-as well, because we eliminate the degeneracies of evolution parameters with
-each other!
-
 ``Perturbation theory breaks down at small scales and low $z$, at least for
 nonlinear evolution of structures'' (\cbib{Zennaro}).
 
@@ -525,6 +537,15 @@ Mpc$^{-1}$'' (\cbib{Kiakotou}).
 
 ``Nonlinearities introduce a coupling between large and small scales''
 (Zennaro et al, 2017).
+
+``The leading-order low-$z$ astrophysical effect [on the microwave sky] is
+expected to be gravitational lensing of the CMB by foreground structures; this
+generates a $<1$\% covariance in the $\pi$ angular power spectrum on WMAP
+angular scales'' (\cbib{Verde}).
+
+``The power spectrum covariance encodes the uncertainties in the power spectrum
+due to cosmic variance, detector noise, point sources, the sky cut, and
+systematic errors'' (\cbib{Verde}).
 
 \begin{centering}
 \section{Meta / Lessons Learned}
