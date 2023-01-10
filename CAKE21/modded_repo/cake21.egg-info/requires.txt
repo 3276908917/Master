@@ -1,0 +1,14 @@
+numpy
+scipy
+pyDOE
+six
+astropy
+GPy
+matplotlib
+
+[doc]
+sphinx
+sphinx-rtd-theme
+
+[test]
+pytest
