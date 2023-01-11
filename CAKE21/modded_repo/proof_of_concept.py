@@ -47,6 +47,7 @@ def homogenize_k_axes(samples):
 
     base_x = samples[max_min_i][0]
     base_y = samples[max_min_i][1]
+    homo_samples = np.zeros((len(samples), 2, len(base_x)))
 
     if max_min_i != min_max_i:
         obj_x = samples[min_max_i][0]
@@ -54,23 +55,19 @@ def homogenize_k_axes(samples):
 
         base_x, base_y, aligned_y = truncator(base_x, base_y, obj_x, obj_y) 
 
-        # The following assignment might throw some errors because we gave a
-        # fixed np.zeros type of array, and the truncated arrays will certainly
-        # not fill it up. But let's worry about that when we hit the problem.
-        
-        #samples[max_min_i][0] = trunc_x
-        samples[max_min_i][1] = base_y
-        #samples[min_max_i][0] = trunc_x
-        samples[min_max_i][1] = aligned_y
+        homo_samples = np.zeros((len(samples), 2, len(base_x)))
+
+        homo_samples[max_min_i][1] = base_y
+        homo_samples[min_max_i][1] = aligned_y
 
     for i in range(len(samples)):
-        samples[i][0] = base_x
+        homo_samples[i][0] = base_x
         if i != max_min_i and i != min_max_i:
             # I'm not 100% sure about this underscore dummy syntax
-            _, _, samples[i][1] = \
+            _, _, homo_samples[i][1] = \
                 truncator(base_x, base_y, samples[i][0], samples[i][1])
      
-    return samples
+    return homo_samples
 
 def truncator(base_x, base_y, obj_x, obj_y):
     """
@@ -88,11 +85,19 @@ def truncator(base_x, base_y, obj_x, obj_y):
     lcd_max = min(max(obj_x), max(base_x))
     
     # Eliminate points outside the conservative bounds
-    mask = np.all([[base_x < lcd_max], [base_x > lcd_min]], axis=0)[0]
-    trunc_x = base_x[mask]
-    trunc_y = base_y[mask]
-    
+    mask_base = np.all([[base_x < lcd_max], [base_x > lcd_min]], axis=0)[0]
+    trunc_base_x = base_x[mask_base]
+    trunc_base_y = base_y[mask_base]
+   
+    mask_obj = np.all([[obj_x < lcd_max], [obj_x > lcd_min]], axis=0)[0]
+    trunc_obj_x = obj_x[mask_obj]
+    trunc_obj_y = obj_y[mask_obj]
+
+    #print(min(trunc_obj_x), max(trunc_obj_x))
+    #print(min(obj_x), max(obj_x))
+    #print(min(trunc_base_x), max(trunc_base_x))
+ 
     interpolator = interp1d(obj_x, obj_y, kind="cubic")
-    aligned_y = interpolator(base_x)
+    aligned_y = interpolator(trunc_base_x)
     
-    return trunc_x, trunc_y, aligned_y
+    return trunc_base_x, trunc_base_y, aligned_y

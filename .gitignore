@@ -9,7 +9,7 @@
 ## Misc ad-hoc stuff
 *-checkpoint.ipynb
 *checkpoints
-.npy
+*.npy
 
 # Ignore generated media and heavy analyses
 communications
@@ -332,5 +332,4 @@ TSWLatexianTemp*
 CAMB_demo/planck_2018.ini
 *.pdf
 *.pyc
-*.pdf
 *.dat
