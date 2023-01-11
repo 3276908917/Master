@@ -63,13 +63,3 @@ def kp(om_b, om_c, h):
     )
 
     return k * h, p * h ** 3
-
-"""
-Here is some demo code that I used to get to start this off:
-ombh2 = 0.022445
-omch2 = 0.120567
-hc = evolmap.lhc.generate_samples({
-    'om_b': [0.9 * ombh2, 1.1 * omch2],
-    'om_c': [0.9 * omch2, 1.1 * omch2],
-    'h': [.603, .737]}, 100, 100)
-"""

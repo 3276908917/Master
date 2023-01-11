@@ -1,7 +1,17 @@
 import numpy as np
 from scipy.interpolate import interp1d
+import GPy
 
 #Here is some demo code that I used to get to start this off:                    
+
+def test():
+    model0 = np.array([0.022445, 0.120567, 0.67])
+    model0 = model0.reshape(3, 1)
+    hc, samples = load("evolmap/hc.npy", "evolmap/samples.npy")
+    base_k, homogenized_P = homogenize_k_axes(samples)
+    gp_model = get_model(hc, homogenized_P)
+
+    return gp_model.predict_noiseless(model0)
 
 def initialize():
     """
@@ -98,3 +108,14 @@ def truncator(base_x, base_y, obj_x, obj_y):
 
     #print(len(trunc_base_x), len(aligned_y)) 
     return trunc_base_x, trunc_base_y, aligned_y
+
+def get_model(X, Y):
+    # Does it work if three parameters predicts a nine-thousand element array?
+    
+    # Should we use a 3D kernel because the X row is 3D?
+    # Or should the kernel match the Y dimensions?
+    ker = GPy.kern.Matern52(3, ARD=True) + GPy.kern.White(3)
+    m = GPy.models.GPRegression(X, Y, ker)
+    m.optimize(messages=True, max_f_eval=1000)
+    return m   
+ 

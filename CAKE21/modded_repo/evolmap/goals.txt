@@ -40,20 +40,22 @@ Status as of 15:42 on January 10, 2023: (using work-arounds i.e. proof of concep
 
     -> Let's ask Ariel.
 
+    But not so fast!
+        I think that our current setup is probably not going to work very well, since we would have to train
+    the GP to also predict the k-axis. That would not only waste a lot of compute but it would achieve
+    nothing, since we assign no intrinsic meaning to the particular k-axis returned by CAMB.
+        Instead, I propose the following: let's arbitrarily pick some baseline power spectrum (maybe just
+    first one in the list?) and use its k-axis to interpolate all of the other power spectra. This shouldn't
+    be too hard since we already have code for this in a few of our Jupyter notebooks--all we need to change
+    is scaling it up to interpolate all ninety-nine remaining spectra.
+        Once we've accomplished that, the k-axis is now worthless to the GP. Of course, we want to hold onto
+    it, because it will allow us to plot the GP's final predictions. But the k-axis data will play no role
+    in the training of the GP.
+        Once we've accomplished all of the above, we want to study the GPy documentation until we understand
+    how to get the computer to learn a mapping from a triple (omega_b, omega_c, h) to a length-10000 array
+    consisting of the power spectrum evaluated at different k.
+
 4. This is the next step. We have all of the samples and now we want to train a GP
     to find the relationship between the parameter values and the power spectrum.
 
-But not so fast!
-    I think that our current setup is probably not going to work very well, since we would have to train
-the GP to also predict the k-axis. That would not only waste a lot of compute but it would achieve
-nothing, since we assign no intrinsic meaning to the particular k-axis returned by CAMB.
-    Instead, I propose the following: let's arbitrarily pick some baseline power spectrum (maybe just
-first one in the list?) and use its k-axis to interpolate all of the other power spectra. This shouldn't
-be too hard since we already have code for this in a few of our Jupyter notebooks--all we need to change
-is scaling it up to interpolate all ninety-nine remaining spectra.
-    Once we've accomplished that, the k-axis is now worthless to the GP. Of course, we want to hold onto
-it, because it will allow us to plot the GP's final predictions. But the k-axis data will play no role
-in the training of the GP.
-    Once we've accomplished all of the above, we want to study the GPy documentation until we understand
-how to get the computer to learn a mapping from a triple (omega_b, omega_c, h) to a length-10000 array
-consisting of the power spectrum evaluated at different k.
+
