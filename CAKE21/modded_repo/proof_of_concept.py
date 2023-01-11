@@ -45,29 +45,25 @@ def homogenize_k_axes(samples):
             min_max = max_
             min_max_i = i
 
-    base_x = samples[max_min_i][0]
-    base_y = samples[max_min_i][1]
-    homo_samples = np.zeros((len(samples), 2, len(base_x)))
+    base_k = samples[max_min_i][0]
+    base_P = samples[max_min_i][1]
+    interpd_spectra = np.zeros((len(samples), len(base_k)))
 
     if max_min_i != min_max_i:
-        obj_x = samples[min_max_i][0]
-        obj_y = samples[max_min_i][1]
+        obj_k = samples[min_max_i][0]
+        obj_P = samples[max_min_i][1]
 
-        base_x, base_y, aligned_y = truncator(base_x, base_y, obj_x, obj_y) 
+        base_k, base_P, aligned_P = truncator(base_k, base_P, obj_k, obj_P) 
 
-        homo_samples = np.zeros((len(samples), 2, len(base_x)))
-
-        homo_samples[max_min_i][1] = base_y
-        homo_samples[min_max_i][1] = aligned_y
+        interpd_spectra = np.zeros((len(samples), len(base_k)))
+        interpd_spectra[min_max_i] = aligned_P
 
     for i in range(len(samples)):
-        homo_samples[i][0] = base_x
         if i != max_min_i and i != min_max_i:
-            # I'm not 100% sure about this underscore dummy syntax
-            _, _, homo_samples[i][1] = \
-                truncator(base_x, base_y, samples[i][0], samples[i][1])
+            _, _, interpd_spectra[i] = \
+                truncator(base_k, base_P, samples[i][0], samples[i][1])
      
-    return homo_samples
+    return base_k, interpd_spectra
 
 def truncator(base_x, base_y, obj_x, obj_y):
     """
@@ -85,11 +81,11 @@ def truncator(base_x, base_y, obj_x, obj_y):
     lcd_max = min(max(obj_x), max(base_x))
     
     # Eliminate points outside the conservative bounds
-    mask_base = np.all([[base_x < lcd_max], [base_x > lcd_min]], axis=0)[0]
+    mask_base = np.all([[base_x <= lcd_max], [base_x >= lcd_min]], axis=0)[0]
     trunc_base_x = base_x[mask_base]
     trunc_base_y = base_y[mask_base]
    
-    mask_obj = np.all([[obj_x < lcd_max], [obj_x > lcd_min]], axis=0)[0]
+    mask_obj = np.all([[obj_x <= lcd_max], [obj_x >= lcd_min]], axis=0)[0]
     trunc_obj_x = obj_x[mask_obj]
     trunc_obj_y = obj_y[mask_obj]
 
@@ -99,5 +95,6 @@ def truncator(base_x, base_y, obj_x, obj_y):
  
     interpolator = interp1d(obj_x, obj_y, kind="cubic")
     aligned_y = interpolator(trunc_base_x)
-    
+
+    #print(len(trunc_base_x), len(aligned_y)) 
     return trunc_base_x, trunc_base_y, aligned_y
