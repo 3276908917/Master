@@ -159,8 +159,8 @@ networks lack this feature'' (\cbib{Mancini}). Actually, that `quote' really
 doesn't sound like a direct quote from a paper. \textcolor{orange}{Am I sure I
 didn't just write a note in English?}
 
-In GP regression, one makes the assumption that one's data are all Gaussian-
-distributed. What are the consequences of this being a bad assumption?
+In GP regression, one makes the assumption that one's data are all
+Gaussian-distributed. What are the consequences of this being a bad assumption?
 
 Emulators interpolate across a high-dimensional parameter space. The primary
 limitation is that the emulator has to be built with every possible parameter
@@ -168,7 +168,7 @@ in mind that an end-user could wish to vary. Yet there is a large number of
 different cosmological parameters discussed in the modern literature.
 ``Currently available emulators only sample a few cosmological parameters,
 often with restrictive ranges, and are not applicable to more general parameter
-spces'' (\cbib{San21}). ``Due to the high computational cost of the required
+spaces'' (\cbib{San21}). ``Due to the high computational cost of the required
 simulations, [...] current emulators leave out parameters such as the curvature
 of the Universe or dynamic energy models beyond the standard CPL
 parametrization'' (\cbib{San21}).
@@ -244,10 +244,10 @@ from \cbib{San21}:
 Why is this scheme important? Evolution mapping\footnote{I think we need to
 double check our language here, I think evolution mapping refers to more than
 just the categorization scheme} greatly simplifies the emulator
-scheme, because we can
-funnel all of the evolution parameters through $\sigma_{12}$, so we've
-collapsed that entire category to just one parameter. Fewer parameters means
-that we get a faster emulator.
+implementation. Because we can
+funnel all of the evolution parameters through $\sigma_{12}$, we've effectively
+collapsed an entire category of parameters to just one parameter. Fewer
+parameters means that we get a faster emulator.
 
 ``At the linear level, all models characterized by identical shape parameters
 and the same values of the parameter combinations $b \sigma_{12}(z)$ and
