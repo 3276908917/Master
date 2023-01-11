@@ -37,6 +37,9 @@ Status as of 15:42 on January 10, 2023: (using work-arounds i.e. proof of concep
 3. Done! It seems like the CAKE21 workshop already handled looking for optimal hypercubes,
     although the approach that they used is possibly inefficient
     (is the best solution really to just regenerate the cube a bunch of times?)
+
+    -> Let's ask Ariel.
+
 4. This is the next step. We have all of the samples and now we want to train a GP
     to find the relationship between the parameter values and the power spectrum.
 

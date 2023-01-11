@@ -44,12 +44,14 @@ def kp(om_b, om_c, h):
         omk=model0["OmK"],
         mnu=0,
         num_massive_neutrinos=0,
-        neutrino_hierarchy="degenerate" # 1 eigenstate approximation;
-        # our neutrino setup (see below) is not valid for inverted/normal hierarchies.
+        neutrino_hierarchy="degenerate" # 1 eigenstate approximation; our
+        # neutrino setup (see below) is not valid for inverted/normal
+        # hierarchies.
     )
 
     pars.InitPower.set_params(As=model0["A_s"], ns=model0["n_s"])
-    pars.set_dark_energy(w=model0["w0"], wa=float(model0["wa"]), dark_energy_model='ppf')
+    pars.set_dark_energy(w=model0["w0"], wa=float(model0["wa"]),
+        dark_energy_model='ppf')
 
     pars.set_matter_power(redshifts=np.array([0]), kmax=10.0, nonlinear=False)
     results = camb.get_results(pars)
@@ -66,5 +68,8 @@ def kp(om_b, om_c, h):
 Here is some demo code that I used to get to start this off:
 ombh2 = 0.022445
 omch2 = 0.120567
-hc = evolmap.lhc.generate_samples({'om_b': [0.9 * ombh2, 1.1 * omch2], 'om_c': [0.9 * omch2, 1.1 * omch2], 'h': [.603, .737]}, 100, 100)
+hc = evolmap.lhc.generate_samples({
+    'om_b': [0.9 * ombh2, 1.1 * omch2],
+    'om_c': [0.9 * omch2, 1.1 * omch2],
+    'h': [.603, .737]}, 100, 100)
 """

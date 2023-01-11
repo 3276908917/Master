@@ -9,6 +9,7 @@
 ## Misc ad-hoc stuff
 *-checkpoint.ipynb
 *checkpoints
+.npy
 
 # Ignore generated media and heavy analyses
 communications
