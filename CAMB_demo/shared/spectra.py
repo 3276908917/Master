@@ -154,15 +154,16 @@ def model_ratios(k_list, p_list, snap_index, subscript, title):
 
         plt.plot(truncated_k, aligned_p / truncated_p,
                  label=label_in, c=colors[i], linestyle=styles[i])
-        plt.xscale('log')
-        plt.xlabel(r"k [1 / Mpc]")
-        
-        ylabel = r"$P_\mathrm{" + subscript + "} /" + \
-            r" P_\mathrm{" + subscript + ", model \, 0}$"
-        plt.ylabel(ylabel)
-        
-        plt.title(title)
-        plt.legend()
+
+    plt.xscale('log')
+    plt.xlabel(r"k [1 / Mpc]")
+    
+    ylabel = r"$P_\mathrm{" + subscript + "} /" + \
+        r" P_\mathrm{" + subscript + ", model \, 0}$"
+    plt.ylabel(ylabel)
+    
+    plt.title(title)
+    plt.legend()
 
 def model_ratios_true(snap_index, onh2_str, massive=True):
     """
@@ -188,7 +189,7 @@ def model_ratios_true(snap_index, onh2_str, massive=True):
         this_p = powernu[onh2_str][i][snap_index][P_accessor]
     
         truncated_k, truncated_p, aligned_p = \
-            spectra.truncator(baseline_k, baseline_p, this_k,
+            truncator(baseline_k, baseline_p, this_k,
                 this_p, interpolation=this_h != baseline_h)
 
         label_in = None
@@ -196,18 +197,21 @@ def model_ratios_true(snap_index, onh2_str, massive=True):
 
         plt.plot(truncated_k, aligned_p / truncated_p,
                  label=label_in, c=colors[i], linestyle=styles[i])
-        plt.xscale('log')
-        plt.xlabel(r"k [1 / Mpc]")
-        
-        ylabel = r"$P_\mathrm{massive} / P_\mathrm{massive, model \, 0}$"
-        if not massive:
-            ylabel = r"$P_\mathrm{massless} / P_\mathrm{massless, model \, 0}$"
-        plt.ylabel(ylabel)
-        
-        plt.title(r"Ground truth: $\omega_\nu$ = " + \
-                  str(onh2) + "\n" + \
-                 "Snapshot " + str(snap_index))
-        plt.legend()
+
+        print(label_in)
+
+    plt.xscale('log')
+    plt.xlabel(r"k [1 / Mpc]")
+    
+    ylabel = r"$P_\mathrm{massive} / P_\mathrm{massive, model \, 0}$"
+    if not massive:
+        ylabel = r"$P_\mathrm{massless} / P_\mathrm{massless, model \, 0}$"
+    plt.ylabel(ylabel)
+    
+    plt.title(r"Ground truth: $\omega_\nu$ = " + \
+              onh2_str + "\n" + \
+             "Snapshot " + str(snap_index))
+    plt.legend()
 
 def parse_redshifts(model_num):
     """
