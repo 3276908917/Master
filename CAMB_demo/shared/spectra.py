@@ -1,7 +1,9 @@
 import numpy as np
 import pandas as pd
+import matplotlib.pyplot as plt
 import camb
 import re
+from scipy.interpolate import interp1d
 
 '''Keep in mind that this is NOT the same file as the original
 "cosmology_Aletheia.dat" that Ariel gave us! If you use the unaltered version,
@@ -31,7 +33,16 @@ for omnu in omnu_strings:
                 str(i) + "_000" + str(j) + ".dat",
                 names=["k", "P_no", "P_nu", "ratio"], sep='\s+'))
 
-def kzps(mlc, omnuh2_in, massive_neutrinos=False, zs = [0], nnu_massive_in=3):
+colors = ["green", "blue", "brown", "red", "black", "orange", "purple",
+          "magenta"]
+
+#styles = ["solid", "dotted", "dashed", "dashdot", "solid", "dotted", "dashed",
+#    "dashdot"]
+# Line styles are unfortunately too distracting in plots as dense as those with
+# which we are here dealing; make everything solid
+styles = ["solid"] * 8
+
+def kzps(mlc, omnuh2_in, massive_neutrinos=False, zs = [0], nnu_massive_in=1):
     """
     Returns the scale axis, redshifts, power spectrum, and sigma12
     of a Lambda-CDM model
@@ -106,12 +117,97 @@ def kzps(mlc, omnuh2_in, massive_neutrinos=False, zs = [0], nnu_massive_in=3):
     # The flags var1=8 and var2=8 indicate that we are looking at the
     # power spectrum of CDM + baryons (i.e. neutrinos excluded).
     k, z, p = results.get_matter_power_spectrum(
-        minkh=3e-3, maxkh=3.0, npoints = 1000000,
+        minkh=3e-3, maxkh=3.0, npoints = 100000,
         var1=8, var2=8
     )
     sigma12 = results.get_sigmaR(12, hubble_units=False)
     
     return k, z, p, sigma12 
+
+def model_ratios(k_list, p_list, snap_index, subscript, title):
+    """
+    Plot the ratio of @ps
+
+    Here, the baseline is always model 0, but theoretically it should be quite
+    easy to generalize this function further.
+    
+
+    """
+    z_index = 4 - snap_index
+    # Remember, the returned redshifts are in increasing order
+    # Whereas snapshot indices run from older to newer
+    baseline_h = cosm.loc[0]["h"]
+    baseline_k = k_list[0] * baseline_h
+    baseline_p = p_list[0][z_index] / baseline_h ** 3
+    
+    for i in range(1, len(k_list) - 1):
+        this_h = cosm.loc[i]["h"]
+        this_k = k_list[i] * this_h
+        this_p = p_list[i][z_index] / this_h ** 3
+
+        truncated_k, truncated_p, aligned_p = \
+            truncator(baseline_k, baseline_p, this_k,
+                      this_p, interpolation=this_h != baseline_h)
+
+        label_in = None
+        label_in = "model " + str(i)
+
+        plt.plot(truncated_k, aligned_p / truncated_p,
+                 label=label_in, c=colors[i], linestyle=styles[i])
+        plt.xscale('log')
+        plt.xlabel(r"k [1 / Mpc]")
+        
+        ylabel = r"$P_\mathrm{" + subscript + "} /" + \
+            r" P_\mathrm{" + subscript + ", model \, 0}$"
+        plt.ylabel(ylabel)
+        
+        plt.title(title)
+        plt.legend()
+
+def model_ratios_true(snap_index, onh2_str, massive=True):
+    """
+    Why is this a different function from above?
+    There are a couple of annoying formatting differences with the power nu
+    dictionary which add up to an unpleasant time trying to squeeze it into the
+    existing function...
+
+    Here, the baseline is always model 0,
+    but theoretically it should be quite easy
+    to generalize this function further.
+    """
+    P_accessor = "P_nu" if massive else "P_no"  
+    baseline_h = cosm.loc[0]["h"]
+    baseline_k = powernu[onh2_str][0][snap_index]["k"]
+    baseline_p = powernu[onh2_str][0][snap_index][P_accessor]
+    
+    for i in range(1, len(powernu) - 1):
+        if i == 7:
+            continue # Don't know what's going on with model 8
+        this_h = cosm.loc[i]["h"]
+        this_k = powernu[onh2_str][i][snap_index]["k"]
+        this_p = powernu[onh2_str][i][snap_index][P_accessor]
+    
+        truncated_k, truncated_p, aligned_p = \
+            spectra.truncator(baseline_k, baseline_p, this_k,
+                this_p, interpolation=this_h != baseline_h)
+
+        label_in = None
+        label_in = "model " + str(i)
+
+        plt.plot(truncated_k, aligned_p / truncated_p,
+                 label=label_in, c=colors[i], linestyle=styles[i])
+        plt.xscale('log')
+        plt.xlabel(r"k [1 / Mpc]")
+        
+        ylabel = r"$P_\mathrm{massive} / P_\mathrm{massive, model \, 0}$"
+        if not massive:
+            ylabel = r"$P_\mathrm{massless} / P_\mathrm{massless, model \, 0}$"
+        plt.ylabel(ylabel)
+        
+        plt.title(r"Ground truth: $\omega_\nu$ = " + \
+                  str(onh2) + "\n" + \
+                 "Snapshot " + str(snap_index))
+        plt.legend()
 
 def parse_redshifts(model_num):
     """
