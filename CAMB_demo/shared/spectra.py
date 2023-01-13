@@ -34,13 +34,63 @@ for omnu in omnu_strings:
                 names=["k", "P_no", "P_nu", "ratio"], sep='\s+'))
 
 colors = ["green", "blue", "brown", "red", "black", "orange", "purple",
-          "magenta"]
+          "magenta", "cyan"]
 
 #styles = ["solid", "dotted", "dashed", "dashdot", "solid", "dotted", "dashed",
 #    "dashdot"]
 # Line styles are unfortunately too distracting in plots as dense as those with
 # which we are here dealing; make everything solid
-styles = ["solid"] * 8
+styles = ["solid"] * 9
+
+def boltzmann_battery(onh2, skips=[8]):
+    """
+    The returns are kind of ugly here, but my hand is somewhat tied by the
+    state of the existing code. It might be worthwhile to reform this at some
+    point.
+
+    For example, the following kind of object would be more powerful:
+    spec_sims[omega_nu][massive][model 0][snapshot]["k"]
+    i.e. a dictionary within an array within an array within a dictionary
+        within a dictionary.
+
+    In case the user wants to calculate just for one omega_nu value (to save
+    time in a perfectly reasonable way), we could probably re-use the
+    formatting, but simply have spec_sims[omega_nu != desired_omega_nu] return
+    None.
+    """
+    k_massless_list = []
+    z_massless_list = []
+    p_massless_list = []
+    s12_massless_list = []
+
+    k_massive_list = []
+    z_massive_list = []
+    p_massive_list = []
+    s12_massive_list = []
+
+    for index, row in cosm.iterrows():
+        if index in skips:
+            # For example, I don't yet understand how to implement model 8
+            continue
+        
+        z_in = parse_redshifts(index)
+        k, z, p, s12 = kzps(row, onh2, massive_neutrinos=False,
+                           zs=z_in)
+        k_massless_list.append(k)
+        z_massless_list.append(z)
+        p_massless_list.append(p)
+        s12_massless_list.append(s12)
+        
+        k, z, p, s12 = kzps(row, onh2, massive_neutrinos=True,
+                           zs=z_in)
+        k_massive_list.append(k)
+        z_massive_list.append(z)
+        p_massive_list.append(p)
+        s12_massive_list.append(s12)
+
+    return k_massless_list, z_massless_list, p_massless_list, \
+        s12_massless_list, k_massive_list, z_massive_list, p_massive_list, \
+        s12_massive_list
 
 def kzps(mlc, omnuh2_in, massive_neutrinos=False, zs = [0], nnu_massive_in=1):
     """
@@ -124,7 +174,7 @@ def kzps(mlc, omnuh2_in, massive_neutrinos=False, zs = [0], nnu_massive_in=1):
     
     return k, z, p, sigma12 
 
-def model_ratios(k_list, p_list, snap_index, subscript, title):
+def model_ratios(k_list, p_list, snap_index, subscript, title, skips=[]):
     """
     Plot the ratio of @p_list[i] to @p_list[0] for all i.
 
@@ -138,7 +188,9 @@ def model_ratios(k_list, p_list, snap_index, subscript, title):
     baseline_k = k_list[0] * baseline_h
     baseline_p = p_list[0][z_index] / baseline_h ** 3
     
-    for i in range(1, len(k_list) - 1):
+    for i in range(1, len(k_list)):
+        if i in skips:
+            continue
         this_h = cosm.loc[i]["h"]
         this_k = k_list[i] * this_h
         this_p = p_list[i][z_index] / this_h ** 3
@@ -163,7 +215,7 @@ def model_ratios(k_list, p_list, snap_index, subscript, title):
     plt.title(title)
     plt.legend()
 
-def model_ratios_true(snap_index, onh2_str, massive=True):
+def model_ratios_true(snap_index, onh2_str, massive=True, skips=[]):
     """
     Why is this a different function from above?
     There are a couple of annoying formatting differences with the power nu
@@ -179,8 +231,8 @@ def model_ratios_true(snap_index, onh2_str, massive=True):
     baseline_k = powernu[onh2_str][0][snap_index]["k"]
     baseline_p = powernu[onh2_str][0][snap_index][P_accessor]
     
-    for i in range(1, len(powernu[onh2_str]) - 1):
-        if i == 7:
+    for i in range(1, len(powernu[onh2_str])):
+        if i in skips:
             continue # Don't know what's going on with model 8
         this_h = cosm.loc[i]["h"]
         this_k = powernu[onh2_str][i][snap_index]["k"]
