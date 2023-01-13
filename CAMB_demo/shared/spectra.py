@@ -33,6 +33,14 @@ for omnu in omnu_strings:
                 str(i) + "_000" + str(j) + ".dat",
                 names=["k", "P_no", "P_nu", "ratio"], sep='\s+'))
 
+powernu2 = []
+for i in range(0, 9): # iterate over models
+    powernu2.append([])
+    for j in range(0, 5): # iterate over snapshots
+        powernu2[i].append(pd.read_csv(file_base + omnu + "_caso" + \
+            str(i) + "_000" + str(j) + ".dat",
+            names=["k", "P_no", "P_nu", "ratio"], sep='\s+'))
+
 colors = ["green", "blue", "brown", "red", "black", "orange", "purple",
           "magenta", "cyan"]
 
@@ -175,7 +183,7 @@ def kzps(mlc, omnuh2_in, massive_neutrinos=False, zs = [0], nnu_massive_in=1):
     return k, z, p, sigma12 
 
 def model_ratios(k_list, p_list, snap_index, canvas, subscript, title,
-    skips=[], subplot_indices=None):
+    skips=[], subplot_indices=None, active_labels=['x', 'y']):
     """
     Plot the ratio of @p_list[i] to @p_list[0] for all i.
 
@@ -203,25 +211,25 @@ def model_ratios(k_list, p_list, snap_index, canvas, subscript, title,
             truncator(baseline_k, baseline_p, this_k,
                       this_p, interpolation=this_h != baseline_h)
 
-        label_in = None
         label_in = "model " + str(i)
-
         plot_area.plot(truncated_k,
             aligned_p / truncated_p, label=label_in, c=colors[i],
             linestyle=styles[i])
 
     plot_area.set_xscale('log')
-    plot_area.set_xlabel(r"k [1 / Mpc]")
+    if 'x' in active_labels:
+        plot_area.set_xlabel(r"k [1 / Mpc]")
     
     ylabel = r"$P_\mathrm{" + subscript + "} /" + \
         r" P_\mathrm{" + subscript + ", model \, 0}$"
-    plot_area.set_ylabel(ylabel)
+    if 'y' in active_labels:
+        plot_area.set_ylabel(ylabel)
     
     plot_area.set_title(title)
     plot_area.legend()
 
 def model_ratios_true(snap_index, onh2_str, canvas, massive=True, skips=[],
-    subplot_indices=None):
+    subplot_indices=None, active_labels=['x', 'y']):
     """
     Why is this a different function from above?
     There are a couple of annoying formatting differences with the power nu
@@ -251,21 +259,70 @@ def model_ratios_true(snap_index, onh2_str, canvas, massive=True, skips=[],
             truncator(baseline_k, baseline_p, this_k,
                 this_p, interpolation=this_h != baseline_h)
 
-        label_in = None
         label_in = "model " + str(i)
-
         plot_area.plot(truncated_k, aligned_p / truncated_p,
                  label=label_in, c=colors[i], linestyle=styles[i])
         
     plot_area.set_xscale('log')
-    plot_area.set_xlabel(r"k [1 / Mpc]")
+    if 'x' in active_labels:
+        plot_area.set_xlabel(r"k [1 / Mpc]")
     
     ylabel = r"$P_\mathrm{massive} / P_\mathrm{massive, model \, 0}$" if \
         massive else r"$P_\mathrm{massless} / P_\mathrm{massless, model \, 0}$"
     
-    plot_area.set_ylabel(ylabel)
+    if 'y' in active_labels:
+        plot_area.set_ylabel(ylabel)
     
-    plot_area.set_title(r"Ground truth: $\omega_\nu$ = " + onh2_str + "\n" + \
+    plot_area.set_title(r"Ground truth: $\omega_\nu$ = " + onh2_str + "; " + \
+             "Snapshot " + str(snap_index))
+    plot_area.legend()
+
+def model_ratios_true2(snap_index, canvas, massive=True, skips=[],
+    subplot_indices=None, active_labels=['x', 'y']):
+    """
+    Why is this a different function from above?
+    There are a couple of annoying formatting differences with the power nu
+    dictionary which add up to an unpleasant time trying to squeeze it into the
+    existing function...
+
+    Here, the baseline is always model 0,
+    but theoretically it should be quite easy
+    to generalize this function further.
+    """
+    P_accessor = "P_nu" if massive else "P_no"  
+    baseline_h = cosm.loc[0]["h"]
+    baseline_k = powernu2[0][snap_index]["k"]
+    baseline_p = powernu2[0][snap_index][P_accessor]
+    
+    plot_area = canvas if subplot_indices is None else \
+        canvas[subplot_indices[0], subplot_indices[1]]
+    
+    for i in range(1, len(powernu2)):
+        if i in skips:
+            continue # Don't know what's going on with model 8
+        this_h = cosm.loc[i]["h"]
+        this_k = powernu2[i][snap_index]["k"]
+        this_p = powernu2[i][snap_index][P_accessor]
+    
+        truncated_k, truncated_p, aligned_p = \
+            truncator(baseline_k, baseline_p, this_k,
+                this_p, interpolation=this_h != baseline_h)
+
+        label_in = "model " + str(i)
+        plot_area.plot(truncated_k, aligned_p / truncated_p,
+                 label=label_in, c=colors[i], linestyle=styles[i])
+        
+    plot_area.set_xscale('log')
+    if 'x' in active_labels:
+        plot_area.set_xlabel(r"k [1 / Mpc]")
+    
+    ylabel = r"$P_\mathrm{massive} / P_\mathrm{massive, model \, 0}$" if \
+        massive else r"$P_\mathrm{massless} / P_\mathrm{massless, model \, 0}$"
+    
+    if 'y' in active_labels:
+        plot_area.set_ylabel(ylabel)
+    
+    plot_area.set_title(r"Ground truth: $\omega_\nu = 0.002$; " + \
              "Snapshot " + str(snap_index))
     plot_area.legend()
 
