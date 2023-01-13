@@ -174,7 +174,8 @@ def kzps(mlc, omnuh2_in, massive_neutrinos=False, zs = [0], nnu_massive_in=1):
     
     return k, z, p, sigma12 
 
-def model_ratios(k_list, p_list, snap_index, subscript, title, skips=[]):
+def model_ratios(k_list, p_list, snap_index, canvas, subscript, title,
+    skips=[], subplot_indices=None):
     """
     Plot the ratio of @p_list[i] to @p_list[0] for all i.
 
@@ -188,6 +189,9 @@ def model_ratios(k_list, p_list, snap_index, subscript, title, skips=[]):
     baseline_k = k_list[0] * baseline_h
     baseline_p = p_list[0][z_index] / baseline_h ** 3
     
+    plot_area = canvas if subplot_indices is None else \
+        canvas[subplot_indices[0], subplot_indices[1]]
+
     for i in range(1, len(k_list)):
         if i in skips:
             continue
@@ -202,20 +206,22 @@ def model_ratios(k_list, p_list, snap_index, subscript, title, skips=[]):
         label_in = None
         label_in = "model " + str(i)
 
-        plt.plot(truncated_k, aligned_p / truncated_p,
-                 label=label_in, c=colors[i], linestyle=styles[i])
+        plot_area.plot(truncated_k,
+            aligned_p / truncated_p, label=label_in, c=colors[i],
+            linestyle=styles[i])
 
-    plt.xscale('log')
-    plt.xlabel(r"k [1 / Mpc]")
+    plot_area.set_xscale('log')
+    plot_area.set_xlabel(r"k [1 / Mpc]")
     
     ylabel = r"$P_\mathrm{" + subscript + "} /" + \
         r" P_\mathrm{" + subscript + ", model \, 0}$"
-    plt.ylabel(ylabel)
+    plot_area.set_ylabel(ylabel)
     
-    plt.title(title)
-    plt.legend()
+    plot_area.set_title(title)
+    plot_area.legend()
 
-def model_ratios_true(snap_index, onh2_str, massive=True, skips=[]):
+def model_ratios_true(snap_index, onh2_str, canvas, massive=True, skips=[],
+    subplot_indices=None):
     """
     Why is this a different function from above?
     There are a couple of annoying formatting differences with the power nu
@@ -231,6 +237,9 @@ def model_ratios_true(snap_index, onh2_str, massive=True, skips=[]):
     baseline_k = powernu[onh2_str][0][snap_index]["k"]
     baseline_p = powernu[onh2_str][0][snap_index][P_accessor]
     
+    plot_area = canvas if subplot_indices is None else \
+        canvas[subplot_indices[0], subplot_indices[1]]
+    
     for i in range(1, len(powernu[onh2_str])):
         if i in skips:
             continue # Don't know what's going on with model 8
@@ -245,21 +254,20 @@ def model_ratios_true(snap_index, onh2_str, massive=True, skips=[]):
         label_in = None
         label_in = "model " + str(i)
 
-        plt.plot(truncated_k, aligned_p / truncated_p,
+        plot_area.plot(truncated_k, aligned_p / truncated_p,
                  label=label_in, c=colors[i], linestyle=styles[i])
-
-    plt.xscale('log')
-    plt.xlabel(r"k [1 / Mpc]")
+        
+    plot_area.set_xscale('log')
+    plot_area.set_xlabel(r"k [1 / Mpc]")
     
-    ylabel = r"$P_\mathrm{massive} / P_\mathrm{massive, model \, 0}$"
-    if not massive:
-        ylabel = r"$P_\mathrm{massless} / P_\mathrm{massless, model \, 0}$"
-    plt.ylabel(ylabel)
+    ylabel = r"$P_\mathrm{massive} / P_\mathrm{massive, model \, 0}$" if \
+        massive else r"$P_\mathrm{massless} / P_\mathrm{massless, model \, 0}$"
     
-    plt.title(r"Ground truth: $\omega_\nu$ = " + \
-              onh2_str + "\n" + \
+    plot_area.set_ylabel(ylabel)
+    
+    plot_area.set_title(r"Ground truth: $\omega_\nu$ = " + onh2_str + "\n" + \
              "Snapshot " + str(snap_index))
-    plt.legend()
+    plot_area.legend()
 
 def parse_redshifts(model_num):
     """
