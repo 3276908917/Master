@@ -117,7 +117,7 @@ def kzps(mlc, omnuh2_in, massive_neutrinos=False, zs = [0], nnu_massive_in=1):
     # The flags var1=8 and var2=8 indicate that we are looking at the
     # power spectrum of CDM + baryons (i.e. neutrinos excluded).
     k, z, p = results.get_matter_power_spectrum(
-        minkh=3e-3, maxkh=3.0, npoints = 100000,
+        minkh=1e-4, maxkh=10.0, npoints = 100000,
         var1=8, var2=8
     )
     sigma12 = results.get_sigmaR(12, hubble_units=False)
@@ -126,12 +126,10 @@ def kzps(mlc, omnuh2_in, massive_neutrinos=False, zs = [0], nnu_massive_in=1):
 
 def model_ratios(k_list, p_list, snap_index, subscript, title):
     """
-    Plot the ratio of @ps
+    Plot the ratio of @p_list[i] to @p_list[0] for all i.
 
     Here, the baseline is always model 0, but theoretically it should be quite
     easy to generalize this function further.
-    
-
     """
     z_index = 4 - snap_index
     # Remember, the returned redshifts are in increasing order
@@ -181,7 +179,7 @@ def model_ratios_true(snap_index, onh2_str, massive=True):
     baseline_k = powernu[onh2_str][0][snap_index]["k"]
     baseline_p = powernu[onh2_str][0][snap_index][P_accessor]
     
-    for i in range(1, len(powernu) - 1):
+    for i in range(1, len(powernu[onh2_str]) - 1):
         if i == 7:
             continue # Don't know what's going on with model 8
         this_h = cosm.loc[i]["h"]
@@ -197,8 +195,6 @@ def model_ratios_true(snap_index, onh2_str, massive=True):
 
         plt.plot(truncated_k, aligned_p / truncated_p,
                  label=label_in, c=colors[i], linestyle=styles[i])
-
-        print(label_in)
 
     plt.xscale('log')
     plt.xlabel(r"k [1 / Mpc]")
