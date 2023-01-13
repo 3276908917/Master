@@ -108,8 +108,6 @@ def kzps(mlc, omnuh2_in, massive_neutrinos=False, zs = [0], nnu_massive_in=1):
         a dictionary of values
         for CAMBparams fields
     @param omnuh2_in : neutrino physical mass density
-    @param sigma12 : if the spectrum should be rescaled,
-        this parameter determines the desired sigma12 of the model
     @massive_neutrinos : if this is True,
         the value in omnuh2_in is used to set omnuh2.
         If this is False,
