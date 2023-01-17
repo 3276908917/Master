@@ -8,7 +8,7 @@ from scipy.interpolate import interp1d
 '''Keep in mind that this is NOT the same file as the original
 "cosmology_Aletheia.dat" that Ariel gave us! If you use the unaltered version,
 you will get a segfault'''
-path_to_me = "/home/lfinkbei/Documents/Master/CAMB_demo/shared/"
+path_to_me = "/home/lfinkbei/Documents/Master/CAMB_notebooks/shared/"
 cosm = pd.read_csv(path_to_me + "data/cosmologies.dat", sep='\s+')
 
 omega_nu = np.array([0.0006356, 0.002, 0.006356])
@@ -277,16 +277,6 @@ def model_ratios_true(snap_index, onh2_str, canvas, massive=True, skips=[],
 
 def model_ratios_true2(snap_index, canvas, massive=True, skips=[],
     subplot_indices=None, active_labels=['x', 'y']):
-    """
-    Why is this a different function from above?
-    There are a couple of annoying formatting differences with the power nu
-    dictionary which add up to an unpleasant time trying to squeeze it into the
-    existing function...
-
-    Here, the baseline is always model 0,
-    but theoretically it should be quite easy
-    to generalize this function further.
-    """
     P_accessor = "P_nu" if massive else "P_no"  
     baseline_h = cosm.loc[0]["h"]
     baseline_k = powernu2[0][snap_index]["k"]
@@ -322,6 +312,154 @@ def model_ratios_true2(snap_index, canvas, massive=True, skips=[],
     
     plot_area.set_title(r"Ground truth: $\omega_\nu = 0.002$; " + \
              "Snapshot " + str(snap_index))
+    plot_area.legend()
+
+def compare_wrappers(k_list, p_list, onh2_str, snap_index, canvas, massive,
+    subscript, title, skips=[], subplot_indices=None, active_labels=['x', 'y']):
+    """
+    Python-wrapper (i.e. Lukas') simulation variables feature the _py ending
+    Fortran (i.e. Ariel's) simulation variables feature the _for ending
+    """
+    # Remember, the returned redshifts are in increasing order
+    # Whereas snapshot indices run from older to newer
+    z_index = 4 - snap_index
+
+    # Don't need to double-up on this one; we're comparing like to like
+    baseline_h = cosm.loc[0]["h"]
+    
+    baseline_k_py = k_list[0] * baseline_h
+    baseline_p_py = p_list[0][z_index] / baseline_h ** 3
+    
+    P_accessor = "P_nu" if massive else "P_no"  
+    baseline_k_for = powernu[onh2_str][0][snap_index]["k"]
+    baseline_p_for = powernu[onh2_str][0][snap_index][P_accessor]
+    
+    plot_area = None
+    if subplot_indices is None:
+        plot_area = canvas
+    elif type(subplot_indices) == int:
+        plot_area = canvas[subplot_indices]
+    else:
+        plot_area = canvas[subplot_indices[0], subplot_indices[1]]
+
+    # k_list is the LCD because Ariel has more working models
+    for i in range(1, len(k_list)):
+        # I'm going to have to interpolate between these...
+        if i in skips:
+            continue
+        # Don't need to double-up on this one; we're comparing like to like
+        this_h = cosm.loc[i]["h"]
+        
+        this_k_py = k_list[i] * this_h
+        this_p_py = p_list[i][z_index] / this_h ** 3
+        
+        this_k_for = powernu[onh2_str][i][snap_index]["k"]
+        this_p_for = powernu[onh2_str][i][snap_index][P_accessor]
+
+        truncated_k_py, truncated_p_py, aligned_p_py = \
+            truncator(baseline_k_py, baseline_p_py, this_k_py,
+                this_p_py, interpolation=this_h != baseline_h)
+        y_py = aligned_p_py / truncated_p_py
+
+        truncated_k_for, truncated_p_for, aligned_p_for = \
+            truncator(baseline_k_for, baseline_p_for, this_k_for,
+            this_p_for, interpolation=this_h != baseline_h)
+        y_for = aligned_p_for / truncated_p_for
+
+        truncated_k, truncated_y_py, aligned_p_for = \
+            truncator_neutral(truncated_k_py, y_py, truncated_k_for, y_for) 
+
+        label_in = "model " + str(i)
+        plot_area.plot(truncated_k,
+            truncated_y_py / aligned_p_for, label=label_in, c=colors[i],
+            linestyle=styles[i])
+
+    plot_area.set_xscale('log')
+    if 'x' in active_labels:
+        plot_area.set_xlabel(r"k [1 / Mpc]")
+    
+    ylabel = r"$y_\mathrm{py} / y_\mathrm{fortran}$"
+    if 'y' in active_labels:
+        plot_area.set_ylabel(ylabel)
+    
+    plot_area.set_title(title)
+    plot_area.legend()
+
+    plot_area.set_title(title)
+    plot_area.legend()
+
+def compare_wrappers2(k_list, p_list, snap_index, canvas, massive, subscript,
+    title, skips=[], subplot_indices=None, active_labels=['x', 'y']):
+    """
+    Python-wrapper (i.e. Lukas') simulation variables feature the _py ending
+    Fortran (i.e. Ariel's) simulation variables feature the _for ending
+    """
+    # Remember, the returned redshifts are in increasing order
+    # Whereas snapshot indices run from older to newer
+    z_index = 4 - snap_index
+
+    # Don't need to double-up on this one; we're comparing like to like
+    baseline_h = cosm.loc[0]["h"]
+    
+    baseline_k_py = k_list[0] * baseline_h
+    baseline_p_py = p_list[0][z_index] / baseline_h ** 3
+    
+    P_accessor = "P_nu" if massive else "P_no"  
+    baseline_k_for = powernu2[0][snap_index]["k"]
+    baseline_p_for = powernu2[0][snap_index][P_accessor]
+    
+    plot_area = None
+    if subplot_indices is None:
+        plot_area = canvas
+    elif type(subplot_indices) == int:
+        plot_area = canvas[subplot_indices]
+    else:
+        plot_area = canvas[subplot_indices[0], subplot_indices[1]]
+
+    # k_list is the LCD because Ariel has more working models
+    for i in range(1, len(k_list)):
+        # I'm going to have to interpolate between these...
+        if i in skips:
+            continue
+        # Don't need to double-up on this one; we're comparing like to like
+        this_h = cosm.loc[i]["h"]
+        
+        this_k_py = k_list[i] * this_h
+        this_p_py = p_list[i][z_index] / this_h ** 3
+        
+        this_k_for = powernu2[i][snap_index]["k"]
+        this_p_for = powernu2[i][snap_index][P_accessor]
+
+        truncated_k_py, truncated_p_py, aligned_p_py = \
+            truncator(baseline_k_py, baseline_p_py, this_k_py,
+                this_p_py, interpolation=this_h != baseline_h)
+        y_py = aligned_p_py / truncated_p_py
+
+        truncated_k_for, truncated_p_for, aligned_p_for = \
+            truncator(baseline_k_for, baseline_p_for, this_k_for,
+            this_p_for, interpolation=this_h != baseline_h)
+        y_for = aligned_p_for / truncated_p_for
+
+        truncated_k, truncated_y_py, aligned_p_for = \
+            truncator_neutral(truncated_k_py, y_py, truncated_k_for, y_for) 
+
+        label_in = "model " + str(i)
+        plot_area.plot(truncated_k,
+            truncated_y_py / aligned_p_for, label=label_in, c=colors[i],
+            linestyle=styles[i])
+
+    plot_area.set_xscale('log')
+    if 'x' in active_labels:
+        plot_area.set_xlabel(r"k [1 / Mpc]")
+    
+    ylabel = r"$y_\mathrm{py} / y_\mathrm{fortran}$"
+    if 'y' in active_labels:
+        plot_area.set_ylabel(ylabel)
+    
+    plot_area.set_title(title)
+    plot_area.legend()
+
+    plot_area.set_title(title)
     plot_area.legend()
 
 def parse_redshifts(model_num):
@@ -372,3 +510,35 @@ def truncator(big_x, big_y, small_x, small_y, interpolation=True):
         aligned_y = interpolator(trunc_x)
     
     return trunc_x, trunc_y, aligned_y
+
+def truncator_neutral(base_x, base_y, obj_x, obj_y):
+    # This doesn't make the same assumptions as truncator
+    # But of course it's terrible form to leave both of these functions here.
+    """
+    Throw out base_x values until
+        min(base_x) >= min(obj_x) and max(base_x) <= max(obj_x)    
+    then interpolate the object arrays over the truncated base_x domain.
+    @returns:
+        trunc_x: truncated base_x array, which is now common to both y arrays
+        trunc_y: truncated base_y array
+        aligned_y: interpolation of obj_y over trunc_x
+    """
+    # What is the most conservative lower bound?
+    lcd_min = max(min(obj_x), min(base_x))
+    # What is the most conservative upper bound?
+    lcd_max = min(max(obj_x), max(base_x))
+    
+    # Eliminate points outside the conservative bounds
+    mask_base = np.all([[base_x <= lcd_max], [base_x >= lcd_min]], axis=0)[0]
+    trunc_base_x = base_x[mask_base]
+    trunc_base_y = base_y[mask_base]
+   
+    mask_obj = np.all([[obj_x <= lcd_max], [obj_x >= lcd_min]], axis=0)[0]
+    trunc_obj_x = obj_x[mask_obj]
+    trunc_obj_y = obj_y[mask_obj]
+ 
+    interpolator = interp1d(obj_x, obj_y, kind="cubic")
+    aligned_y = interpolator(trunc_base_x)
+
+    #print(len(trunc_base_x), len(aligned_y)) 
+    return trunc_base_x, trunc_base_y, aligned_y
