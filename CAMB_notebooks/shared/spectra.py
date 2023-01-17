@@ -11,7 +11,7 @@ you will get a segfault'''
 path_to_me = "/home/lfinkbei/Documents/Master/CAMB_notebooks/shared/"
 cosm = pd.read_csv(path_to_me + "data/cosmologies.dat", sep='\s+')
 
-omega_nu = np.array([0.0006356, 0.002, 0.006356])
+omegas_nu = np.array([0.0006356, 0.002, 0.006356])
 # Add corresponding file accessors, to check our work later
 omnu_strings = np.array(["0.0006", "0.002", "0.006"])
 
@@ -99,6 +99,77 @@ def boltzmann_battery(onh2, skips=[8]):
     return k_massless_list, z_massless_list, p_massless_list, \
         s12_massless_list, k_massive_list, z_massive_list, p_massive_list, \
         s12_massive_list
+        
+def better_battery(onh2s, onh2_strs, skips=[8]):
+    """
+    The returns are kind of ugly here, but my hand is somewhat tied by the
+    state of the existing code. It might be worthwhile to reform this at some
+    point.
+
+    For example, the following kind of object would be more powerful:
+    spec_sims[omega_nu][massive][model 0][snapshot]["k"]
+    i.e. a dictionary within an array within an array within a dictionary
+        within a dictionary.
+        
+    to better pass to powernu:
+    spec_sims[onh2_str][model i][snap_index][P_accessor]
+
+    In case the user wants to calculate just for one omega_nu value (to save
+    time in a perfectly reasonable way), we could probably re-use the
+    formatting, but simply have spec_sims[omega_nu != desired_omega_nu] return
+    None.
+    """
+    assert type(onh2s) == list or type(onh2s) == np.ndarray, \
+        "if you want only one omega value, you must still nest it in a list"
+    assert type(onh2_strs) == list or type(onh2_strs) == np.ndarray, \
+        "if you want only one omega value, you must still nest it in a list"
+    assert len(onh2s) == len(onh2_strs), "more or fewer labels than points"
+    
+    spec_sims = {}
+    
+    k_massless_list = []
+    z_massless_list = []
+    p_massless_list = []
+    s12_massless_list = []
+
+    k_massive_list = []
+    z_massive_list = []
+    p_massive_list = []
+    s12_massive_list = []
+
+    for om_index in range(len(onh2s)):
+        spec_sims[onh2_strs[om_index]] = []
+        for mindex, row in cosm.iterrows():
+            spec_sims[onh2_strs[om_index]].append([])
+            if mindex in skips:
+                # For example, I don't yet understand how to implement model 8
+                continue
+        
+            z_input = parse_redshifts(mindex)
+        
+            for z_index in range(len(z_input)):
+                z = z_input[z_index]
+                spec_sims[onh2_strs[om_index]][mindex].append({})
+                k_massless, _, p_massless, s12_massless = \
+                    kzps(row, onh2s[om_index], massive_neutrinos=False, zs=[z])
+                spec_sims[onh2_strs[om_index]][mindex][z_index]["k"] = \
+                    k_massless
+                spec_sims[onh2_strs[om_index]][mindex][z_index]["P_no"] = \
+                    p_massless
+                spec_sims[onh2_strs[om_index]][mindex][z_index]["s12_massless"] = \
+                    s12_massless
+                
+                k_massive, _, p_massive, s12_massive = \
+                    kzps(row, onh2s[om_index], massive_neutrinos=True, zs=[z])
+                assert np.array_equal(k_massless, k_massive), "assumption" + \
+                    " of identical k axies turned out to be incorrect..."
+                
+                spec_sims[onh2_strs[om_index]][mindex][z_index]["P_nu"] = \
+                    p_massive
+                spec_sims[onh2_strs[om_index]][mindex][z_index]["s12_massive"] = \
+                    s12_massive   
+
+    return spec_sims
 
 def kzps(mlc, omnuh2_in, massive_neutrinos=False, zs = [0], nnu_massive_in=1):
     """
