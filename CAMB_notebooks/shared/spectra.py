@@ -126,16 +126,6 @@ def better_battery(onh2s, onh2_strs, skips=[8]):
     assert len(onh2s) == len(onh2_strs), "more or fewer labels than points"
     
     spec_sims = {}
-    
-    k_massless_list = []
-    z_massless_list = []
-    p_massless_list = []
-    s12_massless_list = []
-
-    k_massive_list = []
-    z_massive_list = []
-    p_massive_list = []
-    s12_massive_list = []
 
     for om_index in range(len(onh2s)):
         spec_sims[onh2_strs[om_index]] = []
@@ -146,28 +136,20 @@ def better_battery(onh2s, onh2_strs, skips=[8]):
                 continue
         
             z_input = parse_redshifts(mindex)
-        
+            inner_dict = {}
             for z_index in range(len(z_input)):
                 z = z_input[z_index]
-                spec_sims[onh2_strs[om_index]][mindex].append({})
-                k_massless, _, p_massless, s12_massless = \
+                
+                inner_dict["k"], _, inner_dict["P_no"], \
+                    inner_dict["s12_massless"] = \
                     kzps(row, onh2s[om_index], massive_neutrinos=False, zs=[z])
-                spec_sims[onh2_strs[om_index]][mindex][z_index]["k"] = \
-                    k_massless
-                spec_sims[onh2_strs[om_index]][mindex][z_index]["P_no"] = \
-                    p_massless
-                spec_sims[onh2_strs[om_index]][mindex][z_index]["s12_massless"] = \
-                    s12_massless
+                k_massive, _, inner_dict["P_nu"], inner_dict["s12_massive"] = \
+                    kzps(row, onh2s[om_index], massive_neutrinos=False, zs=[z])
                 
-                k_massive, _, p_massive, s12_massive = \
-                    kzps(row, onh2s[om_index], massive_neutrinos=True, zs=[z])
-                assert np.array_equal(k_massless, k_massive), "assumption" + \
-                    " of identical k axies turned out to be incorrect..."
-                
-                spec_sims[onh2_strs[om_index]][mindex][z_index]["P_nu"] = \
-                    p_massive
-                spec_sims[onh2_strs[om_index]][mindex][z_index]["s12_massive"] = \
-                    s12_massive   
+               assert np.array_equal(inner_dict["k"], k_massive),
+                   "assumption of identical k axies unsatisfied!"
+                    
+            spec_sims[onh2_strs[om_index]][mindex].append({}) 
 
     return spec_sims
 
