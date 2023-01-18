@@ -100,7 +100,8 @@ def boltzmann_battery(onh2, skips=[8]):
         s12_massless_list, k_massive_list, z_massive_list, p_massive_list, \
         s12_massive_list
         
-def better_battery(onh2s, onh2_strs, skips=[8]):
+def better_battery(onh2s, onh2_strs, skips_omega = [0, 3],
+    skips_model=[8], skips_snapshot=[1, 2, 3]):
     """
     The returns are kind of ugly here, but my hand is somewhat tied by the
     state of the existing code. It might be worthwhile to reform this at some
@@ -128,16 +129,27 @@ def better_battery(onh2s, onh2_strs, skips=[8]):
     spec_sims = {}
 
     for om_index in range(len(onh2s)):
+        if om_index in skips_omega:
+            spec_sims[onh2_strs[om_index]] = None
+            continue
         spec_sims[onh2_strs[om_index]] = []
         for mindex, row in cosm.iterrows():
-            spec_sims[onh2_strs[om_index]].append([])
-            if mindex in skips:
+            if mindex in skips_model:
                 # For example, I don't yet understand how to implement model 8
+                spec_sims[onh2_strs[om_index]].append(None)
                 continue
-        
+            spec_sims[onh2_strs[om_index]].append([])
+       
             z_input = parse_redshifts(mindex)
-            inner_dict = {}
-            for z_index in range(len(z_input)):
+            print("total Zs", len(z_input)) 
+            for z_index in range(len(z_input) - 1, -1, -1):
+                snap_index = len(z_input) - 1 - z_index
+                if snap_index in skips_snapshot:
+                    print("skipping", z_index)
+                    spec_sims[onh2_strs[om_index]][mindex].append(None)
+                    continue
+                print("using", z_index)
+                inner_dict = {}
                 z = z_input[z_index]
                 
                 inner_dict["k"], _, inner_dict["P_no"], \
@@ -146,10 +158,12 @@ def better_battery(onh2s, onh2_strs, skips=[8]):
                 k_massive, _, inner_dict["P_nu"], inner_dict["s12_massive"] = \
                     kzps(row, onh2s[om_index], massive_neutrinos=False, zs=[z])
                 
-               assert np.array_equal(inner_dict["k"], k_massive),
+                assert np.array_equal(inner_dict["k"], k_massive), \
                    "assumption of identical k axies unsatisfied!"
                     
-            spec_sims[onh2_strs[om_index]][mindex].append({}) 
+                spec_sims[onh2_strs[om_index]][mindex].append(inner_dict) 
+
+            #print(spec_sims[onh2_strs[om_index]][mindex])
 
     return spec_sims
 
@@ -187,6 +201,7 @@ def kzps(mlc, omnuh2_in, massive_neutrinos=False, zs = [0], nnu_massive_in=1):
         omch2_in -= omnuh2_in
         nnu_massive = nnu_massive_in
 
+    # tau is a desperation argument
     pars.set_cosmology(
         H0=mlc["h"] * 100,
         ombh2=mlc["ombh2"],
@@ -194,6 +209,7 @@ def kzps(mlc, omnuh2_in, massive_neutrinos=False, zs = [0], nnu_massive_in=1):
         omk=mlc["OmK"],
         mnu=mnu_in,
         num_massive_neutrinos=nnu_massive,
+        tau=0.0952,
         neutrino_hierarchy="degenerate" # 1 eigenstate approximation; our
         # neutrino setup (see below) is not valid for inverted/normal
         # hierarchies.
@@ -208,8 +224,17 @@ def kzps(mlc, omnuh2_in, massive_neutrinos=False, zs = [0], nnu_massive_in=1):
     if nnu_massive != 0:
         pars.num_nu_massive = sum(pars.nu_mass_numbers[:stop_i])
     
-    pars.InitPower.set_params(As=mlc["A_s"], ns=mlc["n_s"])
-    
+    pars.InitPower.set_params(As=mlc["A_s"], ns=mlc["n_s"],
+        r=0, nt=0.0, ntrun=0.0) # the last three are desperation arguments
+    # The following six lines are desperation settings
+    pars.NonLinear = camb.model.NonLinear_none
+    pars.WantCls = False
+    pars.WantScalars = False
+    pars.Want_CMB = False
+    pars.DoLensing = False
+    pars.YHe = 0.24   
+
+ 
     pars.set_dark_energy(w=mlc["w0"], wa=float(mlc["wa"]),
         dark_energy_model='ppf')
     '''
@@ -219,7 +244,7 @@ def kzps(mlc, omnuh2_in, massive_neutrinos=False, zs = [0], nnu_massive_in=1):
     In some cursory tests, the accurate_massive_neutrino_transfers
     flag did not appear to significantly alter the outcome.
     '''
-    pars.set_matter_power(redshifts=zs, kmax=10.0, nonlinear=False)
+    pars.set_matter_power(redshifts=zs, kmax=20.0, nonlinear=False)
     results = camb.get_results(pars)
     results.calc_power_spectra(pars)
     
@@ -230,7 +255,10 @@ def kzps(mlc, omnuh2_in, massive_neutrinos=False, zs = [0], nnu_massive_in=1):
         var1=8, var2=8
     )
     sigma12 = results.get_sigmaR(12, hubble_units=False)
-    
+   
+    # De-nest for the single-redshift case:
+    if len(p) == 1:
+        p = p[0] 
     return k, z, p, sigma12 
 
 def model_ratios(k_list, p_list, snap_index, canvas, subscript, title,

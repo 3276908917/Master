@@ -1,3 +1,8 @@
+###
+# Except for some extremely minor revisions, all of the credit for this
+# notebook goes to Matteo Esposito!
+######
+
 import sys
 import os
 import baccoemu as bacco
@@ -133,7 +138,9 @@ def read_Pk(sim_indices, snapnum, pair_idx=None, space='real', path = 'Pks'):
     
 
 def make_cosmo_suite(fname='/home/lfinkbei/Documents/Master/' + \
-    'CAKE21/matteos_spectra/cosmology_Columbus.dat', cosmo_suite_name='my_cosmo_suite.py', use_sigma8=True):
+    'CAKE21/matteos_spectra/cosmology_Columbus.dat',
+    cosmo_suite_name='my_cosmo_suite.py', use_sigma8=True):
+    
     f = open(fname)
     lines = f.readlines()
     f.close()
@@ -155,6 +162,7 @@ def make_cosmo_suite(fname='/home/lfinkbei/Documents/Master/' + \
     
     cosmo_suite = [{labels[i]: (lines[n].split()[i] if 'Columbus' in lines[n].split()[i]
                  else to_float(lines[n].split()[i])) for i in range(len(labels))} for n in range(len(lines))]
+    
     cosmo_dict = {}
     for cosmo in cosmo_suite:
         for snapnum in range(5):
@@ -170,7 +178,8 @@ def make_cosmo_suite(fname='/home/lfinkbei/Documents/Master/' + \
             else:
                 cosmo_params['A_s'] = cosmo['A_s']
                 cosmo_params['sigma8'] = None               
-            cosmo_params['expfactor'] = 1/(1+cosmo['z(%d)' %snapnum]) #Warning!! May differ from the actual expfactor (check header)
+            cosmo_params['expfactor'] = 1/(1+cosmo['z(%d)' %snapnum]) #Warning!!
+               # May differ from the actual expfactor (check header)
             cosmo_params['tau'] = 0.0952 #
             w0 = cosmo['w0']
             wa = cosmo['wa']
