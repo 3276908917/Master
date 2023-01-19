@@ -197,7 +197,8 @@ def kzps(mlc, omnuh2_in, massive_neutrinos=False, zs = [0], nnu_massive_in=1):
         N_total_eff = 3.046 nonetheless, right?'''
         mnu_in = omnuh2_in * camb.constants.neutrino_mass_fac / \
             (camb.constants.default_nnu / 3.0) ** 0.75 
-
+        #print("The mnu value", mnu_in, "corresponds to the omnuh2 value",
+        #    omnuh2_in)
         omch2_in -= omnuh2_in
         nnu_massive = nnu_massive_in
 
