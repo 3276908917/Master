@@ -262,7 +262,7 @@ def kzps(mlc, omnuh2_in, massive_neutrinos=False, zs = [0], nnu_massive_in=1):
     return k, z, p, sigma12 
 
 def model_ratios(k_list, p_list, snap_index, canvas, subscript, title,
-    skips=[], subplot_indices=None, active_labels=['x', 'y']):
+    skips=[], subplot_indices=None, active_labels=['x', 'y'], x_mode=False):
     """
     Plot the ratio of @p_list[i] to @p_list[0] for all i.
 
@@ -274,7 +274,12 @@ def model_ratios(k_list, p_list, snap_index, canvas, subscript, title,
     # Whereas snapshot indices run from older to newer
     baseline_h = cosm.loc[0]["h"]
     baseline_k = k_list[0] * baseline_h
-    baseline_p = p_list[0][z_index] / baseline_h ** 3
+
+    baseline_p = None
+    if x_mode==False:
+        baseline_p = p_list[0][z_index] / baseline_h ** 3
+    else:
+        baseline_p = p_list[0][z_index]
     
     plot_area = canvas if subplot_indices is None else \
         canvas[subplot_indices[0], subplot_indices[1]]
@@ -284,23 +289,31 @@ def model_ratios(k_list, p_list, snap_index, canvas, subscript, title,
             continue
         this_h = cosm.loc[i]["h"]
         this_k = k_list[i] * this_h
-        this_p = p_list[i][z_index] / this_h ** 3
+        
+        this_p = None
+        if x_mode==False:
+            this_p = p_list[i][z_index] / this_h ** 3
+        else:
+            this_p = p_list[i][z_index]
 
-        truncated_k, truncated_p, aligned_p = \
-            truncator(baseline_k, baseline_p, this_k,
-                      this_p, interpolation=this_h != baseline_h)
+        truncated_k, truncated_p, aligned_p = truncator(baseline_k, baseline_p,
+            this_k, this_p, interpolation=True)
 
         label_in = "model " + str(i)
-        plot_area.plot(truncated_k,
-            aligned_p / truncated_p, label=label_in, c=colors[i],
-            linestyle=styles[i])
+        plot_area.plot(truncated_k, aligned_p / truncated_p, label=label_in,
+            c=colors[i], linestyle=styles[i])
 
     plot_area.set_xscale('log')
     if 'x' in active_labels:
         plot_area.set_xlabel(r"k [1 / Mpc]")
     
-    ylabel = r"$P_\mathrm{" + subscript + "} /" + \
-        r" P_\mathrm{" + subscript + ", model \, 0}$"
+    ylabel = None
+    if x_mode == False:
+        ylabel = r"$P_\mathrm{" + subscript + "} /" + \
+            r" P_\mathrm{" + subscript + ", model \, 0}$"
+    else:
+        ylabel = r"$x_i / x_0$"
+
     if 'y' in active_labels:
         plot_area.set_ylabel(ylabel)
     
@@ -319,10 +332,19 @@ def model_ratios_true(snap_index, onh2_str, canvas, massive=True, skips=[],
     but theoretically it should be quite easy
     to generalize this function further.
     """
-    P_accessor = "P_nu" if massive else "P_no"  
+    P_accessor = None
+    if massive == True:
+         P_accessor = "P_nu"
+    else:
+        P_accessor = "P_no"
+ 
     baseline_h = cosm.loc[0]["h"]
     baseline_k = powernu[onh2_str][0][snap_index]["k"]
-    baseline_p = powernu[onh2_str][0][snap_index][P_accessor]
+    
+    baseline_p = powernu[onh2_str][0][snap_index]["P_nu"] / \
+        powernu[onh2_str][0][snap_index]["P_no"]
+    if P_accessor is not None:
+        baseline_p = powernu[onh2_str][0][snap_index][P_accessor]
     
     plot_area = canvas if subplot_indices is None else \
         canvas[subplot_indices[0], subplot_indices[1]]
@@ -332,11 +354,15 @@ def model_ratios_true(snap_index, onh2_str, canvas, massive=True, skips=[],
             continue # Don't know what's going on with model 8
         this_h = cosm.loc[i]["h"]
         this_k = powernu[onh2_str][i][snap_index]["k"]
-        this_p = powernu[onh2_str][i][snap_index][P_accessor]
-    
+        
+        this_p = powernu[onh2_str][i][snap_index]["P_nu"] / \
+            powernu[onh2_str][i][snap_index]["P_no"]
+        if P_accessor is not None:
+            this_p = powernu[onh2_str][i][snap_index][P_accessor]
+        
         truncated_k, truncated_p, aligned_p = \
             truncator(baseline_k, baseline_p, this_k,
-                this_p, interpolation=this_h != baseline_h)
+                this_p, interpolation=True)
 
         label_in = "model " + str(i)
         plot_area.plot(truncated_k, aligned_p / truncated_p,
@@ -345,9 +371,13 @@ def model_ratios_true(snap_index, onh2_str, canvas, massive=True, skips=[],
     plot_area.set_xscale('log')
     if 'x' in active_labels:
         plot_area.set_xlabel(r"k [1 / Mpc]")
-    
-    ylabel = r"$P_\mathrm{massive} / P_\mathrm{massive, model \, 0}$" if \
-        massive else r"$P_\mathrm{massless} / P_\mathrm{massless, model \, 0}$"
+   
+    ylabel =  r"$x_i / x_0$"
+    if P_accessor is not None:
+        if massive == True:
+            ylabel = r"$P_\mathrm{massive} / P_\mathrm{massive, model \, 0}$"
+        if massive == False:
+            ylabel = r"$P_\mathrm{massless} / P_\mathrm{massless, model \, 0}$"
     
     if 'y' in active_labels:
         plot_area.set_ylabel(ylabel)
@@ -358,10 +388,19 @@ def model_ratios_true(snap_index, onh2_str, canvas, massive=True, skips=[],
 
 def model_ratios_true2(snap_index, canvas, massive=True, skips=[],
     subplot_indices=None, active_labels=['x', 'y']):
-    P_accessor = "P_nu" if massive else "P_no"  
+    P_accessor = None
+    if massive == True:
+         P_accessor = "P_nu"
+    elif massive == False:
+        P_accessor = "P_no"
+    
     baseline_h = cosm.loc[0]["h"]
     baseline_k = powernu2[0][snap_index]["k"]
-    baseline_p = powernu2[0][snap_index][P_accessor]
+    
+    baseline_p = powernu2[0][snap_index]["P_nu"] / \
+        powernu2[0][snap_index]["P_no"]
+    if P_accessor is not None:
+        baseline_p = powernu2[0][snap_index][P_accessor]
     
     plot_area = canvas if subplot_indices is None else \
         canvas[subplot_indices[0], subplot_indices[1]]
@@ -371,11 +410,15 @@ def model_ratios_true2(snap_index, canvas, massive=True, skips=[],
             continue # Don't know what's going on with model 8
         this_h = cosm.loc[i]["h"]
         this_k = powernu2[i][snap_index]["k"]
-        this_p = powernu2[i][snap_index][P_accessor]
+        
+        this_p = powernu2[i][snap_index]["P_nu"] / \
+            powernu2[i][snap_index]["P_no"]
+        if P_accessor is not None:
+            this_p = powernu2[i][snap_index][P_accessor]
     
         truncated_k, truncated_p, aligned_p = \
             truncator(baseline_k, baseline_p, this_k,
-                this_p, interpolation=this_h != baseline_h)
+                this_p, interpolation=True)
 
         label_in = "model " + str(i)
         plot_area.plot(truncated_k, aligned_p / truncated_p,
@@ -385,8 +428,12 @@ def model_ratios_true2(snap_index, canvas, massive=True, skips=[],
     if 'x' in active_labels:
         plot_area.set_xlabel(r"k [1 / Mpc]")
     
-    ylabel = r"$P_\mathrm{massive} / P_\mathrm{massive, model \, 0}$" if \
-        massive else r"$P_\mathrm{massless} / P_\mathrm{massless, model \, 0}$"
+    ylabel =  r"$x_i / x_0$"
+    if P_accessor is not None:
+        if massive == True:
+            ylabel = r"$P_\mathrm{massive} / P_\mathrm{massive, model \, 0}$"
+        if massive == False:
+            ylabel = r"$P_\mathrm{massless} / P_\mathrm{massless, model \, 0}$"
     
     if 'y' in active_labels:
         plot_area.set_ylabel(ylabel)
