@@ -239,7 +239,7 @@ def kzps(mlc, omnuh2_in, massive_neutrinos=False, zs = [0], nnu_massive_in=1):
     pars.set_accuracy(AccuracyBoost=2)
 
     # desperation if statement
-    if mlc["w0"] != -1 or float(mlc["wa"] !=0:
+    if mlc["w0"] != -1 or float(mlc["wa"]) !=0:
         pars.set_dark_energy(w=mlc["w0"], wa=float(mlc["wa"]),
           dark_energy_model='ppf')
     '''
@@ -285,8 +285,14 @@ def model_ratios(k_list, p_list, snap_index, canvas, subscript, title,
     else:
         baseline_p = p_list[0][z_index]
     
-    plot_area = canvas if subplot_indices is None else \
-        canvas[subplot_indices[0], subplot_indices[1]]
+    plot_area = canvas # if subplot_indices is None
+    if subplot_indices is not None:
+        if type(subplot_indices) == int:
+            plot_area = canvas[subplot_indices]
+        else: # we assume it's a 2d grid of plots
+            canvas[subplot_indices[0], subplot_indices[1]]
+        # No need to add more if cases because an n-d canvas of n > 2 makes no
+        # sense.
 
     for i in range(1, len(k_list)):
         if i in skips:
@@ -350,8 +356,14 @@ def model_ratios_true(snap_index, onh2_str, canvas, massive=True, skips=[],
     if P_accessor is not None:
         baseline_p = powernu[onh2_str][0][snap_index][P_accessor]
     
-    plot_area = canvas if subplot_indices is None else \
-        canvas[subplot_indices[0], subplot_indices[1]]
+    plot_area = canvas # if subplot_indices is None
+    if subplot_indices is not None:
+        if type(subplot_indices) == int:
+            plot_area = canvas[subplot_indices]
+        else: # we assume it's a 2d grid of plots
+            canvas[subplot_indices[0], subplot_indices[1]]
+        # No need to add more if cases because an n-d canvas of n > 2 makes no
+        # sense.
     
     for i in range(1, len(powernu[onh2_str])):
         if i in skips:
@@ -406,8 +418,14 @@ def model_ratios_true2(snap_index, canvas, massive=True, skips=[],
     if P_accessor is not None:
         baseline_p = powernu2[0][snap_index][P_accessor]
     
-    plot_area = canvas if subplot_indices is None else \
-        canvas[subplot_indices[0], subplot_indices[1]]
+    plot_area = canvas # if subplot_indices is None
+    if subplot_indices is not None:
+        if type(subplot_indices) == int:
+            plot_area = canvas[subplot_indices]
+        else: # we assume it's a 2d grid of plots
+            canvas[subplot_indices[0], subplot_indices[1]]
+        # No need to add more if cases because an n-d canvas of n > 2 makes no
+        # sense.
     
     for i in range(1, len(powernu2)):
         if i in skips:
@@ -446,8 +464,9 @@ def model_ratios_true2(snap_index, canvas, massive=True, skips=[],
              "Snapshot " + str(snap_index))
     plot_area.legend()
 
-def compare_wrappers(k_list, p_list, onh2_str, snap_index, canvas, massive,
-    subscript, title, skips=[], subplot_indices=None, active_labels=['x', 'y']):
+def compare_wrappers(k_list, p_list, correct_sims, snap_index,
+    canvas, massive, subscript, title, skips=[], subplot_indices=None,
+    active_labels=['x', 'y']):
     """
     Python-wrapper (i.e. Lukas') simulation variables feature the _py ending
     Fortran (i.e. Ariel's) simulation variables feature the _for ending
@@ -463,8 +482,8 @@ def compare_wrappers(k_list, p_list, onh2_str, snap_index, canvas, massive,
     baseline_p_py = p_list[0][z_index] / baseline_h ** 3
     
     P_accessor = "P_nu" if massive else "P_no"  
-    baseline_k_for = powernu[onh2_str][0][snap_index]["k"]
-    baseline_p_for = powernu[onh2_str][0][snap_index][P_accessor]
+    baseline_k_for = correct_sims[0][snap_index]["k"]
+    baseline_p_for = correct_sims[0][snap_index][P_accessor]
     
     plot_area = None
     if subplot_indices is None:
@@ -485,82 +504,8 @@ def compare_wrappers(k_list, p_list, onh2_str, snap_index, canvas, massive,
         this_k_py = k_list[i] * this_h
         this_p_py = p_list[i][z_index] / this_h ** 3
         
-        this_k_for = powernu[onh2_str][i][snap_index]["k"]
-        this_p_for = powernu[onh2_str][i][snap_index][P_accessor]
-
-        truncated_k_py, truncated_p_py, aligned_p_py = \
-            truncator(baseline_k_py, baseline_p_py, this_k_py,
-                this_p_py, interpolation=this_h != baseline_h)
-        y_py = aligned_p_py / truncated_p_py
-
-        truncated_k_for, truncated_p_for, aligned_p_for = \
-            truncator(baseline_k_for, baseline_p_for, this_k_for,
-            this_p_for, interpolation=this_h != baseline_h)
-        y_for = aligned_p_for / truncated_p_for
-
-        truncated_k, truncated_y_py, aligned_p_for = \
-            truncator_neutral(truncated_k_py, y_py, truncated_k_for, y_for) 
-
-        label_in = "model " + str(i)
-        plot_area.plot(truncated_k,
-            truncated_y_py / aligned_p_for, label=label_in, c=colors[i],
-            linestyle=styles[i])
-
-    plot_area.set_xscale('log')
-    if 'x' in active_labels:
-        plot_area.set_xlabel(r"k [1 / Mpc]")
-    
-    ylabel = r"$y_\mathrm{py} / y_\mathrm{fortran}$"
-    if 'y' in active_labels:
-        plot_area.set_ylabel(ylabel)
-    
-    plot_area.set_title(title)
-    plot_area.legend()
-
-    plot_area.set_title(title)
-    plot_area.legend()
-
-def compare_wrappers2(k_list, p_list, snap_index, canvas, massive, subscript,
-    title, skips=[], subplot_indices=None, active_labels=['x', 'y']):
-    """
-    Python-wrapper (i.e. Lukas') simulation variables feature the _py ending
-    Fortran (i.e. Ariel's) simulation variables feature the _for ending
-    """
-    # Remember, the returned redshifts are in increasing order
-    # Whereas snapshot indices run from older to newer
-    z_index = 4 - snap_index
-
-    # Don't need to double-up on this one; we're comparing like to like
-    baseline_h = cosm.loc[0]["h"]
-    
-    baseline_k_py = k_list[0] * baseline_h
-    baseline_p_py = p_list[0][z_index] / baseline_h ** 3
-    
-    P_accessor = "P_nu" if massive else "P_no"  
-    baseline_k_for = powernu2[0][snap_index]["k"]
-    baseline_p_for = powernu2[0][snap_index][P_accessor]
-    
-    plot_area = None
-    if subplot_indices is None:
-        plot_area = canvas
-    elif type(subplot_indices) == int:
-        plot_area = canvas[subplot_indices]
-    else:
-        plot_area = canvas[subplot_indices[0], subplot_indices[1]]
-
-    # k_list is the LCD because Ariel has more working models
-    for i in range(1, len(k_list)):
-        # I'm going to have to interpolate between these...
-        if i in skips:
-            continue
-        # Don't need to double-up on this one; we're comparing like to like
-        this_h = cosm.loc[i]["h"]
-        
-        this_k_py = k_list[i] * this_h
-        this_p_py = p_list[i][z_index] / this_h ** 3
-        
-        this_k_for = powernu2[i][snap_index]["k"]
-        this_p_for = powernu2[i][snap_index][P_accessor]
+        this_k_for = correct_sims[i][snap_index]["k"]
+        this_p_for = correct_sims[i][snap_index][P_accessor]
 
         truncated_k_py, truncated_p_py, aligned_p_py = \
             truncator(baseline_k_py, baseline_p_py, this_k_py,
