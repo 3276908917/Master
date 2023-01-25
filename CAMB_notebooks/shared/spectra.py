@@ -330,7 +330,7 @@ def model_ratios(k_list, p_list, snap_index, canvas, subscript, title,
     plot_area.set_title(title)
     plot_area.legend()
 
-def model_ratios_true(snap_index, correct_sims, onh2_str, canvas, massive=True,
+def model_ratios_true(snap_index, correct_sims, canvas, massive=True,
     skips=[], subplot_indices=None, active_labels=['x', 'y']):
     """
     Why is this a different function from above?
@@ -345,7 +345,7 @@ def model_ratios_true(snap_index, correct_sims, onh2_str, canvas, massive=True,
     P_accessor = None
     if massive == True:
          P_accessor = "P_nu"
-    else:
+    elif massive==False:
         P_accessor = "P_no"
  
     baseline_h = cosm.loc[0]["h"]
@@ -398,69 +398,7 @@ def model_ratios_true(snap_index, correct_sims, onh2_str, canvas, massive=True,
     if 'y' in active_labels:
         plot_area.set_ylabel(ylabel)
     
-    plot_area.set_title(r"Ground truth: $\omega_\nu$ = " + onh2_str + "; " + \
-             "Snapshot " + str(snap_index))
-    plot_area.legend()
-
-def model_ratios_true2(snap_index, canvas, massive=True, skips=[],
-    subplot_indices=None, active_labels=['x', 'y']):
-    P_accessor = None
-    if massive == True:
-         P_accessor = "P_nu"
-    elif massive == False:
-        P_accessor = "P_no"
-    
-    baseline_h = cosm.loc[0]["h"]
-    baseline_k = powernu2[0][snap_index]["k"]
-    
-    baseline_p = powernu2[0][snap_index]["P_nu"] / \
-        powernu2[0][snap_index]["P_no"]
-    if P_accessor is not None:
-        baseline_p = powernu2[0][snap_index][P_accessor]
-    
-    plot_area = canvas # if subplot_indices is None
-    if subplot_indices is not None:
-        if type(subplot_indices) == int:
-            plot_area = canvas[subplot_indices]
-        else: # we assume it's a 2d grid of plots
-            plot_area = canvas[subplot_indices[0], subplot_indices[1]]
-        # No need to add more if cases because an n-d canvas of n > 2 makes no
-        # sense.
-    
-    for i in range(1, len(powernu2)):
-        if i in skips:
-            continue # Don't know what's going on with model 8
-        this_h = cosm.loc[i]["h"]
-        this_k = powernu2[i][snap_index]["k"]
-        
-        this_p = powernu2[i][snap_index]["P_nu"] / \
-            powernu2[i][snap_index]["P_no"]
-        if P_accessor is not None:
-            this_p = powernu2[i][snap_index][P_accessor]
-    
-        truncated_k, truncated_p, aligned_p = \
-            truncator(baseline_k, baseline_p, this_k,
-                this_p, interpolation=True)
-
-        label_in = "model " + str(i)
-        plot_area.plot(truncated_k, aligned_p / truncated_p,
-                 label=label_in, c=colors[i], linestyle=styles[i])
-        
-    plot_area.set_xscale('log')
-    if 'x' in active_labels:
-        plot_area.set_xlabel(r"k [1 / Mpc]")
-    
-    ylabel =  r"$x_i / x_0$"
-    if P_accessor is not None:
-        if massive == True:
-            ylabel = r"$P_\mathrm{massive} / P_\mathrm{massive, model \, 0}$"
-        if massive == False:
-            ylabel = r"$P_\mathrm{massless} / P_\mathrm{massless, model \, 0}$"
-    
-    if 'y' in active_labels:
-        plot_area.set_ylabel(ylabel)
-    
-    plot_area.set_title(r"Ground truth: $\omega_\nu = 0.002$; " + \
+    plot_area.set_title(r"Ground truth: $\omega_\nu$ = 0.002; " + \
              "Snapshot " + str(snap_index))
     plot_area.legend()
 
@@ -471,19 +409,34 @@ def compare_wrappers(k_list, p_list, correct_sims, snap_index,
     Python-wrapper (i.e. Lukas') simulation variables feature the _py ending
     Fortran (i.e. Ariel's) simulation variables feature the _for ending
     """
+    
+    P_accessor = None
+    if massive == True:
+        P_accessor = "P_nu"
+    elif massive == False:
+        P_accessor = "P_no"
+    x_mode = P_accessor is None
+
     # Remember, the returned redshifts are in increasing order
     # Whereas snapshot indices run from older to newer
     z_index = 4 - snap_index
 
-    # Don't need to double-up on this one; we're comparing like to like
     baseline_h = cosm.loc[0]["h"]
     
     baseline_k_py = k_list[0] * baseline_h
-    baseline_p_py = p_list[0][z_index] / baseline_h ** 3
     
-    P_accessor = "P_nu" if massive else "P_no"  
+    baseline_p_py = None
+    if x_mode:
+        baseline_p_py = p_list[0][z_index]
+    else:
+        baseline_p_py = p_list[0][z_index] / baseline_h ** 3
+    
     baseline_k_for = correct_sims[0][snap_index]["k"]
-    baseline_p_for = correct_sims[0][snap_index][P_accessor]
+    
+    baseline_p_for = correct_sims[0][snap_index]["P_nu"] / \
+        correct_sims[0][snap_index]["P_no"]
+    if P_accessor is not None:
+        baseline_p_for = correct_sims[0][snap_index][P_accessor]
     
     plot_area = None
     if subplot_indices is None:
@@ -493,19 +446,25 @@ def compare_wrappers(k_list, p_list, correct_sims, snap_index,
     else:
         plot_area = canvas[subplot_indices[0], subplot_indices[1]]
 
-    # k_list is the LCD because Ariel has more working models
+    # k_list is the LCD because Ariel has more working models than I do
     for i in range(1, len(k_list)):
-        # I'm going to have to interpolate between these...
         if i in skips:
             continue
-        # Don't need to double-up on this one; we're comparing like to like
         this_h = cosm.loc[i]["h"]
         
         this_k_py = k_list[i] * this_h
-        this_p_py = p_list[i][z_index] / this_h ** 3
-        
+        this_p_py = None
+        if x_mode==False:
+            this_p_py = p_list[i][z_index] / this_h ** 3
+        else:
+            this_p_py = p_list[i][z_index]
+
         this_k_for = correct_sims[i][snap_index]["k"]
-        this_p_for = correct_sims[i][snap_index][P_accessor]
+        
+        this_p_for = correct_sims[i][snap_index]["P_nu"] / \
+            correct_sims[i][snap_index]["P_no"]
+        if P_accessor is not None:
+            this_p_for = correct_sims[i][snap_index][P_accessor]
 
         truncated_k_py, truncated_p_py, aligned_p_py = \
             truncator(baseline_k_py, baseline_p_py, this_k_py,
@@ -532,7 +491,13 @@ def compare_wrappers(k_list, p_list, correct_sims, snap_index,
     ylabel = r"$y_\mathrm{py} / y_\mathrm{fortran}$"
     if 'y' in active_labels:
         plot_area.set_ylabel(ylabel)
-    
+   
+    ylabel = None
+    if x_mode:
+        ylabel = r"$ж_i/ж_0$"
+    else:
+        ylabel = r"$y_\mathrm{py} / y_\mathrm{fortran}$"
+ 
     plot_area.set_title(title)
     plot_area.legend()
 
