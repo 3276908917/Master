@@ -236,12 +236,12 @@ def kzps(mlc, omnuh2_in, massive_neutrinos=False, zs = [0], nnu_massive_in=1):
     pars.Want_CMB = False
     pars.DoLensing = False
     pars.YHe = 0.24   
-    pars.set_accuracy(AccuracyBoost=2)
+    # pars.set_accuracy(AccuracyBoost=2)
 
     # desperation if statement
     if mlc["w0"] != -1 or float(mlc["wa"]) !=0:
         pars.set_dark_energy(w=mlc["w0"], wa=float(mlc["wa"]),
-          dark_energy_model='ppf')
+            dark_energy_model='ppf')
     '''
     To change the the extent of the k-axis,
     change the following line as well as the "get_matter_power_spectrum" call
@@ -290,7 +290,7 @@ def model_ratios(k_list, p_list, snap_index, canvas, subscript, title,
         if type(subplot_indices) == int:
             plot_area = canvas[subplot_indices]
         else: # we assume it's a 2d grid of plots
-            canvas[subplot_indices[0], subplot_indices[1]]
+            plot_area = canvas[subplot_indices[0], subplot_indices[1]]
         # No need to add more if cases because an n-d canvas of n > 2 makes no
         # sense.
 
@@ -330,8 +330,8 @@ def model_ratios(k_list, p_list, snap_index, canvas, subscript, title,
     plot_area.set_title(title)
     plot_area.legend()
 
-def model_ratios_true(snap_index, onh2_str, canvas, massive=True, skips=[],
-    subplot_indices=None, active_labels=['x', 'y']):
+def model_ratios_true(snap_index, correct_sims, onh2_str, canvas, massive=True,
+    skips=[], subplot_indices=None, active_labels=['x', 'y']):
     """
     Why is this a different function from above?
     There are a couple of annoying formatting differences with the power nu
@@ -349,32 +349,32 @@ def model_ratios_true(snap_index, onh2_str, canvas, massive=True, skips=[],
         P_accessor = "P_no"
  
     baseline_h = cosm.loc[0]["h"]
-    baseline_k = powernu[onh2_str][0][snap_index]["k"]
+    baseline_k = correct_sims[0][snap_index]["k"]
     
-    baseline_p = powernu[onh2_str][0][snap_index]["P_nu"] / \
-        powernu[onh2_str][0][snap_index]["P_no"]
+    baseline_p = correct_sims[0][snap_index]["P_nu"] / \
+        correct_sims[0][snap_index]["P_no"]
     if P_accessor is not None:
-        baseline_p = powernu[onh2_str][0][snap_index][P_accessor]
+        baseline_p = correct_sims[0][snap_index][P_accessor]
     
     plot_area = canvas # if subplot_indices is None
     if subplot_indices is not None:
         if type(subplot_indices) == int:
             plot_area = canvas[subplot_indices]
         else: # we assume it's a 2d grid of plots
-            canvas[subplot_indices[0], subplot_indices[1]]
+            plot_area = canvas[subplot_indices[0], subplot_indices[1]]
         # No need to add more if cases because an n-d canvas of n > 2 makes no
         # sense.
     
-    for i in range(1, len(powernu[onh2_str])):
+    for i in range(1, len(correct_sims)):
         if i in skips:
             continue # Don't know what's going on with model 8
         this_h = cosm.loc[i]["h"]
-        this_k = powernu[onh2_str][i][snap_index]["k"]
+        this_k = correct_sims[i][snap_index]["k"]
         
-        this_p = powernu[onh2_str][i][snap_index]["P_nu"] / \
-            powernu[onh2_str][i][snap_index]["P_no"]
+        this_p = correct_sims[i][snap_index]["P_nu"] / \
+            correct_sims[i][snap_index]["P_no"]
         if P_accessor is not None:
-            this_p = powernu[onh2_str][i][snap_index][P_accessor]
+            this_p = correct_sims[i][snap_index][P_accessor]
         
         truncated_k, truncated_p, aligned_p = \
             truncator(baseline_k, baseline_p, this_k,
@@ -423,7 +423,7 @@ def model_ratios_true2(snap_index, canvas, massive=True, skips=[],
         if type(subplot_indices) == int:
             plot_area = canvas[subplot_indices]
         else: # we assume it's a 2d grid of plots
-            canvas[subplot_indices[0], subplot_indices[1]]
+            plot_area = canvas[subplot_indices[0], subplot_indices[1]]
         # No need to add more if cases because an n-d canvas of n > 2 makes no
         # sense.
     
