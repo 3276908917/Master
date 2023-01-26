@@ -1,6 +1,6 @@
 # This flag is sort of dumb, but it works as long as I'm the only one running
 # the code in this repo.
-linux = False
+linux = True
 
 import numpy as np
 import pandas as pd
@@ -164,7 +164,7 @@ def better_battery(onh2s, onh2_strs, skips_omega = [0, 3],
                     inner_dict["s12_massless"] = \
                     kzps(row, onh2s[om_index], massive_neutrinos=False, zs=[z])
                 k_massive, _, inner_dict["P_nu"], inner_dict["s12_massive"] = \
-                    kzps(row, onh2s[om_index], massive_neutrinos=False, zs=[z])
+                    kzps(row, onh2s[om_index], massive_neutrinos=True, zs=[z])
                 
                 assert np.array_equal(inner_dict["k"], k_massive), \
                    "assumption of identical k axies unsatisfied!"
