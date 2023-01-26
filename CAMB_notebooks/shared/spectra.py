@@ -1,3 +1,7 @@
+# This flag is sort of dumb, but it works as long as I'm the only one running
+# the code in this repo.
+linux = False
+
 import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
@@ -5,10 +9,14 @@ import camb
 import re
 from scipy.interpolate import interp1d
 
+path_base_linux = "/home/lfinkbei/Documents/"
+path_base_windows = "C:/Users/Lukas/Documents/GitHub/"
+path_base = path_base_linux if linux else path_base_windows
+
 '''Keep in mind that this is NOT the same file as the original
 "cosmology_Aletheia.dat" that Ariel gave us! If you use the unaltered version,
 you will get a segfault'''
-path_to_me = "/home/lfinkbei/Documents/Master/CAMB_notebooks/shared/"
+path_to_me = path_base + "Master/CAMB_notebooks/shared/"
 cosm = pd.read_csv(path_to_me + "data/cosmologies.dat", sep='\s+')
 
 omegas_nu = np.array([0.0006356, 0.002, 0.006356])
@@ -236,7 +244,7 @@ def kzps(mlc, omnuh2_in, massive_neutrinos=False, zs = [0], nnu_massive_in=1):
     pars.Want_CMB = False
     pars.DoLensing = False
     pars.YHe = 0.24   
-    # pars.set_accuracy(AccuracyBoost=2)
+    pars.set_accuracy(AccuracyBoost=2)
 
     # desperation if statement
     if mlc["w0"] != -1 or float(mlc["wa"]) !=0:
