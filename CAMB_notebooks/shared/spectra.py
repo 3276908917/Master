@@ -147,16 +147,22 @@ def better_battery(onh2s, onh2_strs, skips_omega = [0, 3],
             spec_sims[om_str].append([])
        
             z_input = parse_redshifts(mindex)
+            #print("z_input", z_input)
             #print("total Zs", len(z_input)) 
-            for z_index in range(len(z_input) - 1, -1, -1):
-                snap_index = len(z_input) - 1 - z_index
+            for snap_index in range(len(z_input)):
+                '''
+                since z_input is ordered from z large to z small,
+                and snap indices run from z large to z small,
+                z_index = snap_index in this case and NOT in general
+                '''
+                #print(z_index)
                 if snap_index in skips_snapshot:
                     #print("skipping", z_index)
                     spec_sims[om_str][mindex].append(None)
                     continue
                 #print("using", z_index)
                 inner_dict = {}
-                z = z_input[z_index]
+                z = z_input[snap_index]
               
                 '''
                 Double check that I have it right: k multiplied by h;
@@ -174,8 +180,11 @@ def better_battery(onh2s, onh2_strs, skips_omega = [0, 3],
                     else massive_tuple[2] / h ** 3
                 inner_dict["s12_massless"] = massive_tuple[3]
                 
+                # Temporary addition, for debugging
+                inner_dict["z"] = z_input[snap_index]               
+ 
                 assert np.array_equal(massless_tuple[0], massive_tuple[0]), \
-                   "assumption of identical k axies unsatisfied!"
+                   "assumption of identical k axies not satisfied!"
                     
                 spec_sims[om_str][mindex].append(inner_dict) 
 
