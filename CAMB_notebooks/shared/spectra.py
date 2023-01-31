@@ -90,15 +90,13 @@ def boltzmann_battery(onh2, skips=[8]):
             continue
         
         z_in = parse_redshifts(index)
-        k, z, p, s12 = kzps(row, onh2, massive_neutrinos=False,
-                           zs=z_in)
+        k, z, p, s12 = kzps(row, onh2, nu_massive=False, zs=z_in)
         k_massless_list.append(k)
         z_massless_list.append(z)
         p_massless_list.append(p)
         s12_massless_list.append(s12)
         
-        k, z, p, s12 = kzps(row, onh2, massive_neutrinos=True,
-                           zs=z_in)
+        k, z, p, s12 = kzps(row, onh2, nu_massive=True, zs=z_in)
         k_massive_list.append(k)
         z_massive_list.append(z)
         p_massive_list.append(p)
