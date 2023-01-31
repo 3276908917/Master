@@ -288,7 +288,7 @@ def kzps(mlc, omnuh2_in, nu_massive=False, zs = [0], nnu_massive_in=1):
         p = p[0] 
     return k, z, p, sigma12 
 
-def model_ratios(k_list, p_list, snap_index, canvas, subscript, title,
+def model_ratios_old(k_list, p_list, snap_index, canvas, subscript, title,
     skips=[], subplot_indices=None, active_labels=['x', 'y'], x_mode=False):
     """
     Plot the ratio of @p_list[i] to @p_list[0] for all i.
@@ -353,8 +353,9 @@ def model_ratios(k_list, p_list, snap_index, canvas, subscript, title,
     plot_area.set_title(title)
     plot_area.legend()
 
-def model_ratios_true(snap_index, correct_sims, canvas, massive=True,
-    skips=[], subplot_indices=None, active_labels=['x', 'y']):
+def model_ratios_true(snap_index, correct_sims, canvas, massive=True, skips=[],
+    skips=[], subplot_indices=None, active_labels=['x', 'y'],
+    title="Ground truth"):
     """
     Why is this a different function from above?
     There are a couple of annoying formatting differences with the power nu
