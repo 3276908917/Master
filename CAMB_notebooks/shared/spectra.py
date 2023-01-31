@@ -109,24 +109,21 @@ def boltzmann_battery(onh2, skips=[8]):
         s12_massive_list
         
 def better_battery(onh2s, onh2_strs, skips_omega = [0, 3],
-    skips_model=[8], skips_snapshot=[1, 2, 3]):
+    skips_model=[8], skips_snapshot=[1, 2, 3], h_units=False):
     """
-    The returns are kind of ugly here, but my hand is somewhat tied by the
-    state of the existing code. It might be worthwhile to reform this at some
-    point.
+    Similar procedure to boltzmann_battery, but with an architecture that
+    more closely agrees with that of Ariel's in the powernu results.
 
-    For example, the following kind of object would be more powerful:
-    spec_sims[omega_nu][massive][model 0][snapshot]["k"]
-    i.e. a dictionary within an array within an array within a dictionary
-        within a dictionary.
-        
-    to better pass to powernu:
-    spec_sims[onh2_str][model i][snap_index][P_accessor]
+    Although this agreement is an added benefit, the main point is simply to
+    have a cleaner and more versatile architecture than the mess of separate
+    arrays returned previously. So even if the "ground truth" object should
+    eventually cease to agree in shape, this function already returns a much
+    more pleasant object.
 
-    In case the user wants to calculate just for one omega_nu value (to save
-    time in a perfectly reasonable way), we could probably re-use the
-    formatting, but simply have spec_sims[omega_nu != desired_omega_nu] return
-    None.
+    Another difference with boltzmann_battery: this function automatically
+    uses h_units=False, which should further bring my object into agreement
+    with powernu. This is more debatable than simple architecture cleanup, so I
+    will leave this as a flag up to the user.
     """
     assert type(onh2s) == list or type(onh2s) == np.ndarray, \
         "if you want only one omega value, you must still nest it in a list"
@@ -137,16 +134,19 @@ def better_battery(onh2s, onh2_strs, skips_omega = [0, 3],
     spec_sims = {}
 
     for om_index in range(len(onh2s)):
+        om = onh2s[om_index]
+        om_str = onh2_strs[om_index]
         if om_index in skips_omega:
-            spec_sims[onh2_strs[om_index]] = None
+            spec_sims[om_str] = None
             continue
-        spec_sims[onh2_strs[om_index]] = []
+        spec_sims[om_str] = []
         for mindex, row in cosm.iterrows():
+            h = row["h"]
             if mindex in skips_model:
                 # For example, I don't yet understand how to implement model 8
-                spec_sims[onh2_strs[om_index]].append(None)
+                spec_sims[om_str].append(None)
                 continue
-            spec_sims[onh2_strs[om_index]].append([])
+            spec_sims[om_str].append([])
        
             z_input = parse_redshifts(mindex)
             #print("total Zs", len(z_input)) 
@@ -154,28 +154,36 @@ def better_battery(onh2s, onh2_strs, skips_omega = [0, 3],
                 snap_index = len(z_input) - 1 - z_index
                 if snap_index in skips_snapshot:
                     #print("skipping", z_index)
-                    spec_sims[onh2_strs[om_index]][mindex].append(None)
+                    spec_sims[om_str][mindex].append(None)
                     continue
                 #print("using", z_index)
                 inner_dict = {}
                 z = z_input[z_index]
+              
+                '''
+                Double check that I have it right: k multiplied by h;
+                    P divided by h^3
+                '''
+                massless_tuple = kzps(row, om, nu_massive=False, zs=[z])
+                inner_dict["k"] = massless_tuple[0] if h_units \
+                    else massless_tuple[0] * h
+                inner_dict["P_no"] = massless_tuple[2] if h_units \
+                    else massless_tuple[2] / h ** 3
+                inner_dict["s12_massive"] = massless_tuple[3]
+
+                massive_tuple = kzps(row, om, nu_massive=True, zs=[z])
+                inner_dict["P_nu"] = massive_tuple[2] if h_units \
+                    else massive_tuple[2] / h ** 3
+                inner_dict["s12_massless"] = massive_tuple[3]
                 
-                inner_dict["k"], _, inner_dict["P_no"], \
-                    inner_dict["s12_massless"] = \
-                    kzps(row, onh2s[om_index], massive_neutrinos=False, zs=[z])
-                k_massive, _, inner_dict["P_nu"], inner_dict["s12_massive"] = \
-                    kzps(row, onh2s[om_index], massive_neutrinos=True, zs=[z])
-                
-                assert np.array_equal(inner_dict["k"], k_massive), \
+                assert np.array_equal(massless_tuple[0], massive_tuple[0]), \
                    "assumption of identical k axies unsatisfied!"
                     
-                spec_sims[onh2_strs[om_index]][mindex].append(inner_dict) 
-
-            #print(spec_sims[onh2_strs[om_index]][mindex])
+                spec_sims[om_str][mindex].append(inner_dict) 
 
     return spec_sims
 
-def kzps(mlc, omnuh2_in, massive_neutrinos=False, zs = [0], nnu_massive_in=1):
+def kzps(mlc, omnuh2_in, nu_massive=False, zs = [0], nnu_massive_in=1):
     """
     Returns the scale axis, redshifts, power spectrum, and sigma12
     of a Lambda-CDM model
@@ -183,7 +191,7 @@ def kzps(mlc, omnuh2_in, massive_neutrinos=False, zs = [0], nnu_massive_in=1):
         a dictionary of values
         for CAMBparams fields
     @param omnuh2_in : neutrino physical mass density
-    @massive_neutrinos : if this is True,
+    @nu_massive : if this is True,
         the value in omnuh2_in is used to set omnuh2.
         If this is False,
         the value in omnuh2_in is simply added to omch2.
@@ -194,7 +202,7 @@ def kzps(mlc, omnuh2_in, massive_neutrinos=False, zs = [0], nnu_massive_in=1):
     mnu_in = 0
     nnu_massive = 0
 
-    if massive_neutrinos:
+    if nu_massive:
         '''This is a horrible workaround, and I would like to get rid of it
         ASAP The following line destroys dependence on TCMB and
         neutrino_hierarchy, possibly more. But CAMB does not accept omnuh2 as
