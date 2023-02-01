@@ -60,19 +60,8 @@ styles = ["solid"] * 9
 
 def boltzmann_battery(onh2, skips=[8]):
     """
-    The returns are kind of ugly here, but my hand is somewhat tied by the
-    state of the existing code. It might be worthwhile to reform this at some
-    point.
-
-    For example, the following kind of object would be more powerful:
-    spec_sims[omega_nu][massive][model 0][snapshot]["k"]
-    i.e. a dictionary within an array within an array within a dictionary
-        within a dictionary.
-
-    In case the user wants to calculate just for one omega_nu value (to save
-    time in a perfectly reasonable way), we could probably re-use the
-    formatting, but simply have spec_sims[omega_nu != desired_omega_nu] return
-    None.
+    This is basically legacy code. Most of the notebooks still use this
+    function, but I am trying to phase it out in favor of better_battery.
     """
     k_massless_list = []
     z_massless_list = []
@@ -106,7 +95,7 @@ def boltzmann_battery(onh2, skips=[8]):
         s12_massless_list, k_massive_list, z_massive_list, p_massive_list, \
         s12_massive_list
         
-def better_battery(onh2s, onh2_strs, skips_omega = [0, 3],
+def better_battery(onh2s, onh2_strs, skips_omega = [0, 2],
     skips_model=[8], skips_snapshot=[1, 2, 3], h_units=False):
     """
     Similar procedure to boltzmann_battery, but with an architecture that
@@ -354,8 +343,8 @@ def model_ratios_old(k_list, p_list, snap_index, canvas, subscript, title,
     plot_area.legend()
 
 def model_ratios_true(snap_index, correct_sims, canvas, massive=True, skips=[],
-    skips=[], subplot_indices=None, active_labels=['x', 'y'],
-    title="Ground truth"):
+    subplot_indices=None, active_labels=['x', 'y'], title="Ground truth",
+    omnuh2_str="0.002"):
     """
     Why is this a different function from above?
     There are a couple of annoying formatting differences with the power nu
@@ -389,6 +378,8 @@ def model_ratios_true(snap_index, correct_sims, canvas, massive=True, skips=[],
         # No need to add more if cases because an n-d canvas of n > 2 makes no
         # sense.
     
+    k_list = []
+    rat_list = []
     for i in range(1, len(correct_sims)):
         if i in skips:
             continue # Don't know what's going on with model 8
@@ -407,7 +398,10 @@ def model_ratios_true(snap_index, correct_sims, canvas, massive=True, skips=[],
         label_in = "model " + str(i)
         plot_area.plot(truncated_k, aligned_p / truncated_p,
                  label=label_in, c=colors[i], linestyle=styles[i])
-        
+       
+        k_list.append(truncated_k)
+        rat_list.append(aligned_p / truncated_p)
+ 
     plot_area.set_xscale('log')
     if 'x' in active_labels:
         plot_area.set_xlabel(r"k [1 / Mpc]")
@@ -422,9 +416,11 @@ def model_ratios_true(snap_index, correct_sims, canvas, massive=True, skips=[],
     if 'y' in active_labels:
         plot_area.set_ylabel(ylabel)
     
-    plot_area.set_title(r"Ground truth: $\omega_\nu$ = 0.002; " + \
-             "Snapshot " + str(snap_index))
+    plot_area.set_title(title + r": $\omega_\nu$ = " + omnuh2_str + \
+        "; Snapshot " + str(snap_index))
     plot_area.legend()
+
+    return k_list, rat_list
 
 def compare_wrappers(k_list, p_list, correct_sims, snap_index,
     canvas, massive, subscript, title, skips=[], subplot_indices=None,
@@ -512,15 +508,14 @@ def compare_wrappers(k_list, p_list, correct_sims, snap_index,
     if 'x' in active_labels:
         plot_area.set_xlabel(r"k [1 / Mpc]")
     
-    ylabel = r"$y_\mathrm{py} / y_\mathrm{fortran}$"
-    if 'y' in active_labels:
-        plot_area.set_ylabel(ylabel)
-   
     ylabel = None
     if x_mode:
         ylabel = r"$ж_i/ж_0$"
     else:
         ylabel = r"$y_\mathrm{py} / y_\mathrm{fortran}$"
+    
+    if 'y' in active_labels:
+        plot_area.set_ylabel(ylabel)
  
     plot_area.set_title(title)
     plot_area.legend()
