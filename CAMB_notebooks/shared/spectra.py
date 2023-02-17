@@ -19,9 +19,9 @@ you will get a segfault'''
 path_to_me = path_base + "Master/CAMB_notebooks/shared/"
 cosm = pd.read_csv(path_to_me + "data/cosmologies.dat", sep='\s+')
 
-omegas_nu = np.array([0.0006356, 0.002, 0.006356])
+omegas_nu = np.array([0.0006356, 0.002148659574468, 0.006356])#, 0.01])
 # Add corresponding file accessors, to check our work later
-omnu_strings = np.array(["0.0006", "0.002", "0.006"])
+omnu_strings = np.array(["0.0006", "0.002", "0.006"])#, "0.01"])
 
 # The following code is somewhat hard;
 # I'm not sure how better to do it.
