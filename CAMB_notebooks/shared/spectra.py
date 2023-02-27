@@ -49,6 +49,17 @@ for i in range(0, 9): # iterate over models
             str(i) + "_000" + str(j) + ".dat",
             names=["k", "P_no", "P_nu", "ratio"], sep='\s+'))
 
+powernu3 = {}
+for omnu in omnu_strings:
+    powernu3[omnu] = []
+
+    for i in range(0, 9): # iterate over models
+        powernu3[omnu].append([])
+        for j in range(0, 5): # iterate over snapshots
+            powernu3[omnu][i].append(pd.read_csv(file_base + omnu + "_caso" + \
+                str(i) + "_000" + str(j) + ".dat",
+                names=["k", "P_no", "P_nu", "ratio"], sep='\s+'))
+
 colors = ["green", "blue", "brown", "red", "black", "orange", "purple",
           "magenta", "cyan"]
 
