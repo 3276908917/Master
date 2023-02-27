@@ -205,9 +205,10 @@ def kzps(mlc, omnuh2_in, nu_massive=False, zs = [0], nnu_massive_in=1):
     """ 
     pars = camb.CAMBparams()
     omch2_in = mlc["omch2"]
-    
+ 
     mnu_in = 0
     nnu_massive = 0
+    h = mlc["h"]
 
     if nu_massive:
         '''This is a horrible workaround, and I would like to get rid of it
@@ -227,7 +228,7 @@ def kzps(mlc, omnuh2_in, nu_massive=False, zs = [0], nnu_massive_in=1):
 
     # tau is a desperation argument
     pars.set_cosmology(
-        H0=mlc["h"] * 100,
+        H0=h * 100,
         ombh2=mlc["ombh2"],
         omch2=omch2_in,
         omk=mlc["OmK"],
@@ -250,9 +251,10 @@ def kzps(mlc, omnuh2_in, nu_massive=False, zs = [0], nnu_massive_in=1):
     
     pars.InitPower.set_params(As=mlc["A_s"], ns=mlc["n_s"],
         r=0, nt=0.0, ntrun=0.0) # the last three are desperation arguments
-    pars.set_matter_power(redshifts=zs, kmax=20.0, nonlinear=False)
+    pars.set_matter_power(redshifts=zs, kmax=20.0 / h, nonlinear=False)
     
     # The following seven lines are desperation settings
+    # If we ever have extra time, we can more closely study what each line does
     pars.NonLinear = camb.model.NonLinear_none
     pars.WantCls = False
     pars.WantScalars = False
@@ -278,7 +280,7 @@ def kzps(mlc, omnuh2_in, nu_massive=False, zs = [0], nnu_massive_in=1):
     # The flags var1=8 and var2=8 indicate that we are looking at the
     # power spectrum of CDM + baryons (i.e. neutrinos excluded).
     k, z, p = results.get_matter_power_spectrum(
-        minkh=1e-4, maxkh=10.0, npoints = 100000,
+        minkh=1e-4 / h, maxkh=10.0 / h, npoints = 100000,
         var1=8, var2=8
     )
     sigma12 = results.get_sigmaR(12, hubble_units=False)
