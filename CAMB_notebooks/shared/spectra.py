@@ -202,6 +202,10 @@ def kzps(mlc, omnuh2_in, nu_massive=False, zs = [0], nnu_massive_in=1):
         the value in omnuh2_in is used to set omnuh2.
         If this is False,
         the value in omnuh2_in is simply added to omch2.
+
+    Possible mistakes:
+    A. We're setting "omk" with OmK * h ** 2. Should I have used OmK? If so,
+        the capitalization here is nonstandard.
     """ 
     pars = camb.CAMBparams()
     omch2_in = mlc["omch2"]
@@ -231,10 +235,11 @@ def kzps(mlc, omnuh2_in, nu_massive=False, zs = [0], nnu_massive_in=1):
         H0=h * 100,
         ombh2=mlc["ombh2"],
         omch2=omch2_in,
-        omk=mlc["OmK"],
+        omk=mlc["OmK"] * h ** 2,
         mnu=mnu_in,
         num_massive_neutrinos=nnu_massive,
-        tau=0.0952,
+        tau=0.0952, # just like in Matteo's notebook, at least (but maybe I got
+            # this value from somewhere else...
         neutrino_hierarchy="degenerate" # 1 eigenstate approximation; our
         # neutrino setup (see below) is not valid for inverted/normal
         # hierarchies.
@@ -253,8 +258,11 @@ def kzps(mlc, omnuh2_in, nu_massive=False, zs = [0], nnu_massive_in=1):
         r=0, nt=0.0, ntrun=0.0) # the last three are desperation arguments
     pars.set_matter_power(redshifts=zs, kmax=20.0 / h, nonlinear=False)
     
-    # The following seven lines are desperation settings
-    # If we ever have extra time, we can more closely study what each line does
+    ''' The following seven lines are desperation settings
+    If we ever have extra time, we can more closely study what each line does
+    '''
+    # This is a desperation line in light of the previous line. The previous
+    # line seems to have served me well enough so far, but BSTS.
     pars.NonLinear = camb.model.NonLinear_none
     pars.WantCls = False
     pars.WantScalars = False
