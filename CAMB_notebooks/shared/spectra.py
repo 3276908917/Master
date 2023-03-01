@@ -69,6 +69,69 @@ colors = ["green", "blue", "brown", "red", "black", "orange", "purple",
 # which we are here dealing; make everything solid
 styles = ["solid"] * 9
 
+def get_cosmology(gen_order = ["M", "L"]):
+    """
+    gen order determines the order in which we generate random numbers deciding
+    the energy budget of the cosmology. The order will determine where the bias
+    lies, because whatever is generated earlier will be skewed in favor of
+    larger values. For example, consider the default argument value. If we
+    generate M first, we have access to the full range of values [0, 1]. When
+    we generate L, we have access only to [0, 1 - M]. Then K is fully
+    determined.
+
+    I have an idea for how to advance this function: I am certain that in one
+    of the papers that I've read for this project, the authors gave a data
+    table which talked about the typical parameter ranges used in emulators.
+    If any of these ranges is larger than the one's encoded below, let's seize!
+    
+    Unfortunately, all of these bounds are hard-coded. Maybe we can read in a
+    table for this?
+    """
+    row = {}
+
+    row['OmM'] = np.random.uniform(0, 1)
+    row['OmL'] = np.random.uniform(0, 1 - row['OmM'])
+    # Where's radiation? Maybe we're neglecting it in all cases?
+    row['OmK'] = 1 - row['OmM'] - row['OmL']
+    
+    row['OmC'] = np.random.uniform(0, row['OmM'])
+    row['OmB'] = 1 - row['OmC']
+
+    #~ Do we have any constraints on h besides Aletheia?
+    # I ask because this seems like a pretty small window.
+    row['h'] = np.random.uniform(0.55, 0.79)
+
+    #ditto
+    row['w0'] = np.random.uniform(-0.85, -1.15)
+    # ditto
+    row['wa'] = np.random.uniform(-0.20, 0.20)
+
+    row['omch2'] = row['OmC'] * row['h'] ** 2
+    row['ombh2'] = row['OmB'] * row['h'] ** 2
+
+    #! Our data tables contain no other n_s values. What, then, could inform
+    # the following statement??
+    row['n_s'] = np.random.uniform(0.2, 0.99)
+
+    #! This would be a good question to ask during a meeting
+    '''
+    Is A_s a checksum parameter? That is to say, now that I have defined all of
+    the parameters above, should A_s be fully determined? Or is A_s actually
+    still a free parameter?
+
+    It shouldn't be free, right? Otherwise, how could our predictor of
+        C \omega_\nu \log (A_s^i / A_s^0)
+    be worth anything?
+    '''
+    row['A_s'] = np.random.uniform(1.78568440085517E-09, 2.48485942677850E-09)
+
+    #~ Should we compute omnuh2 here, or leave that separate?
+
+    #~ Should we also specify parameters not specified by the Aletheia data
+        # table, for example tau or the CMB temperature?
+
+    return row
+
 def boltzmann_battery(onh2, skips=[8]):
     """
     This is basically legacy code. Most of the notebooks still use this
@@ -107,7 +170,8 @@ def boltzmann_battery(onh2, skips=[8]):
         s12_massive_list
         
 def better_battery(onh2s, onh2_strs, skips_omega = [0, 2],
-    skips_model=[8], skips_snapshot=[1, 2, 3], h_units=False):
+    skips_model=[8], skips_snapshot=[1, 2, 3], h_units=False,
+    models=cosm):
     """
     Similar procedure to boltzmann_battery, but with an architecture that
     more closely agrees with that of Ariel's in the powernu results.
@@ -132,13 +196,14 @@ def better_battery(onh2s, onh2_strs, skips_omega = [0, 2],
     spec_sims = {}
 
     for om_index in range(len(onh2s)):
+        print(om_index)
         om = onh2s[om_index]
         om_str = onh2_strs[om_index]
         if om_index in skips_omega:
             spec_sims[om_str] = None
             continue
         spec_sims[om_str] = []
-        for mindex, row in cosm.iterrows():
+        for mindex, row in models.iterrows():
             h = row["h"]
             if mindex in skips_model:
                 # For example, I don't yet understand how to implement model 8
@@ -555,11 +620,14 @@ def parse_redshifts(model_num):
     if not already used.
     """
     z = []
-    model = cosm.loc[model_num]
+    try:
+        model = cosm.loc[model_num]
     
-    for column in cosm.columns:
-        if redshift_column.match(column):
-            z.append(model[column])
+        for column in cosm.columns:
+            if redshift_column.match(column):
+                z.append(model[column])
+    except (ValueError, KeyError):
+        z = [3, 2, 1, 0]
             
     # No need to sort these because they should already
     # be in descending order.
