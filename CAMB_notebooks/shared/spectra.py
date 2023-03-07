@@ -2,16 +2,16 @@
 # the code in this repo.
 linux = True
 
+path_base_linux = "/home/lfinkbei/Documents/"
+path_base_windows = "C:/Users/Lukas/Documents/GitHub/"
+path_base = path_base_linux if linux else path_base_windows
+
 import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
 import camb
 import re
 from scipy.interpolate import interp1d
-
-path_base_linux = "/home/lfinkbei/Documents/"
-path_base_windows = "C:/Users/Lukas/Documents/GitHub/"
-path_base = path_base_linux if linux else path_base_windows
 
 '''Keep in mind that this is NOT the same file as the original
 "cosmology_Aletheia.dat" that Ariel gave us! If you use the unaltered version,
@@ -61,13 +61,28 @@ for omnu in omnu_strings:
                 names=["k", "P_no", "P_nu", "ratio"], sep='\s+'))
 
 colors = ["green", "blue", "brown", "red", "black", "orange", "purple",
-          "magenta", "cyan"]
+          "magenta", "cyan"] * 2
 
 #styles = ["solid", "dotted", "dashed", "dashdot", "solid", "dotted", "dashed",
 #    "dashdot"]
 # Line styles are unfortunately too distracting in plots as dense as those with
 # which we are here dealing; make everything solid
-styles = ["solid"] * 9
+styles = ["solid"] * 18
+
+def match_s12(target, tolerance, cosmology):
+    """
+        Return a redshift at which to evaluate the power spectrum of cosmology
+    @cosmology such that the sigma12_massless value of the power spectrum is
+    within @tolerance (multiplicative discrepancy) of @target.
+ 
+    @target this is the value of sigma12_massless at the assumed redshift
+        (e.g. typically at z=2.0 for a standard Aletheia model-0 setup).
+    @cosmology this is the cosmology for which we want to find a sigma12 value,
+        so this will typically be an exotic or randomly generated cosmology
+    @tolerance ABS((target - sigma12_found) / target) <= tolerance is the
+        stopping condition for the binary search that this routine uses.
+    """
+    return 23
 
 def get_cosmology(gen_order = ["M", "L"]):
     """
@@ -89,40 +104,28 @@ def get_cosmology(gen_order = ["M", "L"]):
     """
     row = {}
 
-    row['OmM'] = np.random.uniform(0, 1)
-    row['OmL'] = np.random.uniform(0, 1 - row['OmM'])
-    # Where's radiation? Maybe we're neglecting it in all cases?
-    row['OmK'] = 1 - row['OmM'] - row['OmL']
-    
-    row['OmC'] = np.random.uniform(0, row['OmM'])
-    row['OmB'] = 1 - row['OmC']
+    # Shape parameters: CONSTANT ACROSS MODELS
+    row['ombh2'] = 0.022445
+    row['omch2'] = 0.120567
+    row['n_s'] = 0.96
 
+    row['h'] = np.random.uniform(0.55, 0.79)
+   
+    # Given h, the following are now fixed:
+    row['OmB'] = row['ombh2'] / row['h'] ** 2
+    row['OmC'] = row['omch2'] / row['h'] ** 2
+    row['OmM'] = row['OmB'] + row['OmC'] 
+
+    row['OmK'] = np.random.uniform(-0.05, 0)
+    row['OmL'] = 1 - row['OmM'] - row['OmK']
+    
     #~ Do we have any constraints on h besides Aletheia?
     # I ask because this seems like a pretty small window.
-    row['h'] = np.random.uniform(0.55, 0.79)
-
     #ditto
     row['w0'] = np.random.uniform(-0.85, -1.15)
     # ditto
     row['wa'] = np.random.uniform(-0.20, 0.20)
 
-    row['omch2'] = row['OmC'] * row['h'] ** 2
-    row['ombh2'] = row['OmB'] * row['h'] ** 2
-
-    #! Our data tables contain no other n_s values. What, then, could inform
-    # the following statement??
-    row['n_s'] = np.random.uniform(0.2, 0.99)
-
-    #! This would be a good question to ask during a meeting
-    '''
-    Is A_s a checksum parameter? That is to say, now that I have defined all of
-    the parameters above, should A_s be fully determined? Or is A_s actually
-    still a free parameter?
-
-    It shouldn't be free, right? Otherwise, how could our predictor of
-        C \omega_\nu \log (A_s^i / A_s^0)
-    be worth anything?
-    '''
     row['A_s'] = np.random.uniform(1.78568440085517E-09, 2.48485942677850E-09)
 
     #~ Should we compute omnuh2 here, or leave that separate?
@@ -175,6 +178,11 @@ def better_battery(onh2s, onh2_strs, skips_omega = [0, 2],
     """
     Similar procedure to boltzmann_battery, but with an architecture that
     more closely agrees with that of Ariel's in the powernu results.
+    spec_sims
+        omnuh2 str
+            model index
+                snapshot index
+                    quantity of interest
 
     Although this agreement is an added benefit, the main point is simply to
     have a cleaner and more versatile architecture than the mess of separate
@@ -430,7 +438,7 @@ def model_ratios_old(k_list, p_list, snap_index, canvas, subscript, title,
 
 def model_ratios_true(snap_index, correct_sims, canvas, massive=True, skips=[],
     subplot_indices=None, active_labels=['x', 'y'], title="Ground truth",
-    omnuh2_str="0.002"):
+    omnuh2_str="0.002", models=cosm):
     """
     Why is this a different function from above?
     There are a couple of annoying formatting differences with the power nu
@@ -447,7 +455,7 @@ def model_ratios_true(snap_index, correct_sims, canvas, massive=True, skips=[],
     elif massive==False:
         P_accessor = "P_no"
  
-    baseline_h = cosm.loc[0]["h"]
+    baseline_h = models.loc[0]["h"]
     baseline_k = correct_sims[0][snap_index]["k"]
     
     baseline_p = correct_sims[0][snap_index]["P_nu"] / \
@@ -469,7 +477,7 @@ def model_ratios_true(snap_index, correct_sims, canvas, massive=True, skips=[],
     for i in range(1, len(correct_sims)):
         if i in skips:
             continue # Don't know what's going on with model 8
-        this_h = cosm.loc[i]["h"]
+        this_h = models.loc[i]["h"]
         this_k = correct_sims[i][snap_index]["k"]
         
         this_p = correct_sims[i][snap_index]["P_nu"] / \
