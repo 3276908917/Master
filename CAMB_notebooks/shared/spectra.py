@@ -69,7 +69,7 @@ colors = ["green", "blue", "brown", "red", "black", "orange", "purple",
 # which we are here dealing; make everything solid
 styles = ["solid"] * 18
 
-def match_s12(target, tolerance, cosmology, _z=1):
+def match_s12(target, tolerance, cosmology, _z=1, _max=100, _min=0):
     """
         Return a redshift at which to evaluate the power spectrum of cosmology
     @cosmology such that the sigma12_massless value of the power spectrum is
@@ -90,15 +90,19 @@ def match_s12(target, tolerance, cosmology, _z=1):
     # First, let's probe the half-way point.
     # We're assuming a maximum allowed redshift of $z=2$ for now.
 
-    z = 1
-    _, _, _, s12 = kzps(cosmology, 0, nu_massive=False, zs=[z])
+    #print(_z)
+    _, _, _, s12 = kzps(cosmology, 0, nu_massive=False, zs=[_z])
+    s12 = s12[0]
+    #print("z:", _z, "s12:", s12)
     discrepancy = (target - s12) / target
     if abs(discrepancy) <= tolerance:
-        return z
+        return _z
     elif discrepancy < 0: # our sigma12 was too large
-        return match_s12(target, tolerance, cosmology, np.average((2, z)))
+        return match_s12(target, tolerance, cosmology,
+            _z=np.average((_max, _z)), _max=_max, _min=_z)
     elif discrepancy > 0: # our sigma12 was too small
-        return match_s12(target, tolerance, cosmology, np.average((z, 0)))
+        return match_s12(target, tolerance, cosmology,
+            _z=np.average((_z, _min)), _max=_z, _min=_min)
 
 def get_cosmology(gen_order = ["M", "L"]):
     """
@@ -273,7 +277,7 @@ def better_battery(onh2s, onh2_strs, skips_omega = [0, 2],
                 inner_dict["z"] = z_input[snap_index]               
  
                 assert np.array_equal(massless_tuple[0], massive_tuple[0]), \
-                   "assumption of identical k axies not satisfied!"
+                   "assumption of identical k axes not satisfied!"
                     
                 spec_sims[om_str][mindex].append(inner_dict) 
 
