@@ -69,7 +69,7 @@ colors = ["green", "blue", "brown", "red", "black", "orange", "purple",
 # which we are here dealing; make everything solid
 styles = ["solid"] * 18
 
-def match_s12(target, tolerance, cosmology):
+def match_s12(target, tolerance, cosmology, _z=1):
     """
         Return a redshift at which to evaluate the power spectrum of cosmology
     @cosmology such that the sigma12_massless value of the power spectrum is
@@ -81,8 +81,24 @@ def match_s12(target, tolerance, cosmology):
         so this will typically be an exotic or randomly generated cosmology
     @tolerance ABS((target - sigma12_found) / target) <= tolerance is the
         stopping condition for the binary search that this routine uses.
+    @_z: the redshift to test at. This is part of the internal logic of the
+        function and should not be referenced elsewhere.
     """
-    return 23
+    # If speed is an issue, let's reduce the k samples to 300, or at least
+    # add num_samples as a function parameter to kzps
+
+    # First, let's probe the half-way point.
+    # We're assuming a maximum allowed redshift of $z=2$ for now.
+
+    z = 1
+    _, _, _, s12 = kzps(cosmology, 0, nu_massive=False, zs=[z])
+    discrepancy = (target - s12) / target
+    if abs(discrepancy) <= tolerance:
+        return z
+    elif discrepancy < 0: # our sigma12 was too large
+        return match_s12(target, tolerance, cosmology, np.average((2, z)))
+    elif discrepancy > 0: # our sigma12 was too small
+        return match_s12(target, tolerance, cosmology, np.average((z, 0)))
 
 def get_cosmology(gen_order = ["M", "L"]):
     """
