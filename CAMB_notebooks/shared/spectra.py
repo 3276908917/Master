@@ -61,13 +61,13 @@ for omnu in omnu_strings:
                 names=["k", "P_no", "P_nu", "ratio"], sep='\s+'))
 
 colors = ["green", "blue", "brown", "red", "black", "orange", "purple",
-          "magenta", "cyan"] * 2
+          "magenta", "cyan"] * 200
 
 #styles = ["solid", "dotted", "dashed", "dashdot", "solid", "dotted", "dashed",
 #    "dashdot"]
 # Line styles are unfortunately too distracting in plots as dense as those with
 # which we are here dealing; make everything solid
-styles = ["solid"] * 18
+styles = ["solid"] * 200
 
 def match_s12(target, tolerance, cosmology, _z=1, _max=100, _min=0):
     """
@@ -129,7 +129,7 @@ def get_cosmology(gen_order = ["M", "L"]):
     row['omch2'] = 0.120567
     row['n_s'] = 0.96
 
-    row['h'] = np.random.uniform(0.55, 0.79)
+    row['h'] = np.random.uniform(0.2, 1)
    
     # Given h, the following are now fixed:
     row['OmB'] = row['ombh2'] / row['h'] ** 2
@@ -142,9 +142,9 @@ def get_cosmology(gen_order = ["M", "L"]):
     #~ Do we have any constraints on h besides Aletheia?
     # I ask because this seems like a pretty small window.
     #ditto
-    row['w0'] = np.random.uniform(-0.85, -1.15)
+    row['w0'] = np.random.uniform(-2., -.5)
     # ditto
-    row['wa'] = np.random.uniform(-0.20, 0.20)
+    row['wa'] = np.random.uniform(-0.5, 0.5)
 
     row['A_s'] = np.random.uniform(1.78568440085517E-09, 2.48485942677850E-09)
 
@@ -458,7 +458,7 @@ def model_ratios_old(k_list, p_list, snap_index, canvas, subscript, title,
 
 def model_ratios_true(snap_index, correct_sims, canvas, massive=True, skips=[],
     subplot_indices=None, active_labels=['x', 'y'], title="Ground truth",
-    omnuh2_str="0.002", models=cosm):
+    omnuh2_str="0.002", models=cosm, suppress_legend=False):
     """
     Why is this a different function from above?
     There are a couple of annoying formatting differences with the power nu
@@ -532,7 +532,8 @@ def model_ratios_true(snap_index, correct_sims, canvas, massive=True, skips=[],
     
     plot_area.set_title(title + r": $\omega_\nu$ = " + omnuh2_str + \
         "; Snapshot " + str(snap_index))
-    plot_area.legend()
+    if not suppress_legend:
+        plot_area.legend()
 
     return k_list, rat_list
 
