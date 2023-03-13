@@ -46,9 +46,14 @@ def generate_samples(ranges, n_samples, n_trials=0, validation=False):
         the latin hypercube
     """
     
-    # Did you mean to say, "if not"?
-    # Anyway, it would be bad if you had, because for some reason,
-    # isinstance(OrderedDict({"one": 1, "two": 2}) == False
+    '''
+    Lukas:
+    Did you mean to say, "if not"?
+    Anyway, it would be bad if you did, because for some reason,
+    isinstance(OrderedDict({"one": 1, "two": 2}), type(OrderedDict)) == False
+    one should instead write
+    isinstance(OrderedDict({"one": 1, "two": 2}), OrderedDict)
+    '''
     if isinstance(ranges, type(OrderedDict)):
         raise LhcException('Ranges argument is meant to be an '
                            'OrderedDict object')
@@ -61,11 +66,13 @@ def generate_samples(ranges, n_samples, n_trials=0, validation=False):
     # Else, we generate the training sample using a routine from pyDOE
     # that creates a LHC
     else:
-        # This is the external function, 'lhs'. It needs to know the size
-        # of the parameter space, the number of points you want, and the
-        # criterion to select points. 'center' means that it first divides
-        # each dimension of the parameter space into n_samples equispaced
-        # intervals and it picks the middle point of the chosen interval
+        '''
+        This is the external function, 'lhs'. It needs to know the size
+        of the parameter space, the number of points you want, and the
+        criterion to select points. 'center' means that it first divides
+        each dimension of the parameter space into n_samples equispaced
+        intervals and it picks the middle point of the chosen interval
+        '''
         samples = lhs(n=n_params, samples=n_samples, criterion='center')
         # We want to get a good configuration for the LHC, that maximises
         # the minimum distance among points.
@@ -83,9 +90,11 @@ def generate_samples(ranges, n_samples, n_trials=0, validation=False):
                 min_dist = min_dist_new
                 samples = samples_new
 
-    # The lhs function returns a LHC normalized within the range [0,1]
-    # for each dimension. We have to rescale the LHC to match the range
-    # we want for our cosmological parameters
+    '''
+    The lhs function returns a LHC normalized within the range [0,1]
+    for each dimension. We have to rescale the LHC to match the range
+    we want for our cosmological parameters
+    '''
     for n, (par, par_range) in enumerate(iteritems(ranges)):
         samples[:, n] = samples[:, n] * (par_range[1] - par_range[0]) \
             + par_range[0]

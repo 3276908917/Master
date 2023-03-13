@@ -2,7 +2,7 @@ import numpy as np
 from scipy.interpolate import interp1d
 import GPy
 
-#Here is some demo code that I used to get to start this off:                    
+# Here is some demo code that I used to get to start this off:                    
 
 def test():
     model0 = np.array([0.022445, 0.120567, 0.67])
@@ -110,7 +110,7 @@ def truncator(base_x, base_y, obj_x, obj_y):
     return trunc_base_x, trunc_base_y, aligned_y
 
 def get_model(X, Y):
-    # Does it work if three parameters predicts a nine-thousand element array?
+    # Does it work if three parameters predict a nine-thousand element array?
     
     # Should we use a 3D kernel because the X row is 3D?
     # Or should the kernel match the Y dimensions?
