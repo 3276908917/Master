@@ -67,7 +67,7 @@ def generate_samples(ranges, n_samples, n_trials=0, validation=False):
     # that creates a LHC
     else:
         '''
-        This is the external function, 'lhs'. It needs to know the size
+        This is the external function, 'lhs.' It needs to know the size
         of the parameter space, the number of points you want, and the
         criterion to select points. 'center' means that it first divides
         each dimension of the parameter space into n_samples equispaced

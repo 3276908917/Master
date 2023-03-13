@@ -336,7 +336,7 @@ def kzps(mlc, omnuh2_in, nu_massive=False, zs = [0], nnu_massive_in=1):
         H0=h * 100,
         ombh2=mlc["ombh2"],
         omch2=omch2_in,
-        omk=mlc["OmK"] * h ** 2,
+        omk=mlc["OmK"],
         mnu=mnu_in,
         num_massive_neutrinos=nnu_massive,
         tau=0.0952, # just like in Matteo's notebook, at least (but maybe I got
@@ -354,9 +354,12 @@ def kzps(mlc, omnuh2_in, nu_massive=False, zs = [0], nnu_massive_in=1):
     pars.num_nu_massive = 0
     if nnu_massive != 0:
         pars.num_nu_massive = sum(pars.nu_mass_numbers[:stop_i])
-    
+
     pars.InitPower.set_params(As=mlc["A_s"], ns=mlc["n_s"],
         r=0, nt=0.0, ntrun=0.0) # the last three are desperation arguments
+    
+    ''' To change the the extent of the k-axis, change the following line as
+    well as the "get_matter_power_spectrum" call. '''
     pars.set_matter_power(redshifts=zs, kmax=20.0 / h, nonlinear=False)
     
     ''' The following seven lines are desperation settings
@@ -376,18 +379,17 @@ def kzps(mlc, omnuh2_in, nu_massive=False, zs = [0], nnu_massive_in=1):
     if mlc["w0"] != -1 or float(mlc["wa"]) !=0:
         pars.set_dark_energy(w=mlc["w0"], wa=float(mlc["wa"]),
             dark_energy_model='ppf')
-    '''
-    To change the the extent of the k-axis,
-    change the following line as well as the "get_matter_power_spectrum" call
     
-    In some cursory tests, the accurate_massive_neutrino_transfers
-    flag did not appear to significantly alter the outcome.
-    '''
     results = camb.get_results(pars)
     results.calc_power_spectra(pars)
+
+    '''
+    In some cursory tests, the accurate_massive_neutrino_transfers
+    flag did not appear to significantly alter the outcome.
     
-    # The flags var1=8 and var2=8 indicate that we are looking at the
-    # power spectrum of CDM + baryons (i.e. neutrinos excluded).
+    The flags var1=8 and var2=8 indicate that we are looking at the
+    power spectrum of CDM + baryons (i.e. neutrinos excluded).
+    '''
     k, z, p = results.get_matter_power_spectrum(
         minkh=1e-4 / h, maxkh=10.0 / h, npoints = 100000,
         var1=8, var2=8

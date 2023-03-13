@@ -1,6 +1,7 @@
 import numpy as np
 from scipy.interpolate import interp1d
 import GPy
+import evolmap.lhc
 
 # Here is some demo code that I used to get to start this off:                    
 
@@ -18,12 +19,34 @@ def initialize():
     This function is no longer necessary if you have .npy files from a previous
     run.
     """
-    ombh2 = 0.022445                                                                
-    omch2 = 0.120567                                                                
+
+    # We're keeping A_s fixed, right?
+    # We're also keeping Omega_K = 0 fixed
+
+    # We still need a sigma_12 range
+    
+    # tau must be an evolution parameter if we're not including it here
+
     hc = evolmap.lhc.generate_samples({                                             
-        'om_b': [0.9 * ombh2, 1.1 * omch2],                                         
-        'om_c': [0.9 * omch2, 1.1 * omch2],                                         
-        'h': [.603, .737]}, 100, 100)                                               
+        'om_b': [0.005, 0.28],                                         
+        'om_c': [0.001, 0.99],                                         
+        #'h': [0.2, 1.0],
+        'n_s': [0.7, 1.3],
+        #'tau': [0.01, 0.8], 
+        #'w0': [-2, -0.5],
+        #'wa': [-0.5, 0.5],
+        'sigma12': [0.343, 1], # based on Sanchez et al 21 and
+            # Sanchez 20, figure 2 
+        'om_nu': [0.0006356, 0.01]
+    }, 100, 100)
+
+    return hc
+
+    ''' Now we want to attach a power spectrum to each cosmology. What values
+        do we take for the remaining parameters? It shouldn't matter, as long
+        as they yield the same sigma_12. So you could assume model0, then
+        simply rescale the result according to the principle of evolution
+        mapping.'''
 
 def load(hc_file="hc.py", samples_file="samples.npy"):
     """
@@ -33,10 +56,10 @@ def load(hc_file="hc.py", samples_file="samples.npy"):
 
 def homogenize_k_axes(samples):
     """
-    This takes as input a two-column matrix of arrays (first dimension: k,
-        second dimension: P(k)). Then it takes the first row as the baseline
-        such that all other P(k) are interpolated as though they had the same
-        k axis as the first row.
+        This takes as input a two-column matrix of arrays (first dimension: k,
+    second dimension: P(k)). Then it takes the first row as the baseline
+    such that all other P(k) are interpolated as though they had the same
+    k axis as the first row.
     """
 
     # First, let's find the rows with the smallest k_max and largest k_min:

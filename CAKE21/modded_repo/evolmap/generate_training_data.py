@@ -23,43 +23,94 @@ def fill_hypercube(parameter_values):
     samples = np.zeros((len(parameter_values), 2, NPOINTS))
     for i in range(len(parameter_values)):
         config = parameter_values[i]
-        k, p = kp(config[0], config[1], config[2])
+        k, p = kp(config[0], config[1], config[2], config[4], config[3])
         samples[i, 0] = k
         samples[i, 1] = p
+        
+        # We still need to do the evolution-mapping relabeling, to convert from
+        # what would have been the model0 sigma12 to what is the target sigma12.
         print(i)
     return samples
 
-def kp(om_b, om_c, h):
+def kp(om_b_in, om_c_in, ns_in, omn_nu_in, sigma12_in):
     """
     This is a pared-down demo version of kzps, it only considers
     redshift zero.
 
     Returns the scale axis and power spectrum in Mpc units
     """
+    # model0 stuff is assumed to get the initial pspectrum that we'll rescale
+    h_in = 0.67
+    As_in = 2.12723788013000E-09
+    OmK_in = 0 '''I didn't want to assume this yet; part of the experiment is to
+    see if OmK is correctly automatically set to 0. Unfortunately, set_cosmology
+    demands an omk value, I guess we can ask Ariel how to run this test then.'''
+    
+    w0_in = -1.00
+    wa_in = 0.00 
+    
+    # This sucks. See spectra.py kzps for a more detailed complaint.
+    mnu_in = om_nu_in * camb.constants.neutrino_mass_fac / \
+        (camb.constants.default_nnu / 3.0) ** 0.75
+    nnu_massive=1 if mnu_in != 0 else 0
+   
     pars = camb.CAMBparams()
     pars.set_cosmology(
-        H0 = h * 100,
-        ombh2=om_b,
-        omch2=om_c,
-        omk=model0["OmK"],
-        mnu=0,
-        num_massive_neutrinos=0,
-        neutrino_hierarchy="degenerate" # 1 eigenstate approximation; our
-        # neutrino setup (see below) is not valid for inverted/normal
-        # hierarchies.
+        H0 = h_in * 100,
+        ombh2=om_b_in,
+        omch2=om_c_in,
+        omk=OmK_in,
+        tau=0.0952, # desperation argument
+        mnu=mnu_in,
+        num_massive_neutrinos=nnu_massive,
+        neutrino_hierarchy="degenerate" ''' 1 eigenstate approximation; our
+        neutrino setup (see below) is not valid for inverted/normal
+        hierarchies.'''
     )
+    
+    pars.num_nu_massless = 3.046 - nnu_massive
+    pars.nu_mass_eigenstates = nnu_massive
+    stop_i = pars.nu_mass_eigenstates + 1
+    pars.nu_mass_numbers[:stop_i] = \
+        list(np.ones(len(pars.nu_mass_numbers[:stop_i]), int))
+    pars.num_nu_massive = 0
+    if nnu_massive != 0:
+        pars.num_nu_massive = sum(pars.nu_mass_numbers[:stop_i])
 
-    pars.InitPower.set_params(As=model0["A_s"], ns=model0["n_s"])
-    pars.set_dark_energy(w=model0["w0"], wa=float(model0["wa"]),
-        dark_energy_model='ppf')
-
-    pars.set_matter_power(redshifts=np.array([0]), kmax=10.0, nonlinear=False)
+    # Last three are desperation arguments
+    pars.InitPower.set_params(As=As_in, ns=ns_in, r=0, nt=0.0, ntrun=0.0)
+    pars.set_matter_power(redshifts=np.array([0]), kmax=10.0 / h_in,
+        nonlinear=False)
+    
+    ''' The following seven lines are desperation settings
+    If we ever have extra time, we can more closely study what each line does
+    '''
+    # This is a desperation line in light of the previous line. The previous
+    # line seems to have served me well enough so far, but BSTS.
+    pars.NonLinear = camb.model.NonLinear_none
+    pars.WantCls = False
+    pars.WantScalars = False
+    pars.Want_CMB = False
+    pars.DoLensing = False
+    pars.YHe = 0.24   
+    pars.set_accuracy(AccuracyBoost=2)
+    
     results = camb.get_results(pars)
     results.calc_power_spectra(pars)
 
+    ''' AndreaP thinks that npoints=300 should be a good balance of accuracy and
+    computability for our LH.'''
     k, z, p = results.get_matter_power_spectrum(
-        minkh=1e-4, maxkh=10.0, npoints = 10000,
+        minkh=1e-4 / h_in, maxkh=10.0 / h_in, npoints = 300,
         var1=8, var2=8
     )
+    
+    if len(p) == 1:
+        p = p[0] 
 
-    return k * h, p * h ** 3
+    ''' What happened to our rescaling routine, with sigma12_in? Since sigma12
+        is no longer a parameter in kzps, I can only assume I must have removed
+        it. But it should be easy enough to use Git to retrieve the latest
+        extant version.'''
+
+    return k * h_in, p * h_in ** 3
