@@ -19,9 +19,9 @@ you will get a segfault'''
 path_to_me = path_base + "Master/CAMB_notebooks/shared/"
 cosm = pd.read_csv(path_to_me + "data/cosmologies.dat", sep='\s+')
 
-omegas_nu = np.array([0.0006356, 0.002148659574468, 0.006356])#, 0.01])
+omegas_nu = np.array([0.0006356, 0.002148659574468, 0.006356, 0.01])
 # Add corresponding file accessors, to check our work later
-omnu_strings = np.array(["0.0006", "0.002", "0.006"])#, "0.01"])
+omnu_strings = np.array(["0.0006", "0.002", "0.006", "0.01"])
 
 # The following code is somewhat hard;
 # I'm not sure how better to do it.
@@ -30,35 +30,41 @@ redshift_column = re.compile("z.+")
 ''' To check our work, we'll need the correct solutions. '''
 file_base = path_to_me + "data/power_nu/Aletheia_powernu_zorig_nu"
 
-powernu = {}
-for omnu in omnu_strings:
-    powernu[omnu] = []
+'''! We really ought to merge the next three functions'''
 
-    for i in range(0, 9): # iterate over models
-        powernu[omnu].append([])
-        for j in range(0, 5): # iterate over snapshots
-            powernu[omnu][i].append(pd.read_csv(file_base + omnu + "_caso" + \
-                str(i) + "_000" + str(j) + ".dat",
-                names=["k", "P_no", "P_nu", "ratio"], sep='\s+'))
+powernu = {}
+
+def define_powernu():
+    for omnu in omnu_strings:
+        powernu[omnu] = []
+
+        for i in range(0, 9): # iterate over models
+            powernu[omnu].append([])
+            for j in range(0, 5): # iterate over snapshots
+                powernu[omnu][i].append(pd.read_csv(file_base + omnu + "_caso" + \
+                    str(i) + "_000" + str(j) + ".dat",
+                    names=["k", "P_no", "P_nu", "ratio"], sep='\s+'))
 
 powernu2 = []
-for i in range(0, 9): # iterate over models
-    powernu2.append([])
-    for j in range(0, 5): # iterate over snapshots
-        powernu2[i].append(pd.read_csv(file_base + omnu + "_caso" + \
-            str(i) + "_000" + str(j) + ".dat",
-            names=["k", "P_no", "P_nu", "ratio"], sep='\s+'))
-
-powernu3 = {}
-for omnu in omnu_strings:
-    powernu3[omnu] = []
-
+def define_powernu2():
     for i in range(0, 9): # iterate over models
-        powernu3[omnu].append([])
+        powernu2.append([])
         for j in range(0, 5): # iterate over snapshots
-            powernu3[omnu][i].append(pd.read_csv(file_base + omnu + "_caso" + \
+            powernu2[i].append(pd.read_csv(file_base + omnu + "_caso" + \
                 str(i) + "_000" + str(j) + ".dat",
                 names=["k", "P_no", "P_nu", "ratio"], sep='\s+'))
+
+powernu3 = {}
+def define_powernu3():
+    for omnu in omnu_strings:
+        powernu3[omnu] = []
+
+        for i in range(0, 9): # iterate over models
+            powernu3[omnu].append([])
+            for j in range(0, 5): # iterate over snapshots
+                powernu3[omnu][i].append(pd.read_csv(file_base + omnu + "_caso" + \
+                    str(i) + "_000" + str(j) + ".dat",
+                    names=["k", "P_no", "P_nu", "ratio"], sep='\s+'))
 
 colors = ["green", "blue", "brown", "red", "black", "orange", "purple",
           "magenta", "cyan"] * 200
@@ -146,7 +152,9 @@ def get_cosmology(gen_order = ["M", "L"]):
     # ditto
     row['wa'] = np.random.uniform(-0.5, 0.5)
 
-    row['A_s'] = np.random.uniform(1.78568440085517E-09, 2.48485942677850E-09)
+    A_min = np.exp(1.61) / 10 ** 10
+    A_max = np.exp(5) / 10 ** 10
+    row['A_s'] = np.random.uniform(A_min, A_max)
 
     #~ Should we compute omnuh2 here, or leave that separate?
 
