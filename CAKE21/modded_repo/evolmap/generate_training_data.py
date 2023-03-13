@@ -13,7 +13,7 @@ import re
 cosm = pd.read_csv("cosmologies.dat", sep='\s+')
 model0 = cosm.loc[0]
 
-NPOINTS = 10000
+NPOINTS = 300
 
 def fill_hypercube(parameter_values):
     """
@@ -32,7 +32,7 @@ def fill_hypercube(parameter_values):
         print(i)
     return samples
 
-def kp(om_b_in, om_c_in, ns_in, omn_nu_in, sigma12_in):
+def kp(om_b_in, om_c_in, ns_in, om_nu_in, sigma12_in):
     """
     This is a pared-down demo version of kzps, it only considers
     redshift zero.
@@ -42,7 +42,8 @@ def kp(om_b_in, om_c_in, ns_in, omn_nu_in, sigma12_in):
     # model0 stuff is assumed to get the initial pspectrum that we'll rescale
     h_in = 0.67
     As_in = 2.12723788013000E-09
-    OmK_in = 0 '''I didn't want to assume this yet; part of the experiment is to
+    OmK_in = 0
+    '''I didn't want to assume this last line yet; part of the experiment is to
     see if OmK is correctly automatically set to 0. Unfortunately, set_cosmology
     demands an omk value, I guess we can ask Ariel how to run this test then.'''
     
@@ -63,9 +64,9 @@ def kp(om_b_in, om_c_in, ns_in, omn_nu_in, sigma12_in):
         tau=0.0952, # desperation argument
         mnu=mnu_in,
         num_massive_neutrinos=nnu_massive,
-        neutrino_hierarchy="degenerate" ''' 1 eigenstate approximation; our
-        neutrino setup (see below) is not valid for inverted/normal
-        hierarchies.'''
+        neutrino_hierarchy="degenerate" # 1 eigenstate approximation; our
+        # neutrino setup (see below) is not valid for inverted/normal
+        # hierarchies.
     )
     
     pars.num_nu_massless = 3.046 - nnu_massive
@@ -97,11 +98,28 @@ def kp(om_b_in, om_c_in, ns_in, omn_nu_in, sigma12_in):
     
     results = camb.get_results(pars)
     results.calc_power_spectra(pars)
+    
+    '''! This is some MEGA old code. Who knows if it even worked when it still
+    lived in the repo? I don't really recall ever making use of it.
+    More importantly, I'm not sure if this is what Ariel even wants me to do. At
+    the last meeting, it kind of sounded like the real solution was to vary the
+    z until sigma12 is correct, not As!
+    
+    Anyway, this code is coming from the Nov 29 commit.
+    I could spend more time looking for the last iteration of the code before it
+    was excised, but that sounds like a complete waste of time. As I recall, it
+    was a stagnant block of code for a very long time before it was removed.
+    '''
+    sigma12_unmodified = results.get_sigmaR(12, hubble_units=False)        
+    As_rescaled = 2e-9 * (sigma12_in / sigma12_unmodified) ** 2
+    
+    pars.InitPower.set_params(As=As_rescaled, ns=ns_in, r=0, nt=0.0,
+        ntrun=0.0)
 
     ''' AndreaP thinks that npoints=300 should be a good balance of accuracy and
     computability for our LH.'''
     k, z, p = results.get_matter_power_spectrum(
-        minkh=1e-4 / h_in, maxkh=10.0 / h_in, npoints = 300,
+        minkh=1e-4 / h_in, maxkh=10.0 / h_in, npoints = NPOINTS,
         var1=8, var2=8
     )
     
