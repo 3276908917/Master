@@ -50,7 +50,7 @@ def define_powernu2():
     for i in range(0, 9): # iterate over models
         powernu2.append([])
         for j in range(0, 5): # iterate over snapshots
-            powernu2[i].append(pd.read_csv(file_base + omnu + "_caso" + \
+            powernu2[i].append(pd.read_csv(file_base + "0.002_caso" + \
                 str(i) + "_000" + str(j) + ".dat",
                 names=["k", "P_no", "P_nu", "ratio"], sep='\s+'))
 
@@ -232,7 +232,7 @@ def better_battery(onh2s, onh2_strs, skips_omega = [0, 2],
     spec_sims = {}
 
     for om_index in range(len(onh2s)):
-        print(om_index)
+        print(om_index % 10, end='')
         om = onh2s[om_index]
         om_str = onh2_strs[om_index]
         if om_index in skips_omega:
