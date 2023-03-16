@@ -3,7 +3,7 @@ from scipy.interpolate import interp1d
 import GPy
 import evolmap.lhc
 
-# Here is some demo code that I used to get to start this off:                    
+# Here is some demo code that I used to start this off:                    
 
 def test():
     model0 = np.array([0.022445, 0.120567, 0.67])
@@ -14,7 +14,7 @@ def test():
 
     return gp_model.predict_noiseless(model0)
 
-def initialize():
+def initialize(num_samples=100, num_trials=100):
     """
     Try to save the results of previous runs as npy files, to ensure consistency
     of outcomes.
@@ -25,7 +25,7 @@ def initialize():
     
     # tau must be an evolution parameter if we're not including it here
 
-    hc = evolmap.lhc.generate_samples({                                             
+    hc, list_min_dist = evolmap.lhc.generate_samples({                                             
         'om_b': [0.005, 0.28],                                         
         'om_c': [0.001, 0.99],    # max 0.3?                                     
         #'h': [0.2, 1.0],
@@ -36,9 +36,9 @@ def initialize():
         'sigma12': [0.2, 1], # based on Sanchez et al 21 and
             # Sanchez 20, figure 2 
         'om_nu': [0.0006356, 0.01]
-    }, 100, 100)
+    }, num_samples, num_trials)
 
-    return hc
+    return hc, list_min_dist
 
     ''' Now we want to attach a power spectrum to each cosmology. What values
         do we take for the remaining parameters? It shouldn't matter, as long

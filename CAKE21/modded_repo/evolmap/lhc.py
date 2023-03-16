@@ -6,7 +6,7 @@ latin hypercubes.
 """
 
 import numpy as np
-from pyDOE import lhs
+from pyDOE2 import lhs
 from six import iteritems
 from scipy.spatial.distance import cdist
 from collections import OrderedDict
@@ -66,6 +66,7 @@ def generate_samples(ranges, n_samples, n_trials=0, validation=False):
     # Else, we generate the training sample using a routine from pyDOE
     # that creates a LHC
     else:
+        list_min_dist = []
         '''
         This is the external function, 'lhs.' It needs to know the size
         of the parameter space, the number of points you want, and the
@@ -87,6 +88,7 @@ def generate_samples(ranges, n_samples, n_trials=0, validation=False):
             # If the new minimum distance is larger than the one we stored,
             # then we pick this configuration
             if (min_dist_new > min_dist):
+                list_min_dist.append((n, min_dist_new))
                 min_dist = min_dist_new
                 samples = samples_new
 
@@ -99,4 +101,4 @@ def generate_samples(ranges, n_samples, n_trials=0, validation=False):
         samples[:, n] = samples[:, n] * (par_range[1] - par_range[0]) \
             + par_range[0]
 
-    return samples
+    return samples, np.array(list_min_dist)
