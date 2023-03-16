@@ -109,6 +109,9 @@ def kp(om_b_in, om_c_in, ns_in, om_nu_in, sigma12_in):
     I could spend more time looking for the last iteration of the code before it
     was excised, but that sounds like a complete waste of time. As I recall, it
     was a stagnant block of code for a very long time before it was removed.
+    
+    >> We should be finding a good redshift, not a good A_s. The A_s should
+        remain close to the Planck value. Instead we should find a good z
     '''
     sigma12_unmodified = results.get_sigmaR(12, hubble_units=False)        
     As_rescaled = 2e-9 * (sigma12_in / sigma12_unmodified) ** 2

@@ -16,26 +16,24 @@ def test():
 
 def initialize():
     """
-    This function is no longer necessary if you have .npy files from a previous
-    run.
+    Try to save the results of previous runs as npy files, to ensure consistency
+    of outcomes.
     """
 
     # We're keeping A_s fixed, right?
     # We're also keeping Omega_K = 0 fixed
-
-    # We still need a sigma_12 range
     
     # tau must be an evolution parameter if we're not including it here
 
     hc = evolmap.lhc.generate_samples({                                             
         'om_b': [0.005, 0.28],                                         
-        'om_c': [0.001, 0.99],                                         
+        'om_c': [0.001, 0.99],    # max 0.3?                                     
         #'h': [0.2, 1.0],
-        'n_s': [0.7, 1.3],
+        'n_s': [0.7, 1.3], # expand?
         #'tau': [0.01, 0.8], 
         #'w0': [-2, -0.5],
         #'wa': [-0.5, 0.5],
-        'sigma12': [0.343, 1], # based on Sanchez et al 21 and
+        'sigma12': [0.2, 1], # based on Sanchez et al 21 and
             # Sanchez 20, figure 2 
         'om_nu': [0.0006356, 0.01]
     }, 100, 100)
