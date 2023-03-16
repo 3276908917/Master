@@ -126,6 +126,10 @@ def kp(om_b_in, om_c_in, ns_in, om_nu_in, sigma12_in):
         var1=8, var2=8
     )
     
+    return results.get_matter_power_interpolator(zmin=-10, zmax=10,
+        nz_step=1000, nonlinear=False, var1=8, var2=8, hubble_units=False,
+        k_hunit=False)
+    
     if len(p) == 1:
         p = p[0] 
 
