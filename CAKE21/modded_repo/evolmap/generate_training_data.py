@@ -4,9 +4,10 @@
 import sys, platform, os
 import numpy as np
 from scipy.interpolate import interp1d
+from scipy.optimize import newton
 
 import camb
-from camb import model, initialpower
+from camb import model, initialpower, get_matter_power_interpolator
 import pandas as pd
 import re
 
@@ -23,6 +24,7 @@ def fill_hypercube(parameter_values):
     samples = np.zeros((len(parameter_values), 2, NPOINTS))
     for i in range(len(parameter_values)):
         config = parameter_values[i]
+        print(config, "\n", config[4])
         k, p = kp(config[0], config[1], config[2], config[4], config[3])
         samples[i, 0] = k
         samples[i, 1] = p
@@ -32,7 +34,8 @@ def fill_hypercube(parameter_values):
         print(i)
     return samples
 
-def kp(om_b_in, om_c_in, ns_in, om_nu_in, sigma12_in):
+def kp(om_b_in, om_c_in, ns_in, om_nu_in, sigma12_in,
+    _redshifts=np.linspace(0, 10, 150)):
     """
     This is a pared-down demo version of kzps, it only considers
     redshift zero.
@@ -80,8 +83,6 @@ def kp(om_b_in, om_c_in, ns_in, om_nu_in, sigma12_in):
 
     # Last three are desperation arguments
     pars.InitPower.set_params(As=As_in, ns=ns_in, r=0, nt=0.0, ntrun=0.0)
-    pars.set_matter_power(redshifts=np.array([0]), kmax=10.0 / h_in,
-        nonlinear=False)
     
     ''' The following seven lines are desperation settings
     If we ever have extra time, we can more closely study what each line does
@@ -95,7 +96,28 @@ def kp(om_b_in, om_c_in, ns_in, om_nu_in, sigma12_in):
     pars.DoLensing = False
     pars.YHe = 0.24   
     pars.set_accuracy(AccuracyBoost=2)
+  
+    pars.set_matter_power(redshifts=_redshifts, kmax=10.0 / h_in,
+        nonlinear=False)
+
+    results = camb.get_results(pars)
+    results.calc_power_spectra(pars)
     
+    list_s12 = results.get_sigmaR(12, var1=8, var2=8, hubble_units=False)
+
+    #import matplotlib.pyplot as plt
+    #print(list_s12)
+    #plt.plot(_redshifts, list_s12); plt.show()
+
+    list_s12 -= sigma12_in # now it's a zero-finding problem
+
+    interpolator = interp1d(_redshifts, list_s12, kind='cubic')
+    z_best = newton(interpolator, 2)
+    #print(z_best, "is our man")
+
+    pars.set_matter_power(redshifts=np.array([z_best]), kmax=10.0 / h_in,
+        nonlinear=False)
+
     results = camb.get_results(pars)
     results.calc_power_spectra(pars)
     
@@ -113,11 +135,13 @@ def kp(om_b_in, om_c_in, ns_in, om_nu_in, sigma12_in):
     >> We should be finding a good redshift, not a good A_s. The A_s should
         remain close to the Planck value. Instead we should find a good z
     '''
+    '''
     sigma12_unmodified = results.get_sigmaR(12, hubble_units=False)        
     As_rescaled = 2e-9 * (sigma12_in / sigma12_unmodified) ** 2
     
     pars.InitPower.set_params(As=As_rescaled, ns=ns_in, r=0, nt=0.0,
         ntrun=0.0)
+    '''
 
     ''' AndreaP thinks that npoints=300 should be a good balance of accuracy and
     computability for our LH.'''
@@ -125,10 +149,15 @@ def kp(om_b_in, om_c_in, ns_in, om_nu_in, sigma12_in):
         minkh=1e-4 / h_in, maxkh=10.0 / h_in, npoints = NPOINTS,
         var1=8, var2=8
     )
+    # print("z", z)
     
-    return results.get_matter_power_interpolator(zmin=-10, zmax=10,
-        nz_step=1000, nonlinear=False, var1=8, var2=8, hubble_units=False,
-        k_hunit=False)
+    # What is the point of the 150 limit? Why can't CAMB simply give me a
+    # bigger interpolator??
+    # Also: you can't root out the negative z later, you have to do it as early
+    # as here...
+    #return get_matter_power_interpolator(pars, zmin=0, zmax=10,
+    #    nz_step=150, nonlinear=False, var1=8, var2=8, hubble_units=False,
+    #    k_hunit=False)
     
     if len(p) == 1:
         p = p[0] 
