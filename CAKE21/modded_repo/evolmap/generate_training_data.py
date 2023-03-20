@@ -19,6 +19,8 @@ model0 = cosm.loc[0]
 
 NPOINTS = 300
 
+import sys, traceback
+
 def fill_hypercube(parameter_values):
     """
     @parameter_values: this should be a list of tuples to
@@ -29,10 +31,15 @@ def fill_hypercube(parameter_values):
         config = parameter_values[i]
         print(config, "\n", config[4])
         k, p = None, None
-        try:
-            k, p = kp(config[0], config[1], config[2], config[4], config[3])
-        except ValueError:
-            print("Ignoring cell with an unreasonable sigma12 request.")
+        #try:
+        k, p = kp(config[0], config[1], config[2], config[4], config[3])
+        #except ValueError:
+            #exc = sys.exception()
+            #traceback.print_tb(exc.__traceback__, limit=1, file=sys.stdout)
+            
+        #    traceback.print_exc(limit=1, file=sys.stdout)
+            
+            #print("Ignoring cell with an unreasonable sigma12 request.")
         samples[i, 0] = k
         samples[i, 1] = p
         
@@ -42,7 +49,7 @@ def fill_hypercube(parameter_values):
     return samples
 
 def kp(om_b_in, om_c_in, ns_in, om_nu_in, sigma12_in,
-    _redshifts=np.linspace(0, 1100, 150)):
+    _redshifts=np.flip(np.linspace(0, 1100, 150))):
     """
     This is a pared-down demo version of kzps, it only considers
     redshift zero.
@@ -112,15 +119,27 @@ def kp(om_b_in, om_c_in, ns_in, om_nu_in, sigma12_in,
     
     list_s12 = results.get_sigmaR(12, var1=8, var2=8, hubble_units=False)
 
-    #import matplotlib.pyplot as plt
+    
+    import matplotlib.pyplot as plt
     #print(list_s12)
-    #plt.plot(_redshifts, list_s12); plt.show()
+    plt.plot(_redshifts, list_s12);
+    plt.axhline(sigma12_in)
+    plt.show()
 
     list_s12 -= sigma12_in # now it's a zero-finding problem
-
-    z_step = _redshifts[1] - _redshifts[0]
+    plt.plot(_redshifts, list_s12);
+    plt.axhline(0)
+    plt.show()
+    
+    
+    z_step = _redshifts[0] - _redshifts[1]
+    print(z_step, "z_step!!!")
     interpolator = interp1d(_redshifts, list_s12, kind='cubic')
-    z_best = newton(interpolator, 2)
+    #print("Lukas' sigma12 guess:", interpolator(1000))
+    print(min(_redshifts), max(_redshifts), np.average(_redshifts))
+    z_best = newton(interpolator, np.average(_redshifts))
+    
+    #print(z_best, "is our man")
     
     if z_step > 0.05: # this is pretty computationally expensive;
         # if the program doesn't run fast enough let's kick it up to 1
@@ -129,9 +148,8 @@ def kp(om_b_in, om_c_in, ns_in, om_nu_in, sigma12_in,
         # seems like a reasonable cap to me.
         new_ceiling = min(1100, z_best + z_step)
         return kp(om_b_in, om_c_in, ns_in, om_nu_in, sigma12_in,
-            _redshifts=np.linspace(new_floor, new_ceiling))
+            _redshifts=np.flip(np.linspace(new_floor, new_ceiling, 150)))
     else:
-        #print(z_best, "is our man")
 
         pars.set_matter_power(redshifts=np.array([z_best]), kmax=10.0 / h_in,
             nonlinear=False)
