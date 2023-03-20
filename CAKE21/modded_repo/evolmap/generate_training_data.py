@@ -34,12 +34,10 @@ def fill_hypercube(parameter_values):
         try:
             k, p = kp(config[0], config[1], config[2], config[4], config[3])
         except ValueError:
-            #exc = sys.exception()
-            #traceback.print_tb(exc.__traceback__, limit=1, file=sys.stdout)
-            
+            # Don't let unreasonable sigma12 values crash the program; ignore
+            # them for now.
             traceback.print_exc(limit=1, file=sys.stdout)
-            
-            #print("Ignoring cell with an unreasonable sigma12 request.")
+        
         samples[i, 0] = k
         samples[i, 1] = p
         
