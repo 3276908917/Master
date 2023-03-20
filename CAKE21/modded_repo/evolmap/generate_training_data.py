@@ -7,7 +7,7 @@
 import sys, platform, os
 import numpy as np
 from scipy.interpolate import interp1d
-from scipy.optimize import newton
+from scipy.optimize import root_scalar
 
 import camb
 from camb import model, initialpower, get_matter_power_interpolator
@@ -29,15 +29,15 @@ def fill_hypercube(parameter_values):
     samples = np.zeros((len(parameter_values), 2, NPOINTS))
     for i in range(len(parameter_values)):
         config = parameter_values[i]
-        print(config, "\n", config[4])
+        #print(config, "\n", config[4])
         k, p = None, None
-        #try:
-        k, p = kp(config[0], config[1], config[2], config[4], config[3])
-        #except ValueError:
+        try:
+            k, p = kp(config[0], config[1], config[2], config[4], config[3])
+        except ValueError:
             #exc = sys.exception()
             #traceback.print_tb(exc.__traceback__, limit=1, file=sys.stdout)
             
-        #    traceback.print_exc(limit=1, file=sys.stdout)
+            traceback.print_exc(limit=1, file=sys.stdout)
             
             #print("Ignoring cell with an unreasonable sigma12 request.")
         samples[i, 0] = k
@@ -119,25 +119,33 @@ def kp(om_b_in, om_c_in, ns_in, om_nu_in, sigma12_in,
     
     list_s12 = results.get_sigmaR(12, var1=8, var2=8, hubble_units=False)
 
-    
+    '''
     import matplotlib.pyplot as plt
     #print(list_s12)
     plt.plot(_redshifts, list_s12);
     plt.axhline(sigma12_in)
     plt.show()
+    '''
 
     list_s12 -= sigma12_in # now it's a zero-finding problem
+    
+    '''
     plt.plot(_redshifts, list_s12);
     plt.axhline(0)
     plt.show()
-    
+    '''
     
     z_step = _redshifts[0] - _redshifts[1]
-    print(z_step, "z_step!!!")
-    interpolator = interp1d(_redshifts, list_s12, kind='cubic')
+    #print(z_step, "z_step!!!")
+    interpolator = interp1d(np.flip(_redshifts), np.flip(list_s12),
+        kind='cubic')
     #print("Lukas' sigma12 guess:", interpolator(1000))
-    print(min(_redshifts), max(_redshifts), np.average(_redshifts))
-    z_best = newton(interpolator, np.average(_redshifts))
+    #print(min(_redshifts), max(_redshifts), np.average(_redshifts))
+    # Newton's method requires that I already almost know the answer
+    #z_best = newton(interpolator, np.average(_redshifts))
+    
+    z_best = root_scalar(interpolator,
+        bracket=(np.min(_redshifts), np.max(_redshifts))).root
     
     #print(z_best, "is our man")
     
