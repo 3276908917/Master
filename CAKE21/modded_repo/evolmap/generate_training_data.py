@@ -1,5 +1,8 @@
- # It seems like tkgrid.py might have been intended to help me with this,
- # but I don't know how to use it
+# It seems like tkgrid.py might have been intended to help me with this,
+# but I don't know how to use it
+
+# Short-cut:
+# Documents\GitHub\Master\CAKE21\modded_repo
 
 import sys, platform, os
 import numpy as np
@@ -25,7 +28,11 @@ def fill_hypercube(parameter_values):
     for i in range(len(parameter_values)):
         config = parameter_values[i]
         print(config, "\n", config[4])
-        k, p = kp(config[0], config[1], config[2], config[4], config[3])
+        k, p = None, None
+        try:
+            k, p = kp(config[0], config[1], config[2], config[4], config[3])
+        except ValueError:
+            print("Ignoring cell with an unreasonable sigma12 request.")
         samples[i, 0] = k
         samples[i, 1] = p
         
@@ -35,7 +42,7 @@ def fill_hypercube(parameter_values):
     return samples
 
 def kp(om_b_in, om_c_in, ns_in, om_nu_in, sigma12_in,
-    _redshifts=np.linspace(0, 10, 150)):
+    _redshifts=np.linspace(0, 1100, 150)):
     """
     This is a pared-down demo version of kzps, it only considers
     redshift zero.
@@ -111,60 +118,71 @@ def kp(om_b_in, om_c_in, ns_in, om_nu_in, sigma12_in,
 
     list_s12 -= sigma12_in # now it's a zero-finding problem
 
+    z_step = _redshifts[1] - _redshifts[0]
     interpolator = interp1d(_redshifts, list_s12, kind='cubic')
     z_best = newton(interpolator, 2)
-    #print(z_best, "is our man")
+    
+    if z_step > 0.05: # this is pretty computationally expensive;
+        # if the program doesn't run fast enough let's kick it up to 1
+        new_floor = max(z_best - z_step, 0)
+        # I don't know if the last scattering really should be our cap, but it
+        # seems like a reasonable cap to me.
+        new_ceiling = min(1100, z_best + z_step)
+        return kp(om_b_in, om_c_in, ns_in, om_nu_in, sigma12_in,
+            _redshifts=np.linspace(new_floor, new_ceiling))
+    else:
+        #print(z_best, "is our man")
 
-    pars.set_matter_power(redshifts=np.array([z_best]), kmax=10.0 / h_in,
-        nonlinear=False)
+        pars.set_matter_power(redshifts=np.array([z_best]), kmax=10.0 / h_in,
+            nonlinear=False)
 
-    results = camb.get_results(pars)
-    results.calc_power_spectra(pars)
-    
-    '''! This is some MEGA old code. Who knows if it even worked when it still
-    lived in the repo? I don't really recall ever making use of it.
-    More importantly, I'm not sure if this is what Ariel even wants me to do. At
-    the last meeting, it kind of sounded like the real solution was to vary the
-    z until sigma12 is correct, not As!
-    
-    Anyway, this code is coming from the Nov 29 commit.
-    I could spend more time looking for the last iteration of the code before it
-    was excised, but that sounds like a complete waste of time. As I recall, it
-    was a stagnant block of code for a very long time before it was removed.
-    
-    >> We should be finding a good redshift, not a good A_s. The A_s should
-        remain close to the Planck value. Instead we should find a good z
-    '''
-    '''
-    sigma12_unmodified = results.get_sigmaR(12, hubble_units=False)        
-    As_rescaled = 2e-9 * (sigma12_in / sigma12_unmodified) ** 2
-    
-    pars.InitPower.set_params(As=As_rescaled, ns=ns_in, r=0, nt=0.0,
-        ntrun=0.0)
-    '''
+        results = camb.get_results(pars)
+        results.calc_power_spectra(pars)
+        
+        '''! This is some MEGA old code. Who knows if it even worked when it still
+        lived in the repo? I don't really recall ever making use of it.
+        More importantly, I'm not sure if this is what Ariel even wants me to do. At
+        the last meeting, it kind of sounded like the real solution was to vary the
+        z until sigma12 is correct, not As!
+        
+        Anyway, this code is coming from the Nov 29 commit.
+        I could spend more time looking for the last iteration of the code before it
+        was excised, but that sounds like a complete waste of time. As I recall, it
+        was a stagnant block of code for a very long time before it was removed.
+        
+        >> We should be finding a good redshift, not a good A_s. The A_s should
+            remain close to the Planck value. Instead we should find a good z
+        '''
+        '''
+        sigma12_unmodified = results.get_sigmaR(12, hubble_units=False)        
+        As_rescaled = 2e-9 * (sigma12_in / sigma12_unmodified) ** 2
+        
+        pars.InitPower.set_params(As=As_rescaled, ns=ns_in, r=0, nt=0.0,
+            ntrun=0.0)
+        '''
 
-    ''' AndreaP thinks that npoints=300 should be a good balance of accuracy and
-    computability for our LH.'''
-    k, z, p = results.get_matter_power_spectrum(
-        minkh=1e-4 / h_in, maxkh=10.0 / h_in, npoints = NPOINTS,
-        var1=8, var2=8
-    )
-    # print("z", z)
-    
-    # What is the point of the 150 limit? Why can't CAMB simply give me a
-    # bigger interpolator??
-    # Also: you can't root out the negative z later, you have to do it as early
-    # as here...
-    #return get_matter_power_interpolator(pars, zmin=0, zmax=10,
-    #    nz_step=150, nonlinear=False, var1=8, var2=8, hubble_units=False,
-    #    k_hunit=False)
-    
-    if len(p) == 1:
-        p = p[0] 
+        ''' AndreaP thinks that npoints=300 should be a good balance of accuracy and
+        computability for our LH.'''
+        k, z, p = results.get_matter_power_spectrum(
+            minkh=1e-4 / h_in, maxkh=10.0 / h_in, npoints = NPOINTS,
+            var1=8, var2=8
+        )
+        # print("z", z)
+        
+        # What is the point of the 150 limit? Why can't CAMB simply give me a
+        # bigger interpolator??
+        # Also: you can't root out the negative z later, you have to do it as early
+        # as here...
+        #return get_matter_power_interpolator(pars, zmin=0, zmax=10,
+        #    nz_step=150, nonlinear=False, var1=8, var2=8, hubble_units=False,
+        #    k_hunit=False)
+        
+        if len(p) == 1:
+            p = p[0] 
 
-    ''' What happened to our rescaling routine, with sigma12_in? Since sigma12
-        is no longer a parameter in kzps, I can only assume I must have removed
-        it. But it should be easy enough to use Git to retrieve the latest
-        extant version.'''
+        ''' What happened to our rescaling routine, with sigma12_in? Since sigma12
+            is no longer a parameter in kzps, I can only assume I must have removed
+            it. But it should be easy enough to use Git to retrieve the latest
+            extant version.'''
 
-    return k * h_in, p * h_in ** 3
+        return k * h_in, p * h_in ** 3
