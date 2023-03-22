@@ -17,6 +17,8 @@ import re
 cosm = pd.read_csv("cosmologies.dat", sep='\s+')
 model0 = cosm.loc[0]
 
+''' AndreaP thinks that npoints=300 should be a good balance of accuracy and
+computability for our LH.'''
 NPOINTS = 300
 
 import sys, traceback
@@ -115,6 +117,9 @@ def kp(om_b_in, om_c_in, ns_in, om_nu_in, sigma12_in,
     
     list_s12 = results.get_sigmaR(12, var1=8, var2=8, hubble_units=False)
 
+    '''Also: you can't root out the negative z later, you have to do it as
+    early as here... '''
+
     # debug block
     '''
     import matplotlib.pyplot as plt
@@ -134,18 +139,13 @@ def kp(om_b_in, om_c_in, ns_in, om_nu_in, sigma12_in,
     '''
     
     z_step = _redshifts[0] - _redshifts[1]
-    #print(z_step, "z_step!!!")
     interpolator = interp1d(np.flip(_redshifts), np.flip(list_s12),
         kind='cubic')
-    #print("Lukas' sigma12 guess:", interpolator(1000))
-    #print(min(_redshifts), max(_redshifts), np.average(_redshifts))
-    # Newton's method requires that I already almost know the answer
-    #z_best = newton(interpolator, np.average(_redshifts))
-    
+        
+    # Newton's method requires that I already almost know the answer, so it's
+    # poorly suited to our problem. This generic root finder works better.
     z_best = root_scalar(interpolator,
         bracket=(np.min(_redshifts), np.max(_redshifts))).root
-    
-    #print(z_best, "is our man")
     
     if z_step > 0.05: # this is pretty computationally expensive;
         # if the program doesn't run fast enough let's kick it up to 1
@@ -153,6 +153,8 @@ def kp(om_b_in, om_c_in, ns_in, om_nu_in, sigma12_in,
         # I don't know if the last scattering really should be our cap, but it
         # seems like a reasonable cap to me.
         new_ceiling = min(1100, z_best + z_step)
+        '''What is the point of the 150 limit? Why can't CAMB simply give me a
+            bigger interpolator?? '''
         return kp(om_b_in, om_c_in, ns_in, om_nu_in, sigma12_in,
             _redshifts=np.flip(np.linspace(new_floor, new_ceiling, 150)))
     else:
@@ -162,51 +164,13 @@ def kp(om_b_in, om_c_in, ns_in, om_nu_in, sigma12_in,
 
         results = camb.get_results(pars)
         results.calc_power_spectra(pars)
-        
-        '''! This is some MEGA old code. Who knows if it even worked when it still
-        lived in the repo? I don't really recall ever making use of it.
-        More importantly, I'm not sure if this is what Ariel even wants me to do. At
-        the last meeting, it kind of sounded like the real solution was to vary the
-        z until sigma12 is correct, not As!
-        
-        Anyway, this code is coming from the Nov 29 commit.
-        I could spend more time looking for the last iteration of the code before it
-        was excised, but that sounds like a complete waste of time. As I recall, it
-        was a stagnant block of code for a very long time before it was removed.
-        
-        >> We should be finding a good redshift, not a good A_s. The A_s should
-            remain close to the Planck value. Instead we should find a good z
-        '''
-        '''
-        sigma12_unmodified = results.get_sigmaR(12, hubble_units=False)        
-        As_rescaled = 2e-9 * (sigma12_in / sigma12_unmodified) ** 2
-        
-        pars.InitPower.set_params(As=As_rescaled, ns=ns_in, r=0, nt=0.0,
-            ntrun=0.0)
-        '''
 
-        ''' AndreaP thinks that npoints=300 should be a good balance of accuracy and
-        computability for our LH.'''
         k, z, p = results.get_matter_power_spectrum(
             minkh=1e-4 / h_in, maxkh=10.0 / h_in, npoints = NPOINTS,
             var1=8, var2=8
         )
-        # print("z", z)
-        
-        # What is the point of the 150 limit? Why can't CAMB simply give me a
-        # bigger interpolator??
-        # Also: you can't root out the negative z later, you have to do it as early
-        # as here...
-        #return get_matter_power_interpolator(pars, zmin=0, zmax=10,
-        #    nz_step=150, nonlinear=False, var1=8, var2=8, hubble_units=False,
-        #    k_hunit=False)
         
         if len(p) == 1:
             p = p[0] 
-
-        ''' What happened to our rescaling routine, with sigma12_in? Since sigma12
-            is no longer a parameter in kzps, I can only assume I must have removed
-            it. But it should be easy enough to use Git to retrieve the latest
-            extant version.'''
 
         return k * h_in, p * h_in ** 3
