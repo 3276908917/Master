@@ -64,7 +64,7 @@ def kp(om_b_in, om_c_in, ns_in, om_nu_in, sigma12_in,
     
     w0_in = -1.00
     wa_in = 0.00 
-    
+   
     # This sucks. See spectra.py kzps for a more detailed complaint.
     mnu_in = om_nu_in * camb.constants.neutrino_mass_fac / \
         (camb.constants.default_nnu / 3.0) ** 0.75
@@ -117,6 +117,7 @@ def kp(om_b_in, om_c_in, ns_in, om_nu_in, sigma12_in,
     
     list_s12 = results.get_sigmaR(12, var1=8, var2=8, hubble_units=False)
 
+    # debug block
     '''
     import matplotlib.pyplot as plt
     #print(list_s12)
@@ -127,6 +128,7 @@ def kp(om_b_in, om_c_in, ns_in, om_nu_in, sigma12_in,
 
     list_s12 -= sigma12_in # now it's a zero-finding problem
     
+    # debug block
     '''
     plt.plot(_redshifts, list_s12);
     plt.axhline(0)

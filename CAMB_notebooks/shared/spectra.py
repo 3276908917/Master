@@ -110,21 +110,48 @@ def match_s12(target, tolerance, cosmology, _z=1, _max=100, _min=0):
         return match_s12(target, tolerance, cosmology,
             _z=np.average((_z, _min)), _max=_z, _min=_min)
 
-def get_cosmology(gen_order = ["M", "L"]):
+def get_As_matched_cosmology(A_s=2.12723788013000E-09):
     """
-    gen order determines the order in which we generate random numbers deciding
-    the energy budget of the cosmology. The order will determine where the bias
-    lies, because whatever is generated earlier will be skewed in favor of
-    larger values. For example, consider the default argument value. If we
-    generate M first, we have access to the full range of values [0, 1]. When
-    we generate L, we have access only to [0, 1 - M]. Then K is fully
-    determined.
+    Unfortunately, all of these bounds are hard-coded. Maybe we can read in a
+    table for this?
 
-    I have an idea for how to advance this function: I am certain that in one
-    of the papers that I've read for this project, the authors gave a data
-    table which talked about the typical parameter ranges used in emulators.
-    If any of these ranges is larger than the one's encoded below, let's seize!
+    The default A_s value corresponds to model 0
+
+    Warning! You may have to throw out some of the cosmologies that you get
+    from this routine because I am nowhere guaranteeing that the sigma12 you
+    want actually corresponds to a positive redshift... of course, this
+    wouldn't be a problem if CAMB allowed negative redshifts.
+    """
+    row = {}
+
+    # Shape parameters: CONSTANT ACROSS MODELS
+    row['ombh2'] = 0.022445
+    row['omch2'] = 0.120567
+    row['n_s'] = 0.96
+
+    row['h'] = np.random.uniform(0.2, 1)
+   
+    # Given h, the following are now fixed:
+    row['OmB'] = row['ombh2'] / row['h'] ** 2
+    row['OmC'] = row['omch2'] / row['h'] ** 2
+    row['OmM'] = row['OmB'] + row['OmC'] 
+
+    row['OmK'] = 0
+    row['OmL'] = 1 - row['OmM'] - row['OmK']
     
+    #~ Do we have any constraints on h besides Aletheia?
+    # I ask because this seems like a pretty small window.
+    #ditto
+    row['w0'] = np.random.uniform(-2., -.5)
+    # ditto
+    row['wa'] = np.random.uniform(-0.5, 0.5)
+
+    row['A_s'] = A_s
+
+    return row
+
+def get_cosmology():
+    """
     Unfortunately, all of these bounds are hard-coded. Maybe we can read in a
     table for this?
     """
