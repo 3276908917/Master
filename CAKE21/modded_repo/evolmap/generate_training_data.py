@@ -41,8 +41,6 @@ def fill_hypercube(parameter_values):
         samples[i, 0] = k
         samples[i, 1] = p
         
-        # We still need to do the evolution-mapping relabeling, to convert from
-        # what would have been the model0 sigma12 to what is the target sigma12.
         print(i)
     return samples
 
