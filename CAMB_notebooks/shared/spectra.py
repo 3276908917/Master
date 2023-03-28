@@ -27,26 +27,29 @@ omnu_strings = np.array(["0.0006", "0.002", "0.006", "0.01"])
 # I'm not sure how better to do it.
 redshift_column = re.compile("z.+")
 
-''' To check our work, we'll need the correct solutions. '''
-file_base = path_to_me + "data/power_nu/Aletheia_powernu_zorig_nu"
-
 '''! We really ought to merge the next three functions'''
 
 powernu = {}
 
 def define_powernu():
+    file_base = file_base = path_to_me + \
+        "data/power_nu/Aletheia_powernu_zorig_nu"
+
     for omnu in omnu_strings:
         powernu[omnu] = []
 
         for i in range(0, 9): # iterate over models
             powernu[omnu].append([])
             for j in range(0, 5): # iterate over snapshots
-                powernu[omnu][i].append(pd.read_csv(file_base + omnu + "_caso" + \
-                    str(i) + "_000" + str(j) + ".dat",
+                powernu[omnu][i].append(pd.read_csv(file_base + omnu + \
+                    "_caso" + str(i) + "_000" + str(j) + ".dat",
                     names=["k", "P_no", "P_nu", "ratio"], sep='\s+'))
 
 powernu2 = []
 def define_powernu2():
+    file_base = file_base = path_to_me + \
+        "data/power_nu2/Aletheia_powernu_zorig_nu"
+
     for i in range(0, 9): # iterate over models
         powernu2.append([])
         for j in range(0, 5): # iterate over snapshots
@@ -56,14 +59,20 @@ def define_powernu2():
 
 powernu3 = {}
 def define_powernu3():
-    for omnu in omnu_strings:
-        powernu3[omnu] = []
+    file_base = file_base = path_to_me + \
+        "data/power_nu3/Aletheia_powernu3_zorig_nu"
+    p3name_scheme = ["0.0006", "0.0021", "0.0064", "0.0100"]
+
+    for i in range(len(omnu_strings)):
+        key = omnu_strings[i]
+        powernu3[key] = []
+        file_handle = p3name_scheme[i]
 
         for i in range(0, 9): # iterate over models
-            powernu3[omnu].append([])
+            powernu3[key].append([])
             for j in range(0, 5): # iterate over snapshots
-                powernu3[omnu][i].append(pd.read_csv(file_base + omnu + "_caso" + \
-                    str(i) + "_000" + str(j) + ".dat",
+                powernu3[key][i].append(pd.read_csv(file_base + file_handle + \
+                    "_caso" + str(i) + "_000" + str(j) + ".dat",
                     names=["k", "P_no", "P_nu", "ratio"], sep='\s+'))
 
 colors = ["green", "blue", "brown", "red", "black", "orange", "purple",
