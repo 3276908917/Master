@@ -430,7 +430,7 @@ def kzps(mlc, omnuh2_in, nu_massive=False, zs = [0], nnu_massive_in=1):
     power spectrum of CDM + baryons (i.e. neutrinos excluded).
     '''
     k, z, p = results.get_matter_power_spectrum(
-        minkh=1e-4 / h, maxkh=10.0 / h, npoints = 100000,
+        minkh=1e-4 / h, maxkh=10.0 / h, npoints = 300,
         var1=8, var2=8
     )
    

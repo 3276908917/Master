@@ -3,6 +3,9 @@ from scipy.interpolate import interp1d
 import GPy
 import evolmap.lhc
 
+A_MIN = np.exp(1.61) / 10 ** 10
+A_MAX = np.exp(5) / 10 ** 10
+
 # Here is some demo code that I used to start this off:                    
 
 def test():
@@ -35,7 +38,8 @@ def initialize(num_samples=100, num_trials=100):
         #'wa': [-0.5, 0.5],
         'sigma12': [0.2, 1], # based on Sanchez et al 21 and
             # Sanchez 20, figure 2 
-        'om_nu': [0.0006356, 0.01]
+        'om_nu': [0.0006356, 0.01],
+        'A_s': [A_MIN, A_MAX]
     }, num_samples, num_trials)
 
     return hc, list_min_dist

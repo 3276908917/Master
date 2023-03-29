@@ -23,40 +23,44 @@ NPOINTS = 300
 
 import sys, traceback
 
-def fill_hypercube(parameter_values):
+def fill_hypercube(parameter_values, standard_k_axis):
     """
     @parameter_values: this should be a list of tuples to
         evaluate kp at.
     """
-    samples = np.zeros((len(parameter_values), 2, NPOINTS))
+    samples = np.zeros((len(parameter_values), NPOINTS))
     for i in range(len(parameter_values)):
+        i = 36
         config = parameter_values[i]
         #print(config, "\n", config[4])
-        k, p = None, None
-        try:
-            k, p = kp(config[0], config[1], config[2], config[4], config[3])
-        except ValueError:
+        p = None
+        #try:
+        p = kp(config[0], config[1], config[2], config[4], config[3],
+                config[5], standard_k_axis)
+        '''except ValueError:
             # Don't let unreasonable sigma12 values crash the program; ignore
             # them for now.
             traceback.print_exc(limit=1, file=sys.stdout)
-        
-        samples[i, 0] = k
-        samples[i, 1] = p
+        '''
+        samples[i] = p
         
         print(i)
     return samples
 
-def kp(om_b_in, om_c_in, ns_in, om_nu_in, sigma12_in,
-    _redshifts=np.flip(np.linspace(0, 1100, 150))):
+def kp(om_b_in, om_c_in, ns_in, om_nu_in, sigma12_in, As_in,
+    standard_k_axis, h_in=0.67, _redshifts=np.flip(np.linspace(0, 1100, 150)),
+    solvability_known=False):
     """
     This is a pared-down demo version of kzps, it only considers
     redshift zero.
 
     Returns the scale axis and power spectrum in Mpc units
+
+    @h_in=0.67 starts out with the model 0 default for Aletheia, and we
+        will {decrease} it if we cannot get the desired sigma12 with a
+        nonnegative redshift.
     """
     # model0 stuff is assumed to get the initial pspectrum that we'll rescale
-    h_in = 0.67
-    As_in = 2.12723788013000E-09
     OmK_in = 0
     '''I didn't want to assume this last line yet; part of the experiment is to
     see if OmK is correctly automatically set to 0. Unfortunately, set_cosmology
@@ -121,22 +125,39 @@ def kp(om_b_in, om_c_in, ns_in, om_nu_in, sigma12_in,
     early as here... '''
 
     # debug block
-    '''
+    
     import matplotlib.pyplot as plt
     #print(list_s12)
-    plt.plot(_redshifts, list_s12);
-    plt.axhline(sigma12_in)
-    plt.show()
-    '''
-
+    if False:
+        plt.plot(_redshifts, list_s12);
+        plt.axhline(sigma12_in)
+        plt.show()
+     
+    # debug block
+    if False:
+        plt.plot(_redshifts, list_s12 - sigma12_in);
+        plt.axhline(0)
+        plt.show()
+    
     list_s12 -= sigma12_in # now it's a zero-finding problem
     
-    # debug block
-    '''
-    plt.plot(_redshifts, list_s12);
-    plt.axhline(0)
-    plt.show()
-    '''
+    # remember that list_s12[0] corresponds to the highest value z
+    if list_s12[len(list_s12) - 1] < 0 and h_in > 0.01:
+        # we need to start playing with h 
+        print("Last z sigma12 sits at", list_s12[len(list_s12) - 1])
+        if not solvability_known:
+            #try:
+            kp(om_b_in, om_c_in, ns_in, om_nu_in, sigma12_in, As_in,
+                    standard_k_axis, h_in=0.01, _redshifts=_redshifts)
+            #except ValueError:
+            #    print("This cell is hopeless. Moving on...")
+            #    return None
+
+        print("But we know that this problem is solvable. Therefore," + \
+            "let's try with h =", h_in - 0.01, "\n")
+        return kp(om_b_in, om_c_in, ns_in, om_nu_in, sigma12_in, As_in,
+            standard_k_axis, h_in - 0.01, _redshifts=_redshifts,
+            solvability_known=True)
     
     z_step = _redshifts[0] - _redshifts[1]
     interpolator = interp1d(np.flip(_redshifts), np.flip(list_s12),
@@ -146,7 +167,7 @@ def kp(om_b_in, om_c_in, ns_in, om_nu_in, sigma12_in,
     # poorly suited to our problem. This generic root finder works better.
     z_best = root_scalar(interpolator,
         bracket=(np.min(_redshifts), np.max(_redshifts))).root
-    
+
     if z_step > 0.05: # this is pretty computationally expensive;
         # if the program doesn't run fast enough let's kick it up to 1
         new_floor = max(z_best - z_step, 0)
@@ -155,22 +176,60 @@ def kp(om_b_in, om_c_in, ns_in, om_nu_in, sigma12_in,
         new_ceiling = min(1100, z_best + z_step)
         '''What is the point of the 150 limit? Why can't CAMB simply give me a
             bigger interpolator?? '''
-        return kp(om_b_in, om_c_in, ns_in, om_nu_in, sigma12_in,
-            _redshifts=np.flip(np.linspace(new_floor, new_ceiling, 150)))
+        return kp(om_b_in, om_c_in, ns_in, om_nu_in, sigma12_in, As_in,
+            standard_k_axis, h_in,
+            _redshifts=np.flip(np.linspace(new_floor, new_ceiling, 150)),
+            solvability_known=True)
     else:
+        print("We've reached desired resolution levels.")
 
         pars.set_matter_power(redshifts=np.array([z_best]), kmax=10.0 / h_in,
             nonlinear=False)
 
         results = camb.get_results(pars)
         results.calc_power_spectra(pars)
-
-        k, z, p = results.get_matter_power_spectrum(
-            minkh=1e-4 / h_in, maxkh=10.0 / h_in, npoints = NPOINTS,
-            var1=8, var2=8
-        )
         
+        p = np.zeros(len(standard_k_axis))
+
+        if h_in == model0['h']: 
+            _, _, p = results.get_matter_power_spectrum(
+                minkh=1e-4 / h_in, maxkh=10.0 / h_in, npoints = NPOINTS,
+                var1=8, var2=8
+            )
+            p *= h_in ** 3
+        else: # it's time to interpolate
+            ''' 
+            _, _, p = results.get_matter_power_spectrum(
+                minkh=1e-4 / h_in, maxkh=10.0 / h_in, npoints = NPOINTS,
+                var1=8, var2=8
+            )
+            import matplotlib.pyplot as plt
+            plt.plot(standard_k_axis, p[0]); plt.show()
+            '''
+
+            p = np.zeros(len(standard_k_axis))
+            # I'm not 100% sure about this next line. The documentation for
+                # this fn says in both the k/h and k cases, Mpc^{-1} units
+                # are used??
+            PK = camb.get_matter_power_interpolator(pars, zs=[z_best],
+                kmax=max(standard_k_axis) / h_in, nonlinear=False, var1=8, var2=8,
+                hubble_units=False) 
+            # We can revisit this line if anybody complains about the shape
+            #print(z_best)
+            #print(standard_k_axis)
+            #or i in range(len(standard_k_axis)):
+                #print(i)
+            for i in range(len(standard_k_axis)):
+                try:
+                    p[i] = PK.P(z_best, standard_k_axis[i])
+                except ValueError:
+                    print("skipping", i)
+            p = PK.P(z_best, standard_k_axis)
+            #p = PK.P(z_best, standard_k_axis)
+
         if len(p) == 1:
             p = p[0] 
 
-        return k * h_in, p * h_in ** 3
+        # We don't need to return k because we take for granted that all
+        # runs will have the same k axis.
+        return p
