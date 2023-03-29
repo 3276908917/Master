@@ -381,7 +381,9 @@ def kzps(mlc, omnuh2_in, nu_massive=False, zs = [0], nnu_massive_in=1):
         # neutrino setup (see below) is not valid for inverted/normal
         # hierarchies.
     )
-    
+    '''
+    # Matteo really didn't use any of this block? I don't understand--this
+    # block seems well theoretically motivated.
     pars.num_nu_massless = 3.046 - nnu_massive
     pars.nu_mass_eigenstates = nnu_massive
     stop_i = pars.nu_mass_eigenstates + 1
@@ -390,7 +392,7 @@ def kzps(mlc, omnuh2_in, nu_massive=False, zs = [0], nnu_massive_in=1):
     pars.num_nu_massive = 0
     if nnu_massive != 0:
         pars.num_nu_massive = sum(pars.nu_mass_numbers[:stop_i])
-
+    '''
     pars.InitPower.set_params(As=mlc["A_s"], ns=mlc["n_s"],
         r=0, nt=0.0, ntrun=0.0) # the last three are desperation arguments
     
