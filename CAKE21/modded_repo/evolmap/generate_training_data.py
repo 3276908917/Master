@@ -23,19 +23,27 @@ NPOINTS = 300
 
 import sys, traceback
 
-def fill_hypercube(parameter_values, standard_k_axis):
+def fill_hypercube(parameter_values, standard_k_axis, cell_range=None,
+    samples=None):
     """
     @parameter_values: this should be a list of tuples to
         evaluate kp at.
+
+    @cell_range adjust this value in order to pick up from where you
+        left off, and to run this method in saveable chunks.
     """
-    samples = np.zeros((len(parameter_values), NPOINTS))
-    for i in range(len(parameter_values)):
+    if cell_range is None:
+        cell_range = range(len(parameter_values))
+    if samples is None:
+        samples = np.zeros((len(parameter_values), NPOINTS))
+
+    for i in cell_range:
         config = parameter_values[i]
         #print(config, "\n", config[4])
         p = None
         #try:
         p = kp(config[0], config[1], config[2], config[4], config[3],
-                config[5], standard_k_axis)
+                config[5], standard_k_axis, h_in=0.67)
         '''except ValueError:
             # Don't let unreasonable sigma12 values crash the program; ignore
             # them for now.
@@ -144,6 +152,9 @@ def kp(om_b_in, om_c_in, ns_in, om_nu_in, sigma12_in, As_in,
     if list_s12[len(list_s12) - 1] < 0 and h_in > 0.01:
         # we need to start playing with h 
         #print("Last z sigma12 sits at", list_s12[len(list_s12) - 1])
+        
+        # To save on computation, let's jump to the lowest allowed h value to
+        # see if there's any point to changing h.
         if not solvability_known:
             try:
                 kp(om_b_in, om_c_in, ns_in, om_nu_in, sigma12_in, As_in,
@@ -180,8 +191,6 @@ def kp(om_b_in, om_c_in, ns_in, om_nu_in, sigma12_in, As_in,
             _redshifts=np.flip(np.linspace(new_floor, new_ceiling, 150)),
             solvability_known=True)
     else:
-        #print("We've reached desired resolution levels.")
-
         pars.set_matter_power(redshifts=np.array([z_best]), kmax=10.0 / h_in,
             nonlinear=False)
 
@@ -197,41 +206,19 @@ def kp(om_b_in, om_c_in, ns_in, om_nu_in, sigma12_in, As_in,
             )
             p *= h_in ** 3
         else: # it's time to interpolate
-            print("We had to move the value of h.")
-            '''
-            _, _, p = results.get_matter_power_spectrum(
-                minkh=1e-4 / h_in, maxkh=10.0 / h_in, npoints = NPOINTS,
-                var1=8, var2=8
-            )
-            import matplotlib.pyplot as plt
-            plt.plot(standard_k_axis, p[0]); plt.show()
-            '''
+            if h_in > 0.01: # otherwise we're repeating ourselves
+                print("We had to move the value of h.")
             p = np.zeros(len(standard_k_axis))
+            
             # I'm not 100% sure about this next line. The documentation for
                 # this fn says in both the k/h and k cases, Mpc^{-1} units
                 # are used??
-            #PK = camb.get_matter_power_interpolator(pars, zs=[z_best],
-            #    kmax=max(standard_k_axis) / h_in, nonlinear=False, var1=8, var2=8,
-            #    hubble_units=False)
-            
             PK = camb.get_matter_power_interpolator(pars, zmin=min(_redshifts),
                 zmax=max(_redshifts), nz_step=150,
                 kmax=max(standard_k_axis) / h_in, nonlinear=False, var1=8,
                 var2=8, hubble_units=False)
-            # We can revisit this line if anybody complains about the shape
-            #print(z_best)
-            #print(standard_k_axis)
-            #or i in range(len(standard_k_axis)):
-                #print(i)
-            '''
-            for i in range(len(standard_k_axis)):
-                try:
-                    p[i] = PK.P(z_best, standard_k_axis[i])
-                except ValueError:
-                    print("skipping", i)
-            '''
+            
             p = PK.P(z_best, standard_k_axis)
-            #p = PK.P(z_best, standard_k_axis)
 
         if len(p) == 1:
             p = p[0] 

@@ -405,8 +405,14 @@ def kzps(mlc, omnuh2_in, nu_massive=False, zs = [0], nnu_massive_in=1):
     pars.WantScalars = False
     pars.Want_CMB = False
     pars.DoLensing = False
-    pars.YHe = 0.24   
+    pars.YHe = 0.24
+    # Matteo used this line but Andrea uses the following lines
     pars.set_accuracy(AccuracyBoost=2)
+    pars.Accuracy.AccuracyBoost = 3
+    pars.Accuracy.lAccuracyBoost = 3
+    pars.Accuracy.AccuratePolarization = False
+    pars.Transfer.kmax = 20.0 / h
+
 
     # desperation if statement
     if mlc["w0"] != -1 or float(mlc["wa"]) !=0:
@@ -430,7 +436,7 @@ def kzps(mlc, omnuh2_in, nu_massive=False, zs = [0], nnu_massive_in=1):
     power spectrum of CDM + baryons (i.e. neutrinos excluded).
     '''
     k, z, p = results.get_matter_power_spectrum(
-        minkh=1e-4 / h, maxkh=10.0 / h, npoints = 300,
+        minkh=1e-4 / h, maxkh=10.0 / h, npoints = 100000,
         var1=8, var2=8
     )
    
