@@ -30,7 +30,6 @@ def fill_hypercube(parameter_values, standard_k_axis):
     """
     samples = np.zeros((len(parameter_values), NPOINTS))
     for i in range(len(parameter_values)):
-        i = 36
         config = parameter_values[i]
         #print(config, "\n", config[4])
         p = None
@@ -144,17 +143,17 @@ def kp(om_b_in, om_c_in, ns_in, om_nu_in, sigma12_in, As_in,
     # remember that list_s12[0] corresponds to the highest value z
     if list_s12[len(list_s12) - 1] < 0 and h_in > 0.01:
         # we need to start playing with h 
-        print("Last z sigma12 sits at", list_s12[len(list_s12) - 1])
+        #print("Last z sigma12 sits at", list_s12[len(list_s12) - 1])
         if not solvability_known:
-            #try:
-            kp(om_b_in, om_c_in, ns_in, om_nu_in, sigma12_in, As_in,
+            try:
+                kp(om_b_in, om_c_in, ns_in, om_nu_in, sigma12_in, As_in,
                     standard_k_axis, h_in=0.01, _redshifts=_redshifts)
-            #except ValueError:
-            #    print("This cell is hopeless. Moving on...")
-            #    return None
+            except ValueError:
+                print("This cell is hopeless. Moving on...")
+                return None
 
-        print("But we know that this problem is solvable. Therefore," + \
-            "let's try with h =", h_in - 0.01, "\n")
+        #print("But we know that this problem is solvable. Therefore," + \
+        #    "let's try with h =", h_in - 0.01, "\n")
         return kp(om_b_in, om_c_in, ns_in, om_nu_in, sigma12_in, As_in,
             standard_k_axis, h_in - 0.01, _redshifts=_redshifts,
             solvability_known=True)
@@ -181,7 +180,7 @@ def kp(om_b_in, om_c_in, ns_in, om_nu_in, sigma12_in, As_in,
             _redshifts=np.flip(np.linspace(new_floor, new_ceiling, 150)),
             solvability_known=True)
     else:
-        print("We've reached desired resolution levels.")
+        #print("We've reached desired resolution levels.")
 
         pars.set_matter_power(redshifts=np.array([z_best]), kmax=10.0 / h_in,
             nonlinear=False)
@@ -198,7 +197,8 @@ def kp(om_b_in, om_c_in, ns_in, om_nu_in, sigma12_in, As_in,
             )
             p *= h_in ** 3
         else: # it's time to interpolate
-            ''' 
+            print("We had to move the value of h.")
+            '''
             _, _, p = results.get_matter_power_spectrum(
                 minkh=1e-4 / h_in, maxkh=10.0 / h_in, npoints = NPOINTS,
                 var1=8, var2=8
@@ -206,24 +206,30 @@ def kp(om_b_in, om_c_in, ns_in, om_nu_in, sigma12_in, As_in,
             import matplotlib.pyplot as plt
             plt.plot(standard_k_axis, p[0]); plt.show()
             '''
-
             p = np.zeros(len(standard_k_axis))
             # I'm not 100% sure about this next line. The documentation for
                 # this fn says in both the k/h and k cases, Mpc^{-1} units
                 # are used??
-            PK = camb.get_matter_power_interpolator(pars, zs=[z_best],
-                kmax=max(standard_k_axis) / h_in, nonlinear=False, var1=8, var2=8,
-                hubble_units=False) 
+            #PK = camb.get_matter_power_interpolator(pars, zs=[z_best],
+            #    kmax=max(standard_k_axis) / h_in, nonlinear=False, var1=8, var2=8,
+            #    hubble_units=False)
+            
+            PK = camb.get_matter_power_interpolator(pars, zmin=min(_redshifts),
+                zmax=max(_redshifts), nz_step=150,
+                kmax=max(standard_k_axis) / h_in, nonlinear=False, var1=8,
+                var2=8, hubble_units=False)
             # We can revisit this line if anybody complains about the shape
             #print(z_best)
             #print(standard_k_axis)
             #or i in range(len(standard_k_axis)):
                 #print(i)
+            '''
             for i in range(len(standard_k_axis)):
                 try:
                     p[i] = PK.P(z_best, standard_k_axis[i])
                 except ValueError:
                     print("skipping", i)
+            '''
             p = PK.P(z_best, standard_k_axis)
             #p = PK.P(z_best, standard_k_axis)
 
