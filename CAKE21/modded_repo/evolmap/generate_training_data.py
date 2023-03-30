@@ -58,13 +58,10 @@ def kp(om_b_in, om_c_in, ns_in, om_nu_in, sigma12_in, As_in,
     standard_k_axis, h_in=0.67, _redshifts=np.flip(np.linspace(0, 1100, 150)),
     solvability_known=False):
     """
-    This is a pared-down demo version of kzps, it only considers
-    redshift zero.
-
     Returns the scale axis and power spectrum in Mpc units
 
     @h_in=0.67 starts out with the model 0 default for Aletheia, and we
-        will {decrease} it if we cannot get the desired sigma12 with a
+        will decrease it if we cannot get the desired sigma12 with a
         nonnegative redshift.
     """
     # model0 stuff is assumed to get the initial pspectrum that we'll rescale
