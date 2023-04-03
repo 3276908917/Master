@@ -132,13 +132,13 @@ def kp(om_b_in, om_c_in, ns_in, om_nu_in, sigma12_in, As_in,
     
     import matplotlib.pyplot as plt
     #print(list_s12)
-    if False:
+    if True:
         plt.plot(_redshifts, list_s12);
         plt.axhline(sigma12_in)
         plt.show()
      
     # debug block
-    if False:
+    if True:
         plt.plot(_redshifts, list_s12 - sigma12_in);
         plt.axhline(0)
         plt.show()

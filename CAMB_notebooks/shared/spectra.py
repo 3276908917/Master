@@ -12,6 +12,7 @@ import matplotlib.pyplot as plt
 import camb
 import re
 from scipy.interpolate import interp1d
+from scipy.optimize import root_scalar
 
 '''Keep in mind that this is NOT the same file as the original
 "cosmology_Aletheia.dat" that Ariel gave us! If you use the unaltered version,
@@ -84,7 +85,13 @@ colors = ["green", "blue", "brown", "red", "black", "orange", "purple",
 # which we are here dealing; make everything solid
 styles = ["solid"] * 200
 
-def match_s12(target, tolerance, cosmology, _z=1, _max=100, _min=0):
+def is_matchable(target, cosmology):
+    # I thought bigger sigma12 values were supposed to come with lower z,
+    # but the recent matching results have got me confused.
+    _, _, _, s12_big = kzps(cosmology, 0, nu_massive=False, zs=[0])
+
+def match_s12(target, tolerance, cosmology,
+    _redshifts=np.flip(np.linspace(0, 1100, 150)), _min=0):
     """
         Return a redshift at which to evaluate the power spectrum of cosmology
     @cosmology such that the sigma12_massless value of the power spectrum is
@@ -106,18 +113,59 @@ def match_s12(target, tolerance, cosmology, _z=1, _max=100, _min=0):
     # We're assuming a maximum allowed redshift of $z=2$ for now.
 
     #print(_z)
-    _, _, _, s12 = kzps(cosmology, 0, nu_massive=False, zs=[_z])
-    s12 = s12[0]
-    #print("z:", _z, "s12:", s12)
-    discrepancy = (target - s12) / target
+    _, _, _, list_s12 = kzps(cosmology, 0, nu_massive=False, zs=_redshifts)
+
+    import matplotlib.pyplot as plt
+    #print(list_s12)
+    if False:
+        plt.plot(_redshifts, list_s12);
+        plt.axhline(sigma12_in)
+        plt.show()
+     
+    # debug block
+    if False:
+        plt.plot(_redshifts, list_s12 - sigma12_in);
+        plt.axhline(0)
+        plt.show()
+    
+
+    list_s12 -= target # now it's a zero-finding problem
+
+    # For some reason, flipping both arrays helps the interpolator
+    # But I should come back and check this, I'm not sure if this was just a
+    # patch for the Newton method
+    interpolator = interp1d(np.flip(_redshifts), np.flip(list_s12),
+        kind='cubic')
+    try:
+        z_best = root_scalar(interpolator, bracket=(np.min(_redshifts),
+            np.max(_redshifts))).root
+    except ValueError:
+        print("No solution.")
+        return None # there is no solution
+
+    _, _, _, s12_out = kzps(cosmology, 0, nu_massive=False, zs=[z_best])
+    discrepancy = (s12_out[0] - target) / target 
     if abs(discrepancy) <= tolerance:
-        return _z
-    elif discrepancy < 0: # our sigma12 was too large
-        return match_s12(target, tolerance, cosmology,
-            _z=np.average((_max, _z)), _max=_max, _min=_z)
-    elif discrepancy > 0: # our sigma12 was too small
-        return match_s12(target, tolerance, cosmology,
-            _z=np.average((_z, _min)), _max=_z, _min=_min)
+        return z_best
+    else:
+        z_step = _redshifts[0] - _redshifts[1]
+        new_floor = max(0, z_best - z_step)
+        new_ceil = min(1100, z_best + z_step)
+        return match_s12(target, tolerance, cosmology, _redshifts = \
+            np.flip(np.linspace(new_floor, new_ceil, 150)))
+
+    if False:
+        #print("z:", _z, "s12:", s12)
+        discrepancy = (target - s12) / target
+        print("\n", _z, discrepancy)
+        if abs(discrepancy) <= tolerance:
+            return _z
+        elif discrepancy < 0: # our sigma12 was too large
+            return match_s12(target, tolerance, cosmology,
+                _z=np.average((_max, _z)), _max=_max, _min=_z)
+        elif discrepancy > 0: # our sigma12 was too small
+            return match_s12(target, tolerance, cosmology,
+                _z=np.average((_z, _min)), _max=_z, _min=_min)
 
 def get_As_matched_cosmology(A_s=2.12723788013000E-09):
     """
@@ -425,6 +473,8 @@ def kzps(mlc, omnuh2_in, nu_massive=False, zs = [0], nnu_massive_in=1):
     pars.set_matter_power(redshifts=zs, kmax=20.0 / h, nonlinear=False)
     
     results = camb.get_results(pars)
+
+    # WHY DOESN'T THIS MAKE ANY DIFFERENCE???
     #results.calc_power_spectra(pars)
 
     sigma12 = results.get_sigmaR(12, hubble_units=False)

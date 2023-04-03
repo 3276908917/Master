@@ -8,6 +8,7 @@ import sys, platform, os
 import numpy as np
 from scipy.interpolate import interp1d
 from scipy.optimize import root_scalar
+import matplotlib.pyplot as plt
 
 import camb
 from camb import model, initialpower, get_matter_power_interpolator
@@ -48,7 +49,7 @@ three_ns = np.array([NS_MIN, NS, NS_MAX])
 
 def ploptimizer(results):
     for key in results:
-        plt.xlabel("$\omega_\mathrm{cdm}$"
+        plt.xlabel("$\omega_\mathrm{cdm}$")
         plt.ylabel("$\sigma_{12}$")
         plt.title(key)
         plt.plot(results[key])
@@ -57,8 +58,8 @@ def ploptimizer(results):
 # This is a somewhat ad-hoc fn based on preliminary results.
 def optimizer(list_b, list_ns, list_nu, dict_y={}, max_steps=5):
     """
-    Don't worry about telling the function where you left off with partial
-    dict. It will automatically determine if a cell needs filling.
+    Don't worry about telling the function where you left off with dict_y. It
+    will automatically determine if a cell needs filling.
     """
     steps_taken = 0
     for bi in range(len(list_b)):
@@ -66,28 +67,27 @@ def optimizer(list_b, list_ns, list_nu, dict_y={}, max_steps=5):
         for nsi in range(len(list_ns)):
             this_ns = list_ns[nsi]
             for nui in range(len(list_nu)):
-                if steps_taken = max_steps:
+                if steps_taken >= max_steps:
                     break
 
                 this_nu = list_nu[nui]
 
                 accessor = "nu" + str(nui) + "ns" + str(nsi) + "b" + str(bi)
                 print(accessor)
-                try:
-                    dict_y[accessor]
+                if accessor in dict_y:
                     print(accessor, "already computed.")
                     continue
-                except KeyError:
+                else:
                     print(accessor, "empty. Calculating...")
 
-                dict_y[accessor] = []
+                    dict_y[accessor] = []
 
-                for e in om_c_space:
-                    #print(e)
-                    dict_y[accessor].append(kp(this_b, e, this_ns, this_nu))
-                
-                steps_taken += 1
-                #print()
+                    for e in om_c_space:
+                        #print(e)
+                        dict_y[accessor].append(kp(this_b, e, this_ns, this_nu))
+                    
+                    steps_taken += 1
+                    #print()
     return dict_y
 
 def create_tester(space, var_index):
