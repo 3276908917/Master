@@ -20,8 +20,93 @@ model0 = cosm.loc[0]
 ''' AndreaP thinks that npoints=300 should be a good balance of accuracy and
 computability for our LH.'''
 NPOINTS = 300
+PARAMETER_SAMPLES = 20
 
 import sys, traceback
+
+OMB = 0.022445 # h^2 
+OMB_MIN = 0.005
+OMB_MAX = 0.28
+om_b_space = np.linspace(OMB_MIN, OMB_MAX, PARAMETER_SAMPLES)
+# For some reason, OMB_MIN=0.005 crashes CAMB
+three_b = np.array([min(om_b_space[1:]), OMB, OMB_MAX])
+
+OM_C = 0.120567
+om_c_space = np.linspace(0.001, 0.99, PARAMETER_SAMPLES)
+
+OMNU = 0.0021 # h^2
+OMNU_MIN = 0.0006356
+OMNU_MAX = 0.01
+om_nu_space = np.linspace(OMNU_MIN, OMNU_MAX, PARAMETER_SAMPLES)
+three_nu = np.array([OMNU_MIN, OMNU, OMNU_MAX])
+
+NS = 0.96 # h^2
+NS_MIN = 0.7
+NS_MAX = 1.3
+ns_space = np.linspace(NS_MIN, NS_MAX, PARAMETER_SAMPLES)
+three_ns = np.array([NS_MIN, NS, NS_MAX])
+
+def ploptimizer(results):
+    for key in results:
+        plt.xlabel("$\omega_\mathrm{cdm}$"
+        plt.ylabel("$\sigma_{12}$")
+        plt.title(key)
+        plt.plot(results[key])
+        plt.show()
+
+# This is a somewhat ad-hoc fn based on preliminary results.
+def optimizer(list_b, list_ns, list_nu, dict_y={}, max_steps=5):
+    """
+    Don't worry about telling the function where you left off with partial
+    dict. It will automatically determine if a cell needs filling.
+    """
+    steps_taken = 0
+    for bi in range(len(list_b)):
+        this_b = list_b[bi]
+        for nsi in range(len(list_ns)):
+            this_ns = list_ns[nsi]
+            for nui in range(len(list_nu)):
+                if steps_taken = max_steps:
+                    break
+
+                this_nu = list_nu[nui]
+
+                accessor = "nu" + str(nui) + "ns" + str(nsi) + "b" + str(bi)
+                print(accessor)
+                try:
+                    dict_y[accessor]
+                    print(accessor, "already computed.")
+                    continue
+                except KeyError:
+                    print(accessor, "empty. Calculating...")
+
+                dict_y[accessor] = []
+
+                for e in om_c_space:
+                    #print(e)
+                    dict_y[accessor].append(kp(this_b, e, this_ns, this_nu))
+                
+                steps_taken += 1
+                #print()
+    return dict_y
+
+def create_tester(space, var_index):
+    tester = []
+    for e in space:
+        print(e)
+        y = None
+        if var_index == 0:
+            y = kp(e, OMC, NS, OMNU)
+        elif var_index == 1:
+            y = kp(OMB, e, NS, OMNU)
+        elif var_index == 2:
+            y = kp(OMB, om_c, e, OMNU)
+        elif var_index == 3:
+            y = kp(OMB, OMC, NS, e)
+        else:
+            raise ValueError("var_index must be an integer in [0, 3]")
+        tester.append(y)
+    return tester
 
 def kp(om_b_in, om_c_in, ns_in, om_nu_in):
     """

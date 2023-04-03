@@ -415,7 +415,6 @@ def kzps(mlc, omnuh2_in, nu_massive=False, zs = [0], nnu_massive_in=1):
     pars.Accuracy.AccuratePolarization = False
     pars.Transfer.kmax = 20.0 / h
 
-
     # desperation if statement
     if mlc["w0"] != -1 or float(mlc["wa"]) !=0:
         pars.set_dark_energy(w=mlc["w0"], wa=float(mlc["wa"]),
@@ -426,7 +425,7 @@ def kzps(mlc, omnuh2_in, nu_massive=False, zs = [0], nnu_massive_in=1):
     pars.set_matter_power(redshifts=zs, kmax=20.0 / h, nonlinear=False)
     
     results = camb.get_results(pars)
-    results.calc_power_spectra(pars)
+    #results.calc_power_spectra(pars)
 
     sigma12 = results.get_sigmaR(12, hubble_units=False)
     
