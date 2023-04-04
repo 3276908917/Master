@@ -11,6 +11,7 @@
 *checkpoints
 *.npy
 *.csv
+*.png
 
 # Ignore generated media and heavy analyses
 communications
