@@ -319,6 +319,10 @@ def better_battery(onh2s, onh2_strs, skips_omega = [0, 2],
             spec_sims[om_str].append([])
        
             z_input = parse_redshifts(mindex)
+            if None in z_input:
+                spec_sims[om_str][m_index] = None
+                continue
+
             #print("z_input", z_input)
             #print("total Zs", len(z_input)) 
             for snap_index in range(len(z_input)):
