@@ -469,7 +469,6 @@ def kzps(mlc, omnuh2_in, nu_massive=False, zs = [0], nnu_massive_in=1):
     # desperation if statement
     # CODE_GREEN should we add the additional try/catch that Matteo uses?
     if mlc["w0"] != -1 or float(mlc["wa"]) != 0:
-        print("We are using the PPF model here.")
         pars.set_dark_energy(w=mlc["w0"], wa=float(mlc["wa"]),
             dark_energy_model='ppf')
     
