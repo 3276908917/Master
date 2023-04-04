@@ -385,7 +385,7 @@ def kzps(mlc, omnuh2_in, nu_massive=False, zs = [0], nnu_massive_in=1):
     """ 
     pars = camb.CAMBparams()
     omch2_in = mlc["omch2"]
- 
+
     mnu_in = 0
     nnu_massive = 0
     h = mlc["h"]
@@ -405,21 +405,6 @@ def kzps(mlc, omnuh2_in, nu_massive=False, zs = [0], nnu_massive_in=1):
         #    omnuh2_in)
         omch2_in -= omnuh2_in
         nnu_massive = nnu_massive_in
-
-    # This line is bottom of the barrel desperation CODE_ORANGE
-    pars.set_cosmology(
-        H0=h * 100,
-        ombh2=mlc["ombh2"],
-        omch2=mlc["omch2"],
-        omk=mlc["OmK"],
-        mnu=mnu_in,
-        #num_massive_neutrinos=nnu_massive, CODE_BLUE
-        tau=0.0952, # just like in Matteo's notebook, at least (but maybe I got
-            # this value from somewhere else...)
-        neutrino_hierarchy="degenerate" # 1 eigenstate approximation; our
-        # neutrino setup (see below) is not valid for inverted/normal
-        # hierarchies.
-    )
 
     # tau is a desperation argument
     pars.set_cosmology(
