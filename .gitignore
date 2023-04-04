@@ -10,6 +10,7 @@
 *-checkpoint.ipynb
 *checkpoints
 *.npy
+*.csv
 
 # Ignore generated media and heavy analyses
 communications

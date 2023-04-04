@@ -154,19 +154,6 @@ def match_s12(target, tolerance, cosmology,
         return match_s12(target, tolerance, cosmology, _redshifts = \
             np.flip(np.linspace(new_floor, new_ceil, 150)))
 
-    if False:
-        #print("z:", _z, "s12:", s12)
-        discrepancy = (target - s12) / target
-        print("\n", _z, discrepancy)
-        if abs(discrepancy) <= tolerance:
-            return _z
-        elif discrepancy < 0: # our sigma12 was too large
-            return match_s12(target, tolerance, cosmology,
-                _z=np.average((_max, _z)), _max=_max, _min=_z)
-        elif discrepancy > 0: # our sigma12 was too small
-            return match_s12(target, tolerance, cosmology,
-                _z=np.average((_z, _min)), _max=_z, _min=_min)
-
 def get_As_matched_cosmology(A_s=2.12723788013000E-09):
     """
     Unfortunately, all of these bounds are hard-coded. Maybe we can read in a
@@ -415,6 +402,21 @@ def kzps(mlc, omnuh2_in, nu_massive=False, zs = [0], nnu_massive_in=1):
         omch2_in -= omnuh2_in
         nnu_massive = nnu_massive_in
 
+    # This line is bottom of the barrel desperation CODE_ORANGE
+    pars.set_cosmology(
+        H0=h * 100,
+        ombh2=mlc["ombh2"],
+        omch2=mlc["omch2"],
+        omk=mlc["OmK"],
+        mnu=mnu_in,
+        #num_massive_neutrinos=nnu_massive, CODE_BLUE
+        tau=0.0952, # just like in Matteo's notebook, at least (but maybe I got
+            # this value from somewhere else...)
+        neutrino_hierarchy="degenerate" # 1 eigenstate approximation; our
+        # neutrino setup (see below) is not valid for inverted/normal
+        # hierarchies.
+    )
+
     # tau is a desperation argument
     pars.set_cosmology(
         H0=h * 100,
@@ -422,9 +424,9 @@ def kzps(mlc, omnuh2_in, nu_massive=False, zs = [0], nnu_massive_in=1):
         omch2=omch2_in,
         omk=mlc["OmK"],
         mnu=mnu_in,
-        num_massive_neutrinos=nnu_massive,
+        #num_massive_neutrinos=nnu_massive, CODE_BLUE
         tau=0.0952, # just like in Matteo's notebook, at least (but maybe I got
-            # this value from somewhere else...
+            # this value from somewhere else...)
         neutrino_hierarchy="degenerate" # 1 eigenstate approximation; our
         # neutrino setup (see below) is not valid for inverted/normal
         # hierarchies.
@@ -444,7 +446,6 @@ def kzps(mlc, omnuh2_in, nu_massive=False, zs = [0], nnu_massive_in=1):
     pars.InitPower.set_params(As=mlc["A_s"], ns=mlc["n_s"],
         r=0, nt=0.0, ntrun=0.0) # the last three are desperation arguments
     
-    
     ''' The following seven lines are desperation settings
     If we ever have extra time, we can more closely study what each line does
     '''
@@ -458,13 +459,17 @@ def kzps(mlc, omnuh2_in, nu_massive=False, zs = [0], nnu_massive_in=1):
     pars.YHe = 0.24
     # Matteo used this line but Andrea uses the following lines
     pars.set_accuracy(AccuracyBoost=2)
+    # I already verified that commenting-out the next four lines DOES NOT
+    # impact the Lukas-Matteo Gap.
     pars.Accuracy.AccuracyBoost = 3
     pars.Accuracy.lAccuracyBoost = 3
     pars.Accuracy.AccuratePolarization = False
     pars.Transfer.kmax = 20.0 / h
 
     # desperation if statement
-    if mlc["w0"] != -1 or float(mlc["wa"]) !=0:
+    # CODE_GREEN should we add the additional try/catch that Matteo uses?
+    if mlc["w0"] != -1 or float(mlc["wa"]) != 0:
+        print("We are using the PPF model here.")
         pars.set_dark_energy(w=mlc["w0"], wa=float(mlc["wa"]),
             dark_energy_model='ppf')
     
