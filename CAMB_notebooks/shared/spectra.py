@@ -340,10 +340,6 @@ def better_battery(onh2s, onh2_strs, skips_omega = [0, 2],
                 inner_dict = {}
                 z = z_input[snap_index]
               
-                '''
-                Double check that I have it right: k multiplied by h;
-                    P divided by h^3
-                '''
                 massless_tuple = kzps(row, om, nu_massive=False, zs=[z])
                 inner_dict["k"] = massless_tuple[0] if h_units \
                     else massless_tuple[0] * h
@@ -392,7 +388,7 @@ def kzps(mlc, omnuh2_in, nu_massive=False, zs = [0], nnu_massive_in=1):
 
     if nu_massive:
         '''This is a horrible workaround, and I would like to get rid of it
-        ASAP The following line destroys dependence on TCMB and
+        ASAP. It destroys dependence on TCMB and
         neutrino_hierarchy, possibly more. But CAMB does not accept omnuh2 as
         an input, so I have to reverse-engineer it somehow.
         
