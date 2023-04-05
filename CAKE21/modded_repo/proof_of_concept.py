@@ -6,6 +6,9 @@ import evolmap.lhc
 A_MIN = np.exp(1.61) / 10 ** 10
 A_MAX = np.exp(5) / 10 ** 10
 
+A_MINI_MIN = np.exp(2.35) / 10 ** 10
+A_MINI_MAX = np.exp(3.91) / 10 ** 10
+
 # Here is some demo code that I used to start this off:                    
 
 def test():
@@ -28,15 +31,28 @@ def initialize(num_samples=100, num_trials=100):
     
     # tau must be an evolution parameter if we're not including it here
 
-    hc, list_min_dist = evolmap.lhc.generate_samples({                                             
-        'om_b': [0.005, 0.28],                                         
-        'om_c': [0.001, 0.99], # max 0.3?                                     
-        'n_s': [0.7, 1.3], # expand?
-        'sigma12': [0.2, 1], # based on Sanchez et al 21 and
-            # Sanchez 20, fig 2 
-        'om_nu': [0.0006356, 0.01],
-        'A_s': [A_MIN, A_MAX]
-    }, num_samples, num_trials)
+    mega = False
+
+    if mega:
+        hc, list_min_dist = evolmap.lhc.generate_samples({                                             
+            'om_b': [0.005, 0.28],                                         
+            'om_c': [0.001, 0.99], # max 0.3?                                     
+            'n_s': [0.7, 1.3], # expand?
+            'sigma12': [0.2, 1], # based on Sanchez et al 21 and
+                # Sanchez 20, fig 2 
+            'om_nu': [0.0006356, 0.01],
+            'A_s': [A_MIN, A_MAX]
+        }, num_samples, num_trials)
+    else: # This is useful for a demo run. 
+        hc, list_min_dist = evolmap.lhc.generate_samples({                                             
+            'om_b': [0.01875, 0.02625],                                         
+            'om_c': [0.05, 0.255], # max 0.3?                                     
+            'n_s': [0.84, 1.1], # expand?
+            'sigma12': [0.2, 1], # based on Sanchez et al 21 and
+                # Sanchez 20, fig 2 
+            'om_nu': [0.0006356, 0.01],
+            'A_s': [A_MINI_MIN, A_MINI_MAX]
+        }, num_samples, num_trials)
 
     return hc, list_min_dist
 
