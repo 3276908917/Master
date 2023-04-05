@@ -32,7 +32,7 @@ om_b_space = np.linspace(OMB_MIN, OMB_MAX, PARAMETER_SAMPLES)
 # For some reason, OMB_MIN=0.005 crashes CAMB
 three_b = np.array([min(om_b_space[1:]), OMB, OMB_MAX])
 
-OM_C = 0.120567
+OMC = 0.120567
 om_c_space = np.linspace(0.001, 0.99, PARAMETER_SAMPLES)
 
 OMNU = 0.0021 # h^2
@@ -52,7 +52,7 @@ def ploptimizer(results):
         plt.xlabel("$\omega_\mathrm{cdm}$")
         plt.ylabel("$\sigma_{12}$")
         plt.title(key)
-        plt.plot(results[key])
+        plt.plot(om_c_space, results[key])
         plt.show()
 
 # This is a somewhat ad-hoc fn based on preliminary results.
@@ -90,19 +90,19 @@ def optimizer(list_b, list_ns, list_nu, dict_y={}, max_steps=5):
                     #print()
     return dict_y
 
-def create_tester(space, var_index):
+def create_tester(space, var_index, overrides=[OMB, OMC, NS, OMNU]):
     tester = []
     for e in space:
         print(e)
         y = None
         if var_index == 0:
-            y = kp(e, OMC, NS, OMNU)
+            y = kp(e, overrides[1], overrides[2], overrides[3])
         elif var_index == 1:
-            y = kp(OMB, e, NS, OMNU)
+            y = kp(overrides[0], e, overrides[2], overrides[3])
         elif var_index == 2:
-            y = kp(OMB, om_c, e, OMNU)
+            y = kp(overrides[0], overrides[1], e, overrides[3])
         elif var_index == 3:
-            y = kp(OMB, OMC, NS, e)
+            y = kp(overrides[0], overrides[1], overrides[2], e)
         else:
             raise ValueError("var_index must be an integer in [0, 3]")
         tester.append(y)
