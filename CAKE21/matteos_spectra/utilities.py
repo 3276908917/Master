@@ -137,8 +137,12 @@ def read_Pk(sim_indices, snapnum, pair_idx=None, space='real', path = 'Pks'):
     return k_arr, Pk_arr
     
 
-def make_cosmo_suite(fname='/home/lfinkbei/Documents/Master/' + \
-    'CAKE21/matteos_spectra/cosmology_Columbus.dat',
+path2master_linux = '/home/lfinkbei/Documents/'
+path2master_otto = 'T:/GitHub/'
+
+fpath_ending = fname='Master/CAKE21/matteos_spectra/cosmology_Columbus.dat'
+
+def make_cosmo_suite(fname=path2master_otto + fpath_ending,
     cosmo_suite_name='my_cosmo_suite.py', use_sigma8=True):
     
     f = open(fname)

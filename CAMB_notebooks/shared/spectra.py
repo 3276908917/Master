@@ -1,10 +1,7 @@
-# This flag is sort of dumb, but it works as long as I'm the only one running
-# the code in this repo.
-linux = True
-
 path_base_linux = "/home/lfinkbei/Documents/"
-path_base_windows = "C:/Users/Lukas/Documents/GitHub/"
-path_base = path_base_linux if linux else path_base_windows
+path_base_rex = "C:/Users/Lukas/Documents/GitHub/"
+path_base_otto = "T:/GitHub/"
+path_base = path_base_otto
 
 import numpy as np
 import pandas as pd
