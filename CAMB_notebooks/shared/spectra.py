@@ -308,11 +308,12 @@ def better_battery(onh2s, onh2_strs, skips_omega = [0, 2],
             continue
         spec_sims[om_str] = []
         for mindex, row in models.iterrows():
-            h = row["h"]
             if mindex in skips_model:
                 # For example, I don't yet understand how to implement model 8
                 spec_sims[om_str].append(None)
                 continue
+                
+            h = row["h"]
             spec_sims[om_str].append([])
        
             z_input = parse_redshifts(mindex)

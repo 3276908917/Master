@@ -336,3 +336,4 @@ CAMB_demo/planck_2018.ini
 *.pyc
 *.dat
 *.ini
+*.gif
