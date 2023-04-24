@@ -321,8 +321,8 @@ def better_battery(onh2s, onh2_strs, skips_omega = [0, 2],
                 spec_sims[om_str][m_index] = None
                 continue
 
-            #print("z_input", z_input)
-            #print("total Zs", len(z_input)) 
+            print("z_input", z_input)
+            print("total Zs", len(z_input)) 
             for snap_index in range(len(z_input)):
                 '''
                 since z_input is ordered from z large to z small,

@@ -24,7 +24,7 @@ NPOINTS = 300
 import sys, traceback
 
 def fill_hypercube(parameter_values, standard_k_axis, cell_range=None,
-    samples=None):
+    samples=None, write_period=None):
     """
     @parameter_values: this should be a list of tuples to
         evaluate kp at.
@@ -37,25 +37,29 @@ def fill_hypercube(parameter_values, standard_k_axis, cell_range=None,
     if samples is None:
         samples = np.zeros((len(parameter_values), NPOINTS))
 
+    unwritten_cells = 0
     for i in cell_range:
         config = parameter_values[i]
         #print(config, "\n", config[4])
         p = None
-        #try:
-        p = kp(config[0], config[1], config[2], config[4], config[3],
+        try:
+            p = kp(config[0], config[1], config[2], config[4], config[3],
                 config[5], standard_k_axis, h_in=0.67)
-        '''except ValueError:
+        except ValueError:
             # Don't let unreasonable sigma12 values crash the program; ignore
             # them for now.
             traceback.print_exc(limit=1, file=sys.stdout)
-        '''
         samples[i] = p
         
         print(i)
+        unwritten_cells += 1
+        if write_period is not None and unwritten_cells >= write_period:
+            np.save("samples_backup_i" + str(i) + ".npy", samples,
+                allow_pickle=True)
     return samples
 
 def kp(om_b_in, om_c_in, ns_in, om_nu_in, sigma12_in, As_in,
-    standard_k_axis, h_in=0.67, _redshifts=np.flip(np.linspace(0, 4, 150)),
+    standard_k_axis, h_in=0.67, _redshifts=np.flip(np.linspace(0, 1100, 150)),
     solvability_known=False):
     """
     Returns the scale axis and power spectrum in Mpc units
@@ -132,7 +136,7 @@ def kp(om_b_in, om_c_in, ns_in, om_nu_in, sigma12_in, As_in,
     
     import matplotlib.pyplot as plt
     #print(list_s12)
-    if True:
+    if False:
         plt.plot(_redshifts, list_s12);
         plt.axhline(sigma12_in, c="black")
         plt.title("$\sigma_{12}$ vs. $z$")
@@ -141,7 +145,7 @@ def kp(om_b_in, om_c_in, ns_in, om_nu_in, sigma12_in, As_in,
         plt.show()
      
     # debug block
-    if True:
+    if False:
         plt.plot(_redshifts, list_s12 - sigma12_in);
         plt.axhline(0, c="black")
         plt.title("$\sigma_{12} - \sigma^{\mathrm{goal}}_{12}$ vs. $z$")
