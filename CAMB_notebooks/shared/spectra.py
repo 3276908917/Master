@@ -321,8 +321,8 @@ def better_battery(onh2s, onh2_strs, skips_omega = [0, 2],
                 spec_sims[om_str][m_index] = None
                 continue
 
-            print("z_input", z_input)
-            print("total Zs", len(z_input)) 
+            #print("z_input", z_input)
+            #print("total Zs", len(z_input)) 
             for snap_index in range(len(z_input)):
                 '''
                 since z_input is ordered from z large to z small,
@@ -343,12 +343,12 @@ def better_battery(onh2s, onh2_strs, skips_omega = [0, 2],
                     else massless_tuple[0] * h
                 inner_dict["P_no"] = massless_tuple[2] if h_units \
                     else massless_tuple[2] / h ** 3
-                inner_dict["s12_massive"] = massless_tuple[3]
+                inner_dict["s12_massless"] = massless_tuple[3]
 
                 massive_tuple = kzps(row, om, nu_massive=True, zs=[z])
                 inner_dict["P_nu"] = massive_tuple[2] if h_units \
                     else massive_tuple[2] / h ** 3
-                inner_dict["s12_massless"] = massive_tuple[3]
+                inner_dict["s12_massive"] = massive_tuple[3]
                 
                 # Temporary addition, for debugging
                 inner_dict["z"] = z_input[snap_index]               
