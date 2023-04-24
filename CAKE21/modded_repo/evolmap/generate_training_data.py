@@ -55,7 +55,7 @@ def fill_hypercube(parameter_values, standard_k_axis, cell_range=None,
     return samples
 
 def kp(om_b_in, om_c_in, ns_in, om_nu_in, sigma12_in, As_in,
-    standard_k_axis, h_in=0.67, _redshifts=np.flip(np.linspace(0, 1100, 150)),
+    standard_k_axis, h_in=0.67, _redshifts=np.flip(np.linspace(0, 4, 150)),
     solvability_known=False):
     """
     Returns the scale axis and power spectrum in Mpc units
@@ -134,13 +134,19 @@ def kp(om_b_in, om_c_in, ns_in, om_nu_in, sigma12_in, As_in,
     #print(list_s12)
     if True:
         plt.plot(_redshifts, list_s12);
-        plt.axhline(sigma12_in)
+        plt.axhline(sigma12_in, c="black")
+        plt.title("$\sigma_{12}$ vs. $z$")
+        plt.ylabel("$\sigma_{12}$")
+        plt.xlabel("$z$")
         plt.show()
      
     # debug block
     if True:
         plt.plot(_redshifts, list_s12 - sigma12_in);
-        plt.axhline(0)
+        plt.axhline(0, c="black")
+        plt.title("$\sigma_{12} - \sigma^{\mathrm{goal}}_{12}$ vs. $z$")
+        plt.xlabel("$z$")
+        plt.ylabel("$\sigma_{12} - \sigma^{\mathrm{goal}}_{12}$")
         plt.show()
     
     list_s12 -= sigma12_in # now it's a zero-finding problem

@@ -46,10 +46,9 @@ def initialize(num_samples=100, num_trials=100):
     else: # This is useful for a demo run. 
         hc, list_min_dist = evolmap.lhc.generate_samples({                                             
             'om_b': [0.01875, 0.02625],                                         
-            'om_c': [0.05, 0.255], # max 0.3?                                     
-            'n_s': [0.84, 1.1], # expand?
-            'sigma12': [0.2, 1], # based on Sanchez et al 21 and
-                # Sanchez 20, fig 2 
+            'om_c': [0.05, 0.255],                                   
+            'n_s': [0.84, 1.1],
+            'sigma12': [0.2, 1], # based on Sanchez et al 21; Sanchez 20 fig 2 
             'om_nu': [0.0006356, 0.01],
             'A_s': [A_MINI_MIN, A_MINI_MAX]
         }, num_samples, num_trials)

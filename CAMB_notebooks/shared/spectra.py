@@ -1,7 +1,7 @@
 path_base_linux = "/home/lfinkbei/Documents/"
 path_base_rex = "C:/Users/Lukas/Documents/GitHub/"
 path_base_otto = "T:/GitHub/"
-path_base = path_base_otto
+path_base = path_base_linux
 
 import numpy as np
 import pandas as pd
