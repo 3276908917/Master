@@ -39,23 +39,27 @@ def fill_hypercube(parameter_values, standard_k_axis, cell_range=None,
 
     unwritten_cells = 0
     for i in cell_range:
+        #print(i, "computation initiated")
         config = parameter_values[i]
         #print(config, "\n", config[4])
         p = None
         try:
+            #print("beginning p-spectrum computation")
             p = kp(config[0], config[1], config[2], config[4], config[3],
                 config[5], standard_k_axis, h_in=0.67)
+            #print("p-spectrum computation complete!")
         except ValueError:
             # Don't let unreasonable sigma12 values crash the program; ignore
             # them for now.
             traceback.print_exc(limit=1, file=sys.stdout)
         samples[i] = p
         
-        print(i)
+        print(i, "complete")
         unwritten_cells += 1
         if write_period is not None and unwritten_cells >= write_period:
             np.save("samples_backup_i" + str(i) + ".npy", samples,
                 allow_pickle=True)
+            unwritten_cells = 0
     return samples
 
 def kp(om_b_in, om_c_in, ns_in, om_nu_in, sigma12_in, As_in,
