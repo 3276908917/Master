@@ -189,8 +189,9 @@ def kp(om_b_in, om_c_in, ns_in, om_nu_in, sigma12_in, As_in,
     z_best = root_scalar(interpolator,
         bracket=(np.min(_redshifts), np.max(_redshifts))).root
 
-    if z_step > 0.05: # this is pretty computationally expensive;
-        # if the program doesn't run fast enough let's kick it up to 1
+    if z_step > 0.05: # The z-resolution is too low, we need to recurse
+        # '0.05' here is pretty computationally expensive;
+        # if the program doesn't run fast enough let's kick it up.
         new_floor = max(z_best - z_step, 0)
         # I don't know if the last scattering really should be our cap, but it
         # seems like a reasonable cap to me.
@@ -201,7 +202,7 @@ def kp(om_b_in, om_c_in, ns_in, om_nu_in, sigma12_in, As_in,
             standard_k_axis, h_in,
             _redshifts=np.flip(np.linspace(new_floor, new_ceiling, 150)),
             solvability_known=True)
-    else:
+    else: # Our current resolution is satisfactor, let's return a result
         pars.set_matter_power(redshifts=np.array([z_best]), kmax=10.0 / h_in,
             nonlinear=False)
 
@@ -210,22 +211,22 @@ def kp(om_b_in, om_c_in, ns_in, om_nu_in, sigma12_in, As_in,
         
         p = np.zeros(len(standard_k_axis))
 
-        if h_in == model0['h']: 
+        if h_in == model0['h']: # if we haven't touched h, we don't need to
+            # interpolate.
             _, _, p = results.get_matter_power_spectrum(
                 minkh=1e-4 / h_in, maxkh=10.0 / h_in, npoints = NPOINTS,
                 var1=8, var2=8
             )
             p *= h_in ** 3
         else: # it's time to interpolate
-            if h_in > 0.01: # otherwise we're repeating ourselves
+            if h_in > 0.01: # this check ensures that the notification appears
+                # only once.
                 print("We had to move the value of h.")
             p = np.zeros(len(standard_k_axis))
             
-            # I'm not 100% sure about this next line. The documentation for
-                # this fn says in both the k/h and k cases, Mpc^{-1} units
-                # are used??
+            # Andrea and Ariel agree that this should use k_hunit=False
             PK = camb.get_matter_power_interpolator(pars, zmin=min(_redshifts),
-                zmax=max(_redshifts), nz_step=150,
+                zmax=max(_redshifts), nz_step=150, k_hunit=False,
                 kmax=max(standard_k_axis) / h_in, nonlinear=False, var1=8,
                 var2=8, hubble_units=False)
             
