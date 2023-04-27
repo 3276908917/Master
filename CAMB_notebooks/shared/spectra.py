@@ -1,4 +1,4 @@
-path_base_linux = "/home/lfinkbei/Documents/"
+path_base_linux = "/home/lfinkbe/Documents/"
 path_base_rex = "C:/Users/Lukas/Documents/GitHub/"
 path_base_otto = "T:/GitHub/"
 path_base = path_base_linux
@@ -268,6 +268,98 @@ def boltzmann_battery(onh2, skips=[8]):
         s12_massless_list, k_massive_list, z_massive_list, p_massive_list, \
         s12_massive_list
         
+def nu_battery(onh2s, onh2_strs, skips_omega = [0, 2],
+    skips_model=[8], skips_snapshot=[1, 2, 3], h_units=False,
+    models=cosm):
+    """
+    Similar procedure to boltzmann_battery, but with an architecture that
+    more closely agrees with that of Ariel's in the powernu results.
+    spec_sims
+        omnuh2 str
+            model index
+                snapshot index
+                    quantity of interest
+
+    Although this agreement is an added benefit, the main point is simply to
+    have a cleaner and more versatile architecture than the mess of separate
+    arrays returned previously. So even if the "ground truth" object should
+    eventually cease to agree in shape, this function already returns a much
+    more pleasant object.
+
+    Another difference with boltzmann_battery: this function automatically
+    uses h_units=False, which should further bring my object into agreement
+    with powernu. This is more debatable than simple architecture cleanup, so I
+    will leave this as a flag up to the user.
+    """
+    assert type(onh2s) == list or type(onh2s) == np.ndarray, \
+        "if you want only one omega value, you must still nest it in a list"
+    assert type(onh2_strs) == list or type(onh2_strs) == np.ndarray, \
+        "if you want only one omega value, you must still nest it in a list"
+    assert len(onh2s) == len(onh2_strs), "more or fewer labels than points"
+    
+    spec_sims = {}
+
+    for om_index in range(len(onh2s)):
+        print(om_index % 10, end='')
+        om = onh2s[om_index]
+        om_str = onh2_strs[om_index]
+        if om_index in skips_omega:
+            spec_sims[om_str] = None
+            continue
+        spec_sims[om_str] = []
+        for mindex, row in models.iterrows():
+            if mindex in skips_model:
+                # For example, I don't yet understand how to implement model 8
+                spec_sims[om_str].append(None)
+                continue
+                
+            h = row["h"]
+            spec_sims[om_str].append([])
+       
+            z_input = parse_redshifts(mindex)
+            if None in z_input:
+                spec_sims[om_str][m_index] = None
+                continue
+
+            #print("z_input", z_input)
+            #print("total Zs", len(z_input)) 
+            for snap_index in range(len(z_input)):
+                '''
+                since z_input is ordered from z large to z small,
+                and snap indices run from z large to z small,
+                z_index = snap_index in this case and NOT in general
+                '''
+                #print(z_index)
+                if snap_index in skips_snapshot:
+                    #print("skipping", z_index)
+                    spec_sims[om_str][mindex].append(None)
+                    continue
+                #print("using", z_index)
+                inner_dict = {}
+                z = z_input[snap_index]
+              
+                massless_tuple = nu_kzps(row, om, nu_massive=False, zs=[z])
+                inner_dict["k"] = massless_tuple[0] if h_units \
+                    else massless_tuple[0] * h
+                inner_dict["P_no"] = massless_tuple[2] if h_units \
+                    else massless_tuple[2] / h ** 3
+                inner_dict["s12_massless"] = massless_tuple[3]
+
+                massive_tuple = nu_kzps(row, om, nu_massive=True, zs=[z])
+                inner_dict["P_nu"] = massive_tuple[2] if h_units \
+                    else massive_tuple[2] / h ** 3
+                inner_dict["s12_massive"] = massive_tuple[3]
+                
+                # Temporary addition, for debugging
+                inner_dict["z"] = z_input[snap_index]               
+ 
+                assert np.array_equal(massless_tuple[0], massive_tuple[0]), \
+                   "assumption of identical k axes not satisfied!"
+                    
+                spec_sims[om_str][mindex].append(inner_dict) 
+
+    return spec_sims
+
 def better_battery(onh2s, onh2_strs, skips_omega = [0, 2],
     skips_model=[8], skips_snapshot=[1, 2, 3], h_units=False,
     models=cosm):
@@ -360,6 +452,75 @@ def better_battery(onh2s, onh2_strs, skips_omega = [0, 2],
 
     return spec_sims
 
+def nu_kzps(mlc, omnuh2_in, nu_massive=False, zs = [0], nnu_massive_in=1):
+    """
+    Version of kzps with the infamous neutrino code block.
+    """ 
+    pars = camb.CAMBparams()
+    omch2_in = mlc["omch2"]
+
+    mnu_in = 0
+    nnu_massive = 0
+    h = mlc["h"]
+
+    if nu_massive:
+        mnu_in = omnuh2_in * camb.constants.neutrino_mass_fac / \
+            (camb.constants.default_nnu / 3.0) ** 0.75 
+        omch2_in -= omnuh2_in
+        nnu_massive = nnu_massive_in
+
+    pars.set_cosmology(
+        H0=h * 100,
+        ombh2=mlc["ombh2"],
+        omch2=omch2_in,
+        omk=mlc["OmK"],
+        mnu=mnu_in,
+        tau=0.0952, 
+        neutrino_hierarchy="degenerate"
+    )
+    pars.num_nu_massless = 3.046 - nnu_massive
+    pars.nu_mass_eigenstates = nnu_massive
+    stop_i = pars.nu_mass_eigenstates + 1
+    pars.nu_mass_numbers[:stop_i] = \
+        list(np.ones(len(pars.nu_mass_numbers[:stop_i]), int))
+    pars.num_nu_massive = 0
+    if nnu_massive != 0:
+        pars.num_nu_massive = sum(pars.nu_mass_numbers[:stop_i])
+    
+    pars.InitPower.set_params(As=mlc["A_s"], ns=mlc["n_s"],
+        r=0, nt=0.0, ntrun=0.0) # the last three are desperation arguments
+    
+    pars.NonLinear = camb.model.NonLinear_none
+    pars.WantCls = False
+    pars.WantScalars = False
+    pars.Want_CMB = False
+    pars.DoLensing = False
+    pars.YHe = 0.24
+    pars.set_accuracy(AccuracyBoost=2)
+    pars.Accuracy.AccuracyBoost = 3
+    pars.Accuracy.lAccuracyBoost = 3
+    pars.Accuracy.AccuratePolarization = False
+    pars.Transfer.kmax = 20.0 / h
+
+    if mlc["w0"] != -1 or float(mlc["wa"]) != 0:
+        pars.set_dark_energy(w=mlc["w0"], wa=float(mlc["wa"]),
+            dark_energy_model='ppf')
+    
+    pars.set_matter_power(redshifts=zs, kmax=20.0 / h, nonlinear=False)
+    
+    results = camb.get_results(pars)
+
+    sigma12 = results.get_sigmaR(12, hubble_units=False)
+    
+    k, z, p = results.get_matter_power_spectrum(
+        minkh=1e-4 / h, maxkh=10.0 / h, npoints = 100000,
+        var1=8, var2=8
+    )
+   
+    if len(p) == 1:
+        p = p[0] 
+    return k, z, p, sigma12 
+
 def kzps(mlc, omnuh2_in, nu_massive=False, zs = [0], nnu_massive_in=1):
     """
     Returns the scale axis, redshifts, power spectrum, and sigma12
@@ -377,6 +538,20 @@ def kzps(mlc, omnuh2_in, nu_massive=False, zs = [0], nnu_massive_in=1):
     A. We're setting "omk" with OmK * h ** 2. Should I have used OmK? If so,
         the capitalization here is nonstandard.
     """ 
+
+    # Something is wrong with the inputs?
+    '''
+    print("redshifts", zs)
+    print("baryon dens", mlc['ombh2'])
+    print("cdm dens", mlc['omch2'])
+    print("spec index", mlc["n_s"])
+    print("scalar amp", mlc["A_s"])
+    print("Hubble con", mlc["h"])
+    print("DE con", mlc["w0"])
+    print("DE slope", mlc['wa'])
+    print("curvie", mlc['OmK'])
+    '''
+
     pars = camb.CAMBparams()
     omch2_in = mlc["omch2"]
 
