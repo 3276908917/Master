@@ -1,4 +1,4 @@
-path_base_linux = "/home/lfinkbe/Documents/"
+path_base_linux = "/home/lfinkbei/Documents/"
 path_base_rex = "C:/Users/Lukas/Documents/GitHub/"
 path_base_otto = "T:/GitHub/"
 path_base = path_base_linux
@@ -478,6 +478,13 @@ def nu_kzps(mlc, omnuh2_in, nu_massive=False, zs = [0], nnu_massive_in=1):
         tau=0.0952, 
         neutrino_hierarchy="degenerate"
     )
+
+    print("\n" + mlc["Name"], "before neutrino modifications")
+    print("num_nu_massless", pars.num_nu_massless)
+    print("nu_mass_eigenstates", pars.nu_mass_eigenstates)
+    print("nu_mass_numbers", pars.nu_mass_numbers)
+    print("num_nu_massive", pars.num_nu_massive)
+
     pars.num_nu_massless = 3.046 - nnu_massive
     pars.nu_mass_eigenstates = nnu_massive
     stop_i = pars.nu_mass_eigenstates + 1
@@ -487,6 +494,13 @@ def nu_kzps(mlc, omnuh2_in, nu_massive=False, zs = [0], nnu_massive_in=1):
     if nnu_massive != 0:
         pars.num_nu_massive = sum(pars.nu_mass_numbers[:stop_i])
     
+    print("\n" + mlc["Name"], "after neutrino modifications")
+    print("num_nu_massless", pars.num_nu_massless)
+    print("nu_mass_eigenstates", pars.nu_mass_eigenstates)
+    print("nu_mass_numbers", pars.nu_mass_numbers)
+    print("num_nu_massive", pars.num_nu_massive)
+    print()
+
     pars.InitPower.set_params(As=mlc["A_s"], ns=mlc["n_s"],
         r=0, nt=0.0, ntrun=0.0) # the last three are desperation arguments
     
