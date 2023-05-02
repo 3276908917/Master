@@ -479,10 +479,14 @@ def nu_kzps(mlc, omnuh2_in, nu_massive=False, zs = [0], nnu_massive_in=1):
         neutrino_hierarchy="degenerate"
     )
 
-    print("\n" + mlc["Name"], "before neutrino modifications")
+    print("\n" + mlc["Name"])
+    print("massive neutrinos", nu_massive)
+    print("redshifts", zs)
+    print("before neutrino modifications")
+
     print("num_nu_massless", pars.num_nu_massless)
     print("nu_mass_eigenstates", pars.nu_mass_eigenstates)
-    print("nu_mass_numbers", pars.nu_mass_numbers)
+    print("nu_mass_numbers", list(pars.nu_mass_numbers))
     print("num_nu_massive", pars.num_nu_massive)
 
     pars.num_nu_massless = 3.046 - nnu_massive
@@ -494,10 +498,10 @@ def nu_kzps(mlc, omnuh2_in, nu_massive=False, zs = [0], nnu_massive_in=1):
     if nnu_massive != 0:
         pars.num_nu_massive = sum(pars.nu_mass_numbers[:stop_i])
     
-    print("\n" + mlc["Name"], "after neutrino modifications")
+    print("\nAfter neutrino modifications:")
     print("num_nu_massless", pars.num_nu_massless)
     print("nu_mass_eigenstates", pars.nu_mass_eigenstates)
-    print("nu_mass_numbers", pars.nu_mass_numbers)
+    print("nu_mass_numbers", list(pars.nu_mass_numbers))
     print("num_nu_massive", pars.num_nu_massive)
     print()
 
