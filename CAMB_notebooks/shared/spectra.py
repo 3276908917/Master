@@ -27,52 +27,34 @@ redshift_column = re.compile("z.+")
 
 '''! We really ought to merge the next three functions'''
 
-powernu = {}
+def define_powernu(relative_path, omeganu_strings=None):
+    file_base = file_base = path_to_me + relative_path
 
-def define_powernu():
-    file_base = file_base = path_to_me + \
-        "data/power_nu/Aletheia_powernu_zorig_nu"
-
-    for omnu in omnu_strings:
-        powernu[omnu] = []
-
+    def iterate_over_models_and_redshifts(accessor="0.002"):
+        nested_spectra = []
         for i in range(0, 9): # iterate over models
-            powernu[omnu].append([])
+            nested_spectra.append([])
             for j in range(0, 5): # iterate over snapshots
-                powernu[omnu][i].append(pd.read_csv(file_base + omnu + \
-                    "_caso" + str(i) + "_000" + str(j) + ".dat",
+                nested_spectra[i].append(pd.read_csv(file_base + \
+                    accessor + "_caso" + str(i) + "_000" + str(j) + ".dat",
                     names=["k", "P_no", "P_nu", "ratio"], sep='\s+'))
 
-powernu2 = []
-def define_powernu2():
-    file_base = file_base = path_to_me + \
-        "data/power_nu2/Aletheia_powernu_zorig_nu"
+    if omeganu_strings is None:
+        return iterate_over_models_and_redshifts()
 
-    for i in range(0, 9): # iterate over models
-        powernu2.append([])
-        for j in range(0, 5): # iterate over snapshots
-            powernu2[i].append(pd.read_csv(file_base + "0.002_caso" + \
-                str(i) + "_000" + str(j) + ".dat",
-                names=["k", "P_no", "P_nu", "ratio"], sep='\s+'))
+    powernu = {}
 
-powernu3 = {}
-def define_powernu3():
-    file_base = file_base = path_to_me + \
-        "data/power_nu3/Aletheia_powernu3_zorig_nu"
-    p3name_scheme = ["0.0006", "0.0021", "0.0064", "0.0100"]
+    for i in range(len(omeganu_strings)):
+        file_accessor = omeganu_strings[i]
+        powernu_key = omnu_strings[i]
 
-    for i in range(len(omnu_strings)):
-        key = omnu_strings[i]
-        powernu3[key] = []
-        file_handle = p3name_scheme[i]
+        powernu[powernu_key] = \
+            iterate_over_models_and_redshifts(file_accessor)
 
-        for i in range(0, 9): # iterate over models
-            powernu3[key].append([])
-            for j in range(0, 5): # iterate over snapshots
-                powernu3[key][i].append(pd.read_csv(file_base + file_handle + \
-                    "_caso" + str(i) + "_000" + str(j) + ".dat",
-                    names=["k", "P_no", "P_nu", "ratio"], sep='\s+'))
+    return powernu
 
+### Just some standard colors and styles for when I plot several models
+# together.
 colors = ["green", "blue", "brown", "red", "black", "orange", "purple",
           "magenta", "cyan"] * 200
 
@@ -191,7 +173,7 @@ def get_As_matched_cosmology(A_s=2.12723788013000E-09):
 
     return row
 
-def get_cosmology():
+def get_random_cosmology():
     """
     Unfortunately, all of these bounds are hard-coded. Maybe we can read in a
     table for this?
@@ -230,50 +212,13 @@ def get_cosmology():
         # table, for example tau or the CMB temperature?
 
     return row
-
-def boltzmann_battery(onh2, skips=[8]):
-    """
-    This is basically legacy code. Most of the notebooks still use this
-    function, but I am trying to phase it out in favor of better_battery.
-    """
-    k_massless_list = []
-    z_massless_list = []
-    p_massless_list = []
-    s12_massless_list = []
-
-    k_massive_list = []
-    z_massive_list = []
-    p_massive_list = []
-    s12_massive_list = []
-
-    for index, row in cosm.iterrows():
-        if index in skips:
-            # For example, I don't yet understand how to implement model 8
-            continue
         
-        z_in = parse_redshifts(index)
-        k, z, p, s12 = kzps(row, onh2, nu_massive=False, zs=z_in)
-        k_massless_list.append(k)
-        z_massless_list.append(z)
-        p_massless_list.append(p)
-        s12_massless_list.append(s12)
-        
-        k, z, p, s12 = kzps(row, onh2, nu_massive=True, zs=z_in)
-        k_massive_list.append(k)
-        z_massive_list.append(z)
-        p_massive_list.append(p)
-        s12_massive_list.append(s12)
-
-    return k_massless_list, z_massless_list, p_massless_list, \
-        s12_massless_list, k_massive_list, z_massive_list, p_massive_list, \
-        s12_massive_list
-        
-def nu_battery(onh2s, onh2_strs, skips_omega = [0, 2],
+def boltzmann_battery(onh2s, onh2_strs, skips_omega = [0, 2],
     skips_model=[8], skips_snapshot=[1, 2, 3], h_units=False,
-    models=cosm):
+    models=cosm, fancy_neutrinos=False):
     """
-    Similar procedure to boltzmann_battery, but with an architecture that
-    more closely agrees with that of Ariel's in the powernu results.
+    Return format uses an architecture that closely agrees with that of Ariel's
+    in the powernu results:
     spec_sims
         omnuh2 str
             model index
@@ -338,99 +283,8 @@ def nu_battery(onh2s, onh2_strs, skips_omega = [0, 2],
                 inner_dict = {}
                 z = z_input[snap_index]
               
-                massless_tuple = nu_kzps(row, om, nu_massive=False, zs=[z])
-                inner_dict["k"] = massless_tuple[0] if h_units \
-                    else massless_tuple[0] * h
-                inner_dict["P_no"] = massless_tuple[2] if h_units \
-                    else massless_tuple[2] / h ** 3
-                inner_dict["s12_massless"] = massless_tuple[3]
-
-                massive_tuple = nu_kzps(row, om, nu_massive=True, zs=[z])
-                inner_dict["P_nu"] = massive_tuple[2] if h_units \
-                    else massive_tuple[2] / h ** 3
-                inner_dict["s12_massive"] = massive_tuple[3]
-                
-                # Temporary addition, for debugging
-                inner_dict["z"] = z_input[snap_index]               
- 
-                assert np.array_equal(massless_tuple[0], massive_tuple[0]), \
-                   "assumption of identical k axes not satisfied!"
-                    
-                spec_sims[om_str][mindex].append(inner_dict) 
-
-    return spec_sims
-
-def better_battery(onh2s, onh2_strs, skips_omega = [0, 2],
-    skips_model=[8], skips_snapshot=[1, 2, 3], h_units=False,
-    models=cosm):
-    """
-    Similar procedure to boltzmann_battery, but with an architecture that
-    more closely agrees with that of Ariel's in the powernu results.
-    spec_sims
-        omnuh2 str
-            model index
-                snapshot index
-                    quantity of interest
-
-    Although this agreement is an added benefit, the main point is simply to
-    have a cleaner and more versatile architecture than the mess of separate
-    arrays returned previously. So even if the "ground truth" object should
-    eventually cease to agree in shape, this function already returns a much
-    more pleasant object.
-
-    Another difference with boltzmann_battery: this function automatically
-    uses h_units=False, which should further bring my object into agreement
-    with powernu. This is more debatable than simple architecture cleanup, so I
-    will leave this as a flag up to the user.
-    """
-    assert type(onh2s) == list or type(onh2s) == np.ndarray, \
-        "if you want only one omega value, you must still nest it in a list"
-    assert type(onh2_strs) == list or type(onh2_strs) == np.ndarray, \
-        "if you want only one omega value, you must still nest it in a list"
-    assert len(onh2s) == len(onh2_strs), "more or fewer labels than points"
-    
-    spec_sims = {}
-
-    for om_index in range(len(onh2s)):
-        print(om_index % 10, end='')
-        om = onh2s[om_index]
-        om_str = onh2_strs[om_index]
-        if om_index in skips_omega:
-            spec_sims[om_str] = None
-            continue
-        spec_sims[om_str] = []
-        for mindex, row in models.iterrows():
-            if mindex in skips_model:
-                # For example, I don't yet understand how to implement model 8
-                spec_sims[om_str].append(None)
-                continue
-                
-            h = row["h"]
-            spec_sims[om_str].append([])
-       
-            z_input = parse_redshifts(mindex)
-            if None in z_input:
-                spec_sims[om_str][m_index] = None
-                continue
-
-            #print("z_input", z_input)
-            #print("total Zs", len(z_input)) 
-            for snap_index in range(len(z_input)):
-                '''
-                since z_input is ordered from z large to z small,
-                and snap indices run from z large to z small,
-                z_index = snap_index in this case and NOT in general
-                '''
-                #print(z_index)
-                if snap_index in skips_snapshot:
-                    #print("skipping", z_index)
-                    spec_sims[om_str][mindex].append(None)
-                    continue
-                #print("using", z_index)
-                inner_dict = {}
-                z = z_input[snap_index]
-              
-                massless_tuple = kzps(row, om, nu_massive=False, zs=[z])
+                massless_tuple = kzps(row, om, nu_massive=False, zs=[z],
+                    fancy_neutrinos=fancy_neutrinos)
                 inner_dict["k"] = massless_tuple[0] if h_units \
                     else massless_tuple[0] * h
                 inner_dict["P_no"] = massless_tuple[2] if h_units \
@@ -452,94 +306,8 @@ def better_battery(onh2s, onh2_strs, skips_omega = [0, 2],
 
     return spec_sims
 
-def nu_kzps(mlc, omnuh2_in, nu_massive=False, zs = [0], nnu_massive_in=1):
-    """
-    Version of kzps with the infamous neutrino code block.
-    """ 
-    pars = camb.CAMBparams()
-    omch2_in = mlc["omch2"]
-
-    mnu_in = 0
-    nnu_massive = 0
-    h = mlc["h"]
-
-    if nu_massive:
-        mnu_in = omnuh2_in * camb.constants.neutrino_mass_fac / \
-            (camb.constants.default_nnu / 3.0) ** 0.75 
-        omch2_in -= omnuh2_in
-        nnu_massive = nnu_massive_in
-
-    pars.set_cosmology(
-        H0=h * 100,
-        ombh2=mlc["ombh2"],
-        omch2=omch2_in,
-        omk=mlc["OmK"],
-        mnu=mnu_in,
-        tau=0.0952, 
-        neutrino_hierarchy="degenerate"
-    )
-
-    print("\n" + mlc["Name"])
-    print("massive neutrinos", nu_massive)
-    print("redshifts", zs)
-    print("before neutrino modifications")
-
-    print("num_nu_massless", pars.num_nu_massless)
-    print("nu_mass_eigenstates", pars.nu_mass_eigenstates)
-    print("nu_mass_numbers", list(pars.nu_mass_numbers))
-    print("num_nu_massive", pars.num_nu_massive)
-
-    pars.num_nu_massless = 3.046 - nnu_massive
-    pars.nu_mass_eigenstates = nnu_massive
-    stop_i = pars.nu_mass_eigenstates + 1
-    pars.nu_mass_numbers[:stop_i] = \
-        list(np.ones(len(pars.nu_mass_numbers[:stop_i]), int))
-    pars.num_nu_massive = 0
-    if nnu_massive != 0:
-        pars.num_nu_massive = sum(pars.nu_mass_numbers[:stop_i])
-    
-    print("\nAfter neutrino modifications:")
-    print("num_nu_massless", pars.num_nu_massless)
-    print("nu_mass_eigenstates", pars.nu_mass_eigenstates)
-    print("nu_mass_numbers", list(pars.nu_mass_numbers))
-    print("num_nu_massive", pars.num_nu_massive)
-    print()
-
-    pars.InitPower.set_params(As=mlc["A_s"], ns=mlc["n_s"],
-        r=0, nt=0.0, ntrun=0.0) # the last three are desperation arguments
-    
-    pars.NonLinear = camb.model.NonLinear_none
-    pars.WantCls = False
-    pars.WantScalars = False
-    pars.Want_CMB = False
-    pars.DoLensing = False
-    pars.YHe = 0.24
-    pars.set_accuracy(AccuracyBoost=2)
-    pars.Accuracy.AccuracyBoost = 3
-    pars.Accuracy.lAccuracyBoost = 3
-    pars.Accuracy.AccuratePolarization = False
-    pars.Transfer.kmax = 20.0 / h
-
-    if mlc["w0"] != -1 or float(mlc["wa"]) != 0:
-        pars.set_dark_energy(w=mlc["w0"], wa=float(mlc["wa"]),
-            dark_energy_model='ppf')
-    
-    pars.set_matter_power(redshifts=zs, kmax=20.0 / h, nonlinear=False)
-    
-    results = camb.get_results(pars)
-
-    sigma12 = results.get_sigmaR(12, hubble_units=False)
-    
-    k, z, p = results.get_matter_power_spectrum(
-        minkh=1e-4 / h, maxkh=10.0 / h, npoints = 100000,
-        var1=8, var2=8
-    )
-   
-    if len(p) == 1:
-        p = p[0] 
-    return k, z, p, sigma12 
-
-def kzps(mlc, omnuh2_in, nu_massive=False, zs = [0], nnu_massive_in=1):
+def kzps(mlc, omnuh2_in, nu_massive=False, zs = [0], nnu_massive_in=1,
+    fancy_neutrinos=False):
     """
     Returns the scale axis, redshifts, power spectrum, and sigma12
     of a Lambda-CDM model
@@ -556,19 +324,6 @@ def kzps(mlc, omnuh2_in, nu_massive=False, zs = [0], nnu_massive_in=1):
     A. We're setting "omk" with OmK * h ** 2. Should I have used OmK? If so,
         the capitalization here is nonstandard.
     """ 
-
-    # Something is wrong with the inputs?
-    '''
-    print("redshifts", zs)
-    print("baryon dens", mlc['ombh2'])
-    print("cdm dens", mlc['omch2'])
-    print("spec index", mlc["n_s"])
-    print("scalar amp", mlc["A_s"])
-    print("Hubble con", mlc["h"])
-    print("DE con", mlc["w0"])
-    print("DE slope", mlc['wa'])
-    print("curvie", mlc['OmK'])
-    '''
 
     pars = camb.CAMBparams()
     omch2_in = mlc["omch2"]
@@ -607,18 +362,18 @@ def kzps(mlc, omnuh2_in, nu_massive=False, zs = [0], nnu_massive_in=1):
         # neutrino setup (see below) is not valid for inverted/normal
         # hierarchies.
     )
-    '''
     # Matteo really didn't use any of this block? I don't understand--this
     # block seems well theoretically motivated.
-    pars.num_nu_massless = 3.046 - nnu_massive
-    pars.nu_mass_eigenstates = nnu_massive
-    stop_i = pars.nu_mass_eigenstates + 1
-    pars.nu_mass_numbers[:stop_i] = \
-        list(np.ones(len(pars.nu_mass_numbers[:stop_i]), int))
-    pars.num_nu_massive = 0
-    if nnu_massive != 0:
-        pars.num_nu_massive = sum(pars.nu_mass_numbers[:stop_i])
-    '''
+    if fancy_neutrinos:
+        pars.num_nu_massless = 3.046 - nnu_massive
+        pars.nu_mass_eigenstates = nnu_massive
+        stop_i = pars.nu_mass_eigenstates + 1
+        pars.nu_mass_numbers[:stop_i] = \
+            list(np.ones(len(pars.nu_mass_numbers[:stop_i]), int))
+        pars.num_nu_massive = 0
+        if nnu_massive != 0:
+            pars.num_nu_massive = sum(pars.nu_mass_numbers[:stop_i])
+    
     pars.InitPower.set_params(As=mlc["A_s"], ns=mlc["n_s"],
         r=0, nt=0.0, ntrun=0.0) # the last three are desperation arguments
     
