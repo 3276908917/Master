@@ -99,7 +99,8 @@ def kp(om_b_in, om_c_in, ns_in, om_nu_in, sigma12_in, As_in,
         # neutrino setup (see below) is not valid for inverted/normal
         # hierarchies.
     )
-    
+
+    '''
     pars.num_nu_massless = 3.046 - nnu_massive
     pars.nu_mass_eigenstates = nnu_massive
     stop_i = pars.nu_mass_eigenstates + 1
@@ -108,7 +109,7 @@ def kp(om_b_in, om_c_in, ns_in, om_nu_in, sigma12_in, As_in,
     pars.num_nu_massive = 0
     if nnu_massive != 0:
         pars.num_nu_massive = sum(pars.nu_mass_numbers[:stop_i])
-
+    '''
     # Last three are desperation arguments
     pars.InitPower.set_params(As=As_in, ns=ns_in, r=0, nt=0.0, ntrun=0.0)
     
