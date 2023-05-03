@@ -39,6 +39,8 @@ def define_powernu(relative_path, omeganu_strings=None):
                     accessor + "_caso" + str(i) + "_000" + str(j) + ".dat",
                     names=["k", "P_no", "P_nu", "ratio"], sep='\s+'))
 
+        return nested_spectra
+
     if omeganu_strings is None:
         return iterate_over_models_and_redshifts()
 
@@ -291,7 +293,8 @@ def boltzmann_battery(onh2s, onh2_strs, skips_omega = [0, 2],
                     else massless_tuple[2] / h ** 3
                 inner_dict["s12_massless"] = massless_tuple[3]
 
-                massive_tuple = kzps(row, om, nu_massive=True, zs=[z])
+                massive_tuple = kzps(row, om, nu_massive=True, zs=[z],
+                    fancy_neutrinos=fancy_neutrinos)
                 inner_dict["P_nu"] = massive_tuple[2] if h_units \
                     else massive_tuple[2] / h ** 3
                 inner_dict["s12_massive"] = massive_tuple[3]
@@ -431,72 +434,7 @@ def kzps(mlc, omnuh2_in, nu_massive=False, zs = [0], nnu_massive_in=1,
         p = p[0] 
     return k, z, p, sigma12 
 
-def model_ratios_old(k_list, p_list, snap_index, canvas, subscript, title,
-    skips=[], subplot_indices=None, active_labels=['x', 'y'], x_mode=False):
-    """
-    Plot the ratio of @p_list[i] to @p_list[0] for all i.
-
-    Here, the baseline is always model 0, but theoretically it should be quite
-    easy to generalize this function further.
-    """
-    z_index = 4 - snap_index
-    # Remember, the returned redshifts are in increasing order
-    # Whereas snapshot indices run from older to newer
-    baseline_h = cosm.loc[0]["h"]
-    baseline_k = k_list[0] * baseline_h
-
-    baseline_p = None
-    if x_mode==False:
-        baseline_p = p_list[0][z_index] / baseline_h ** 3
-    else:
-        baseline_p = p_list[0][z_index]
-    
-    plot_area = canvas # if subplot_indices is None
-    if subplot_indices is not None:
-        if type(subplot_indices) == int:
-            plot_area = canvas[subplot_indices]
-        else: # we assume it's a 2d grid of plots
-            plot_area = canvas[subplot_indices[0], subplot_indices[1]]
-        # No need to add more if cases because an n-d canvas of n > 2 makes no
-        # sense.
-
-    for i in range(1, len(k_list)):
-        if i in skips:
-            continue
-        this_h = cosm.loc[i]["h"]
-        this_k = k_list[i] * this_h
-        
-        this_p = None
-        if x_mode==False:
-            this_p = p_list[i][z_index] / this_h ** 3
-        else:
-            this_p = p_list[i][z_index]
-
-        truncated_k, truncated_p, aligned_p = truncator(baseline_k, baseline_p,
-            this_k, this_p, interpolation=True)
-
-        label_in = "model " + str(i)
-        plot_area.plot(truncated_k, aligned_p / truncated_p, label=label_in,
-            c=colors[i], linestyle=styles[i])
-
-    plot_area.set_xscale('log')
-    if 'x' in active_labels:
-        plot_area.set_xlabel(r"k [1 / Mpc]")
-    
-    ylabel = None
-    if x_mode == False:
-        ylabel = r"$P_\mathrm{" + subscript + "} /" + \
-            r" P_\mathrm{" + subscript + ", model \, 0}$"
-    else:
-        ylabel = r"$x_i / x_0$"
-
-    if 'y' in active_labels:
-        plot_area.set_ylabel(ylabel)
-    
-    plot_area.set_title(title)
-    plot_area.legend()
-
-def model_ratios_true(snap_index, correct_sims, canvas, massive=True, skips=[],
+def model_ratios(snap_index, sims, canvas, massive=True, skips=[],
     subplot_indices=None, active_labels=['x', 'y'], title="Ground truth",
     omnuh2_str="0.002", models=cosm, suppress_legend=False):
     """
@@ -518,10 +456,10 @@ def model_ratios_true(snap_index, correct_sims, canvas, massive=True, skips=[],
     baseline_h = models.loc[0]["h"]
     baseline_k = correct_sims[0][snap_index]["k"]
     
-    baseline_p = correct_sims[0][snap_index]["P_nu"] / \
-        correct_sims[0][snap_index]["P_no"]
+    baseline_p = sims[0][snap_index]["P_nu"] / \
+        sims[0][snap_index]["P_no"]
     if P_accessor is not None:
-        baseline_p = correct_sims[0][snap_index][P_accessor]
+        baseline_p = sims[0][snap_index][P_accessor]
     
     plot_area = canvas # if subplot_indices is None
     if subplot_indices is not None:
@@ -702,35 +640,7 @@ def parse_redshifts(model_num):
     # be in descending order.
     return np.array(z)
 
-def truncator(big_x, big_y, small_x, small_y, interpolation=True):
-    """
-    Truncate big arrays based on small_arrays,
-    then interpolate the small arrays over
-    the truncated big_x domain.
-    @returns:
-        trunc_x: truncated big_x array
-        trunc_y: truncated big_y array
-        aligned_y: interpolation of small_y over trunc_x
-    """
-    # What is the most conservative lower bound?
-    lcd_min = max(min(small_x), min(big_x))
-    # What is the most conservative upper bound?
-    lcd_max = min(max(small_x), max(big_x))
-    
-    # Eliminate points outside the conservative bounds
-    mask = np.all([[big_x <= lcd_max], [big_x >= lcd_min]], axis=0)[0]
-    trunc_x = big_x[mask]
-    trunc_y = big_y[mask]
-    
-    aligned_y = small_y[mask]
-    # Is the spacing different in big_x and small_x?
-    if interpolation:
-        interpolator = interp1d(small_x, small_y, kind="cubic")
-        aligned_y = interpolator(trunc_x)
-    
-    return trunc_x, trunc_y, aligned_y
-
-def truncator_neutral(base_x, base_y, obj_x, obj_y):
+def truncator(base_x, base_y, obj_x, obj_y):
     # This doesn't make the same assumptions as truncator
     # But of course it's terrible form to leave both of these functions here.
     """
