@@ -149,7 +149,7 @@ def get_As_matched_cosmology(A_s=2.12723788013000E-09):
     """
     row = {}
 
-    # Shape parameters: CONSTANT ACROSS MODELS
+    # Shape pars: CONSTANT ACROSS MODELS
     row['ombh2'] = 0.022445
     row['omch2'] = 0.120567
     row['n_s'] = 0.96
@@ -182,7 +182,7 @@ def get_random_cosmology():
     """
     row = {}
 
-    # Shape parameters: CONSTANT ACROSS MODELS
+    # Shape pars: CONSTANT ACROSS MODELS
     row['ombh2'] = 0.022445
     row['omch2'] = 0.120567
     row['n_s'] = 0.96
@@ -210,7 +210,7 @@ def get_random_cosmology():
 
     #~ Should we compute omnuh2 here, or leave that separate?
 
-    #~ Should we also specify parameters not specified by the Aletheia data
+    #~ Should we also specify pars not specified by the Aletheia data
         # table, for example tau or the CMB temperature?
 
     return row
@@ -309,6 +309,41 @@ def boltzmann_battery(onh2s, onh2_strs, skips_omega = [0, 2],
 
     return spec_sims
 
+def make_neutrinos_fancy(pars, nnu_massive):
+    """
+    This is a kzps helper function which enables the infamous fancy neutrino.
+    In practice, this only overrides the effective number of massless neutrinos
+    by a small amount, which nonetheless leads to irreconcilable discrepancies
+    compared to observations.
+    """
+    pars.num_nu_massless = 3.046 - nnu_massive
+    pars.nu_mass_eigenstates = nnu_massive
+    stop_i = pars.nu_mass_eigenstates + 1
+    pars.nu_mass_numbers[:stop_i] = \
+        list(np.ones(len(pars.nu_mass_numbers[:stop_i]), int))
+    pars.num_nu_massive = 0
+    if nnu_massive != 0:
+        pars.num_nu_massive = sum(pars.nu_mass_numbers[:stop_i])
+
+def apply_universal_output_settings(pars):
+    """
+    This is a kzps helper function which modifies the desired accuracy of CAMB
+    and which disables certain outputs in which we are not interested.
+    """
+
+    ''' The following lines are desperation settings
+    If we ever have extra time, we can more closely study what each line does
+    '''
+    pars.WantCls = False
+    pars.WantScalars = False
+    pars.Want_CMB = False
+    pars.DoLensing = False
+    pars.YHe = 0.24
+    pars.Accuracy.AccuracyBoost = 3
+    pars.Accuracy.lAccuracyBoost = 3
+    pars.Accuracy.AccuratePolarization = False
+    pars.Transfer.kmax = 20.0 / h
+
 def kzps(mlc, omnuh2_in, nu_massive=False, zs = [0], nnu_massive_in=1,
     fancy_neutrinos=False, k_points=100000):
     """
@@ -369,30 +404,12 @@ def kzps(mlc, omnuh2_in, nu_massive=False, zs = [0], nnu_massive_in=1,
     )
     
     if fancy_neutrinos:
-        pars.num_nu_massless = 3.046 - nnu_massive
-        pars.nu_mass_eigenstates = nnu_massive
-        stop_i = pars.nu_mass_eigenstates + 1
-        pars.nu_mass_numbers[:stop_i] = \
-            list(np.ones(len(pars.nu_mass_numbers[:stop_i]), int))
-        pars.num_nu_massive = 0
-        if nnu_massive != 0:
-            pars.num_nu_massive = sum(pars.nu_mass_numbers[:stop_i])
+        make_neutrinos_fancy(pars, nnu_massive)
     
     pars.InitPower.set_params(As=mlc["A_s"], ns=mlc["n_s"],
         r=0, nt=0.0, ntrun=0.0) # the last three are desperation arguments
-    
-    ''' The following lines are desperation settings
-    If we ever have extra time, we can more closely study what each line does
-    '''
-    pars.WantCls = False
-    pars.WantScalars = False
-    pars.Want_CMB = False
-    pars.DoLensing = False
-    pars.YHe = 0.24
-    pars.Accuracy.AccuracyBoost = 3
-    pars.Accuracy.lAccuracyBoost = 3
-    pars.Accuracy.AccuratePolarization = False
-    pars.Transfer.kmax = 20.0 / h
+   
+    apply_universal_output_settings(pars)
 
     # Default is fluid, so we don't need an 'else'
     if mlc["w0"] != -1 or float(mlc["wa"]) != 0:
@@ -404,9 +421,6 @@ def kzps(mlc, omnuh2_in, nu_massive=False, zs = [0], nnu_massive_in=1,
     pars.set_matter_power(redshifts=zs, kmax=20.0 / h, nonlinear=False)
     
     results = camb.get_results(pars)
-
-    # WHY DOESN'T THIS MAKE ANY DIFFERENCE???
-    #results.calc_power_spectra(pars)
 
     sigma12 = results.get_sigmaR(12, hubble_units=False)
     
