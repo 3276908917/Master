@@ -10,6 +10,7 @@ import camb
 import re
 from scipy.interpolate import interp1d
 from scipy.optimize import root_scalar
+import copy as cp
 
 '''Keep in mind that this is NOT the same file as the original
 "cosmology_Aletheia.dat" that Ariel gave us! If you use the unaltered version,
@@ -344,81 +345,89 @@ def apply_universal_output_settings(pars):
     pars.Accuracy.AccuratePolarization = False
     pars.Transfer.kmax = 20.0 / h
 
-def kzps(mlc, omnuh2_in, nu_massive=False, zs = [0], nnu_massive_in=1,
-    fancy_neutrinos=False, k_points=100000):
+def input_dark_energy(pars, w0, wa):
     """
-    Returns the scale axis, redshifts, power spectrum, and sigma12
-    of a Lambda-CDM model
-    @param mlc : "MassLess Cosmology"
-        a dictionary of values
-        for CAMBparams fields
-    @param omnuh2_in : neutrino physical mass density
-    @nu_massive : if this is True,
-        the value in omnuh2_in is used to set omnuh2.
-        If this is False,
-        the value in omnuh2_in is simply added to omch2.
-    @fancy_neutrinos: flag sets whether we attempt to impose a neutrino
-        scheme on CAMB after we've already set the physical density. The
-        results seem to be inconsistent with observation.
+    Helper function for input_cosmology.
+    Handles dark energy by using a PPF model (which allows a wide range of
+        w0 and wa values) unless w0 is -1 and wa is zero, in which case we use
+        the two-fluid approximation.
+    """
+    # Default is fluid, so we don't need an 'else'
+    if w0 != -1 or wa != 0:
+        pars.set_dark_energy(w=w0, wa=wa, dark_energy_model='ppf')
 
+def specify_neutrino_mass(mlc, omnuh2_in, nnu_massive_in=1):
+    """
+    Helper function for input_cosmology.
+    This returns modified copy of the input dictionary object, which
+    corresponds to a cosmology with massive neutrinos.
+    """
+    
+    '''This is a horrible workaround, and I would like to get rid of it
+    ASAP. It destroys dependence on TCMB and
+    neutrino_hierarchy, possibly more. But CAMB does not accept omnuh2 as
+    an input, so I have to reverse-engineer it somehow.
+    
+    Also, should we replace default_nnu with something else in the
+    following expression? Even if we're changing N_massive to 1,
+    N_total_eff = 3.046 nonetheless, right?'''
+    full_cosmology = cp.deepcopy(mlc) 
+
+    full_cosmology["mnu"] = omnuh2_in * camb.constants.neutrino_mass_fac / \
+        (camb.constants.default_nnu / 3.0) ** 0.75 
+    #print("The mnu value", mnu_in, "corresponds to the omnuh2 value",
+    #    omnuh2_in)
+    full_cosmology["omch2"] -= omnuh2_in
+    full_cosmology["nnu_massive"] = nnu_massive_in
+
+def input_cosmology(cosmology): 
+    """
+    Helper function for kzps.
+    Read entries from a dictionary representing a cosmological configuration.
+    Then write these values to a CAMBparams object and return. 
+    
     Possible mistakes:
     A. We're setting "omk" with OmK * h ** 2. Should I have used OmK? If so,
         the capitalization here is nonstandard.
-    """ 
+    """
 
     pars = camb.CAMBparams()
-    omch2_in = mlc["omch2"]
 
-    mnu_in = 0
-    nnu_massive = 0
-    h = mlc["h"]
-
-    if nu_massive:
-        '''This is a horrible workaround, and I would like to get rid of it
-        ASAP. It destroys dependence on TCMB and
-        neutrino_hierarchy, possibly more. But CAMB does not accept omnuh2 as
-        an input, so I have to reverse-engineer it somehow.
-        
-        Also, should we replace default_nnu with something else in the
-        following expression? Even if we're changing N_massive to 1,
-        N_total_eff = 3.046 nonetheless, right?'''
-        mnu_in = omnuh2_in * camb.constants.neutrino_mass_fac / \
-            (camb.constants.default_nnu / 3.0) ** 0.75 
-        #print("The mnu value", mnu_in, "corresponds to the omnuh2 value",
-        #    omnuh2_in)
-        omch2_in -= omnuh2_in
-        nnu_massive = nnu_massive_in
+    h = cosmology["h"]
 
     # tau is a desperation argument
+    ### Why are we using the degenerate hierarchy? Isn't that wrong?
     pars.set_cosmology(
         H0=h * 100,
-        ombh2=mlc["ombh2"],
-        omch2=omch2_in,
-        omk=mlc["OmK"],
-        mnu=mnu_in,
-        num_massive_neutrinos=nnu_massive,
+        ombh2=cosmology["ombh2"],
+        omch2=cosmology["omch2"],
+        omk=cosmology["OmK"],
+        mnu=cosmology["mnu"],
+        num_massive_neutrinos=cosmology["nnu_massive"],
         tau=0.0952, # for justification, ask Matteo
         neutrino_hierarchy="degenerate" # 1 eigenstate approximation; our
         # neutrino setup (see below) is not valid for inverted/normal
         # hierarchies.
     )
-    
-    if fancy_neutrinos:
-        make_neutrinos_fancy(pars, nnu_massive)
-    
-    pars.InitPower.set_params(As=mlc["A_s"], ns=mlc["n_s"],
+ 
+    pars.InitPower.set_params(As=cosmology["A_s"], ns=cosmology["n_s"],
         r=0, nt=0.0, ntrun=0.0) # the last three are desperation arguments
-   
-    apply_universal_output_settings(pars)
 
-    # Default is fluid, so we don't need an 'else'
-    if mlc["w0"] != -1 or float(mlc["wa"]) != 0:
-        pars.set_dark_energy(w=mlc["w0"], wa=float(mlc["wa"]),
-            dark_energy_model='ppf')
-    
+    input_dark_energy(pars, cosmology["w0"], float(cosmology["wa"])
+
+    return pars
+
+def obtain_pspectrum(pars, zs=[0], k_points=100000):
+    """
+    Helper function for kzps.
+    Given a fully set-up pars function, return the following in this order:
+        scale axis, redshifts used, power spectra, and sigma12 values.
+
+    """
+
     ''' To change the the extent of the k-axis, change the following line as
     well as the "get_matter_power_spectrum" call. '''
-    pars.set_matter_power(redshifts=zs, kmax=20.0 / h, nonlinear=False)
+    pars.set_matter_power(redshifts=zs, kmax=20.0 / pars.h, nonlinear=False)
     
     results = camb.get_results(pars)
 
@@ -432,14 +441,37 @@ def kzps(mlc, omnuh2_in, nu_massive=False, zs = [0], nnu_massive_in=1,
     power spectrum of CDM + baryons (i.e. neutrinos excluded).
     '''
     k, z, p = results.get_matter_power_spectrum(
-        minkh=1e-4 / h, maxkh=10.0 / h, npoints = k_points,
+        minkh=1e-4 / pars.h, maxkh=10.0 / pars.h, npoints = k_points,
         var1=8, var2=8
     )
    
     # De-nest for the single-redshift case:
     if len(p) == 1:
-        p = p[0] 
-    return k, z, p, sigma12 
+        p = p[0]
+
+    return k, z, p, sigma12
+
+def kzps(mlc, omnuh2_in, zs = [0], nnu_massive_in=1, fancy_neutrinos=False,
+    k_points=100000):
+    """
+    Returns the scale axis, redshifts, power spectrum, and sigma12
+        of a massless-neutrino Lambda-CDM model
+    @param mlc : "MassLess Cosmology"
+        a dictionary of value for CAMBparams fields
+    @param omnuh2_in : neutrino physical mass density
+    @fancy_neutrinos: flag sets whether we attempt to impose a neutrino
+        scheme on CAMB after we've already set the physical density. The
+        results seem to be inconsistent with observation.
+    """ 
+    full_cosmology = specify_neutrino_mass(mlc)
+    pars = input_cosmology(full_cosmology, omnuh2_in, nu_massive=False)
+    
+    if fancy_neutrinos:
+        make_neutrinos_fancy(pars, nnu_massive)
+    
+    apply_universal_output_settings(pars)
+    
+    return obtain_pspectrum(pars, zs, k_points=k_points) 
 
 def model_ratios(snap_index, sims, canvas, massive=True, skips=[],
     subplot_indices=None, active_labels=['x', 'y'], title="Ground truth",
