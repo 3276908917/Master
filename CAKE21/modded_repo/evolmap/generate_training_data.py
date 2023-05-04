@@ -100,16 +100,6 @@ def kp(om_b_in, om_c_in, ns_in, om_nu_in, sigma12_in, As_in,
         # hierarchies.
     )
 
-    '''
-    pars.num_nu_massless = 3.046 - nnu_massive
-    pars.nu_mass_eigenstates = nnu_massive
-    stop_i = pars.nu_mass_eigenstates + 1
-    pars.nu_mass_numbers[:stop_i] = \
-        list(np.ones(len(pars.nu_mass_numbers[:stop_i]), int))
-    pars.num_nu_massive = 0
-    if nnu_massive != 0:
-        pars.num_nu_massive = sum(pars.nu_mass_numbers[:stop_i])
-    '''
     # Last three are desperation arguments
     pars.InitPower.set_params(As=As_in, ns=ns_in, r=0, nt=0.0, ntrun=0.0)
     
@@ -118,19 +108,24 @@ def kp(om_b_in, om_c_in, ns_in, om_nu_in, sigma12_in, As_in,
     '''
     # This is a desperation line in light of the previous line. The previous
     # line seems to have served me well enough so far, but BSTS.
-    pars.NonLinear = camb.model.NonLinear_none
     pars.WantCls = False
     pars.WantScalars = False
     pars.Want_CMB = False
     pars.DoLensing = False
     pars.YHe = 0.24   
-    pars.set_accuracy(AccuracyBoost=2)
-  
+    pars.Accuracy.AccuracyBoost = 3                                             
+    pars.Accuracy.lAccuracyBoost = 3                                            
+    pars.Accuracy.AccuratePolarization = False                                     
+    pars.Transfer.kmax = 20.0 / h             
+    
+    if mlc["w0"] != -1 or float(mlc["wa"]) != 0:                                
+        pars.set_dark_energy(w=mlc["w0"], wa=float(mlc["wa"]),
+            dark_energy_model='ppf')      
+
     pars.set_matter_power(redshifts=_redshifts, kmax=10.0 / h_in,
         nonlinear=False)
 
     results = camb.get_results(pars)
-    results.calc_power_spectra(pars)
     
     list_s12 = results.get_sigmaR(12, var1=8, var2=8, hubble_units=False)
 

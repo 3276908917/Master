@@ -217,7 +217,7 @@ def get_random_cosmology():
         
 def boltzmann_battery(onh2s, onh2_strs, skips_omega = [0, 2],
     skips_model=[8], skips_snapshot=[1, 2, 3], h_units=False,
-    models=cosm, fancy_neutrinos=False):
+    models=cosm, fancy_neutrinos=False, k_points=100000):
     """
     Return format uses an architecture that closely agrees with that of Ariel's
     in the powernu results:
@@ -286,7 +286,7 @@ def boltzmann_battery(onh2s, onh2_strs, skips_omega = [0, 2],
                 z = z_input[snap_index]
               
                 massless_tuple = kzps(row, om, nu_massive=False, zs=[z],
-                    fancy_neutrinos=fancy_neutrinos)
+                    fancy_neutrinos=fancy_neutrinos, k_points=k_points)
                 inner_dict["k"] = massless_tuple[0] if h_units \
                     else massless_tuple[0] * h
                 inner_dict["P_no"] = massless_tuple[2] if h_units \
@@ -294,7 +294,7 @@ def boltzmann_battery(onh2s, onh2_strs, skips_omega = [0, 2],
                 inner_dict["s12_massless"] = massless_tuple[3]
 
                 massive_tuple = kzps(row, om, nu_massive=True, zs=[z],
-                    fancy_neutrinos=fancy_neutrinos)
+                    fancy_neutrinos=fancy_neutrinos, k_points=k_points)
                 inner_dict["P_nu"] = massive_tuple[2] if h_units \
                     else massive_tuple[2] / h ** 3
                 inner_dict["s12_massive"] = massive_tuple[3]
@@ -310,7 +310,7 @@ def boltzmann_battery(onh2s, onh2_strs, skips_omega = [0, 2],
     return spec_sims
 
 def kzps(mlc, omnuh2_in, nu_massive=False, zs = [0], nnu_massive_in=1,
-    fancy_neutrinos=False):
+    fancy_neutrinos=False, k_points=100000):
     """
     Returns the scale axis, redshifts, power spectrum, and sigma12
     of a Lambda-CDM model
@@ -322,6 +322,9 @@ def kzps(mlc, omnuh2_in, nu_massive=False, zs = [0], nnu_massive_in=1,
         the value in omnuh2_in is used to set omnuh2.
         If this is False,
         the value in omnuh2_in is simply added to omch2.
+    @fancy_neutrinos: flag sets whether we attempt to impose a neutrino
+        scheme on CAMB after we've already set the physical density. The
+        results seem to be inconsistent with observation.
 
     Possible mistakes:
     A. We're setting "omk" with OmK * h ** 2. Should I have used OmK? If so,
@@ -358,15 +361,13 @@ def kzps(mlc, omnuh2_in, nu_massive=False, zs = [0], nnu_massive_in=1,
         omch2=omch2_in,
         omk=mlc["OmK"],
         mnu=mnu_in,
-        #num_massive_neutrinos=nnu_massive, CODE_BLUE
-        tau=0.0952, # just like in Matteo's notebook, at least (but maybe I got
-            # this value from somewhere else...)
+        num_massive_neutrinos=nnu_massive,
+        tau=0.0952, # for justification, ask Matteo
         neutrino_hierarchy="degenerate" # 1 eigenstate approximation; our
         # neutrino setup (see below) is not valid for inverted/normal
         # hierarchies.
     )
-    # Matteo really didn't use any of this block? I don't understand--this
-    # block seems well theoretically motivated.
+    
     if fancy_neutrinos:
         pars.num_nu_massless = 3.046 - nnu_massive
         pars.nu_mass_eigenstates = nnu_massive
@@ -380,28 +381,20 @@ def kzps(mlc, omnuh2_in, nu_massive=False, zs = [0], nnu_massive_in=1,
     pars.InitPower.set_params(As=mlc["A_s"], ns=mlc["n_s"],
         r=0, nt=0.0, ntrun=0.0) # the last three are desperation arguments
     
-    ''' The following seven lines are desperation settings
+    ''' The following lines are desperation settings
     If we ever have extra time, we can more closely study what each line does
     '''
-    # This is a desperation line in light of the previous line. The previous
-    # line seems to have served me well enough so far, but BSTS.
-    pars.NonLinear = camb.model.NonLinear_none
     pars.WantCls = False
     pars.WantScalars = False
     pars.Want_CMB = False
     pars.DoLensing = False
     pars.YHe = 0.24
-    # Matteo used this line but Andrea uses the following lines
-    pars.set_accuracy(AccuracyBoost=2)
-    # I already verified that commenting-out the next four lines DOES NOT
-    # impact the Lukas-Matteo Gap.
     pars.Accuracy.AccuracyBoost = 3
     pars.Accuracy.lAccuracyBoost = 3
     pars.Accuracy.AccuratePolarization = False
     pars.Transfer.kmax = 20.0 / h
 
-    # desperation if statement
-    # CODE_GREEN should we add the additional try/catch that Matteo uses?
+    # Default is fluid, so we don't need an 'else'
     if mlc["w0"] != -1 or float(mlc["wa"]) != 0:
         pars.set_dark_energy(w=mlc["w0"], wa=float(mlc["wa"]),
             dark_energy_model='ppf')
@@ -425,7 +418,7 @@ def kzps(mlc, omnuh2_in, nu_massive=False, zs = [0], nnu_massive_in=1,
     power spectrum of CDM + baryons (i.e. neutrinos excluded).
     '''
     k, z, p = results.get_matter_power_spectrum(
-        minkh=1e-4 / h, maxkh=10.0 / h, npoints = 100000,
+        minkh=1e-4 / h, maxkh=10.0 / h, npoints = k_points,
         var1=8, var2=8
     )
    
