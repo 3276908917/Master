@@ -102,7 +102,7 @@ def kp(cosmology, standard_k_axis,
     
     import matplotlib.pyplot as plt
     #print(list_s12)
-    if True:
+    if False:
         plt.plot(_redshifts, list_sigma12);
         plt.axhline(cosmology["sigma12"], c="black")
         plt.title("$\sigma_{12}$ vs. $z$")
@@ -111,7 +111,7 @@ def kp(cosmology, standard_k_axis,
         plt.show()
      
     # debug block
-    if True:
+    if False:
         plt.plot(_redshifts, list_sigma12 - cosmology["sigma12"]);
         plt.axhline(0, c="black")
         plt.title("$\sigma_{12} - \sigma^{\mathrm{goal}}_{12}$ vs. $z$")
@@ -169,9 +169,9 @@ def kp(cosmology, standard_k_axis,
 
         if cosmology['h'] == model0['h']: # if we haven't touched h,
             # we don't need to interpolate.
-            _, p, _, _ = ci.kzps(cosmology, zs=np.array([z_best]),
+            _, _, p, _ = ci.kzps(cosmology, zs=np.array([z_best]),
                 fancy_neutrinos=False, k_points=300)
-            
+           
         else: # it's time to interpolate
             if cosmology['h'] > 0.01: # this check ensures that the
                 # notification appears only once.
@@ -189,7 +189,8 @@ def kp(cosmology, standard_k_axis,
         # We don't need to return k because we take for granted that all
         # runs will have the same k axis.
 
-        print(p)
-        print(p is None)
-        plt.plot(p); plt.show()
+        #print(p)
+        #print(p is None)
+        #plt.plot(p); plt.show()
+        
         return p
