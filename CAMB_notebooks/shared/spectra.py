@@ -290,7 +290,7 @@ def boltzmann_battery(onh2s, onh2_strs, skips_omega = [0, 2],
                     row, 0, nnu_massive_in=0)
                 massless_tuple = kzps(massless_nu_cosmology, zs=[z],
                     fancy_neutrinos=fancy_neutrinos, k_points=k_points,
-                    hubble_units)
+                    hubble_units=hubble_units)
                 inner_dict["s12_massless"] = massless_tuple[3]
 
                 massive_nu_cosmology = specify_neutrino_mass(
@@ -301,7 +301,7 @@ def boltzmann_battery(onh2s, onh2_strs, skips_omega = [0, 2],
 
                 massive_tuple = kzps(massive_nu_cosmology, zs=[z],
                     fancy_neutrinos=fancy_neutrinos, k_points=k_points,
-                    hubble_units)
+                    hubble_units=hubble_units)
                 inner_dict["s12_massive"] = massive_tuple[3]
                 
                 # Temporary addition, for debugging
@@ -462,8 +462,8 @@ def obtain_pspectrum(pars, zs=[0], k_points=100000, hubble_units=False):
         p = p[0]
 
     if not hubble_units:
-        k *= h
-        p /= h ** 3
+        k *= pars.h
+        p /= pars.h ** 3
 
     return k, z, p, sigma12
 
@@ -502,7 +502,8 @@ def kzps(cosmology, zs = [0], fancy_neutrinos=False, k_points=100000,
     
     apply_universal_output_settings(pars)
     
-    return obtain_pspectrum(pars, zs, k_points=k_points, hubble_units) 
+    return obtain_pspectrum(pars, zs, k_points=k_points,
+        hubble_units=hubble_units) 
 
 def obtain_pspectrum_interpolator(pars, zs=[0], z_points=150,
     hubble_units=False):
@@ -550,7 +551,7 @@ def kzps_interpolator(cosmology, zs = [0], fancy_neutrinos=False,
     apply_universal_output_settings(pars)
     
     return obtain_pspectrum_interpolator(pars, zs, z_points=z_points,
-        hubble_units) 
+        hubble_units=hubble_units) 
 
 def model_ratios(snap_index, sims, canvas, massive=True, skips=[],
     subplot_indices=None, active_labels=['x', 'y'], title="Ground truth",

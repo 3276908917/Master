@@ -67,16 +67,16 @@ def fill_hypercube(parameter_values, standard_k_axis, cell_range=None,
         config = parameter_values[i]
         #print(config, "\n", config[4])
         p = None
-        try:
+        #try:
             #print("beginning p-spectrum computation")
-            cosmology = build_cosmology(config[0], config[1], config[2],
-                config[4], config[3], config[5])
-            p = kp(cosmology, standard_k_axis, h_in=cosmology["h"])
+        cosmology = build_cosmology(config[0], config[1], config[2],
+            config[4], config[3], config[5])
+        p = kp(cosmology, standard_k_axis)
             #print("p-spectrum computation complete!")
-        except ValueError:
+        #except ValueError:
             # Don't let unreasonable sigma12 values crash the program; ignore
             # them for now.
-            traceback.print_exc(limit=1, file=sys.stdout)
+        #    traceback.print_exc(limit=1, file=sys.stdout)
         samples[i] = p
         
         print(i, "complete")
@@ -96,33 +96,33 @@ def kp(cosmology, standard_k_axis,
         will decrease it if we cannot get the desired sigma12 with a
         nonnegative redshift.
     """
-    k, z, p, list_sigma12 = ci.kzps(cosmology, _redshifts,
+    _, _, _, list_sigma12 = ci.kzps(cosmology, _redshifts,
         fancy_neutrinos=False, k_points=300)
     # debug block
     
     import matplotlib.pyplot as plt
     #print(list_s12)
-    if False:
+    if True:
         plt.plot(_redshifts, list_sigma12);
-        plt.axhline(list_sigma12, c="black")
+        plt.axhline(cosmology["sigma12"], c="black")
         plt.title("$\sigma_{12}$ vs. $z$")
         plt.ylabel("$\sigma_{12}$")
         plt.xlabel("$z$")
         plt.show()
      
     # debug block
-    if False:
-        plt.plot(_redshifts, list_sigma12 - cosomology["sigma12"]);
+    if True:
+        plt.plot(_redshifts, list_sigma12 - cosmology["sigma12"]);
         plt.axhline(0, c="black")
         plt.title("$\sigma_{12} - \sigma^{\mathrm{goal}}_{12}$ vs. $z$")
         plt.xlabel("$z$")
         plt.ylabel("$\sigma_{12} - \sigma^{\mathrm{goal}}_{12}$")
         plt.show()
     
-    list_s12 -= cosmology["sigma12"] # now it's a zero-finding problem
+    list_sigma12 -= cosmology["sigma12"] # now it's a zero-finding problem
     
     # remember that list_s12[0] corresponds to the highest value z
-    if list_sigma12[len(list_sigma12) - 1] < 0 and cosmology["h"] > 0.01:
+    if list_sigma12[len(list_sigma12) - 1] < 0 and cosmology['h'] > 0.01:
         ''' we need to start playing with h.
         To save on computation, let's check if even the minimum allowed value
         rescues the problem.
@@ -130,7 +130,7 @@ def kp(cosmology, standard_k_axis,
         if not solvability_known:
             try:
                 limiting_case = cp.deepcopy(cosmology)
-                limiting_case["h"] = 0.01
+                limiting_case['h'] = 0.01
                 kp(cosmology, standard_k_axis, _redshifts=_redshifts)
             except ValueError:
                 print("This cell is hopeless. Moving on...")
@@ -139,12 +139,12 @@ def kp(cosmology, standard_k_axis,
         ''' Now we know that modifying h will eventually fix the situation,
         so we start decreasing h. We also set a flag to make sure we never
         repeat this check.'''
-        cosmology["h"] -= 0.01
+        cosmology['h'] -= 0.01
         return kp(cosmology, standard_k_axis, _redshifts=_redshifts,
             solvability_known=True)
 
     z_step = _redshifts[0] - _redshifts[1]
-    interpolator = interp1d(np.flip(_redshifts), np.flip(list_s12),
+    interpolator = interp1d(np.flip(_redshifts), np.flip(list_sigma12),
         kind='cubic')
         
     # Newton's method requires that I already almost know the answer, so it's
@@ -165,20 +165,16 @@ def kp(cosmology, standard_k_axis,
             _redshifts=np.flip(np.linspace(new_floor, new_ceiling, 150)),
             solvability_known=True)
     else: # Our current resolution is satisfactory, let's return a result
-        k, p, z, sigma12 = ci.kzps(cosmology, zs=np.array([z_best]),
-            fancy_neutrinos=False, k_points=300)
-
         p = np.zeros(len(standard_k_axis))
 
         if cosmology['h'] == model0['h']: # if we haven't touched h,
             # we don't need to interpolate.
-            _, _, p = results.get_matter_power_spectrum(
-                minkh=1e-4 / h_in, maxkh=10.0 / h_in, npoints = NPOINTS,
-                var1=8, var2=8
-            )
+            _, p, _, _ = ci.kzps(cosmology, zs=np.array([z_best]),
+                fancy_neutrinos=False, k_points=300)
+            
         else: # it's time to interpolate
-            if h_in > 0.01: # this check ensures that the notification appears
-                # only once.
+            if cosmology['h'] > 0.01: # this check ensures that the
+                # notification appears only once.
                 print("We had to move the value of h.")
             
             # Andrea and Ariel agree that this should use k_hunit=False
@@ -192,4 +188,8 @@ def kp(cosmology, standard_k_axis,
 
         # We don't need to return k because we take for granted that all
         # runs will have the same k axis.
+
+        print(p)
+        print(p is None)
+        plt.plot(p); plt.show()
         return p
