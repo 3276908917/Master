@@ -489,18 +489,18 @@ def kzps(cosmology, zs = [0], fancy_neutrinos=False, k_points=100000):
     
     if fancy_neutrinos:
     
-        print("\n" + mlc["Name"], "before neutrino modifications")
+        print("\n" + cosmology["Name"], "before neutrino modifications")
         print("num_nu_massless", pars.num_nu_massless)
         print("nu_mass_eigenstates", pars.nu_mass_eigenstates)
-        print("nu_mass_numbers", pars.nu_mass_numbers)
+        print("nu_mass_numbers", list(pars.nu_mass_numbers))
         print("num_nu_massive", pars.num_nu_massive)
 
-        make_neutrinos_fancy(pars, nnu_massive_in)
+        make_neutrinos_fancy(pars, cosmology["nnu_massive"])
     
-        print("\n" + mlc["Name"], "after neutrino modifications")
+        print("\n" + cosmology["Name"], "after neutrino modifications")
         print("num_nu_massless", pars.num_nu_massless)
         print("nu_mass_eigenstates", pars.nu_mass_eigenstates)
-        print("nu_mass_numbers", pars.nu_mass_numbers)
+        print("nu_mass_numbers", list(pars.nu_mass_numbers))
         print("num_nu_massive", pars.num_nu_massive)
     
     apply_universal_output_settings(pars)
