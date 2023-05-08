@@ -22,6 +22,20 @@ computability for our LH.'''
 NPOINTS = 300
 
 import sys, traceback
+import copy as cp
+import camb_interface
+
+def build_cosmology(om_b_in, om_c_in, ns_in, om_nu_in, sigma12_in, As_in):
+    # Use Aletheia model 0 as a base
+    cosmology = cp.deepcopy(camb_interface.cosm.iloc[0])
+    
+    cosmology["ombh2"] = om_b_in
+    cosmology["omch2"] = om_c_in
+    cosmology["n_s"] = ns_in
+    # Incomplete
+    cosmology[""] = omn_nu_in
+    cosmology[""] = sigma12_in
+    cosmology["A_s"] = As_in
 
 def fill_hypercube(parameter_values, standard_k_axis, cell_range=None,
     samples=None, write_period=None):

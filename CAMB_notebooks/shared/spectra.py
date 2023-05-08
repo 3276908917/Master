@@ -470,7 +470,7 @@ def kzps(mlc, omnuh2_in, zs = [0], nnu_massive_in=1, fancy_neutrinos=False,
     pars = input_cosmology(full_cosmology)
     
     if fancy_neutrinos:
-        make_neutrinos_fancy(pars, nnu_massive)
+        make_neutrinos_fancy(pars, nnu_massive_in)
     
     apply_universal_output_settings(pars)
     
