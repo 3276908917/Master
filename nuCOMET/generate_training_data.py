@@ -25,11 +25,10 @@ NPOINTS = 300
 
 import sys, traceback
 import copy as cp
-import camb_interface
 
 def build_cosmology(om_b_in, om_c_in, ns_in, om_nu_in, sigma12_in, As_in):
     # Use Aletheia model 0 as a base
-    cosmology = cp.deepcopy(camb_interface.cosm.iloc[0])
+    cosmology = cp.deepcopy(ci.cosm.iloc[0])
     
     cosmology["ombh2"] = om_b_in
     cosmology["omch2"] = om_c_in
@@ -44,7 +43,7 @@ def build_cosmology(om_b_in, om_c_in, ns_in, om_nu_in, sigma12_in, As_in):
         side.'''
     nnu_massive = 0 if om_nu_in == 0 else 1
 
-    return camb_interface.specify_neutrino_mass(cosmology, nnu_massive,
+    return ci.specify_neutrino_mass(cosmology, om_nu_in,
         nnu_massive_in=nnu_massive)
 
 def fill_hypercube(parameter_values, standard_k_axis, cell_range=None,
@@ -67,16 +66,16 @@ def fill_hypercube(parameter_values, standard_k_axis, cell_range=None,
         config = parameter_values[i]
         #print(config, "\n", config[4])
         p = None
-        #try:
+        try:
             #print("beginning p-spectrum computation")
-        cosmology = build_cosmology(config[0], config[1], config[2],
-            config[4], config[3], config[5])
-        p = kp(cosmology, standard_k_axis)
+            cosmology = build_cosmology(config[0], config[1], config[2],
+                config[4], config[3], config[5])
+            p = kp(cosmology, standard_k_axis)
             #print("p-spectrum computation complete!")
-        #except ValueError:
+        except ValueError:
             # Don't let unreasonable sigma12 values crash the program; ignore
             # them for now.
-        #    traceback.print_exc(limit=1, file=sys.stdout)
+            traceback.print_exc(limit=1, file=sys.stdout)
         samples[i] = p
         
         print(i, "complete")
@@ -131,7 +130,7 @@ def kp(cosmology, standard_k_axis,
             try:
                 limiting_case = cp.deepcopy(cosmology)
                 limiting_case['h'] = 0.01
-                kp(cosmology, standard_k_axis, _redshifts=_redshifts)
+                kp(limiting_case, standard_k_axis, _redshifts=_redshifts)
             except ValueError:
                 print("This cell is hopeless. Moving on...")
                 return None

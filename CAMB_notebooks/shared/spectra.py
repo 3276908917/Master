@@ -304,7 +304,7 @@ def boltzmann_battery(onh2s, onh2_strs, skips_omega = [0, 2],
                 massive_tuple = kzps(massive_nu_cosmology, zs=[z],
                     fancy_neutrinos=fancy_neutrinos, k_points=k_points,
                     hubble_units=hubble_units)
-                inner_dict["P_nu"] = massless_tuple[2]
+                inner_dict["P_nu"] = massive_tuple[2]
                 inner_dict["s12_massive"] = massive_tuple[3]
                 
                 # Temporary addition, for debugging
@@ -504,7 +504,7 @@ def kzps(cosmology, zs = [0], fancy_neutrinos=False, k_points=100000,
         make_neutrinos_fancy(pars, cosmology["nnu_massive"])
     
     apply_universal_output_settings(pars)
-    
+   
     return obtain_pspectrum(pars, zs, k_points=k_points,
         hubble_units=hubble_units) 
 
