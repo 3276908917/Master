@@ -247,26 +247,26 @@ def boltzmann_battery(onh2s, onh2_strs, skips_omega = [0, 2],
     
     spec_sims = {}
 
-    for om_index in range(len(onh2s)):
-        print(om_index % 10, end='')
-        om = onh2s[om_index]
-        om_str = onh2_strs[om_index]
-        if om_index in skips_omega:
-            spec_sims[om_str] = None
+    for this_omnu_index in range(len(onh2s)):
+        print(this_omnu_index % 10, end='')
+        this_omnu = onh2s[this_omnu_index]
+        this_omnu_str = onh2_strs[this_omnu_index]
+        if this_omnu_index in skips_omega:
+            spec_sims[this_omnu_str] = None
             continue
-        spec_sims[om_str] = []
+        spec_sims[this_omnu_str] = []
         for mindex, row in models.iterrows():
             if mindex in skips_model:
                 # For example, I don't yet understand how to implement model 8
-                spec_sims[om_str].append(None)
+                spec_sims[this_omnu_str].append(None)
                 continue
                 
             h = row["h"]
-            spec_sims[om_str].append([])
+            spec_sims[this_omnu_str].append([])
        
             z_input = parse_redshifts(mindex)
             if None in z_input:
-                spec_sims[om_str][m_index] = None
+                spec_sims[this_omnu_str][m_index] = None
                 continue
 
             #print("z_input", z_input)
@@ -280,13 +280,13 @@ def boltzmann_battery(onh2s, onh2_strs, skips_omega = [0, 2],
                 #print(z_index)
                 if snap_index in skips_snapshot:
                     #print("skipping", z_index)
-                    spec_sims[om_str][mindex].append(None)
+                    spec_sims[this_omnu_str][mindex].append(None)
                     continue
                 #print("using", z_index)
                 inner_dict = {}
                 z = z_input[snap_index]
               
-                massless_tuple = kzps(row, om, nu_massive=False, zs=[z],
+                massless_tuple = kzps(row, 0, zs=[z],
                     fancy_neutrinos=fancy_neutrinos, k_points=k_points)
                 inner_dict["k"] = massless_tuple[0] if h_units \
                     else massless_tuple[0] * h
@@ -294,7 +294,7 @@ def boltzmann_battery(onh2s, onh2_strs, skips_omega = [0, 2],
                     else massless_tuple[2] / h ** 3
                 inner_dict["s12_massless"] = massless_tuple[3]
 
-                massive_tuple = kzps(row, om, nu_massive=True, zs=[z],
+                massive_tuple = kzps(row, this_omnu, zs=[z],
                     fancy_neutrinos=fancy_neutrinos, k_points=k_points)
                 inner_dict["P_nu"] = massive_tuple[2] if h_units \
                     else massive_tuple[2] / h ** 3
@@ -306,7 +306,7 @@ def boltzmann_battery(onh2s, onh2_strs, skips_omega = [0, 2],
                 assert np.array_equal(massless_tuple[0], massive_tuple[0]), \
                    "assumption of identical k axes not satisfied!"
                     
-                spec_sims[om_str][mindex].append(inner_dict) 
+                spec_sims[this_omnu_str][mindex].append(inner_dict) 
 
     return spec_sims
 
@@ -343,7 +343,6 @@ def apply_universal_output_settings(pars):
     pars.Accuracy.AccuracyBoost = 3
     pars.Accuracy.lAccuracyBoost = 3
     pars.Accuracy.AccuratePolarization = False
-    pars.Transfer.kmax = 20.0 / h
 
 def input_dark_energy(pars, w0, wa):
     """
@@ -380,6 +379,8 @@ def specify_neutrino_mass(mlc, omnuh2_in, nnu_massive_in=1):
     full_cosmology["omch2"] -= omnuh2_in
     full_cosmology["nnu_massive"] = nnu_massive_in
 
+    return full_cosmology
+
 def input_cosmology(cosmology): 
     """
     Helper function for kzps.
@@ -413,7 +414,9 @@ def input_cosmology(cosmology):
     pars.InitPower.set_params(As=cosmology["A_s"], ns=cosmology["n_s"],
         r=0, nt=0.0, ntrun=0.0) # the last three are desperation arguments
 
-    input_dark_energy(pars, cosmology["w0"], float(cosmology["wa"])
+    input_dark_energy(pars, cosmology["w0"], float(cosmology["wa"]))
+
+    pars.Transfer.kmax = 20.0 / h
 
     return pars
 
@@ -463,8 +466,8 @@ def kzps(mlc, omnuh2_in, zs = [0], nnu_massive_in=1, fancy_neutrinos=False,
         scheme on CAMB after we've already set the physical density. The
         results seem to be inconsistent with observation.
     """ 
-    full_cosmology = specify_neutrino_mass(mlc)
-    pars = input_cosmology(full_cosmology, omnuh2_in, nu_massive=False)
+    full_cosmology = specify_neutrino_mass(mlc, omnuh2_in, nnu_massive_in)
+    pars = input_cosmology(full_cosmology)
     
     if fancy_neutrinos:
         make_neutrinos_fancy(pars, nnu_massive)
