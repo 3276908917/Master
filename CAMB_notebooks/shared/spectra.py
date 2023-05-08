@@ -72,7 +72,7 @@ def is_matchable(target, cosmology):
     # but the recent matching results have got me confused.
     _, _, _, s12_big = kzps(cosmology, 0, nu_massive=False, zs=[0])
 
-def match_s12(target, tolerance, cosmology,
+def match_sigma12(target, tolerance, cosmology,
     _redshifts=np.flip(np.linspace(0, 1100, 150)), _min=0):
     """
         Return a redshift at which to evaluate the power spectrum of cosmology
@@ -298,6 +298,10 @@ def boltzmann_battery(onh2s, onh2_strs, skips_omega = [0, 2],
 
                 massive_nu_cosmology = specify_neutrino_mass(
                     row, this_omnu, nnu_massive_in=1)
+                # Adjust CDM density so that we have the same total matter
+                # density as before:
+                massive_nu_cosmology["omch2"] -= this_omnu
+
                 massive_tuple = kzps(massive_nu_cosmology, zs=[z],
                     fancy_neutrinos=fancy_neutrinos, k_points=k_points)
                 inner_dict["P_nu"] = massive_tuple[2] if h_units \

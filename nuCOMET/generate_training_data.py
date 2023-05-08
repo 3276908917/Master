@@ -40,8 +40,10 @@ def build_cosmology(om_b_in, om_c_in, ns_in, om_nu_in, sigma12_in, As_in):
         the default value. I'm writing this out explicitly because we're still
         in the debugging phase and so my code should always err on the verbose
         side.'''
-    return camb_interface.specify_neutrino_mass(cosmology, om_nu_in,
-        nnu_massive_in=1)
+    nnu_massive = 0 if om_nu_in == 0 else 1
+
+    return camb_interface.specify_neutrino_mass(cosmology, nnu_massive,
+        nnu_massive_in=nnu_massive)
 
 def fill_hypercube(parameter_values, standard_k_axis, cell_range=None,
     samples=None, write_period=None):
@@ -65,8 +67,9 @@ def fill_hypercube(parameter_values, standard_k_axis, cell_range=None,
         p = None
         try:
             #print("beginning p-spectrum computation")
-            p = kp(config[0], config[1], config[2], config[4], config[3],
-                config[5], standard_k_axis, h_in=0.67)
+            cosmology = build_cosmology(config[0], config[1], config[2],
+                config[4], config[3], config[5])
+            p = kp(cosmology, standard_k_axis, h_in=cosmology["h"])
             #print("p-spectrum computation complete!")
         except ValueError:
             # Don't let unreasonable sigma12 values crash the program; ignore
@@ -82,9 +85,8 @@ def fill_hypercube(parameter_values, standard_k_axis, cell_range=None,
             unwritten_cells = 0
     return samples
 
-def kp(om_b_in, om_c_in, ns_in, om_nu_in, sigma12_in, As_in,
-    standard_k_axis, h_in=0.67, _redshifts=np.flip(np.linspace(0, 1100, 150)),
-    solvability_known=False):
+def kp(cosmology, standard_k_axis, h_in=0.67,
+    _redshifts=np.flip(np.linspace(0, 1100, 150)), solvability_known=False):
     """
     Returns the scale axis and power spectrum in Mpc units
 
@@ -92,20 +94,8 @@ def kp(om_b_in, om_c_in, ns_in, om_nu_in, sigma12_in, As_in,
         will decrease it if we cannot get the desired sigma12 with a
         nonnegative redshift.
     """
-    # model0 stuff is assumed to get the initial pspectrum that we'll rescale
-    OmK_in = 0
-    '''I didn't want to assume this last line yet; part of the experiment is to
-    see if OmK is correctly automatically set to 0. Unfortunately, set_cosmology
-    demands an omk value, I guess we can ask Ariel how to run this test then.'''
-    
-    w0_in = -1.00
-    wa_in = 0.00 
-   
-    # This sucks. See spectra.py kzps for a more detailed complaint.
-    mnu_in = om_nu_in * camb.constants.neutrino_mass_fac / \
-        (camb.constants.default_nnu / 3.0) ** 0.75
-    nnu_massive=1 if mnu_in != 0 else 0
-   
+    pars = input_cosmology(cosmology)
+
     pars = camb.CAMBparams()
     pars.set_cosmology(
         H0 = h_in * 100,
@@ -148,9 +138,6 @@ def kp(om_b_in, om_c_in, ns_in, om_nu_in, sigma12_in, As_in,
     results = camb.get_results(pars)
     
     list_s12 = results.get_sigmaR(12, var1=8, var2=8, hubble_units=False)
-
-    '''Also: you can't root out the negative z later, you have to do it as
-    early as here... '''
 
     # debug block
     
