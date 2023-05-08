@@ -390,7 +390,7 @@ def specify_neutrino_mass(mlc, omnuh2_in, nnu_massive_in=1):
 
     return full_cosmology
 
-def input_cosmology(cosmology): 
+def input_cosmology(cosmology, hubble_units=False): 
     """
     Helper function for kzps.
     Read entries from a dictionary representing a cosmological configuration.
@@ -425,7 +425,7 @@ def input_cosmology(cosmology):
 
     input_dark_energy(pars, cosmology["w0"], float(cosmology["wa"]))
 
-    pars.Transfer.kmax = 20.0 / h
+    pars.Transfer.kmax = 10.0 if hubble_units else 10.0 / h
 
     return pars
 
@@ -498,24 +498,59 @@ def kzps(cosmology, zs = [0], fancy_neutrinos=False, k_points=100000,
     pars = input_cosmology(cosmology)
     
     if fancy_neutrinos:
-    
-        print("\n" + cosmology["Name"], "before neutrino modifications")
-        print("num_nu_massless", pars.num_nu_massless)
-        print("nu_mass_eigenstates", pars.nu_mass_eigenstates)
-        print("nu_mass_numbers", list(pars.nu_mass_numbers))
-        print("num_nu_massive", pars.num_nu_massive)
-
         make_neutrinos_fancy(pars, cosmology["nnu_massive"])
-    
-        print("\n" + cosmology["Name"], "after neutrino modifications")
-        print("num_nu_massless", pars.num_nu_massless)
-        print("nu_mass_eigenstates", pars.nu_mass_eigenstates)
-        print("nu_mass_numbers", list(pars.nu_mass_numbers))
-        print("num_nu_massive", pars.num_nu_massive)
     
     apply_universal_output_settings(pars)
     
     return obtain_pspectrum(pars, zs, k_points=k_points, hubble_units) 
+
+def obtain_pspectrum_interpolator(pars, zs=[0], z_points=150,
+    hubble_units=False):
+    """
+    Helper function for kzps.
+    Given a fully set-up pars function, return the following in this order:
+        scale axis, redshifts used, power spectra, and sigma12 values.
+
+    """
+
+    ''' To change the the extent of the k-axis, change the following line as
+    well as the "get_matter_power_spectrum" call. '''
+    pars.set_matter_power(redshifts=zs, kmax=20.0 / pars.h, nonlinear=False)
+    
+    results = camb.get_results(pars)
+
+    '''
+    In some cursory tests, the accurate_massive_neutrino_transfers
+    flag did not appear to significantly alter the outcome.
+    
+    The flags var1=8 and var2=8 indicate that we are looking at the
+    power spectrum of CDM + baryons (i.e. neutrinos excluded).
+    '''
+    kmax = max(standard_k_axis) if hubble_units else max(standard_k_axis) / h
+
+    PK = results.get_matter_power_interpolator(pars,
+        zmin=min(_redshifts), zmax=max(_redshifts), nz_step=z_points,
+        k_hunit=hubble_units, kmax=kmax, nonlinear=False, var1=8, var2=8,
+        hubble_units=False
+    )
+   
+    return PK
+
+def kzps_interpolator(cosmology, zs = [0], fancy_neutrinos=False,
+    z_points=150, hubble_units=False):
+    """
+    This is a really rough function, I'm just trying to test out an idea.
+    """
+
+    pars = input_cosmology(cosmology, hubble_units)
+    
+    if fancy_neutrinos:
+        make_neutrinos_fancy(pars, cosmology["nnu_massive"])
+    
+    apply_universal_output_settings(pars)
+    
+    return obtain_pspectrum_interpolator(pars, zs, z_points=z_points,
+        hubble_units) 
 
 def model_ratios(snap_index, sims, canvas, massive=True, skips=[],
     subplot_indices=None, active_labels=['x', 'y'], title="Ground truth",

@@ -170,25 +170,21 @@ def kp(cosmology, standard_k_axis,
 
         p = np.zeros(len(standard_k_axis))
 
-        if h_in == model0['h']: # if we haven't touched h, we don't need to
-            # interpolate.
+        if cosmology['h'] == model0['h']: # if we haven't touched h,
+            # we don't need to interpolate.
             _, _, p = results.get_matter_power_spectrum(
                 minkh=1e-4 / h_in, maxkh=10.0 / h_in, npoints = NPOINTS,
                 var1=8, var2=8
             )
-            p /= h_in ** 3
         else: # it's time to interpolate
             if h_in > 0.01: # this check ensures that the notification appears
                 # only once.
                 print("We had to move the value of h.")
-            p = np.zeros(len(standard_k_axis))
             
             # Andrea and Ariel agree that this should use k_hunit=False
-            PK = camb.get_matter_power_interpolator(pars, zmin=min(_redshifts),
-                zmax=max(_redshifts), nz_step=150, k_hunit=False,
-                kmax=max(standard_k_axis) / h_in, nonlinear=False, var1=8,
-                var2=8, hubble_units=False)
-            
+            PK = ci.kzps_interpolator(cosmology, zs=_redshifts,
+                fancy_neutrinos=False, z_points=150)
+
             p = PK.P(z_best, standard_k_axis)
 
         if len(p) == 1:
