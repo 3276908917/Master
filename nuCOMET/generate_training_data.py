@@ -33,9 +33,15 @@ def build_cosmology(om_b_in, om_c_in, ns_in, om_nu_in, sigma12_in, As_in):
     cosmology["omch2"] = om_c_in
     cosmology["n_s"] = ns_in
     # Incomplete
-    cosmology[""] = omn_nu_in
-    cosmology[""] = sigma12_in
+    cosmology["sigma12"] = sigma12_in
     cosmology["A_s"] = As_in
+
+    ''' Actually the last argument is not really important and is indeed just
+        the default value. I'm writing this out explicitly because we're still
+        in the debugging phase and so my code should always err on the verbose
+        side.'''
+    return camb_interface.specify_neutrino_mass(cosmology, om_nu_in,
+        nnu_massive_in=1)
 
 def fill_hypercube(parameter_values, standard_k_axis, cell_range=None,
     samples=None, write_period=None):
