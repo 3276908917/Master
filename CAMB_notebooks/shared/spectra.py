@@ -217,7 +217,7 @@ def get_random_cosmology():
     return row
         
 def boltzmann_battery(onh2s, onh2_strs, skips_omega = [0, 2],
-    skips_model=[8], skips_snapshot=[1, 2, 3], h_units=False,
+    skips_model=[8], skips_snapshot=[1, 2, 3], hubble_units=False,
     models=cosm, fancy_neutrinos=False, k_points=100000):
     """
     Return format uses an architecture that closely agrees with that of Ariel's
@@ -289,11 +289,8 @@ def boltzmann_battery(onh2s, onh2_strs, skips_omega = [0, 2],
                 massless_nu_cosmology = specify_neutrino_mass(
                     row, 0, nnu_massive_in=0)
                 massless_tuple = kzps(massless_nu_cosmology, zs=[z],
-                    fancy_neutrinos=fancy_neutrinos, k_points=k_points)
-                inner_dict["k"] = massless_tuple[0] if h_units \
-                    else massless_tuple[0] * h
-                inner_dict["P_no"] = massless_tuple[2] if h_units \
-                    else massless_tuple[2] / h ** 3
+                    fancy_neutrinos=fancy_neutrinos, k_points=k_points,
+                    hubble_units)
                 inner_dict["s12_massless"] = massless_tuple[3]
 
                 massive_nu_cosmology = specify_neutrino_mass(
@@ -303,9 +300,8 @@ def boltzmann_battery(onh2s, onh2_strs, skips_omega = [0, 2],
                 massive_nu_cosmology["omch2"] -= this_omnu
 
                 massive_tuple = kzps(massive_nu_cosmology, zs=[z],
-                    fancy_neutrinos=fancy_neutrinos, k_points=k_points)
-                inner_dict["P_nu"] = massive_tuple[2] if h_units \
-                    else massive_tuple[2] / h ** 3
+                    fancy_neutrinos=fancy_neutrinos, k_points=k_points,
+                    hubble_units)
                 inner_dict["s12_massive"] = massive_tuple[3]
                 
                 # Temporary addition, for debugging
@@ -433,7 +429,7 @@ def input_cosmology(cosmology):
 
     return pars
 
-def obtain_pspectrum(pars, zs=[0], k_points=100000):
+def obtain_pspectrum(pars, zs=[0], k_points=100000, hubble_units=False):
     """
     Helper function for kzps.
     Given a fully set-up pars function, return the following in this order:
@@ -465,9 +461,14 @@ def obtain_pspectrum(pars, zs=[0], k_points=100000):
     if len(p) == 1:
         p = p[0]
 
+    if not hubble_units:
+        k *= h
+        p /= h ** 3
+
     return k, z, p, sigma12
 
-def kzps(cosmology, zs = [0], fancy_neutrinos=False, k_points=100000):
+def kzps(cosmology, zs = [0], fancy_neutrinos=False, k_points=100000,
+    hubble_units=False):
     """
     Returns the scale axis, redshifts, power spectrum, and sigma12
         of a massless-neutrino Lambda-CDM model
@@ -477,17 +478,22 @@ def kzps(cosmology, zs = [0], fancy_neutrinos=False, k_points=100000):
         dictionary and set this parameter to None. If you would not like to
         fix the sigma12 value, make sure that the mlc dictionary does not
         contain a non-None sigma12 entry.
+
+        UPDATE: I changed my mind for now, let's say that z takes in case both
+            are specified.
     @param omnuh2_in : neutrino physical mass density
     @fancy_neutrinos: flag sets whether we attempt to impose a neutrino
         scheme on CAMB after we've already set the physical density. The
         results seem to be inconsistent with observation.
     """
+    ''' Retire this code block until we figure out z dominance
     if zs is None:
         assert "sigma12" in cosmology.keys(), \
             "Redshift and sigma12 cannot be supplied simultaneously."
     else:
         assert "sigma12" not in cosmology.keys() or mlc["sigma12"] is None, \
             "Redshift and sigma12 cannot be supplied simultaneously."
+    '''
 
     pars = input_cosmology(cosmology)
     
@@ -509,7 +515,7 @@ def kzps(cosmology, zs = [0], fancy_neutrinos=False, k_points=100000):
     
     apply_universal_output_settings(pars)
     
-    return obtain_pspectrum(pars, zs, k_points=k_points) 
+    return obtain_pspectrum(pars, zs, k_points=k_points, hubble_units) 
 
 def model_ratios(snap_index, sims, canvas, massive=True, skips=[],
     subplot_indices=None, active_labels=['x', 'y'], title="Ground truth",

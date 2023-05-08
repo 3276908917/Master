@@ -14,6 +14,8 @@ from camb import model, initialpower, get_matter_power_interpolator
 import pandas as pd
 import re
 
+import camb_interface as ci
+
 cosm = pd.read_csv("cosmologies.dat", sep='\s+')
 model0 = cosm.loc[0]
 
@@ -85,7 +87,7 @@ def fill_hypercube(parameter_values, standard_k_axis, cell_range=None,
             unwritten_cells = 0
     return samples
 
-def kp(cosmology, standard_k_axis, h_in=0.67,
+def kp(cosmology, standard_k_axis,
     _redshifts=np.flip(np.linspace(0, 1100, 150)), solvability_known=False):
     """
     Returns the scale axis and power spectrum in Mpc units
@@ -94,58 +96,15 @@ def kp(cosmology, standard_k_axis, h_in=0.67,
         will decrease it if we cannot get the desired sigma12 with a
         nonnegative redshift.
     """
-    pars = input_cosmology(cosmology)
-
-    pars = camb.CAMBparams()
-    pars.set_cosmology(
-        H0 = h_in * 100,
-        ombh2=om_b_in,
-        omch2=om_c_in,
-        omk=OmK_in,
-        tau=0.0952, # desperation argument
-        mnu=mnu_in,
-        num_massive_neutrinos=nnu_massive,
-        neutrino_hierarchy="degenerate" # 1 eigenstate approximation; our
-        # neutrino setup (see below) is not valid for inverted/normal
-        # hierarchies.
-    )
-
-    # Last three are desperation arguments
-    pars.InitPower.set_params(As=As_in, ns=ns_in, r=0, nt=0.0, ntrun=0.0)
-    
-    ''' The following seven lines are desperation settings
-    If we ever have extra time, we can more closely study what each line does
-    '''
-    # This is a desperation line in light of the previous line. The previous
-    # line seems to have served me well enough so far, but BSTS.
-    pars.WantCls = False
-    pars.WantScalars = False
-    pars.Want_CMB = False
-    pars.DoLensing = False
-    pars.YHe = 0.24   
-    pars.Accuracy.AccuracyBoost = 3                                             
-    pars.Accuracy.lAccuracyBoost = 3                                            
-    pars.Accuracy.AccuratePolarization = False                                     
-    pars.Transfer.kmax = 20.0 / h             
-    
-    if mlc["w0"] != -1 or float(mlc["wa"]) != 0:                                
-        pars.set_dark_energy(w=mlc["w0"], wa=float(mlc["wa"]),
-            dark_energy_model='ppf')      
-
-    pars.set_matter_power(redshifts=_redshifts, kmax=10.0 / h_in,
-        nonlinear=False)
-
-    results = camb.get_results(pars)
-    
-    list_s12 = results.get_sigmaR(12, var1=8, var2=8, hubble_units=False)
-
+    k, z, p, list_sigma12 = ci.kzps(cosmology, _redshifts,
+        fancy_neutrinos=False, k_points=300)
     # debug block
     
     import matplotlib.pyplot as plt
     #print(list_s12)
     if False:
-        plt.plot(_redshifts, list_s12);
-        plt.axhline(sigma12_in, c="black")
+        plt.plot(_redshifts, list_sigma12);
+        plt.axhline(list_sigma12, c="black")
         plt.title("$\sigma_{12}$ vs. $z$")
         plt.ylabel("$\sigma_{12}$")
         plt.xlabel("$z$")
@@ -153,36 +112,37 @@ def kp(cosmology, standard_k_axis, h_in=0.67,
      
     # debug block
     if False:
-        plt.plot(_redshifts, list_s12 - sigma12_in);
+        plt.plot(_redshifts, list_sigma12 - cosomology["sigma12"]);
         plt.axhline(0, c="black")
         plt.title("$\sigma_{12} - \sigma^{\mathrm{goal}}_{12}$ vs. $z$")
         plt.xlabel("$z$")
         plt.ylabel("$\sigma_{12} - \sigma^{\mathrm{goal}}_{12}$")
         plt.show()
     
-    list_s12 -= sigma12_in # now it's a zero-finding problem
+    list_s12 -= cosmology["sigma12"] # now it's a zero-finding problem
     
     # remember that list_s12[0] corresponds to the highest value z
-    if list_s12[len(list_s12) - 1] < 0 and h_in > 0.01:
-        # we need to start playing with h 
-        #print("Last z sigma12 sits at", list_s12[len(list_s12) - 1])
-        
-        # To save on computation, let's jump to the lowest allowed h value to
-        # see if there's any point to changing h.
+    if list_sigma12[len(list_sigma12) - 1] < 0 and cosmology["h"] > 0.01:
+        ''' we need to start playing with h.
+        To save on computation, let's check if even the minimum allowed value
+        rescues the problem.
+        '''
         if not solvability_known:
             try:
-                kp(om_b_in, om_c_in, ns_in, om_nu_in, sigma12_in, As_in,
-                    standard_k_axis, h_in=0.01, _redshifts=_redshifts)
+                limiting_case = cp.deepcopy(cosmology)
+                limiting_case["h"] = 0.01
+                kp(cosmology, standard_k_axis, _redshifts=_redshifts)
             except ValueError:
                 print("This cell is hopeless. Moving on...")
                 return None
 
-        #print("But we know that this problem is solvable. Therefore," + \
-        #    "let's try with h =", h_in - 0.01, "\n")
-        return kp(om_b_in, om_c_in, ns_in, om_nu_in, sigma12_in, As_in,
-            standard_k_axis, h_in - 0.01, _redshifts=_redshifts,
+        ''' Now we know that modifying h will eventually fix the situation,
+        so we start decreasing h. We also set a flag to make sure we never
+        repeat this check.'''
+        cosmology["h"] -= 0.01
+        return kp(cosmology, standard_k_axis, _redshifts=_redshifts,
             solvability_known=True)
-    
+
     z_step = _redshifts[0] - _redshifts[1]
     interpolator = interp1d(np.flip(_redshifts), np.flip(list_s12),
         kind='cubic')
@@ -201,17 +161,13 @@ def kp(cosmology, standard_k_axis, h_in=0.67,
         new_ceiling = min(1100, z_best + z_step)
         '''What is the point of the 150 limit? Why can't CAMB simply give me a
             bigger interpolator?? '''
-        return kp(om_b_in, om_c_in, ns_in, om_nu_in, sigma12_in, As_in,
-            standard_k_axis, h_in,
+        return kp(cosmology, standard_k_axis,
             _redshifts=np.flip(np.linspace(new_floor, new_ceiling, 150)),
             solvability_known=True)
-    else: # Our current resolution is satisfactor, let's return a result
-        pars.set_matter_power(redshifts=np.array([z_best]), kmax=10.0 / h_in,
-            nonlinear=False)
+    else: # Our current resolution is satisfactory, let's return a result
+        k, p, z, sigma12 = ci.kzps(cosmology, zs=np.array([z_best]),
+            fancy_neutrinos=False, k_points=300)
 
-        results = camb.get_results(pars)
-        results.calc_power_spectra(pars)
-        
         p = np.zeros(len(standard_k_axis))
 
         if h_in == model0['h']: # if we haven't touched h, we don't need to
@@ -220,7 +176,7 @@ def kp(cosmology, standard_k_axis, h_in=0.67,
                 minkh=1e-4 / h_in, maxkh=10.0 / h_in, npoints = NPOINTS,
                 var1=8, var2=8
             )
-            p *= h_in ** 3
+            p /= h_in ** 3
         else: # it's time to interpolate
             if h_in > 0.01: # this check ensures that the notification appears
                 # only once.
