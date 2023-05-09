@@ -52,6 +52,8 @@ def fill_hypercube(parameter_values, standard_k_axis, cell_range=None,
             # Don't let unreasonable sigma12 values crash the program; ignore
             # them for now.
             traceback.print_exc(limit=1, file=sys.stdout)
+        except Exception:
+            traceback.print_exc(limit=1, file=sys.stdout)
         samples[i] = p
         
         print(i, "complete")
@@ -116,12 +118,8 @@ def kp(om_b_in, om_c_in, ns_in, om_nu_in, sigma12_in, As_in,
     pars.Accuracy.AccuracyBoost = 3                                             
     pars.Accuracy.lAccuracyBoost = 3                                            
     pars.Accuracy.AccuratePolarization = False                                     
-    pars.Transfer.kmax = 20.0 / h             
+    pars.Transfer.kmax = 20.0 / h_in             
     
-    if mlc["w0"] != -1 or float(mlc["wa"]) != 0:                                
-        pars.set_dark_energy(w=mlc["w0"], wa=float(mlc["wa"]),
-            dark_energy_model='ppf')      
-
     pars.set_matter_power(redshifts=_redshifts, kmax=10.0 / h_in,
         nonlinear=False)
 
@@ -213,7 +211,7 @@ def kp(om_b_in, om_c_in, ns_in, om_nu_in, sigma12_in, As_in,
                 minkh=1e-4 / h_in, maxkh=10.0 / h_in, npoints = NPOINTS,
                 var1=8, var2=8
             )
-            p *= h_in ** 3
+            p /= h_in ** 3
         else: # it's time to interpolate
             if h_in > 0.01: # this check ensures that the notification appears
                 # only once.
