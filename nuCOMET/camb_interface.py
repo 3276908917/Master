@@ -509,7 +509,7 @@ def kzps(cosmology, zs = [0], fancy_neutrinos=False, k_points=100000,
         hubble_units=hubble_units) 
 
 def obtain_pspectrum_interpolator(pars, zs=[0], z_points=150,
-    hubble_units=False):
+    kmin=1e-4, kmax=1, hubble_units=False):
     """
     Helper function for kzps.
     Given a fully set-up pars function, return the following in this order:
@@ -519,7 +519,7 @@ def obtain_pspectrum_interpolator(pars, zs=[0], z_points=150,
 
     ''' To change the the extent of the k-axis, change the following line as
     well as the "get_matter_power_spectrum" call. '''
-    pars.set_matter_power(redshifts=zs, kmax=10.0 / pars.h, nonlinear=False)
+    pars.set_matter_power(redshifts=zs, kmax=kmax, nonlinear=False)
     
     results = camb.get_results(pars)
 
@@ -530,8 +530,6 @@ def obtain_pspectrum_interpolator(pars, zs=[0], z_points=150,
     The flags var1=8 and var2=8 indicate that we are looking at the
     power spectrum of CDM + baryons (i.e. neutrinos excluded).
     '''
-    kmax = max(standard_k_axis) if hubble_units else max(standard_k_axis) / h
-
     PK = results.get_matter_power_interpolator(pars,
         zmin=min(_redshifts), zmax=max(_redshifts), nz_step=z_points,
         k_hunit=hubble_units, kmax=kmax, nonlinear=False, var1=8, var2=8,
@@ -541,7 +539,7 @@ def obtain_pspectrum_interpolator(pars, zs=[0], z_points=150,
     return PK
 
 def kzps_interpolator(cosmology, zs = [0], fancy_neutrinos=False,
-    z_points=150, hubble_units=False):
+    z_points=150, kmin=1e-4, kmax=1, hubble_units=False):
     """
     This is a really rough function, I'm just trying to test out an idea.
     """
@@ -553,8 +551,7 @@ def kzps_interpolator(cosmology, zs = [0], fancy_neutrinos=False,
     
     apply_universal_output_settings(pars)
     
-    return obtain_pspectrum_interpolator(pars, zs, z_points=z_points,
-        hubble_units=hubble_units) 
+    return obtain_pspectrum_interpolator(pars, zs, kmin, kmax, hubble_units) 
 
 def model_ratios(snap_index, sims, canvas, massive=True, skips=[],
     subplot_indices=None, active_labels=['x', 'y'], title="Ground truth",

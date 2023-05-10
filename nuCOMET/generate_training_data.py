@@ -80,8 +80,8 @@ def fill_hypercube(parameter_values, standard_k_axis, cell_range=None,
             in kp.
             '''
             traceback.print_exc(limit=1, file=sys.stdout)
-        except Exception: 
-            traceback.print_exc(limit=1, file=sys.stdout)
+        #except Exception: 
+        #    traceback.print_exc(limit=1, file=sys.stdout)
         
         samples[i] = p
         
@@ -102,13 +102,16 @@ def kp(cosmology, standard_k_axis,
         will decrease it if we cannot get the desired sigma12 with a
         nonnegative redshift.
     """
-    _, _, _, list_sigma12 = ci.kzps(cosmology, _redshifts,
-        fancy_neutrinos=False, k_points=300)
+    print("Trying with h", cosmology['h'])
+    print("min z", min(_redshifts), "max z", max(_redshifts))
     
+    _, _, _, list_sigma12 = ci.kzps(cosmology, _redshifts,
+        fancy_neutrinos=False, k_points=NPOINTS)
+
     # debug block
     
     #print(list_s12)
-    if False:
+    if True:
         import matplotlib.pyplot as plt
         # Original intersection problem we're trying to solve
         plt.plot(_redshifts, list_sigma12);
@@ -128,11 +131,14 @@ def kp(cosmology, standard_k_axis,
     list_sigma12 -= cosmology["sigma12"] # now it's a zero-finding problem
     
     # remember that list_s12[0] corresponds to the highest value z
-    if list_sigma12[len(list_sigma12) - 1] < 0 and cosmology['h'] > 0.01:
+    if list_sigma12[len(list_sigma12) - 1] < 0 and cosmology['h'] > 0.1:
         ''' we need to start playing with h.
         To save on computation, let's check if even the minimum allowed value
         rescues the problem.
         '''
+        #print("We need to move h")
+        #print(cosmology)
+
         if not solvability_known:
             try:
                 limiting_case = cp.deepcopy(cosmology)
@@ -176,16 +182,19 @@ def kp(cosmology, standard_k_axis,
         if cosmology['h'] == model0['h']: # if we haven't touched h,
             # we don't need to interpolate.
             _, _, p, _ = ci.kzps(cosmology, zs=np.array([z_best]),
-                fancy_neutrinos=False, k_points=300)
+                fancy_neutrinos=False, k_points=NPOINTS)
            
         else: # it's time to interpolate
             if cosmology['h'] > 0.01: # this check ensures that the
                 # notification appears only once.
                 print("We had to move the value of h.")
-            
+          
+            print("Almost there! Just this one last step...")
+
             # Andrea and Ariel agree that this should use k_hunit=False
             PK = ci.kzps_interpolator(cosmology, zs=_redshifts,
-                fancy_neutrinos=False, z_points=150)
+                fancy_neutrinos=False, z_points=150,
+                kmin=min(standard_k_axis), kmax=max(standard_k_axis))
 
             p = PK.P(z_best, standard_k_axis)
 
@@ -198,5 +207,7 @@ def kp(cosmology, standard_k_axis,
         #print(p)
         #print(p is None)
         #plt.plot(p); plt.show()
-        
+       
+        print("Redshift used:", z_best)
+
         return p
