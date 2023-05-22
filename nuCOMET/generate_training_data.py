@@ -178,7 +178,7 @@ def kp(cosmology, standard_k_axis,
                 fancy_neutrinos=False, k_points=NPOINTS) 
            
         else: # it's time to interpolate
-            print("We had to move h to", cosmology['h'])
+            print("We had to move h to", np.around(cosmology['h'], 3))
             # Andrea and Ariel agree that this should use k_hunit=False
             PK = ci.kzps_interpolator(cosmology, redshifts=_redshifts,
                 fancy_neutrinos=False, z_points=150,
