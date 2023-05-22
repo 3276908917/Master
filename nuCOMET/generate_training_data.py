@@ -66,20 +66,20 @@ def fill_hypercube(parameter_values, standard_k_axis, cell_range=None,
         config = parameter_values[i]
         #print(config, "\n", config[4])
         p = None
-        try:
+        #try:
             #print("beginning p-spectrum computation")
-            cosmology = build_cosmology(config[0], config[1], config[2],
+        cosmology = build_cosmology(config[0], config[1], config[2],
                 config[4], config[3], config[5])
-            p = kp(cosmology, standard_k_axis)
+        p = kp(cosmology, standard_k_axis)
             #print("p-spectrum computation complete!")
-        except ValueError:
-            ''' Don't let unreasonable sigma12 values crash the program; ignore
-            them for now. It's not clear to me why unreasonable sigma12 values
-            sometimes (albeit quite rarely) raise ValueErrors. One would think
-            that that situation would be adequately handled by the h=0.01 check
-            in kp.
-            '''
-            traceback.print_exc(limit=1, file=sys.stdout)
+        #except ValueError:
+        ''' Don't let unreasonable sigma12 values crash the program; ignore
+        them for now. It's not clear to me why unreasonable sigma12 values
+        sometimes (albeit quite rarely) raise ValueErrors. One would think
+        that that situation would be adequately handled by the h=0.01 check
+        in kp.
+        '''
+        #    traceback.print_exc(limit=1, file=sys.stdout)
         #except Exception: 
         #    traceback.print_exc(limit=1, file=sys.stdout)
         
@@ -111,7 +111,7 @@ def kp(cosmology, standard_k_axis,
     # debug block
     
     #print(list_s12)
-    if True:
+    if False:
         import matplotlib.pyplot as plt
         # Original intersection problem we're trying to solve
         plt.plot(_redshifts, list_sigma12);
@@ -131,7 +131,7 @@ def kp(cosmology, standard_k_axis,
     list_sigma12 -= cosmology["sigma12"] # now it's a zero-finding problem
     
     # remember that list_s12[0] corresponds to the highest value z
-    if list_sigma12[len(list_sigma12) - 1] < 0 and cosmology['h'] > 0.1:
+    if list_sigma12[len(list_sigma12) - 1] < 0 and cosmology['h'] > 0.3:
         ''' we need to start playing with h.
         To save on computation, let's check if even the minimum allowed value
         rescues the problem.
@@ -142,7 +142,9 @@ def kp(cosmology, standard_k_axis,
         if not solvability_known:
             try:
                 limiting_case = cp.deepcopy(cosmology)
-                limiting_case['h'] = 0.01
+                limiting_case['h'] = 0.3
+                print(limiting_case)
+                print("A_s", limiting_case["A_s"])
                 kp(limiting_case, standard_k_axis, _redshifts=_redshifts)
             except ValueError:
                 print("This cell is hopeless. Moving on...")
@@ -182,7 +184,7 @@ def kp(cosmology, standard_k_axis,
         if cosmology['h'] == model0['h']: # if we haven't touched h,
             # we don't need to interpolate.
             _, _, p, _ = ci.kzps(cosmology, zs=np.array([z_best]),
-                fancy_neutrinos=False, k_points=NPOINTS)
+                fancy_neutrinos=False, k_points=NPOINTS) 
            
         else: # it's time to interpolate
             if cosmology['h'] > 0.01: # this check ensures that the
@@ -192,9 +194,9 @@ def kp(cosmology, standard_k_axis,
             print("Almost there! Just this one last step...")
 
             # Andrea and Ariel agree that this should use k_hunit=False
-            PK = ci.kzps_interpolator(cosmology, zs=_redshifts,
+            PK = ci.kzps_interpolator(cosmology, redshifts=_redshifts,
                 fancy_neutrinos=False, z_points=150,
-                kmin=min(standard_k_axis), kmax=max(standard_k_axis))
+                kmax=max(standard_k_axis), hubble_units=False)
 
             p = PK.P(z_best, standard_k_axis)
 

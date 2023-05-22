@@ -1,0 +1,6 @@
+Version 1 was broken because we hadn't fixed the h factor yet, I think...
+
+Version 2 was broken because the h factor fix introduced an h reduction crash,
+so we don't have all of the cells.
+
+ 
