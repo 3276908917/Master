@@ -94,7 +94,7 @@ def fill_hypercube(parameter_values, standard_k_axis, cell_range=None,
     return samples
 
 def kp(cosmology, standard_k_axis,
-    _redshifts=np.flip(np.linspace(0, 1100, 150)), solvability_known=False):
+    _redshifts=np.flip(np.linspace(0, 1100, 150))):
     """
     Returns the scale axis and power spectrum in Mpc units
 
@@ -102,8 +102,8 @@ def kp(cosmology, standard_k_axis,
         will decrease it if we cannot get the desired sigma12 with a
         nonnegative redshift.
     """
-    print("Trying with h", cosmology['h'])
-    print("min z", min(_redshifts), "max z", max(_redshifts))
+    #print("Trying with h", cosmology['h'])
+    #print("min z", min(_redshifts), "max z", max(_redshifts))
     
     _, _, _, list_sigma12 = ci.kzps(cosmology, _redshifts,
         fancy_neutrinos=False, k_points=NPOINTS)
@@ -131,31 +131,23 @@ def kp(cosmology, standard_k_axis,
     list_sigma12 -= cosmology["sigma12"] # now it's a zero-finding problem
     
     # remember that list_s12[0] corresponds to the highest value z
-    if list_sigma12[len(list_sigma12) - 1] < 0 and cosmology['h'] > 0.3:
+    if list_sigma12[len(list_sigma12) - 1] < 0:
         ''' we need to start playing with h.
         To save on computation, let's check if even the minimum allowed value
         rescues the problem.
         '''
         #print("We need to move h")
         #print(cosmology)
-
-        if not solvability_known:
-            try:
-                limiting_case = cp.deepcopy(cosmology)
-                limiting_case['h'] = 0.3
-                print(limiting_case)
-                print("A_s", limiting_case["A_s"])
-                kp(limiting_case, standard_k_axis, _redshifts=_redshifts)
-            except ValueError:
-                print("This cell is hopeless. Moving on...")
-                return None
+        if cosmology['h'] <= 0.1:
+            print("This cell is hopeless. Here are the details:")
+            print(cosmology)
+            return None
 
         ''' Now we know that modifying h will eventually fix the situation,
         so we start decreasing h. We also set a flag to make sure we never
         repeat this check.'''
-        cosmology['h'] -= 0.01
-        return kp(cosmology, standard_k_axis, _redshifts=_redshifts,
-            solvability_known=True)
+        cosmology['h'] -= 0.1
+        return kp(cosmology, standard_k_axis, _redshifts=_redshifts)
 
     z_step = _redshifts[0] - _redshifts[1]
     interpolator = interp1d(np.flip(_redshifts), np.flip(list_sigma12),
@@ -176,23 +168,17 @@ def kp(cosmology, standard_k_axis,
         '''What is the point of the 150 limit? Why can't CAMB simply give me a
             bigger interpolator?? '''
         return kp(cosmology, standard_k_axis,
-            _redshifts=np.flip(np.linspace(new_floor, new_ceiling, 150)),
-            solvability_known=True)
+            _redshifts=np.flip(np.linspace(new_floor, new_ceiling, 150)))
     else: # Our current resolution is satisfactory, let's return a result
         p = np.zeros(len(standard_k_axis))
 
         if cosmology['h'] == model0['h']: # if we haven't touched h,
             # we don't need to interpolate.
-            _, _, p, _ = ci.kzps(cosmology, zs=np.array([z_best]),
+            _, _, p, _ = ci.kzps(cosmology, redshifts=np.array([z_best]),
                 fancy_neutrinos=False, k_points=NPOINTS) 
            
         else: # it's time to interpolate
-            if cosmology['h'] > 0.01: # this check ensures that the
-                # notification appears only once.
-                print("We had to move the value of h.")
-          
-            print("Almost there! Just this one last step...")
-
+            print("We had to move h to", cosmology['h'])
             # Andrea and Ariel agree that this should use k_hunit=False
             PK = ci.kzps_interpolator(cosmology, redshifts=_redshifts,
                 fancy_neutrinos=False, z_points=150,
@@ -209,7 +195,9 @@ def kp(cosmology, standard_k_axis,
         #print(p)
         #print(p is None)
         #plt.plot(p); plt.show()
-       
+        
+        # This one's for Andrea. Don't delete it until you've collected some
+        # results.
         print("Redshift used:", z_best)
 
         return p
