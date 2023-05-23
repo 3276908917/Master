@@ -3,4 +3,6 @@ Version 1 was broken because we hadn't fixed the h factor yet, I think...
 Version 2 was broken because the h factor fix introduced an h reduction crash,
 so we don't have all of the cells.
 
- 
+Version 3 is looking great, but it remains to be seen whether there are still
+    "hopeless" cells... but if we can solve everything, then we'll be in a really
+    good position...
