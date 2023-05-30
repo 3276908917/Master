@@ -26,6 +26,17 @@ NPOINTS = 300
 import sys, traceback
 import copy as cp
 
+# These values help with the following function.
+# However, neither of these belongs here, we should find a different home.
+disregard_keys = ["OmB", "OmC", "OmM", "z(4)", "z(3)", "z(2)", "z(1)", "z(0)",
+    "Lbox", "sigma8", "Name", "nnu_massive", "EOmDE"]
+
+def print_cosmology(cosmology):
+    for key in cosmology.keys():
+        if key not in disregard_keys:
+            print(key, cosmology[key])
+    print()
+
 def build_cosmology(om_b_in, om_c_in, ns_in, om_nu_in, sigma12_in, As_in):
     # Use Aletheia model 0 as a base
     cosmology = cp.deepcopy(ci.cosm.iloc[0])
@@ -70,6 +81,7 @@ def fill_hypercube(parameter_values, standard_k_axis, cell_range=None,
             #print("beginning p-spectrum computation")
         cosmology = build_cosmology(config[0], config[1], config[2],
                 config[4], config[3], config[5])
+        print_cosmology(cosmology)
         p = kp(cosmology, standard_k_axis)
             #print("p-spectrum computation complete!")
         #except ValueError:
@@ -93,8 +105,7 @@ def fill_hypercube(parameter_values, standard_k_axis, cell_range=None,
             unwritten_cells = 0
     return samples
 
-def kp(cosmology, standard_k_axis,
-    _redshifts=np.flip(np.linspace(0, 1100, 150))):
+def kp(cosmology, standard_k_axis):
     """
     Returns the scale axis and power spectrum in Mpc units
 
@@ -104,6 +115,10 @@ def kp(cosmology, standard_k_axis,
     """
     #print("Trying with h", cosmology['h'])
     #print("min z", min(_redshifts), "max z", max(_redshifts))
+    
+    # This allows us to roughly find the z corresponding to the sigma12 that we
+    # want.
+    _redshifts=np.flip(np.linspace(0, 10, 150))
     
     _, _, _, list_sigma12 = ci.kzps(cosmology, _redshifts,
         fancy_neutrinos=False, k_points=NPOINTS)
@@ -143,11 +158,8 @@ def kp(cosmology, standard_k_axis,
             print(cosmology)
             return None
 
-        ''' Now we know that modifying h will eventually fix the situation,
-        so we start decreasing h. We also set a flag to make sure we never
-        repeat this check.'''
         cosmology['h'] -= 0.1
-        return kp(cosmology, standard_k_axis, _redshifts=_redshifts)
+        return kp(cosmology, standard_k_axis)
 
     z_step = _redshifts[0] - _redshifts[1]
     interpolator = interp1d(np.flip(_redshifts), np.flip(list_sigma12),
@@ -158,46 +170,30 @@ def kp(cosmology, standard_k_axis,
     z_best = root_scalar(interpolator,
         bracket=(np.min(_redshifts), np.max(_redshifts))).root
 
-    if z_step > 0.05: # The z-resolution is too low, we need to recurse
-        # '0.05' here is pretty computationally expensive;
-        # if the program doesn't run fast enough let's kick it up.
-        new_floor = max(z_best - z_step, 0)
-        # I don't know if the last scattering really should be our cap, but it
-        # seems like a reasonable cap to me.
-        new_ceiling = min(1100, z_best + z_step)
-        '''What is the point of the 150 limit? Why can't CAMB simply give me a
-            bigger interpolator?? '''
-        return kp(cosmology, standard_k_axis,
-            _redshifts=np.flip(np.linspace(new_floor, new_ceiling, 150)))
-    else: # Our current resolution is satisfactory, let's return a result
-        p = np.zeros(len(standard_k_axis))
+    p = np.zeros(len(standard_k_axis))
 
-        if cosmology['h'] == model0['h']: # if we haven't touched h,
-            # we don't need to interpolate.
-            _, _, p, _ = ci.kzps(cosmology, redshifts=np.array([z_best]),
-                fancy_neutrinos=False, k_points=NPOINTS) 
-           
-        else: # it's time to interpolate
-            print("We had to move h to", np.around(cosmology['h'], 3))
-            # Andrea and Ariel agree that this should use k_hunit=False
-            PK = ci.kzps_interpolator(cosmology, redshifts=_redshifts,
-                fancy_neutrinos=False, z_points=150,
-                kmax=max(standard_k_axis), hubble_units=False)
+    if cosmology['h'] == model0['h']: # if we haven't touched h,
+        # we don't need to interpolate.
+        _, _, p, actual_sigma12 = ci.kzps(cosmology,
+            redshifts=np.array([z_best]), fancy_neutrinos=False,
+            k_points=NPOINTS) 
+       
+    else: # it's time to interpolate
+        print("We had to move h to", np.around(cosmology['h'], 3))
+        PK = ci.kzps_interpolator(cosmology, redshifts=_redshifts,
+            fancy_neutrinos=False, z_points=150,
+            kmax=max(standard_k_axis), hubble_units=False)
 
-            p = PK.P(z_best, standard_k_axis)
+        p = PK.P(z_best, standard_k_axis)
 
-        if len(p) == 1:
-            p = p[0] 
+    if len(p) == 1:
+        p = p[0] 
 
-        # We don't need to return k because we take for granted that all
-        # runs will have the same k axis.
+    # We don't need to return k because we take for granted that all
+    # runs will have the same k axis.
 
-        #print(p)
-        #print(p is None)
-        #plt.plot(p); plt.show()
-        
-        # This one's for Andrea. Don't delete it until you've collected some
-        # results.
-        print("Redshift used:", z_best)
+    # This one's for Andrea. Don't delete it until you've collected some
+    # results.
+    print("Redshift used:", z_best)
 
-        return p
+    return p, actual_sigma12, z_best
