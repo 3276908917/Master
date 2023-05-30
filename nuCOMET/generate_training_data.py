@@ -65,14 +65,21 @@ def fill_hypercube(parameter_values, standard_k_axis, cell_range=None,
 
     @cell_range adjust this value in order to pick up from where you
         left off, and to run this method in saveable chunks.
+        
+    BE CAREFUL! This function deliberately mutates the parameter_values object,
+        replacing the target sigma12 values with the actual sigma12 values used.
     """
     if cell_range is None:
         cell_range = range(len(parameter_values))
     if samples is None:
         samples = np.zeros((len(parameter_values), NPOINTS))
 
+    # This just provides debugging information
+    redshifts_used = np.array([])
+
     unwritten_cells = 0
     for i in cell_range:
+        i = 19
         #print(i, "computation initiated")
         config = parameter_values[i]
         #print(config, "\n", config[4])
@@ -81,9 +88,19 @@ def fill_hypercube(parameter_values, standard_k_axis, cell_range=None,
             #print("beginning p-spectrum computation")
         cosmology = build_cosmology(config[0], config[1], config[2],
                 config[4], config[3], config[5])
-        print_cosmology(cosmology)
-        p = kp(cosmology, standard_k_axis)
-            #print("p-spectrum computation complete!")
+        
+        # kp returns (in this order): p-spectrum, actual_sigma12, z_best
+        
+        p, actual_sigma12, z_best = kp(cosmology, standard_k_axis)
+        redshifts_used = np.append(redshifts_used, z_best)
+        
+        # We may actually want to remove this if-condition. For now, though, it
+        # allows us to repeatedly evaluate a cosmology with the same
+        # deterministic result.
+        if actual_sigma12 is not None:        
+            parameter_values[i][3] = actual_sigma12
+        
+        #print("p-spectrum computation complete!")
         #except ValueError:
         ''' Don't let unreasonable sigma12 values crash the program; ignore
         them for now. It's not clear to me why unreasonable sigma12 values
@@ -102,8 +119,10 @@ def fill_hypercube(parameter_values, standard_k_axis, cell_range=None,
         if write_period is not None and unwritten_cells >= write_period:
             np.save("samples_backup_i" + str(i) + ".npy", samples,
                 allow_pickle=True)
+            np.save("redshifts_backup_i" + str(i) + ".npy", redshifts_used,
+                allow_pickle=True)
             unwritten_cells = 0
-    return samples
+    return samples, redshifts_used
 
 def kp(cosmology, standard_k_axis):
     """
@@ -147,16 +166,11 @@ def kp(cosmology, standard_k_axis):
     
     # remember that list_s12[0] corresponds to the highest value z
     if list_sigma12[len(list_sigma12) - 1] < 0:
-        ''' we need to start playing with h.
-        To save on computation, let's check if even the minimum allowed value
-        rescues the problem.
-        '''
-        #print("We need to move h")
-        #print(cosmology)
+        # we need to start playing with h.
         if cosmology['h'] <= 0.1:
             print("This cell is hopeless. Here are the details:")
-            print(cosmology)
-            return None
+            print_cosmology(cosmology)
+            return None, None, None
 
         cosmology['h'] -= 0.1
         return kp(cosmology, standard_k_axis)
@@ -172,28 +186,20 @@ def kp(cosmology, standard_k_axis):
 
     p = np.zeros(len(standard_k_axis))
 
-    if cosmology['h'] == model0['h']: # if we haven't touched h,
-        # we don't need to interpolate.
-        _, _, p, actual_sigma12 = ci.kzps(cosmology,
-            redshifts=np.array([z_best]), fancy_neutrinos=False,
-            k_points=NPOINTS) 
-       
-    else: # it's time to interpolate
-        print("We had to move h to", np.around(cosmology['h'], 3))
-        PK = ci.kzps_interpolator(cosmology, redshifts=_redshifts,
-            fancy_neutrinos=False, z_points=150,
-            kmax=max(standard_k_axis), hubble_units=False)
+    k, _, p, actual_sigma12 = ci.kzps(cosmology,
+        redshifts=np.array([z_best]), fancy_neutrinos=False,
+        k_points=NPOINTS) 
 
-        p = PK.P(z_best, standard_k_axis)
+    if cosmology['h'] != model0['h']: # we've touched h, we need to interpolate
+        print("We had to move h to", np.around(cosmology['h'], 3))
+        
+        interpolator = interp1d(k, p, kind="cubic")
+        p = interpolator(standard_k_axis)
 
     if len(p) == 1:
         p = p[0] 
 
     # We don't need to return k because we take for granted that all
     # runs will have the same k axis.
-
-    # This one's for Andrea. Don't delete it until you've collected some
-    # results.
-    print("Redshift used:", z_best)
 
     return p, actual_sigma12, z_best
