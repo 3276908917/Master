@@ -35,7 +35,6 @@ def print_cosmology(cosmology):
     for key in cosmology.keys():
         if key not in disregard_keys:
             print(key, cosmology[key])
-    print()
 
 def build_cosmology(om_b_in, om_c_in, ns_in, om_nu_in, sigma12_in, As_in):
     # Use Aletheia model 0 as a base
@@ -57,8 +56,8 @@ def build_cosmology(om_b_in, om_c_in, ns_in, om_nu_in, sigma12_in, As_in):
     return ci.specify_neutrino_mass(cosmology, om_nu_in,
         nnu_massive_in=nnu_massive)
 
-def fill_hypercube(parameter_values, standard_k_axis, cell_range=None,
-    samples=None, write_period=None):
+def fill_hypercube(parameter_values, standard_k_axis, massive_neutrinos=False,
+    cell_range=None, samples=None, write_period=None, save_label="unlabeled"):
     """
     @parameter_values: this should be a list of tuples to
         evaluate kp at.
@@ -74,20 +73,23 @@ def fill_hypercube(parameter_values, standard_k_axis, cell_range=None,
     if samples is None:
         samples = np.zeros((len(parameter_values), NPOINTS))
 
+    bundle_parameters = lambda row: build_cosmology(row[0], row[1], row[2],
+        row[4], row[3], row[5])
+
+    if massive_neutrinos == False:
+        bundle_parameters = lambda row: build_cosmology(row[0], row[1], row[2],
+            0, row[3], row[4])
+
     # This just provides debugging information
     redshifts_used = np.array([])
 
     unwritten_cells = 0
     for i in cell_range:
-        i = 19
         #print(i, "computation initiated")
-        config = parameter_values[i]
-        #print(config, "\n", config[4])
         p = None
         #try:
             #print("beginning p-spectrum computation")
-        cosmology = build_cosmology(config[0], config[1], config[2],
-                config[4], config[3], config[5])
+        cosmology = bundle_parameters(parameter_values[i])
         
         # kp returns (in this order): p-spectrum, actual_sigma12, z_best
         
@@ -117,10 +119,12 @@ def fill_hypercube(parameter_values, standard_k_axis, cell_range=None,
         print(i, "complete")
         unwritten_cells += 1
         if write_period is not None and unwritten_cells >= write_period:
-            np.save("samples_backup_i" + str(i) + ".npy", samples,
-                allow_pickle=True)
-            np.save("redshifts_backup_i" + str(i) + ".npy", redshifts_used,
-                allow_pickle=True)
+            np.save("samples_backup_i" + str(i) + "_" + save_label + ".npy",
+                samples, allow_pickle=True)
+            np.save("redshifts_backup_i" + str(i) + "_" + save_label + ".npy",
+                redshifts_used, allow_pickle=True)
+            np.save("hc_backup_i" + str(i) + "_" + save_label + ".npy",
+                parameter_values, allow_pickle=True)
             unwritten_cells = 0
     return samples, redshifts_used
 
@@ -168,8 +172,11 @@ def kp(cosmology, standard_k_axis):
     if list_sigma12[len(list_sigma12) - 1] < 0:
         # we need to start playing with h.
         if cosmology['h'] <= 0.1:
-            print("This cell is hopeless. Here are the details:")
+            print("\nThis cell is hopeless. Here are the details:\n")
             print_cosmology(cosmology)
+            print("\nThe extent of failure is:",
+                abs(list_sigma12[len(list_sigma12) - 1] / \
+                cosmology["sigma12"]) * 100, "%\n")
             return None, None, None
 
         cosmology['h'] -= 0.1

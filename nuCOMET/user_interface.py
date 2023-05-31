@@ -20,7 +20,8 @@ def test():
 
     return gp_model.predict_noiseless(model0)
 
-def initialize(num_samples=100, num_trials=100):
+def initialize(num_samples=100, num_trials=100, priors="COMET",
+    massive_neutrinos=True):
     """
     Try to save the results of previous runs as npy files, to ensure consistency
     of outcomes.
@@ -31,10 +32,10 @@ def initialize(num_samples=100, num_trials=100):
     
     # tau must be an evolution parameter if we're not including it here
 
-    mega = False
+    param_ranges = {}
 
-    if mega:
-        hc, list_min_dist = evolmap.lhc.generate_samples({                                             
+    if priors == "MEGA":
+        param_ranges = {                                             
             'om_b': [0.005, 0.28],                                         
             'om_c': [0.001, 0.99], # max 0.3?                                     
             'n_s': [0.7, 1.3], # expand?
@@ -42,19 +43,31 @@ def initialize(num_samples=100, num_trials=100):
                 # Sanchez 20, fig 2 
             'om_nu': [0., 0.01],
             'A_s': [A_MIN, A_MAX]
-        }, num_samples, num_trials)
-    else: # This is useful for a demo run. 
-        hc, list_min_dist = lhc.generate_samples({                                             
+        }
+    elif priors == "classic": # This is useful for a demo run. 
+        param_ranges = {                                             
             'om_b': [0.01875, 0.02625],                                         
             'om_c': [0.05, 0.255],                                   
             'n_s': [0.84, 1.1],
             'sigma12': [0.2, 1], # based on Sanchez et al 21; Sanchez 20 fig 2 
             'om_nu': [0., 0.01],
             'A_s': [A_MINI_MIN, A_MINI_MAX]
-        }, num_samples, num_trials)
+        }
+    elif priors=="CAMB": 
+        param_ranges = {                                             
+            'om_b': [0.0205, 0.02415],                                         
+            'om_c': [0.085, 0.155],                                   
+            'n_s': [0.92, 1.01],
+            'sigma12': [0.2, 1], # based on Sanchez et al 21; Sanchez 20 fig 2 
+            'om_nu': [0., 0.01],
+            'A_s': [1.15e-9, A_MINI_MAX]
+        }
 
-    ### If the above doesn't work, we should create two emulators. One with
-    # massive neutrinos, the other without.
+    if massive_neutrinos:
+        param_ranges['om_nu'] = [0., 0.01]
+
+    hc, list_min_dist = lhc.generate_samples(param_ranges, num_samples,
+        num_trials)
 
     return hc, list_min_dist
 
