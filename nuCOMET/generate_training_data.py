@@ -56,7 +56,7 @@ def build_cosmology(om_b_in, om_c_in, ns_in, om_nu_in, sigma12_in, As_in):
     return ci.specify_neutrino_mass(cosmology, om_nu_in,
         nnu_massive_in=nnu_massive)
 
-def fill_hypercube(parameter_values, standard_k_axis, massive_neutrinos=False,
+def fill_hypercube(parameter_values, standard_k_axis, massive_neutrinos=True,
     cell_range=None, samples=None, write_period=None, save_label="unlabeled"):
     """
     @parameter_values: this should be a list of tuples to

@@ -27,8 +27,7 @@ def initialize(num_samples=100, num_trials=100, priors="COMET",
     of outcomes.
     """
 
-    # We're keeping A_s fixed, right?
-    # We're also keeping Omega_K = 0 fixed
+    # We're keeping Omega_K = 0 fixed for now
     
     # tau must be an evolution parameter if we're not including it here
 
@@ -41,7 +40,6 @@ def initialize(num_samples=100, num_trials=100, priors="COMET",
             'n_s': [0.7, 1.3], # expand?
             'sigma12': [0.2, 1], # based on Sanchez et al 21 and
                 # Sanchez 20, fig 2 
-            'om_nu': [0., 0.01],
             'A_s': [A_MIN, A_MAX]
         }
     elif priors == "classic": # This is useful for a demo run. 
@@ -50,16 +48,14 @@ def initialize(num_samples=100, num_trials=100, priors="COMET",
             'om_c': [0.05, 0.255],                                   
             'n_s': [0.84, 1.1],
             'sigma12': [0.2, 1], # based on Sanchez et al 21; Sanchez 20 fig 2 
-            'om_nu': [0., 0.01],
             'A_s': [A_MINI_MIN, A_MINI_MAX]
         }
-    elif priors=="CAMB": 
+    elif priors=="COMET": 
         param_ranges = {                                             
             'om_b': [0.0205, 0.02415],                                         
             'om_c': [0.085, 0.155],                                   
             'n_s': [0.92, 1.01],
             'sigma12': [0.2, 1], # based on Sanchez et al 21; Sanchez 20 fig 2 
-            'om_nu': [0., 0.01],
             'A_s': [1.15e-9, A_MINI_MAX]
         }
 
@@ -70,12 +66,6 @@ def initialize(num_samples=100, num_trials=100, priors="COMET",
         num_trials)
 
     return hc, list_min_dist
-
-    ''' Now we want to attach a power spectrum to each cosmology. What values
-        do we take for the remaining parameters? It shouldn't matter, as long
-        as they yield the same sigma_12. So you could assume model0, then
-        simply rescale the result according to the principle of evolution
-        mapping.'''
 
 def load(hc_file="hc.py", samples_file="samples.npy"):
     """
