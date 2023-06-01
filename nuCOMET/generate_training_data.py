@@ -75,7 +75,7 @@ def fill_hypercube(parameter_values, standard_k_axis, massive_neutrinos=True,
 
     # Recent change: now omega_nu comes last
 
-    bundle_parameters = lambda now: build_cosmology(row[0], row[1], row[2],
+    bundle_parameters = lambda row: build_cosmology(row[0], row[1], row[2],
         row[3], row[4], row[5])
 
     if massive_neutrinos == False:
