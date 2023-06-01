@@ -36,7 +36,7 @@ def print_cosmology(cosmology):
         if key not in disregard_keys:
             print(key, cosmology[key])
 
-def build_cosmology(om_b_in, om_c_in, ns_in, om_nu_in, sigma12_in, As_in):
+def build_cosmology(om_b_in, om_c_in, ns_in, sigma12_in, As_in, om_nu_in):
     # Use Aletheia model 0 as a base
     cosmology = cp.deepcopy(ci.cosm.iloc[0])
     
@@ -73,12 +73,14 @@ def fill_hypercube(parameter_values, standard_k_axis, massive_neutrinos=True,
     if samples is None:
         samples = np.zeros((len(parameter_values), NPOINTS))
 
-    bundle_parameters = lambda row: build_cosmology(row[0], row[1], row[2],
-        row[4], row[3], row[5])
+    # Recent change: now omega_nu comes last
+
+    bundle_parameters = lambda now: build_cosmology(row[0], row[1], row[2],
+        row[3], row[4], row[5])
 
     if massive_neutrinos == False:
         bundle_parameters = lambda row: build_cosmology(row[0], row[1], row[2],
-            0, row[3], row[4])
+            row[3], row[4], 0)
 
     # This just provides debugging information
     redshifts_used = np.array([])
