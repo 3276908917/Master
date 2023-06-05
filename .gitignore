@@ -12,6 +12,7 @@
 *.npy
 *.csv
 *.png
+*.nucomet
 
 # Ignore generated media and heavy analyses
 communications
