@@ -15,6 +15,7 @@ import pandas as pd
 import re
 
 import camb_interface as ci
+import copy as cp
 
 cosm = pd.read_csv("cosmologies.dat", sep='\s+')
 model0 = cosm.loc[0]
@@ -22,6 +23,8 @@ model0 = cosm.loc[0]
 ''' AndreaP thinks that npoints=300 should be a good balance of accuracy and
 computability for our LH.'''
 NPOINTS = 300
+
+A_S_DEFAULT = 2.12723788013000E-09
 
 import sys, traceback
 import copy as cp
@@ -80,7 +83,7 @@ def fill_hypercube(parameter_values, standard_k_axis, massive_neutrinos=True,
 
     if massive_neutrinos == False:
         bundle_parameters = lambda row: build_cosmology(row[0], row[1], row[2],
-            row[3], row[4], 0)
+            row[3], A_S_DEFAULT, 0)
 
     # This just provides debugging information
     redshifts_used = np.array([])
@@ -143,9 +146,13 @@ def kp(cosmology, standard_k_axis):
     
     # This allows us to roughly find the z corresponding to the sigma12 that we
     # want.
+    tilde_cosmology = cp.deepcopy(cosmology)
+    tilde_cosmology['omch2'] += tilde_cosmology['omnuh2']
+    tilde_cosmology['omnuh2'] = 0
+
     _redshifts=np.flip(np.linspace(0, 10, 150))
     
-    _, _, _, list_sigma12 = ci.kzps(cosmology, _redshifts,
+    _, _, _, list_sigma12 = ci.kzps(tilde_cosmology, _redshifts,
         fancy_neutrinos=False, k_points=NPOINTS)
 
     # debug block
@@ -195,9 +202,12 @@ def kp(cosmology, standard_k_axis):
 
     p = np.zeros(len(standard_k_axis))
 
-    k, _, p, actual_sigma12 = ci.kzps(cosmology,
+    k, _, p, actual_sigma12 = ci.kzps(tilde_cosmology,
         redshifts=np.array([z_best]), fancy_neutrinos=False,
         k_points=NPOINTS) 
+    if cosmology['omnuh2'] != 0:
+        k, _, p, _ = ci.kzps(cosmology, redshifts=np.array([z_best]),
+            fancy_neutrinos=False, k_points=NPOINTS)
 
     if cosmology['h'] != model0['h']: # we've touched h, we need to interpolate
         print("We had to move h to", np.around(cosmology['h'], 3))

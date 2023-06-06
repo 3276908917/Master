@@ -40,7 +40,6 @@ def initialize(num_samples=100, num_trials=100, priors="COMET",
             'n_s': [0.7, 1.3], # expand?
             'sigma12': [0.2, 1], # based on Sanchez et al 21 and
                 # Sanchez 20, fig 2 
-            'A_s': [A_MIN, A_MAX]
         }
     elif priors == "classic": # This is useful for a demo run. 
         param_ranges = {                                             
@@ -48,7 +47,6 @@ def initialize(num_samples=100, num_trials=100, priors="COMET",
             'om_c': [0.05, 0.255],                                   
             'n_s': [0.84, 1.1],
             'sigma12': [0.2, 1], # based on Sanchez et al 21; Sanchez 20 fig 2 
-            'A_s': [A_MINI_MIN, A_MINI_MAX]
         }
     elif priors=="COMET": 
         param_ranges = {                                             
@@ -56,10 +54,16 @@ def initialize(num_samples=100, num_trials=100, priors="COMET",
             'om_c': [0.085, 0.155],                                   
             'n_s': [0.92, 1.01],
             'sigma12': [0.2, 1], # based on Sanchez et al 21; Sanchez 20 fig 2 
-            'A_s': [1.15e-9, A_MINI_MAX]
         }
 
     if massive_neutrinos:
+        if priors == "MEGA":
+            param_ranges['A_s'] = [A_MIN, A_MAX]
+        elif priors == "classic":
+            param_ranges['A_s'] = [A_MINI_MIN, A_MINI_MAX]
+        elif priors == "COMET": 
+            param_ranges['A_s'] = [1.15e-9, A_MINI_MAX]
+
         param_ranges['om_nu'] = [0., 0.01]
 
     hc, list_min_dist = lhc.generate_samples(param_ranges, num_samples,

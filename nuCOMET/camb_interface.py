@@ -383,6 +383,8 @@ def specify_neutrino_mass(mlc, omnuh2_in, nnu_massive_in=1):
     N_total_eff = 3.046 nonetheless, right?'''
     full_cosmology = cp.deepcopy(mlc) 
 
+    full_cosmology["omnuh2"] = omnuh2_in
+
     full_cosmology["mnu"] = omnuh2_in * camb.constants.neutrino_mass_fac / \
         (camb.constants.default_nnu / 3.0) ** 0.75 
     
