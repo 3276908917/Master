@@ -369,10 +369,14 @@ def input_dark_energy(pars, w0, wa):
 def specify_neutrino_mass(mlc, omnuh2_in, nnu_massive_in=1):
     """
     Helper function for input_cosmology.
-    This returns modified copy of the input dictionary object, which
-    corresponds to a cosmology with massive neutrinos.
-    """
-    
+    This returns modified copy (and therefore does not mutate the original) of
+    the input dictionary object, which corresponds to a cosmology with massive
+    neutrinos.
+    """ 
+    full_cosmology = cp.deepcopy(mlc) 
+
+    full_cosmology["omnuh2"] = omnuh2_in
+
     '''This is a horrible workaround, and I would like to get rid of it
     ASAP. It destroys dependence on TCMB and
     neutrino_hierarchy, possibly more. But CAMB does not accept omnuh2 as
@@ -381,10 +385,6 @@ def specify_neutrino_mass(mlc, omnuh2_in, nnu_massive_in=1):
     Also, should we replace default_nnu with something else in the
     following expression? Even if we're changing N_massive to 1,
     N_total_eff = 3.046 nonetheless, right?'''
-    full_cosmology = cp.deepcopy(mlc) 
-
-    full_cosmology["omnuh2"] = omnuh2_in
-
     full_cosmology["mnu"] = omnuh2_in * camb.constants.neutrino_mass_fac / \
         (camb.constants.default_nnu / 3.0) ** 0.75 
     

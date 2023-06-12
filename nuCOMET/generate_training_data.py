@@ -34,10 +34,16 @@ import copy as cp
 disregard_keys = ["OmB", "OmC", "OmM", "z(4)", "z(3)", "z(2)", "z(1)", "z(0)",
     "Lbox", "sigma8", "Name", "nnu_massive", "EOmDE"]
 
+# For some reason, these keys are not printed by default, so we need to
+# explicitly mention them.
+res_keys = ["sigma12", "omnuh2"]
+
 def print_cosmology(cosmology):
     for key in cosmology.keys():
         if key not in disregard_keys:
             print(key, cosmology[key])
+    for key in res_keys:
+        print(key, cosmology[key])
 
 def build_cosmology(om_b_in, om_c_in, ns_in, sigma12_in, As_in, om_nu_in):
     # Use Aletheia model 0 as a base
@@ -98,7 +104,7 @@ def fill_hypercube(parameter_values, standard_k_axis, massive_neutrinos=True,
         
         # kp returns (in this order): p-spectrum, actual_sigma12, z_best
         
-        p, actual_sigma12, z_best = kp(cosmology, standard_k_axis)
+        p, actual_sigma12, z_best = psz(cosmology, standard_k_axis)
         redshifts_used = np.append(redshifts_used, z_best)
         
         # We may actually want to remove this if-condition. For now, though, it
@@ -133,32 +139,38 @@ def fill_hypercube(parameter_values, standard_k_axis, massive_neutrinos=True,
             unwritten_cells = 0
     return samples, redshifts_used
 
-def kp(cosmology, standard_k_axis):
+debug = False
+def psz(cosmology, standard_k_axis):
     """
-    Returns the scale axis and power spectrum in Mpc units
-
-    @h_in=0.67 starts out with the model 0 default for Aletheia, and we
-        will decrease it if we cannot get the desired sigma12 with a
-        nonnegative redshift.
+    Returns the power spectrum in Mpc units and the actual sigma12_tilde value
+        to which it corresponds.
     """
-    #print("Trying with h", cosmology['h'])
-    #print("min z", min(_redshifts), "max z", max(_redshifts))
-    
     # This allows us to roughly find the z corresponding to the sigma12 that we
     # want.
+    #print("it's really changed.")
     tilde_cosmology = cp.deepcopy(cosmology)
     tilde_cosmology['omch2'] += tilde_cosmology['omnuh2']
     tilde_cosmology['omnuh2'] = 0
 
+    tilde_cosmology = ci.specify_neutrino_mass(tilde_cosmology,
+        tilde_cosmology['omnuh2'], nnu_massive_in=0)
+
     _redshifts=np.flip(np.linspace(0, 10, 150))
-    
+   
+    if debug:
+        print("\nTilde cosmology:")
+        print_cosmology(tilde_cosmology)
+        print("\nTrue cosmology:")
+        print_cosmology(cosmology)
+        print("\n")
+
     _, _, _, list_sigma12 = ci.kzps(tilde_cosmology, _redshifts,
-        fancy_neutrinos=False, k_points=NPOINTS)
+        fancy_neutrinos=False, k_points=NPOINTS, hubble_units=False)
 
     # debug block
     
     #print(list_s12)
-    if False:
+    if debug:
         import matplotlib.pyplot as plt
         # Original intersection problem we're trying to solve
         plt.plot(_redshifts, list_sigma12);
@@ -189,7 +201,7 @@ def kp(cosmology, standard_k_axis):
             return None, None, None
 
         cosmology['h'] -= 0.1
-        return kp(cosmology, standard_k_axis)
+        return psz(cosmology, standard_k_axis)
 
     z_step = _redshifts[0] - _redshifts[1]
     interpolator = interp1d(np.flip(_redshifts), np.flip(list_sigma12),
@@ -202,12 +214,13 @@ def kp(cosmology, standard_k_axis):
 
     p = np.zeros(len(standard_k_axis))
 
-    k, _, p, actual_sigma12 = ci.kzps(tilde_cosmology,
+    k, _, p, actual_sigma12 = ci.kzps(cosmology,
         redshifts=np.array([z_best]), fancy_neutrinos=False,
         k_points=NPOINTS) 
     if cosmology['omnuh2'] != 0:
-        k, _, p, _ = ci.kzps(cosmology, redshifts=np.array([z_best]),
-            fancy_neutrinos=False, k_points=NPOINTS)
+        _, _, _, actual_sigma12 = ci.kzps(tilde_cosmology,
+            redshifts=np.array([z_best]), fancy_neutrinos=False,
+            k_points=NPOINTS)
 
     if cosmology['h'] != model0['h']: # we've touched h, we need to interpolate
         print("We had to move h to", np.around(cosmology['h'], 3))
