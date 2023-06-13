@@ -36,14 +36,14 @@ disregard_keys = ["OmB", "OmC", "OmM", "z(4)", "z(3)", "z(2)", "z(1)", "z(0)",
 
 # For some reason, these keys are not printed by default, so we need to
 # explicitly mention them.
-res_keys = ["sigma12", "omnuh2"]
+# res_keys = ["sigma12", "omnuh2"]
 
 def print_cosmology(cosmology):
     for key in cosmology.keys():
         if key not in disregard_keys:
             print(key, cosmology[key])
-    for key in res_keys:
-        print(key, cosmology[key])
+    #for key in res_keys:
+    #    print(key, cosmology[key])
 
 def build_cosmology(om_b_in, om_c_in, ns_in, sigma12_in, As_in, om_nu_in):
     # Use Aletheia model 0 as a base
@@ -148,6 +148,7 @@ def psz(cosmology, standard_k_axis):
     # This allows us to roughly find the z corresponding to the sigma12 that we
     # want.
     #print("it's really changed.")
+
     tilde_cosmology = cp.deepcopy(cosmology)
     tilde_cosmology['omch2'] += tilde_cosmology['omnuh2']
     tilde_cosmology['omnuh2'] = 0
