@@ -447,7 +447,8 @@ def obtain_pspectrum(pars, redshifts=[0], k_points=100000, hubble_units=False):
 
     ''' To change the the extent of the k-axis, change the following line as
     well as the "get_matter_power_spectrum" call. '''
-    pars.set_matter_power(redshifts=redshifts, kmax=20.0 / pars.h, nonlinear=False)
+    pars.set_matter_power(redshifts=redshifts, kmax=10.0 / pars.h,
+        nonlinear=False)
     
     results = camb.get_results(pars)
 
@@ -462,7 +463,7 @@ def obtain_pspectrum(pars, redshifts=[0], k_points=100000, hubble_units=False):
     '''
     k, z, p = results.get_matter_power_spectrum(
         minkh=1e-4 / pars.h, maxkh=10.0 / pars.h, npoints = k_points,
-        var1=8, var2=8
+        var1='delta_tot', var2='delta_tot'
     )
    
     # De-nest for the single-redshift case:

@@ -224,6 +224,8 @@ def psz(cosmology, standard_k_axis):
         _, _, _, actual_sigma12 = ci.kzps(tilde_cosmology,
             redshifts=np.array([z_best]), fancy_neutrinos=False,
             k_points=NPOINTS)
+    # De-nest
+    actual_sigma12 = actual_sigma12[0]
 
     if cosmology['h'] != model0['h']: # we've touched h, we need to interpolate
         print("We had to move h to", np.around(cosmology['h'], 3))
@@ -231,7 +233,7 @@ def psz(cosmology, standard_k_axis):
         interpolator = interp1d(k, p, kind="cubic")
         p = interpolator(standard_k_axis)
 
-    if len(p) == 1:
+    if len(p) == 1: # then de-nest
         p = p[0] 
 
     # We don't need to return k because we take for granted that all
