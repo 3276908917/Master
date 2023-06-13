@@ -190,6 +190,9 @@ def psz(cosmology, standard_k_axis):
     list_sigma12 -= cosmology["sigma12"] # now it's a zero-finding problem
     
     # remember that list_s12[0] corresponds to the highest value z
+    print("Discrepancy between maximal achievable sigma12 and target", 
+        list_sigma12[len(list_sigma12) - 1])
+    print("Desired", cosmology["sigma12"])
     if list_sigma12[len(list_sigma12) - 1] < 0:
         # we need to start playing with h.
         if cosmology['h'] <= 0.1:

@@ -1,7 +1,8 @@
 path_base_linux = "/home/lfinkbei/Documents/"
 path_base_rex = "C:/Users/Lukas/Documents/GitHub/"
 path_base_otto = "T:/GitHub/"
-path_base = path_base_linux
+path_base_work_laptop = "C:/Users/lfinkbei/Documents/GitHub/"
+path_base = path_base_work_laptop
 
 import numpy as np
 import pandas as pd
@@ -25,8 +26,6 @@ omnu_strings = np.array(["0.0006", "0.002", "0.006", "0.01"])
 # The following code is somewhat hard;
 # I'm not sure how better to do it.
 redshift_column = re.compile("z.+")
-
-'''! We really ought to merge the next three functions'''
 
 def define_powernu(relative_path, omeganu_strings=None):
     file_base = file_base = path_to_me + relative_path
