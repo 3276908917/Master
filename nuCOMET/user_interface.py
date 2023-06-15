@@ -20,17 +20,7 @@ def test():
 
     return gp_model.predict_noiseless(model0)
 
-def initialize(num_samples=100, num_trials=100, priors="COMET",
-    massive_neutrinos=True):
-    """
-    Try to save the results of previous runs as npy files, to ensure consistency
-    of outcomes.
-    """
-
-    # We're keeping Omega_K = 0 fixed for now
-    
-    # tau must be an evolution parameter if we're not including it here
-
+def get_param_ranges(priors="COMET", massive_neutrinos=True):
     param_ranges = {}
 
     if priors == "MEGA":
@@ -66,6 +56,19 @@ def initialize(num_samples=100, num_trials=100, priors="COMET",
 
         param_ranges['om_nu'] = [0., 0.01]
 
+    return param_ranges
+
+def initialize(num_samples=100, num_trials=100, priors="COMET",
+    massive_neutrinos=True):
+    """
+    Try to save the results of previous runs as npy files, to ensure consistency
+    of outcomes.
+    """
+    param_ranges = get_param_ranges(priors, massive_neutrinos)
+
+    # We're keeping Omega_K = 0 fixed for now
+    
+    # tau must be an evolution parameter if we're not including it here
     hc, list_min_dist = lhc.generate_samples(param_ranges, num_samples,
         num_trials)
 
