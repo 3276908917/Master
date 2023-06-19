@@ -139,8 +139,7 @@ def fill_hypercube(parameter_values, standard_k_axis, massive_neutrinos=True,
             unwritten_cells = 0
     return samples, redshifts_used
 
-debug = True
-def psz(cosmology, standard_k_axis):
+def psz(cosmology, standard_k_axis, debug=False):
     """
     Returns the power spectrum in Mpc units and the actual sigma12_tilde value
         to which it corresponds.
