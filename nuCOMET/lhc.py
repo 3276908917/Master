@@ -178,6 +178,7 @@ def multithread_LHC_builder(param_ranges, n_samples, label="unlabeled",
     As of 19.06.23 @ 11:40 am, the records are as follows:
     * COMET priors
         * massive case: 0.0802202670064637
+            (saved under "best_lhc_multi2.npy")
     """
     n_params = len(param_ranges)
 

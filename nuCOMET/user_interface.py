@@ -3,24 +3,46 @@ from scipy.interpolate import interp1d
 import GPy
 import lhc
 
+# In keeping with the format of values typically quoted in the literature for
+# the scalar mode amplitude (see, for example, Spurio Mancini et al, 2021 ),
+# we here define our prior ranges with the use of exponentiation.
 A_MIN = np.exp(1.61) / 10 ** 10
 A_MAX = np.exp(5) / 10 ** 10
 
+# The MINI qualifier indicates that these belong to the "classic" prior ranges
+# (see the function get_param_ranges).
 A_MINI_MIN = np.exp(2.35) / 10 ** 10
 A_MINI_MAX = np.exp(3.91) / 10 ** 10
 
-# Here is some demo code that I used to start this off:                    
-
-def test():
-    model0 = np.array([0.022445, 0.120567, 0.67])
-    model0 = model0.reshape(3, 1)
-    hc, samples = load("evolmap/hc.npy", "evolmap/samples.npy")
-    base_k, homogenized_P = homogenize_k_axes(samples)
-    gp_model = get_model(hc, homogenized_P)
-
-    return gp_model.predict_noiseless(model0)
-
 def get_param_ranges(priors="COMET", massive_neutrinos=True):
+    """
+    !
+    Return a dictionary of arrays where each key is a cosmological parameter
+    over which the emulator will be trained. The first entry of each array is
+    the parameter's lower bound, the second entry is the parameter's upper
+    bound.
+
+    @priors string indicating which set of parameters to use.
+        "MEGA": the original goal for this project, which unfortunately
+            suffered from too many empty cells. The code has gone through
+            several crucial bug fixes since switching to a different set of
+            priors, so we need to test this prior suite again and re-asses the
+            rate of empty cells.
+        "classic": a prior range with widths in between those of "COMET" and
+            "MEGA". We need to test this prior suite again to see if it still
+            suffers from a large number of empty cells.
+        "COMET" as of 19.06.23, this is the default for the emulator. It is
+            the most restrictive of the three options and it is intended to
+            totally eliminate the problem of empty cells, so that a totally
+            complete LHC can be used to train a demonstration emulator. The
+            hope is for the demonstration emulator to be extremely accurate
+            but confined to a very narrow range in each parameter.
+
+    @massive_neutrinos should be set to False when one is training the emulator
+        for massless neutrinos. This is because the massless neutrino emulator
+        should be using two fewer parameters--A_s and omega_nu_h2 are no longer
+        appropriate.
+    """
     param_ranges = {}
 
     if priors == "MEGA":
