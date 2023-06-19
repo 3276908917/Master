@@ -167,7 +167,18 @@ def batch(n_params, n_samples=5000):
 
     return samples, min_dist
 
-def multithread_LHC_builder(param_ranges, n_samples, label="unlabeled"):
+def multithread_LHC_builder(param_ranges, n_samples, label="unlabeled",
+    previous_record=0):
+    """
+    Use more CPU to compute more random LHCs, periodically saving the one with
+    the greatest minimum separation. In other words, our LHC generation
+    approach is still fundamentally inefficient (we're hoping to simply get
+    lucky with the minimum separations).
+
+    As of 19.06.23 @ 11:40 am, the records are as follows:
+    * COMET priors
+        * massive case: 0.0802202670064637
+    """
     n_params = len(param_ranges)
 
     '''
@@ -177,7 +188,7 @@ def multithread_LHC_builder(param_ranges, n_samples, label="unlabeled"):
     each dimension of the parameter space into n_samples equispaced
     intervals and it picks the middle point of the chosen interval
     '''
-    overall_min_dist = 0
+    overall_min_dist = previous_record
     overall_best_lhc = None
     num_workers = 12
 

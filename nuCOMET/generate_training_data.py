@@ -139,7 +139,7 @@ def fill_hypercube(parameter_values, standard_k_axis, massive_neutrinos=True,
             unwritten_cells = 0
     return samples, redshifts_used
 
-debug = False
+debug = True
 def psz(cosmology, standard_k_axis):
     """
     Returns the power spectrum in Mpc units and the actual sigma12_tilde value
@@ -147,7 +147,6 @@ def psz(cosmology, standard_k_axis):
     """
     # This allows us to roughly find the z corresponding to the sigma12 that we
     # want.
-    #print("it's really changed.")
 
     tilde_cosmology = cp.deepcopy(cosmology)
     tilde_cosmology['omch2'] += tilde_cosmology['omnuh2']
@@ -169,9 +168,10 @@ def psz(cosmology, standard_k_axis):
         fancy_neutrinos=False, k_points=NPOINTS, hubble_units=False)
 
     # debug block
-    
+
     #print(list_s12)
     if debug:
+        print("Maximum s12:", max(list_sigma12))
         import matplotlib.pyplot as plt
         # Original intersection problem we're trying to solve
         plt.plot(_redshifts, list_sigma12);
@@ -216,6 +216,9 @@ def psz(cosmology, standard_k_axis):
     # poorly suited to our problem. This generic root finder works better.
     z_best = root_scalar(interpolator,
         bracket=(np.min(_redshifts), np.max(_redshifts))).root
+
+    if debug:
+        print("recommended redshift", z_best)
 
     p = np.zeros(len(standard_k_axis))
 
