@@ -102,7 +102,7 @@ def fill_hypercube(parameter_values, standard_k_axis, massive_neutrinos=True,
         
         # kp returns (in this order): p-spectrum, actual_sigma12, z_best
         
-        p, actual_sigma12, z_best = psz(cosmology, standard_k_axis)
+        p, actual_sigma12, z_best = evaluate_cell(cosmology, standard_k_axis)
         redshifts_used = np.append(redshifts_used, z_best)
         
         # We may actually want to remove this if-condition. For now, though, it
@@ -137,10 +137,13 @@ def fill_hypercube(parameter_values, standard_k_axis, massive_neutrinos=True,
             unwritten_cells = 0
     return samples, redshifts_used
 
-def psz(cosmology, standard_k_axis, debug=False):
+def evaluate_cell(cosmology, standard_k_axis, debug=False):
     """
     Returns the power spectrum in Mpc units and the actual sigma12_tilde value
         to which it corresponds.
+
+    I concede that the function looks like a mess right now, with debug
+    statements littered all over the place.
     """
     # This allows us to roughly find the z corresponding to the sigma12 that we
     # want.
@@ -203,7 +206,7 @@ def psz(cosmology, standard_k_axis, debug=False):
             return None, None, None
 
         cosmology['h'] -= 0.1
-        return psz(cosmology, standard_k_axis)
+        return evaluate_cell(cosmology, standard_k_axis)
 
     z_step = _redshifts[0] - _redshifts[1]
     interpolator = interp1d(np.flip(_redshifts), np.flip(list_sigma12),

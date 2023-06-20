@@ -1,7 +1,10 @@
+# In order to redirect the Python session to the correct location of files,
+# we set the path_base parameter to one of the four following options.
 path_base_linux = "/home/lfinkbei/Documents/"
 path_base_rex = "C:/Users/Lukas/Documents/GitHub/"
 path_base_otto = "T:/GitHub/"
 path_base_work_laptop = "C:/Users/lfinkbei/Documents/GitHub/"
+
 path_base = path_base_linux
 
 import numpy as np
@@ -13,24 +16,63 @@ from scipy.interpolate import interp1d
 from scipy.optimize import root_scalar
 import copy as cp
 
-'''Keep in mind that this is NOT the same file as the original
-"cosmology_Aletheia.dat" that Ariel gave us! If you use the unaltered version,
-you will get a segfault'''
 path_to_me = path_base + "Master/CAMB_notebooks/shared/"
+'''Keep in mind that 'cosmologies.dat' is NOT the same file as the original
+'cosmology_Aletheia.dat' that Ariel provided. In order to facilitate the
+reading-in of the file, we make some miner formatting adjustments such as the
+removal of number signs. Use the unaltered version will cause a segfault.'''
 path_to_cosms = path_to_me + "data/cosmologies.dat"
 cosm = pd.read_csv(path_to_cosms, sep='\s+')
 
+'''! If there is a justification for using these specific values, one would
+have to ask Ariel for it. I use these values because he used them. Anyway,
+the values used here have nothing to do with the emulator, we are only using
+them as reference values at which to compare code implementations.'''
 omegas_nu = np.array([0.0006356, 0.002148659574468, 0.006356, 0.01])
-# Add corresponding file accessors, to check our work later
+''' Add corresponding file accessors, to check our work later. These strings,
+which contain approximations of the values in omegas_nu, are used to access
+the power spectra save files provided to us by Ariel.'''
 omnu_strings = np.array(["0.0006", "0.002", "0.006", "0.01"])
 
-'''
-The following code is somewhat hard; I'm not sure how better to do it.
-In order to get the list of redshifts at which to evaluate the Aletheia models,
-we look for all columns of the data table that begin with the letter 'z.'
-(Refer to the function parse_redshifts for more.)
-'''
+# This regex expression powers the parse_redshifts function.
 redshift_column = re.compile("z.+")
+
+def parse_redshifts(model_num):
+    r"""
+    Return the list of redshifts given for a particular model in the Aletheia
+    dat file. The models are equal in sigma12 for each index of this list.
+    For example, sigma12(model a evaluated at parse_reshifts(a)[j]) is equal to
+    sigma12(model b evaluated at parse_redshifts(b)[j]).
+    
+    This function is intended to return the redshifts in order from high (old)
+    to low (recent), since this is the order that CAMB will impose unless
+    already used.
+
+    Parameters
+    ----------
+    model_num: int
+        Index corresponding to the Aletheia model. For example, model 0
+        corresponds to the Planck best fit configuration.
+
+    Returns
+    -------
+    z: numpy.ndarray of float64
+        List of redshifts at which to evaluate the model so that the sigma12
+        values of the different models match.
+    """
+    z = []
+    model = cosm.loc[model_num]
+
+    for column in cosm.columns:
+        # In the file, all of the columns containing redshift information begin
+        # with the letter 'z.'
+        if redshift_column.match(column):
+            z.append(model[column])
+            
+    #!! There's no need to sort these because they should already
+    # be in descending order.
+    # But we should sort anyway so that the code is more versatile.
+    return np.array(z)
 
 def define_powernu(relative_path, omeganu_strings=None):
     file_base = file_base = path_to_me + relative_path
@@ -74,7 +116,7 @@ styles = ["solid"] * 200
 def is_matchable(target, cosmology):
     # I thought bigger sigma12 values were supposed to come with lower z,
     # but the recent matching results have got me confused.
-    _, _, _, s12_big = kzps(cosmology, 0, nu_massive=False, redshifts=[0])
+    _, _, _, s12_big = evaluate_cosmology(cosmology, 0, nu_massive=False, redshifts=[0])
 
 def match_sigma12(target, tolerance, cosmology,
     _redshifts=np.flip(np.linspace(0, 1100, 150)), _min=0):
@@ -99,7 +141,7 @@ def match_sigma12(target, tolerance, cosmology,
     # We're assuming a maximum allowed redshift of $z=2$ for now.
 
     #print(_z)
-    _, _, _, list_s12 = kzps(cosmology, 0, nu_massive=False, redshifts=_redshifts)
+    _, _, _, list_s12 = evaluate_cosmology(cosmology, 0, nu_massive=False, redshifts=_redshifts)
 
     import matplotlib.pyplot as plt
     #print(list_s12)
@@ -129,7 +171,7 @@ def match_sigma12(target, tolerance, cosmology,
         print("No solution.")
         return None # there is no solution
 
-    _, _, _, s12_out = kzps(cosmology, 0, nu_massive=False, redshifts=[z_best])
+    _, _, _, s12_out = evaluate_cosmology(cosmology, 0, nu_massive=False, redshifts=[z_best])
     discrepancy = (s12_out[0] - target) / target 
     if abs(discrepancy) <= tolerance:
         return z_best
@@ -292,7 +334,7 @@ def boltzmann_battery(onh2s, onh2_strs, skips_omega = [0, 2],
              
                 massless_nu_cosmology = specify_neutrino_mass(
                     row, 0, nnu_massive_in=0)
-                massless_tuple = kzps(massless_nu_cosmology, redshifts=[z],
+                massless_tuple = evaluate_cosmology(massless_nu_cosmology, redshifts=[z],
                     fancy_neutrinos=fancy_neutrinos, k_points=k_points,
                     hubble_units=hubble_units)
                 inner_dict["k"] = massless_tuple[0]
@@ -305,7 +347,7 @@ def boltzmann_battery(onh2s, onh2_strs, skips_omega = [0, 2],
                 # density as before:
                 massive_nu_cosmology["omch2"] -= this_omnu
 
-                massive_tuple = kzps(massive_nu_cosmology, redshifts=[z],
+                massive_tuple = evaluate_cosmology(massive_nu_cosmology, redshifts=[z],
                     fancy_neutrinos=fancy_neutrinos, k_points=k_points,
                     hubble_units=hubble_units)
                 inner_dict["P_nu"] = massive_tuple[2]
@@ -481,11 +523,11 @@ def obtain_pspectrum(pars, redshifts=[0], k_points=100000, hubble_units=False):
 
     return k, z, p, sigma12
 
-def kzps(cosmology, redshifts = [0], fancy_neutrinos=False, k_points=100000,
-    hubble_units=False):
+def evaluate_cosmology(cosmology, redshifts = [0], fancy_neutrinos=False,
+    k_points=100000, hubble_units=False):
     """
-    Returns the scale axis, redshifts, power spectrum, and sigma12
-        of a massless-neutrino Lambda-CDM model
+    Returns the scale axis, redshifts, power spectrum, and sigma12 of a
+        cosmological model specified by a dictionary of parameter values.
     @param cosmology : a dictionary of value for CAMBparams fields
     @param redshifts : redshifts at which to evaluate the model
         If you would like to fix the sigma12 value, specify this in the mlc
@@ -744,42 +786,6 @@ def compare_wrappers(k_list, p_list, correct_sims, snap_index,
     plot_area.set_title(title)
     plot_area.legend()
 
-def parse_redshifts(model_num):
-    r"""
-    Return the list of redshifts given for a particular model in the Aletheia
-    dat file. The models are equal in sigma12 for each index of this list.
-    For example, sigma12(model a evaluated at parse_reshifts(a)[j]) is equal to
-    sigma12(model b evaluated at parse_redshifts(b)[j]).
-    
-    This function is intended to return the redshifts in order from high (old)
-    to low (recent), since this is the order that CAMB will impose unless
-    already used.
-
-    Parameters
-    ----------
-    model_num: int
-        Index corresponding to the Aletheia model. For example, model 0
-        corresponds to the Planck best fit configuration.
-
-    Returns
-    -------
-    z: numpy.ndarray of float64
-        List of redshifts at which to evaluate the model so that the sigma12
-        values of the different models match.
-    """
-    z = []
-    try:
-        model = cosm.loc[model_num]
-    
-        for column in cosm.columns:
-            if redshift_column.match(column):
-                z.append(model[column])
-    except (ValueError, KeyError):
-        z = [3, 2, 1, 0]
-            
-    # No need to sort these because they should already
-    # be in descending order.
-    return np.array(z)
 
 def truncator(base_x, base_y, obj_x, obj_y):
     # This doesn't make the same assumptions as truncator
