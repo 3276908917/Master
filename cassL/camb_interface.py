@@ -2,7 +2,7 @@ path_base_linux = "/home/lfinkbei/Documents/"
 path_base_rex = "C:/Users/Lukas/Documents/GitHub/"
 path_base_otto = "T:/GitHub/"
 path_base_work_laptop = "C:/Users/lfinkbei/Documents/GitHub/"
-path_base = path_base_work_laptop
+path_base = path_base_linux
 
 import numpy as np
 import pandas as pd
@@ -24,8 +24,12 @@ omegas_nu = np.array([0.0006356, 0.002148659574468, 0.006356, 0.01])
 # Add corresponding file accessors, to check our work later
 omnu_strings = np.array(["0.0006", "0.002", "0.006", "0.01"])
 
-# The following code is somewhat hard;
-# I'm not sure how better to do it.
+'''
+The following code is somewhat hard; I'm not sure how better to do it.
+In order to get the list of redshifts at which to evaluate the Aletheia models,
+we look for all columns of the data table that begin with the letter 'z.'
+(Refer to the function parse_redshifts for more.)
+'''
 redshift_column = re.compile("z.+")
 
 def define_powernu(relative_path, omeganu_strings=None):
@@ -741,14 +745,27 @@ def compare_wrappers(k_list, p_list, correct_sims, snap_index,
     plot_area.legend()
 
 def parse_redshifts(model_num):
-    """
-    Return the list of amplitude-equalized redshifts
-    given for a particular model in the Aletheia dat file.
+    r"""
+    Return the list of redshifts given for a particular model in the Aletheia
+    dat file. The models are equal in sigma12 for each index of this list.
+    For example, sigma12(model a evaluated at parse_reshifts(a)[j]) is equal to
+    sigma12(model b evaluated at parse_redshifts(b)[j]).
     
-    This function is intended to return the redshifts
-    in order from high (old) to low (recent),
-    which is the order that CAMB will impose
-    if not already used.
+    This function is intended to return the redshifts in order from high (old)
+    to low (recent), since this is the order that CAMB will impose unless
+    already used.
+
+    Parameters
+    ----------
+    model_num: int
+        Index corresponding to the Aletheia model. For example, model 0
+        corresponds to the Planck best fit configuration.
+
+    Returns
+    -------
+    z: numpy.ndarray of float64
+        List of redshifts at which to evaluate the model so that the sigma12
+        values of the different models match.
     """
     z = []
     try:
