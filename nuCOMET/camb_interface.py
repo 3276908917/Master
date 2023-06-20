@@ -2,7 +2,7 @@ path_base_linux = "/home/lfinkbei/Documents/"
 path_base_rex = "C:/Users/Lukas/Documents/GitHub/"
 path_base_otto = "T:/GitHub/"
 path_base_work_laptop = "C:/Users/lfinkbei/Documents/GitHub/"
-path_base = path_base_linux
+path_base = path_base_work_laptop
 
 import numpy as np
 import pandas as pd
@@ -17,7 +17,8 @@ import copy as cp
 "cosmology_Aletheia.dat" that Ariel gave us! If you use the unaltered version,
 you will get a segfault'''
 path_to_me = path_base + "Master/CAMB_notebooks/shared/"
-cosm = pd.read_csv(path_to_me + "data/cosmologies.dat", sep='\s+')
+path_to_cosms = path_to_me + "data/cosmologies.dat"
+cosm = pd.read_csv(path_to_cosms, sep='\s+')
 
 omegas_nu = np.array([0.0006356, 0.002148659574468, 0.006356, 0.01])
 # Add corresponding file accessors, to check our work later

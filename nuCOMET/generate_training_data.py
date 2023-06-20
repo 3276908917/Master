@@ -11,13 +11,11 @@ from scipy.optimize import root_scalar
 
 import camb
 from camb import model, initialpower, get_matter_power_interpolator
-import pandas as pd
-import re
 
 import camb_interface as ci
 import copy as cp
 
-cosm = pd.read_csv("cosmologies.dat", sep='\s+')
+cosm = ci.cosm
 model0 = cosm.loc[0]
 
 ''' AndreaP thinks that npoints=300 should be a good balance of accuracy and
