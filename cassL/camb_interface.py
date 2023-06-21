@@ -16,23 +16,23 @@ from scipy.interpolate import interp1d
 from scipy.optimize import root_scalar
 import copy as cp
 
-path_to_me = path_base + "Master/CAMB_notebooks/shared/"
+path_to_shared = path_base + "Master/CAMB_notebooks/shared/"
 '''Keep in mind that 'cosmologies.dat' is NOT the same file as the original
 'cosmology_Aletheia.dat' that Ariel provided. In order to facilitate the
 reading-in of the file, we make some miner formatting adjustments such as the
 removal of number signs. Use the unaltered version will cause a segfault.'''
-path_to_cosms = path_to_me + "data/cosmologies.dat"
+path_to_cosms = path_to_shared + "data/cosmologies.dat"
 cosm = pd.read_csv(path_to_cosms, sep='\s+')
 
 '''! If there is a justification for using these specific values, one would
 have to ask Ariel for it. I use these values because he used them. Anyway,
 the values used here have nothing to do with the emulator, we are only using
 them as reference values at which to compare code implementations.'''
-omegas_nu = np.array([0.0006356, 0.002148659574468, 0.006356, 0.01])
+OMNUH2_FLOATS = np.array([0.0006356, 0.002148659574468, 0.006356, 0.01])
 ''' Add corresponding file accessors, to check our work later. These strings,
-which contain approximations of the values in omegas_nu, are used to access
+which contain approximations of the values in OMNUH2_FLOATS, are used to access
 the power spectra save files provided to us by Ariel.'''
-omnu_strings = np.array(["0.0006", "0.002", "0.006", "0.01"])
+OMNUH2_STRS = np.array(["0.0006", "0.002", "0.006", "0.01"])
 
 # This regex expression powers the parse_redshifts function.
 redshift_column = re.compile("z.+")
@@ -69,33 +69,57 @@ def parse_redshifts(model_num):
         if redshift_column.match(column):
             z.append(model[column])
             
-    #!! There's no need to sort these because they should already
-    # be in descending order.
-    # But we should sort anyway so that the code is more versatile.
-    return np.array(z)
+    return np.flip(np.sort(np.array(z)))
 
-def define_powernu(relative_path, omeganu_strings=None):
-    file_base = file_base = path_to_me + relative_path
+def load_benchmark(relative_path, omnuh2_strs=None):
+    r"""
+    ! We should change the location of the powernu and cosmologies.dat;
+        it's weird to have it all in the notebooks folder.
+    ! This documentation is unfinished.
+    Return a nested dictionary containing the power spectra that Ariel computed
+    using CAMB in native Fortran. These power spectra were stored in a series
+    of files with the common prefix "powernu."
+
+    The nested dictionary consists of the following layers:
+        1. A dictionary whose keys are strings representing approximations of
+            the true omega_nu_h2 values to which they correspond. For specific
+            examples of keys and the true vales behind them, compare the global
+            constant arrays OMNU_FLOATS and OMNU_STRS defined at the top of
+            camb_interface.py.
+        2. An array whose indices correspond to Aletheia model indices.
+        3. An array whose indices correspond to snapshot indices. Lower
+            shapshot indices correspond to higher values of redshift.
+
+    Parameters
+    ----------
+    relative_path: str
+       The relative file path of the particular save file containing the
+       desired benchmark spectra. The file path is relative to the 'shared'
+       folder in the 'CAMB_notebooks' directory.
+
+    """
+
+    benchmark_file_base = path_to_shared + relative_path
 
     def iterate_over_models_and_redshifts(accessor="0.002"):
         nested_spectra = []
         for i in range(0, 9): # iterate over models
             nested_spectra.append([])
             for j in range(0, 5): # iterate over snapshots
-                nested_spectra[i].append(pd.read_csv(file_base + \
+                nested_spectra[i].append(pd.read_csv(benchmark_file_base + \
                     accessor + "_caso" + str(i) + "_000" + str(j) + ".dat",
                     names=["k", "P_no", "P_nu", "ratio"], sep='\s+'))
 
         return nested_spectra
 
-    if omeganu_strings is None:
+    if omnuh2_strs is None:
         return iterate_over_models_and_redshifts()
 
     powernu = {}
 
-    for i in range(len(omeganu_strings)):
-        file_accessor = omeganu_strings[i]
-        powernu_key = omnu_strings[i]
+    for i in range(len(omnuh2_strs)):
+        file_accessor = omnuh2_strs[i]
+        powernu_key = OMNUH2_STRS[i]
 
         powernu[powernu_key] = \
             iterate_over_models_and_redshifts(file_accessor)
