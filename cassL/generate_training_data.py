@@ -164,7 +164,7 @@ def evaluate_cell(cosmology, standard_k_axis, debug=False):
         print_cosmology(cosmology)
         print("\n")
 
-    _, _, _, list_sigma12 = ci.kzps(tilde_cosmology, _redshifts,
+    _, _, _, list_sigma12 = ci.evaluate_cosmology(tilde_cosmology, _redshifts,
         fancy_neutrinos=False, k_points=NPOINTS, hubble_units=False)
 
     # debug block
@@ -222,11 +222,11 @@ def evaluate_cell(cosmology, standard_k_axis, debug=False):
 
     p = np.zeros(len(standard_k_axis))
 
-    k, _, p, actual_sigma12 = ci.kzps(cosmology,
+    k, _, p, actual_sigma12 = ci.evaluate_cosmology(cosmology,
         redshifts=np.array([z_best]), fancy_neutrinos=False,
         k_points=NPOINTS) 
     if cosmology['omnuh2'] != 0:
-        _, _, _, actual_sigma12 = ci.kzps(tilde_cosmology,
+        _, _, _, actual_sigma12 = ci.evaluate_cosmology(tilde_cosmology,
             redshifts=np.array([z_best]), fancy_neutrinos=False,
             k_points=NPOINTS)
     # De-nest

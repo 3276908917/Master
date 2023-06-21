@@ -16,12 +16,12 @@ from scipy.interpolate import interp1d
 from scipy.optimize import root_scalar
 import copy as cp
 
-path_to_shared = path_base + "Master/CAMB_notebooks/shared/"
+path_to_this_repo = path_base + "Master/"
 '''Keep in mind that 'cosmologies.dat' is NOT the same file as the original
 'cosmology_Aletheia.dat' that Ariel provided. In order to facilitate the
 reading-in of the file, we make some miner formatting adjustments such as the
 removal of number signs. Use the unaltered version will cause a segfault.'''
-path_to_cosms = path_to_shared + "data/cosmologies.dat"
+path_to_cosms = path_to_this_repo + "cosmologies.dat"
 cosm = pd.read_csv(path_to_cosms, sep='\s+')
 
 '''! If there is a justification for using these specific values, one would
