@@ -148,23 +148,23 @@ def evaluate_cell(cosmology, standard_k_axis, debug=False):
     # This allows us to roughly find the z corresponding to the sigma12 that we
     # want.
 
-    tilde_cosmology = cp.deepcopy(cosmology)
-    tilde_cosmology['omch2'] += tilde_cosmology['omnuh2']
-    tilde_cosmology['omnuh2'] = 0
+    MEMNeC = cp.deepcopy(cosmology)
+    MEMNeC['omch2'] += MEMNeC['omnuh2']
+    MEMNeC['omnuh2'] = 0
 
-    tilde_cosmology = ci.specify_neutrino_mass(tilde_cosmology,
-        tilde_cosmology['omnuh2'], nnu_massive_in=0)
+    MEMNeC = ci.specify_neutrino_mass(MEMNeC,
+        MEMNeC['omnuh2'], nnu_massive_in=0)
 
     _redshifts=np.flip(np.linspace(0, 10, 150))
    
     if debug:
-        print("\nTilde cosmology:")
-        print_cosmology(tilde_cosmology)
-        print("\nTrue cosmology:")
+        print("\nMEMNeC:")
+        print_cosmology(MEMNeC)
+        print("\nOriginal cosmology:")
         print_cosmology(cosmology)
         print("\n")
 
-    _, _, _, list_sigma12 = ci.evaluate_cosmology(tilde_cosmology, _redshifts,
+    _, _, _, list_sigma12 = ci.evaluate_cosmology(MEMNeC, _redshifts,
         fancy_neutrinos=False, k_points=NPOINTS, hubble_units=False)
 
     # debug block
@@ -192,9 +192,9 @@ def evaluate_cell(cosmology, standard_k_axis, debug=False):
     
     # remember that list_s12[0] corresponds to the highest value z
     if debug:
-        print("Discrepancy between maximal achievable sigma12 and target", 
+        print("Discrepancy between maximum achievable sigma12 and target", 
             list_sigma12[len(list_sigma12) - 1])
-        print("Desired", cosmology["sigma12"])
+        print("Target sigma12:", cosmology["sigma12"])
     if list_sigma12[len(list_sigma12) - 1] < 0:
         # we need to start playing with h.
         if cosmology['h'] <= 0.1:
@@ -206,7 +206,7 @@ def evaluate_cell(cosmology, standard_k_axis, debug=False):
             return None, None, None
 
         cosmology['h'] -= 0.1
-        return evaluate_cell(cosmology, standard_k_axis)
+        return evaluate_cell(cosmology, standard_k_axis, debug)
 
     z_step = _redshifts[0] - _redshifts[1]
     interpolator = interp1d(np.flip(_redshifts), np.flip(list_sigma12),
@@ -226,7 +226,7 @@ def evaluate_cell(cosmology, standard_k_axis, debug=False):
         redshifts=np.array([z_best]), fancy_neutrinos=False,
         k_points=NPOINTS) 
     if cosmology['omnuh2'] != 0:
-        _, _, _, actual_sigma12 = ci.evaluate_cosmology(tilde_cosmology,
+        _, _, _, actual_sigma12 = ci.evaluate_cosmology(MEMNeC,
             redshifts=np.array([z_best]), fancy_neutrinos=False,
             k_points=NPOINTS)
     # De-nest

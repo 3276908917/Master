@@ -26,7 +26,7 @@ def get_param_ranges(priors="COMET", massive_neutrinos=True):
         "MEGA": the original goal for this project, which unfortunately
             suffered from too many empty cells. The code has gone through
             several crucial bug fixes since switching to a different set of
-            priors, so we need to test this prior suite again and re-asses the
+            priors, so we need to test this prior suite again and re-assess the
             rate of empty cells.
         "classic": a prior range with widths in between those of "COMET" and
             "MEGA". We need to test this prior suite again to see if it still

@@ -21,7 +21,7 @@ class LhcException(Exception):
 
 
 def generate_samples(ranges, n_samples, n_trials=0, validation=False):
-    """
+    r"""
     Generate samples on a latin hypercube
 
     Parameters

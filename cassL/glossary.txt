@@ -1,0 +1,7 @@
+MEMNeC: Matter-Equivalent Massless-Neutrino Cosmology
+    For any given cosmology, this is a similar cosmology generated through the
+    following steps.
+    1. MEMNeC[omega_cdm_h2] = old_cosmology[omega_cdm_h2] + old_cosmology[omega_nu_h2]
+    2. MEMNeC[omega_nu_h2] = 0
+    
+  

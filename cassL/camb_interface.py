@@ -34,6 +34,12 @@ which contain approximations of the values in OMNUH2_FLOATS, are used to access
 the power spectra save files provided to us by Ariel.'''
 OMNUH2_STRS = np.array(["0.0006", "0.002", "0.006", "0.01"])
 
+### Just some standard colors and styles for when I plot several models
+# together. We should figure out a way to get rid of this.
+colors = ["green", "blue", "brown", "red", "black", "orange", "purple",
+          "magenta", "cyan"] * 200
+styles = ["solid"] * 200
+
 # This regex expression powers the parse_redshifts function.
 redshift_column = re.compile("z.+")
 
@@ -73,22 +79,9 @@ def parse_redshifts(model_num):
 
 def load_benchmark(relative_path, omnuh2_strs=None):
     r"""
-    ! We should change the location of the powernu and cosmologies.dat;
-        it's weird to have it all in the notebooks folder.
-    ! This documentation is unfinished.
     Return a nested dictionary containing the power spectra that Ariel computed
     using CAMB in native Fortran. These power spectra were stored in a series
     of files with the common prefix "powernu."
-
-    The nested dictionary consists of the following layers:
-        1. A dictionary whose keys are strings representing approximations of
-            the true omega_nu_h2 values to which they correspond. For specific
-            examples of keys and the true vales behind them, compare the global
-            constant arrays OMNU_FLOATS and OMNU_STRS defined at the top of
-            camb_interface.py.
-        2. An array whose indices correspond to Aletheia model indices.
-        3. An array whose indices correspond to snapshot indices. Lower
-            shapshot indices correspond to higher values of redshift.
 
     Parameters
     ----------
@@ -97,6 +90,28 @@ def load_benchmark(relative_path, omnuh2_strs=None):
        desired benchmark spectra. The file path is relative to the 'shared'
        folder in the 'CAMB_notebooks' directory.
 
+    Returns
+    -------
+    benchmark: dict
+        Power spectra nested in a series of arrays and dictionaries. The order
+        of layers from outer to inner is as follows:
+            1. A dictionary whose keys are strings representing approximations
+                of the true omega_nu_h2 values to which they correspond. For
+                specific examples of keys and the true vales behind them,
+                compare the global constant arrays OMNU_FLOATS and OMNU_STRS
+                defined at the top of camb_interface.py.
+            2. An array whose indices correspond to Aletheia model indices.
+            3. An array whose indices correspond to snapshot indices. Lower
+                shapshot indices correspond to higher values of redshift.
+            4. A dictionary whose key-value pairs are as follows:
+                "P_nu": np.ndarray of float64
+                    the power spectrum of the cosmology defined by that
+                        particular Aletheia model
+                "P_no": np.ndarray of float64
+                    the power spectrum of its MEMNeC
+                "k": np.ndarray of float64
+                    k[i] is the inverse of the physical scale associated with
+                    each P_nu[i] and P_no[i]
     """
 
     benchmark_file_base = path_to_shared + relative_path
@@ -115,29 +130,22 @@ def load_benchmark(relative_path, omnuh2_strs=None):
     if omnuh2_strs is None:
         return iterate_over_models_and_redshifts()
 
-    powernu = {}
+    benchmark = {}
 
     for i in range(len(omnuh2_strs)):
         file_accessor = omnuh2_strs[i]
-        powernu_key = OMNUH2_STRS[i]
+        benchmark_key = OMNUH2_STRS[i]
 
-        powernu[powernu_key] = \
+        benchmark[benchmark_key] = \
             iterate_over_models_and_redshifts(file_accessor)
 
-    return powernu
-
-### Just some standard colors and styles for when I plot several models
-# together.
-colors = ["green", "blue", "brown", "red", "black", "orange", "purple",
-          "magenta", "cyan"] * 200
-
-#styles = ["solid", "dotted", "dashed", "dashdot", "solid", "dotted", "dashed",
-#    "dashdot"]
-# Line styles are unfortunately too distracting in plots as dense as those with
-# which we are here dealing; make everything solid
-styles = ["solid"] * 200
+    return benchmark
 
 def is_matchable(target, cosmology):
+    r"""
+    !
+    Delete this function? When was the last time that we used it?
+    """
     # I thought bigger sigma12 values were supposed to come with lower z,
     # but the recent matching results have got me confused.
     _, _, _, s12_big = evaluate_cosmology(cosmology, 0, nu_massive=False, redshifts=[0])
@@ -145,6 +153,8 @@ def is_matchable(target, cosmology):
 def match_sigma12(target, tolerance, cosmology,
     _redshifts=np.flip(np.linspace(0, 1100, 150)), _min=0):
     """
+    !
+    Delete this function? When was the last time that we used it?
         Return a redshift at which to evaluate the power spectrum of cosmology
     @cosmology such that the sigma12_massless value of the power spectrum is
     within @tolerance (multiplicative discrepancy) of @target.
@@ -180,7 +190,6 @@ def match_sigma12(target, tolerance, cosmology,
         plt.axhline(0)
         plt.show()
     
-
     list_s12 -= target # now it's a zero-finding problem
 
     # For some reason, flipping both arrays helps the interpolator
@@ -193,7 +202,7 @@ def match_sigma12(target, tolerance, cosmology,
             np.max(_redshifts))).root
     except ValueError:
         print("No solution.")
-        return None # there is no solution
+        return None
 
     _, _, _, s12_out = evaluate_cosmology(cosmology, 0, nu_massive=False, redshifts=[z_best])
     discrepancy = (s12_out[0] - target) / target 
@@ -208,15 +217,32 @@ def match_sigma12(target, tolerance, cosmology,
 
 def get_As_matched_cosmology(A_s=2.12723788013000E-09):
     """
-    Unfortunately, all of these bounds are hard-coded. Maybe we can read in a
-    table for this?
-
+    !
     The default A_s value corresponds to model 0
 
     Warning! You may have to throw out some of the cosmologies that you get
     from this routine because I am nowhere guaranteeing that the sigma12 you
     want actually corresponds to a positive redshift... of course, this
     wouldn't be a problem if CAMB allowed negative redshifts.
+    
+    Return a cosmological configuration based on model0 but uniformly
+    randomized in:
+        h: [0.2, 1]
+        OmegaK: [-.05, 0]
+        w0: [-2, -.5]
+        wa: [-.5, .5]
+
+    ! This function is nearly the same as get_random_cosmology(). Can we
+        collapse the two?
+
+    Returns
+    -------
+    row: dict
+        Configuration of cosmological parameters in the format of a row read in
+        from the data table of Aletheia models.
+
+    ! Unfortunately, all of these bounds are hard-coded. Maybe we can read in a
+    table for this?
     """
     row = {}
 
@@ -247,8 +273,23 @@ def get_As_matched_cosmology(A_s=2.12723788013000E-09):
     return row
 
 def get_random_cosmology():
-    """
-    Unfortunately, all of these bounds are hard-coded. Maybe we can read in a
+    r"""
+    !
+    Return a cosmological configuration based on model0 but uniformly
+    randomized in:
+        h: [0.2, 1]
+        OmegaK: [-.05, 0]
+        A_s: about [5.0028e-10, 1.4841e-8]
+        w0: [-2, -.5]
+        wa: [-.5, .5]
+
+    Returns
+    -------
+    row: dict
+        Configuration of cosmological parameters in the format of a row read in
+        from the data table of Aletheia models.
+
+    ! Unfortunately, all of these bounds are hard-coded. Maybe we can read in a
     table for this?
     """
     row = {}
@@ -298,16 +339,6 @@ def boltzmann_battery(onh2s, onh2_strs, skips_omega = [0, 2],
                 snapshot index
                     quantity of interest
 
-    Although this agreement is an added benefit, the main point is simply to
-    have a cleaner and more versatile architecture than the mess of separate
-    arrays returned previously. So even if the "ground truth" object should
-    eventually cease to agree in shape, this function already returns a much
-    more pleasant object.
-
-    Another difference with boltzmann_battery: this function automatically
-    uses h_units=False, which should further bring my object into agreement
-    with powernu. This is more debatable than simple architecture cleanup, so I
-    will leave this as a flag up to the user.
     """
     assert type(onh2s) == list or type(onh2s) == np.ndarray, \
         "if you want only one omega value, you must still nest it in a list"
