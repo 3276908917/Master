@@ -52,7 +52,7 @@ def parse_redshifts(model_num):
     dat file. The models are equal in sigma12 for each index of this list.
     For example, sigma12(model a evaluated at parse_reshifts(a)[j]) is equal to
     sigma12(model b evaluated at parse_redshifts(b)[j]).
-    
+
     This function is intended to return the redshifts in order from high (old)
     to low (recent), since this is the order that CAMB will impose unless
     already used.
@@ -122,12 +122,16 @@ def load_benchmark(relative_path, omnuh2_strs=None):
 
     def iterate_over_models_and_redshifts(accessor="0.002"):
         nested_spectra = []
-        for i in range(0, 9): # iterate over models
+        for i in range(0, 9):  # iterate over models
             nested_spectra.append([])
-            for j in range(0, 5): # iterate over snapshots
-                nested_spectra[i].append(pd.read_csv(benchmark_file_base + \
-                                                     accessor + "_caso" + str(i) + "_000" + str(j) + ".dat",
-                                                     names=["k", "P_no", "P_nu", "ratio"], sep='\s+'))
+            for j in range(0, 5):  # iterate over snapshots
+                next_file_name = benchmark_file_base + accessor + "_caso" + \
+                            str(i) + "_000" + str(j) + ".dat"
+                next_spectrum = pd.read_csv(next_file_name,
+                                            names=["k", "P_no", "P_nu",
+                                                   "ratio"],
+                                            sep='\s+')
+                nested_spectra[i].append(next_spectrum)
 
         return nested_spectra
 
@@ -153,7 +157,8 @@ def is_matchable(target, cosmology):
     """
     # I thought bigger sigma12 values were supposed to come with lower z,
     # but the recent matching results have got me confused.
-    _, _, _, s12_big = evaluate_cosmology(cosmology, 0, nu_massive=False, redshifts=[0])
+    _, _, _, s12_big = evaluate_cosmology(cosmology, 0, nu_massive=False,
+                                          redshifts=[0])
 
 
 def match_sigma12(target, tolerance, cosmology,
@@ -164,7 +169,7 @@ def match_sigma12(target, tolerance, cosmology,
         Return a redshift at which to evaluate the power spectrum of cosmology
     @cosmology such that the sigma12_massless value of the power spectrum is
     within @tolerance (multiplicative discrepancy) of @target.
- 
+
     @target this is the value of sigma12_massless at the assumed redshift
         (e.g. typically at z=2.0 for a standard Aletheia model-0 setup).
     @cosmology this is the cosmology for which we want to find a sigma12 value,
@@ -180,23 +185,24 @@ def match_sigma12(target, tolerance, cosmology,
     # First, let's probe the half-way point.
     # We're assuming a maximum allowed redshift of $z=2$ for now.
 
-    #print(_z)
-    _, _, _, list_s12 = evaluate_cosmology(cosmology, 0, nu_massive=False, redshifts=_redshifts)
+    # print(_z)
+    _, _, _, list_s12 = evaluate_cosmology(cosmology, 0, nu_massive=False,
+                                           redshifts=_redshifts)
 
     import matplotlib.pyplot as plt
-    #print(list_s12)
+    # print(list_s12)
     if False:
-        plt.plot(_redshifts, list_s12);
+        plt.plot(_redshifts, list_s12)
         plt.axhline(sigma12_in)
         plt.show()
 
     # debug block
     if False:
-        plt.plot(_redshifts, list_s12 - sigma12_in);
+        plt.plot(_redshifts, list_s12 - sigma12_in)
         plt.axhline(0)
         plt.show()
 
-    list_s12 -= target # now it's a zero-finding problem
+    list_s12 -= target  # now it's a zero-finding problem
 
     # !For some reason, flipping both arrays helps the interpolator
     # But I should come back and check this, I'm not sure if this was just a
@@ -210,7 +216,8 @@ def match_sigma12(target, tolerance, cosmology,
         print("No solution.")
         return None
 
-    _, _, _, s12_out = evaluate_cosmology(cosmology, 0, nu_massive=False, redshifts=[z_best])
+    _, _, _, s12_out = evaluate_cosmology(cosmology, 0, nu_massive=False,
+                                          redshifts=[z_best])
     discrepancy = (s12_out[0] - target) / target
     if abs(discrepancy) <= tolerance:
         return z_best
@@ -218,8 +225,9 @@ def match_sigma12(target, tolerance, cosmology,
         z_step = _redshifts[0] - _redshifts[1]
         new_floor = max(0, z_best - z_step)
         new_ceil = min(1100, z_best + z_step)
-        return match_s12(target, tolerance, cosmology, _redshifts = \
-                         np.flip(np.linspace(new_floor, new_ceil, 150)))
+        new_redshifts = np.flip(np.linspace(new_floor, new_ceil, 150))
+        return match_s12(target, tolerance, cosmology,
+                         _redshifts=new_redshifts)
 
 
 def get_As_matched_cosmology(A_s=2.12723788013000E-09):
@@ -236,7 +244,7 @@ def get_As_matched_cosmology(A_s=2.12723788013000E-09):
     from this routine because I am nowhere guaranteeing that the sigma12 you
     want actually corresponds to a positive redshift... of course, this
     wouldn't be a problem if CAMB allowed negative redshifts.
-    
+
     ! This function is nearly the same as get_random_cosmology(). Can we
         collapse the two?
 
@@ -266,9 +274,9 @@ def get_As_matched_cosmology(A_s=2.12723788013000E-09):
     row['OmK'] = 0
     row['OmL'] = 1 - row['OmM'] - row['OmK']
 
-    #~ Do we have any constraints on h besides Aletheia?
+    # ~ Do we have any constraints on h besides Aletheia?
     # I ask because this seems like a pretty small window.
-    #ditto
+    # ditto
     row['w0'] = np.random.uniform(-2., -.5)
     # ditto
     row['wa'] = np.random.uniform(-0.5, 0.5)
@@ -315,9 +323,9 @@ def get_random_cosmology():
     row['OmK'] = np.random.uniform(-0.05, 0)
     row['OmL'] = 1 - row['OmM'] - row['OmK']
 
-    #~ Do we have any constraints on h besides Aletheia?
+    # ~ Do we have any constraints on h besides Aletheia?
     # I ask because this seems like a pretty small window.
-    #ditto
+    # ditto
     row['w0'] = np.random.uniform(-2., -.5)
     # ditto
     row['wa'] = np.random.uniform(-0.5, 0.5)
@@ -326,17 +334,18 @@ def get_random_cosmology():
     A_max = np.exp(5) / 10 ** 10
     row['A_s'] = np.random.uniform(A_min, A_max)
 
-    #~ Should we compute omnuh2 here, or leave that separate?
+    # ~ Should we compute omnuh2 here, or leave that separate?
 
-    #~ Should we also specify pars not specified by the Aletheia data
-        # table, for example tau or the CMB temperature?
+    # ~ Should we also specify pars not specified by the Aletheia data
+    # table, for example tau or the CMB temperature?
 
     return row
 
 
-def boltzmann_battery(omnuh2_floats, omnuh2_strs, skips_omega = [0, 2],
-                      skips_model=[8], skips_snapshot=[1, 2, 3], hubble_units=False,
-                      models=cosm, fancy_neutrinos=False, k_points=100000):
+def boltzmann_battery(omnuh2_floats, omnuh2_strs, skips_omega=[0, 2],
+                      skips_model=[8], skips_snapshot=[1, 2, 3],
+                      hubble_units=False, models=cosm, fancy_neutrinos=False,
+                      k_points=100000):
     """
     !
     We should get rid of omnuh2_strs and make the outer layer a dictionary
@@ -375,7 +384,7 @@ def boltzmann_battery(omnuh2_floats, omnuh2_strs, skips_omega = [0, 2],
                 "k": np.ndarray of float64
                     k[i] is the inverse of the physical scale associated with
                     each P_nu[i] and P_no[i]
-    
+
     Return format uses an architecture that closely agrees with that of Ariel's
     in the powernu results:
     spec_sims
@@ -424,9 +433,11 @@ def boltzmann_battery(omnuh2_floats, omnuh2_strs, skips_omega = [0, 2],
 
                 massless_nu_cosmology = specify_neutrino_mass(
                     row, 0, nnu_massive_in=0)
-                massless_tuple = evaluate_cosmology(massless_nu_cosmology,
-                                                    redshifts=[z], fancy_neutrinos=fancy_neutrinos,
-                                                    k_points=k_points, hubble_units=hubble_units)
+                massless_tuple = \
+                    evaluate_cosmology(massless_nu_cosmology, redshifts=[z],
+                                       fancy_neutrinos=fancy_neutrinos,
+                                       k_points=k_points,
+                                       hubble_units=hubble_units)
                 inner_dict["k"] = massless_tuple[0]
                 inner_dict["P_no"] = massless_tuple[2]
                 inner_dict["s12_massless"] = massless_tuple[3]
@@ -438,14 +449,16 @@ def boltzmann_battery(omnuh2_floats, omnuh2_strs, skips_omega = [0, 2],
                 # density as before:
                 massive_nu_cosmology["omch2"] -= this_omnuh2_float
 
-                massive_tuple = evaluate_cosmology(massive_nu_cosmology,
-                                                   redshifts=[z], fancy_neutrinos=fancy_neutrinos,
-                                                   k_points=k_points, hubble_units=hubble_units)
+                massive_tuple = \
+                    evaluate_cosmology(massive_nu_cosmology, redshifts=[z],
+                                       fancy_neutrinos=fancy_neutrinos,
+                                       k_points=k_points,
+                                       hubble_units=hubble_units)
                 inner_dict["P_nu"] = massive_tuple[2]
                 inner_dict["s12_massive"] = massive_tuple[3]
 
                 assert np.array_equal(massless_tuple[0], massive_tuple[0]), \
-                   "assumption of identical k axes not satisfied!"
+                    "assumption of identical k axes not satisfied!"
 
                 spec_sims[this_omnuh2_float][mindex].append(inner_dict)
 
@@ -473,14 +486,10 @@ def apply_universal_output_settings(pars):
     """
     This is a kzps helper function which modifies the desired accuracy of CAMB
     and which disables certain outputs in which we are not interested.
-    
-    SOMETHING is REALLY wrong with this function. Let's put it on ice until
-        we can figure out what went wrong...
     """
 
-    ''' The following lines are desperation settings
-    If we ever have extra time, we can more closely study what each line does
-    '''
+    # The following lines are desperation settings
+    # If we ever have extra time, we can more closely study what each line does
     pars.NonLinear = camb.model.NonLinear_none
     pars.WantCls = False
     pars.WantScalars = False
@@ -519,16 +528,16 @@ def specify_neutrino_mass(mlc, omnuh2_in, nnu_massive_in=1):
     ASAP. It destroys dependence on TCMB and
     neutrino_hierarchy, possibly more. But CAMB does not accept omnuh2 as
     an input, so I have to reverse-engineer it somehow.
-    
+
     Also, should we replace default_nnu with something else in the
     following expression? Even if we're changing N_massive to 1,
     N_total_eff = 3.046 nonetheless, right?'''
     full_cosmology["mnu"] = omnuh2_in * camb.constants.neutrino_mass_fac / \
         (camb.constants.default_nnu / 3.0) ** 0.75
 
-    #print("The mnu value", mnu_in, "corresponds to the omnuh2 value",
+    # print("The mnu value", mnu_in, "corresponds to the omnuh2 value",
     #    omnuh2_in)
-    #full_cosmology["omch2"] -= omnuh2_in
+    # full_cosmology["omch2"] -= omnuh2_in
     ''' The removal of the above line is a significant difference, but it
         allows us to transition more naturally into the emulator sample
         generating code.'''
@@ -542,8 +551,8 @@ def input_cosmology(cosmology, hubble_units=False):
     """
     Helper function for kzps.
     Read entries from a dictionary representing a cosmological configuration.
-    Then write these values to a CAMBparams object and return. 
-    
+    Then write these values to a CAMBparams object and return.
+
     Possible mistakes:
     A. We're setting "omk" with OmK * h ** 2. Should I have used OmK? If so,
         the capitalization here is nonstandard.
@@ -554,7 +563,7 @@ def input_cosmology(cosmology, hubble_units=False):
     h = cosmology["h"]
 
     # tau is a desperation argument
-    ### Why are we using the degenerate hierarchy? Isn't that wrong?
+    # Why are we using the degenerate hierarchy? Isn't that wrong?
     pars.set_cosmology(
         H0=h * 100,
         ombh2=cosmology["ombh2"],
@@ -562,14 +571,15 @@ def input_cosmology(cosmology, hubble_units=False):
         omk=cosmology["OmK"],
         mnu=cosmology["mnu"],
         num_massive_neutrinos=cosmology["nnu_massive"],
-        tau=0.0952, # for justification, ask Matteo
-        neutrino_hierarchy="degenerate" # 1 eigenstate approximation; our
+        tau=0.0952,  # for justification, ask Matteo
+        neutrino_hierarchy="degenerate"  # 1 eigenstate approximation; our
         # neutrino setup (see below) is not valid for inverted/normal
         # hierarchies.
     )
 
+    # the last three are desperation arguments
     pars.InitPower.set_params(As=cosmology["A_s"], ns=cosmology["n_s"],
-                              r=0, nt=0.0, ntrun=0.0) # the last three are desperation arguments
+                              r=0, nt=0.0, ntrun=0.0)
 
     input_dark_energy(pars, cosmology["w0"], float(cosmology["wa"]))
 
@@ -598,12 +608,12 @@ def obtain_pspectrum(pars, redshifts=[0], k_points=100000, hubble_units=False):
     '''
     In some cursory tests, the accurate_massive_neutrino_transfers
     flag did not appear to significantly alter the outcome.
-    
+
     The flags var1=8 and var2=8 indicate that we are looking at the
     power spectrum of CDM + baryons (i.e. neutrinos excluded).
     '''
     k, z, p = results.get_matter_power_spectrum(
-        minkh=1e-4 / pars.h, maxkh=10.0 / pars.h, npoints = k_points,
+        minkh=1e-4 / pars.h, maxkh=10.0 / pars.h, npoints=k_points,
         var1='delta_tot', var2='delta_tot'
     )
 
@@ -618,7 +628,7 @@ def obtain_pspectrum(pars, redshifts=[0], k_points=100000, hubble_units=False):
     return k, z, p, sigma12
 
 
-def evaluate_cosmology(cosmology, redshifts = [0], fancy_neutrinos=False,
+def evaluate_cosmology(cosmology, redshifts=[0], fancy_neutrinos=False,
                        k_points=100000, hubble_units=False):
     """
     Returns the scale axis, redshifts, power spectrum, and sigma12 of a
@@ -668,25 +678,23 @@ def obtain_pspectrum_interpolator(pars, redshifts=[0], z_points=150,
     well as the "get_matter_power_spectrum" call. '''
     pars.set_matter_power(redshifts=redshifts, kmax=kmax, nonlinear=False)
 
-    #results = camb.get_results(pars)
-    '''
-    In some cursory tests, the accurate_massive_neutrino_transfers
-    flag did not appear to significantly alter the outcome.
-    '''
+    # results = camb.get_results(pars)
 
-    #print("kmax is", kmax)
-    #print(pars)
+    # In some cursory tests, the accurate_massive_neutrino_transfers
+    # flag did not appear to significantly alter the outcome.
 
-    PK = camb.get_matter_power_interpolator(pars, zmin=min(redshifts),
-                                            zmax=max(redshifts), nz_step=z_points, k_hunit=hubble_units, kmax=kmax,
-                                            nonlinear=False, var1='delta_nonu', var2='delta_nonu',
-                                            hubble_units=hubble_units
-    )
+    # print("kmax is", kmax)
+    # print(pars)
+
+    gmpi = camb.get_matter_power_interpolator
+    PK = gmpi(pars, zmin=min(redshifts), zmax=max(redshifts), nz_step=z_points,
+              k_hunit=hubble_units, kmax=kmax, nonlinear=False,
+              var1='delta_nonu', var2='delta_nonu', hubble_units=hubble_units)
 
     return PK
 
 
-def kzps_interpolator(cosmology, redshifts = [0], fancy_neutrinos=False,
+def kzps_interpolator(cosmology, redshifts=[0], fancy_neutrinos=False,
                       z_points=150, kmax=1, hubble_units=False):
     """
     This is a really rough function, I'm just trying to test out an idea.
@@ -703,8 +711,9 @@ def kzps_interpolator(cosmology, redshifts = [0], fancy_neutrinos=False,
 
 
 def model_ratios(snap_index, sims, canvas, massive=True, skips=[],
-                 subplot_indices=None, active_labels=['x', 'y'], title="Ground truth",
-                 omnuh2_str="0.002", models=cosm, suppress_legend=False):
+                 subplot_indices=None, active_labels=['x', 'y'],
+                 title="Ground truth", omnuh2_str="0.002", models=cosm,
+                 suppress_legend=False):
     """
     Why is this a different function from above?
     There are a couple of annoying formatting differences with the power nu
@@ -716,9 +725,9 @@ def model_ratios(snap_index, sims, canvas, massive=True, skips=[],
     to generalize this function further.
     """
     P_accessor = None
-    if massive == True:
-         P_accessor = "P_nu"
-    elif massive==False:
+    if massive is True:
+        P_accessor = "P_nu"
+    elif massive is False:
         P_accessor = "P_no"
 
     baseline_h = models.loc[0]["h"]
@@ -729,11 +738,11 @@ def model_ratios(snap_index, sims, canvas, massive=True, skips=[],
     if P_accessor is not None:
         baseline_p = sims[0][snap_index][P_accessor]
 
-    plot_area = canvas # if subplot_indices is None
+    plot_area = canvas  # if subplot_indices is None
     if subplot_indices is not None:
         if type(subplot_indices) == int:
             plot_area = canvas[subplot_indices]
-        else: # we assume it's a 2d grid of plots
+        else:  # we assume it's a 2d grid of plots
             plot_area = canvas[subplot_indices[0], subplot_indices[1]]
         # No need to add more if cases because an n-d canvas of n > 2 makes no
         # sense.
@@ -742,7 +751,7 @@ def model_ratios(snap_index, sims, canvas, massive=True, skips=[],
     rat_list = []
     for i in range(1, len(correct_sims)):
         if i in skips:
-            continue # Don't know what's going on with model 8
+            continue  # Don't know what's going on with model 8
         this_h = models.loc[i]["h"]
         this_k = correct_sims[i][snap_index]["k"]
 
@@ -766,17 +775,17 @@ def model_ratios(snap_index, sims, canvas, massive=True, skips=[],
     if 'x' in active_labels:
         plot_area.set_xlabel(r"k [1 / Mpc]")
 
-    ylabel =  r"$x_i / x_0$"
+    ylabel = r"$x_i / x_0$"
     if P_accessor is not None:
-        if massive == True:
+        if massive is True:
             ylabel = r"$P_\mathrm{massive} / P_\mathrm{massive, model \, 0}$"
-        if massive == False:
+        if massive is False:
             ylabel = r"$P_\mathrm{massless} / P_\mathrm{massless, model \, 0}$"
 
     if 'y' in active_labels:
         plot_area.set_ylabel(ylabel)
 
-    plot_area.set_title(title + r": $\omega_\nu$ = " + omnuh2_str + \
+    plot_area.set_title(title + r": $\omega_\nu$ = " + omnuh2_str +
                         "; Snapshot " + str(snap_index))
     if not suppress_legend:
         plot_area.legend()
@@ -784,8 +793,8 @@ def model_ratios(snap_index, sims, canvas, massive=True, skips=[],
     return k_list, rat_list
 
 
-def compare_wrappers(k_list, p_list, correct_sims, snap_index,
-                     canvas, massive, subscript, title, skips=[], subplot_indices=None,
+def compare_wrappers(k_list, p_list, correct_sims, snap_index, canvas, massive,
+                     subscript, title, skips=[], subplot_indices=None,
                      active_labels=['x', 'y']):
     """
     Python-wrapper (i.e. Lukas') simulation variables feature the _py ending
@@ -793,9 +802,9 @@ def compare_wrappers(k_list, p_list, correct_sims, snap_index,
     """
 
     P_accessor = None
-    if massive == True:
+    if massive is True:
         P_accessor = "P_nu"
-    elif massive == False:
+    elif massive is False:
         P_accessor = "P_no"
     x_mode = P_accessor is None
 
@@ -836,7 +845,7 @@ def compare_wrappers(k_list, p_list, correct_sims, snap_index,
 
         this_k_py = k_list[i] * this_h
         this_p_py = None
-        if x_mode == False:
+        if x_mode is False:
             this_p_py = p_list[i][z_index] / this_h ** 3
         else:
             this_p_py = p_list[i][z_index]
