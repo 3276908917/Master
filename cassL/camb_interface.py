@@ -1,12 +1,3 @@
-# In order to redirect the Python session to the correct location of files,
-# we set the path_base parameter to one of the four following options.
-path_base_linux = "/home/lfinkbei/Documents/"
-path_base_rex = "C:/Users/Lukas/Documents/GitHub/"
-path_base_otto = "T:/GitHub/"
-path_base_work_laptop = "C:/Users/lfinkbei/Documents/GitHub/"
-
-path_base = path_base_linux
-
 import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
@@ -15,6 +6,15 @@ import re
 from scipy.interpolate import interp1d
 from scipy.optimize import root_scalar
 import copy as cp
+
+# In order to redirect the Python session to the correct location of files,
+# we set the path_base parameter to one of the four following options.
+path_base_linux = "/home/lfinkbei/Documents/"
+path_base_rex = "C:/Users/Lukas/Documents/GitHub/"
+path_base_otto = "T:/GitHub/"
+path_base_work_laptop = "C:/Users/lfinkbei/Documents/GitHub/"
+
+path_base = path_base_linux
 
 path_to_this_repo = path_base + "Master/"
 
@@ -44,6 +44,7 @@ styles = ["solid"] * 200
 
 # This regex expression powers the parse_redshifts function.
 redshift_column = re.compile("z.+")
+
 
 def parse_redshifts(model_num):
     r"""
@@ -76,8 +77,9 @@ def parse_redshifts(model_num):
         # with the letter 'z.'
         if redshift_column.match(column):
             z.append(model[column])
-            
+
     return np.flip(np.sort(np.array(z)))
+
 
 def load_benchmark(relative_path, omnuh2_strs=None):
     r"""
@@ -124,8 +126,8 @@ def load_benchmark(relative_path, omnuh2_strs=None):
             nested_spectra.append([])
             for j in range(0, 5): # iterate over snapshots
                 nested_spectra[i].append(pd.read_csv(benchmark_file_base + \
-                    accessor + "_caso" + str(i) + "_000" + str(j) + ".dat",
-                    names=["k", "P_no", "P_nu", "ratio"], sep='\s+'))
+                                                     accessor + "_caso" + str(i) + "_000" + str(j) + ".dat",
+                                                     names=["k", "P_no", "P_nu", "ratio"], sep='\s+'))
 
         return nested_spectra
 
@@ -143,6 +145,7 @@ def load_benchmark(relative_path, omnuh2_strs=None):
 
     return benchmark
 
+
 def is_matchable(target, cosmology):
     r"""
     !
@@ -152,8 +155,9 @@ def is_matchable(target, cosmology):
     # but the recent matching results have got me confused.
     _, _, _, s12_big = evaluate_cosmology(cosmology, 0, nu_massive=False, redshifts=[0])
 
+
 def match_sigma12(target, tolerance, cosmology,
-    _redshifts=np.flip(np.linspace(0, 1100, 150)), _min=0):
+                  _redshifts=np.flip(np.linspace(0, 1100, 150)), _min=0):
     """
     !
     Delete this function? When was the last time that we used it?
@@ -185,29 +189,29 @@ def match_sigma12(target, tolerance, cosmology,
         plt.plot(_redshifts, list_s12);
         plt.axhline(sigma12_in)
         plt.show()
-     
+
     # debug block
     if False:
         plt.plot(_redshifts, list_s12 - sigma12_in);
         plt.axhline(0)
         plt.show()
-    
+
     list_s12 -= target # now it's a zero-finding problem
 
     # !For some reason, flipping both arrays helps the interpolator
     # But I should come back and check this, I'm not sure if this was just a
     # patch for the Newton method
     interpolator = interp1d(np.flip(_redshifts), np.flip(list_s12),
-        kind='cubic')
+                            kind='cubic')
     try:
         z_best = root_scalar(interpolator, bracket=(np.min(_redshifts),
-            np.max(_redshifts))).root
+                                                    np.max(_redshifts))).root
     except ValueError:
         print("No solution.")
         return None
 
     _, _, _, s12_out = evaluate_cosmology(cosmology, 0, nu_massive=False, redshifts=[z_best])
-    discrepancy = (s12_out[0] - target) / target 
+    discrepancy = (s12_out[0] - target) / target
     if abs(discrepancy) <= tolerance:
         return z_best
     else:
@@ -215,7 +219,8 @@ def match_sigma12(target, tolerance, cosmology,
         new_floor = max(0, z_best - z_step)
         new_ceil = min(1100, z_best + z_step)
         return match_s12(target, tolerance, cosmology, _redshifts = \
-            np.flip(np.linspace(new_floor, new_ceil, 150)))
+                         np.flip(np.linspace(new_floor, new_ceil, 150)))
+
 
 def get_As_matched_cosmology(A_s=2.12723788013000E-09):
     """
@@ -252,15 +257,15 @@ def get_As_matched_cosmology(A_s=2.12723788013000E-09):
     row['n_s'] = 0.96
 
     row['h'] = np.random.uniform(0.2, 1)
-   
+
     # Given h, the following are now fixed:
     row['OmB'] = row['ombh2'] / row['h'] ** 2
     row['OmC'] = row['omch2'] / row['h'] ** 2
-    row['OmM'] = row['OmB'] + row['OmC'] 
+    row['OmM'] = row['OmB'] + row['OmC']
 
     row['OmK'] = 0
     row['OmL'] = 1 - row['OmM'] - row['OmK']
-    
+
     #~ Do we have any constraints on h besides Aletheia?
     # I ask because this seems like a pretty small window.
     #ditto
@@ -271,6 +276,7 @@ def get_As_matched_cosmology(A_s=2.12723788013000E-09):
     row['A_s'] = A_s
 
     return row
+
 
 def get_random_cosmology():
     r"""
@@ -300,15 +306,15 @@ def get_random_cosmology():
     row['n_s'] = 0.96
 
     row['h'] = np.random.uniform(0.2, 1)
-   
+
     # Given h, the following are now fixed:
     row['OmB'] = row['ombh2'] / row['h'] ** 2
     row['OmC'] = row['omch2'] / row['h'] ** 2
-    row['OmM'] = row['OmB'] + row['OmC'] 
+    row['OmM'] = row['OmB'] + row['OmC']
 
     row['OmK'] = np.random.uniform(-0.05, 0)
     row['OmL'] = 1 - row['OmM'] - row['OmK']
-    
+
     #~ Do we have any constraints on h besides Aletheia?
     # I ask because this seems like a pretty small window.
     #ditto
@@ -326,10 +332,11 @@ def get_random_cosmology():
         # table, for example tau or the CMB temperature?
 
     return row
-        
+
+
 def boltzmann_battery(omnuh2_floats, omnuh2_strs, skips_omega = [0, 2],
-    skips_model=[8], skips_snapshot=[1, 2, 3], hubble_units=False,
-    models=cosm, fancy_neutrinos=False, k_points=100000):
+                      skips_model=[8], skips_snapshot=[1, 2, 3], hubble_units=False,
+                      models=cosm, fancy_neutrinos=False, k_points=100000):
     """
     !
     We should get rid of omnuh2_strs and make the outer layer a dictionary
@@ -380,7 +387,7 @@ def boltzmann_battery(omnuh2_floats, omnuh2_strs, skips_omega = [0, 2],
     """
     assert type(omnuh2_floats) == list or type(omnuh2_floats) == np.ndarray, \
         "if you want only one omega value, you must still nest it in a list"
-    
+
     spec_sims = {}
 
     for this_omnuh2_index in range(len(omnuh2_floats)):
@@ -395,10 +402,10 @@ def boltzmann_battery(omnuh2_floats, omnuh2_strs, skips_omega = [0, 2],
                 # For example, I don't yet understand how to implement model 8
                 spec_sims[this_omnuh2_float].append(None)
                 continue
-                
+
             h = row["h"]
             spec_sims[this_omnuh2_float].append([])
-       
+
             z_input = parse_redshifts(mindex)
             if None in z_input:
                 spec_sims[this_omnuh2_float][m_index] = None
@@ -411,38 +418,39 @@ def boltzmann_battery(omnuh2_floats, omnuh2_strs, skips_omega = [0, 2],
                 if snap_index in skips_snapshot:
                     spec_sims[this_omnuh2_float][mindex].append(None)
                     continue
-                
+
                 inner_dict = {}
                 z = z_input[snap_index]
-             
+
                 massless_nu_cosmology = specify_neutrino_mass(
                     row, 0, nnu_massive_in=0)
                 massless_tuple = evaluate_cosmology(massless_nu_cosmology,
-                    redshifts=[z], fancy_neutrinos=fancy_neutrinos,
-                    k_points=k_points, hubble_units=hubble_units)
+                                                    redshifts=[z], fancy_neutrinos=fancy_neutrinos,
+                                                    k_points=k_points, hubble_units=hubble_units)
                 inner_dict["k"] = massless_tuple[0]
                 inner_dict["P_no"] = massless_tuple[2]
                 inner_dict["s12_massless"] = massless_tuple[3]
 
                 massive_nu_cosmology = specify_neutrino_mass(
                     row, this_omnuh2_float, nnu_massive_in=1)
-               
+
                 # Adjust CDM density so that we have the same total matter
                 # density as before:
                 massive_nu_cosmology["omch2"] -= this_omnuh2_float
 
                 massive_tuple = evaluate_cosmology(massive_nu_cosmology,
-                    redshifts=[z], fancy_neutrinos=fancy_neutrinos,
-                    k_points=k_points, hubble_units=hubble_units)
+                                                   redshifts=[z], fancy_neutrinos=fancy_neutrinos,
+                                                   k_points=k_points, hubble_units=hubble_units)
                 inner_dict["P_nu"] = massive_tuple[2]
                 inner_dict["s12_massive"] = massive_tuple[3]
-                
+
                 assert np.array_equal(massless_tuple[0], massive_tuple[0]), \
                    "assumption of identical k axes not satisfied!"
-                    
-                spec_sims[this_omnuh2_float][mindex].append(inner_dict) 
+
+                spec_sims[this_omnuh2_float][mindex].append(inner_dict)
 
     return spec_sims
+
 
 def make_neutrinos_fancy(pars, nnu_massive):
     """
@@ -459,6 +467,7 @@ def make_neutrinos_fancy(pars, nnu_massive):
     pars.num_nu_massive = 0
     if nnu_massive != 0:
         pars.num_nu_massive = sum(pars.nu_mass_numbers[:stop_i])
+
 
 def apply_universal_output_settings(pars):
     """
@@ -482,6 +491,7 @@ def apply_universal_output_settings(pars):
     pars.Accuracy.lAccuracyBoost = 3
     pars.Accuracy.AccuratePolarization = False
 
+
 def input_dark_energy(pars, w0, wa):
     """
     Helper function for input_cosmology.
@@ -493,14 +503,15 @@ def input_dark_energy(pars, w0, wa):
     if w0 != -1 or wa != 0:
         pars.set_dark_energy(w=w0, wa=wa, dark_energy_model='ppf')
 
+
 def specify_neutrino_mass(mlc, omnuh2_in, nnu_massive_in=1):
     """
     Helper function for input_cosmology.
     This returns modified copy (and therefore does not mutate the original) of
     the input dictionary object, which corresponds to a cosmology with massive
     neutrinos.
-    """ 
-    full_cosmology = cp.deepcopy(mlc) 
+    """
+    full_cosmology = cp.deepcopy(mlc)
 
     full_cosmology["omnuh2"] = omnuh2_in
 
@@ -513,8 +524,8 @@ def specify_neutrino_mass(mlc, omnuh2_in, nnu_massive_in=1):
     following expression? Even if we're changing N_massive to 1,
     N_total_eff = 3.046 nonetheless, right?'''
     full_cosmology["mnu"] = omnuh2_in * camb.constants.neutrino_mass_fac / \
-        (camb.constants.default_nnu / 3.0) ** 0.75 
-    
+        (camb.constants.default_nnu / 3.0) ** 0.75
+
     #print("The mnu value", mnu_in, "corresponds to the omnuh2 value",
     #    omnuh2_in)
     #full_cosmology["omch2"] -= omnuh2_in
@@ -526,7 +537,8 @@ def specify_neutrino_mass(mlc, omnuh2_in, nnu_massive_in=1):
 
     return full_cosmology
 
-def input_cosmology(cosmology, hubble_units=False): 
+
+def input_cosmology(cosmology, hubble_units=False):
     """
     Helper function for kzps.
     Read entries from a dictionary representing a cosmological configuration.
@@ -555,15 +567,16 @@ def input_cosmology(cosmology, hubble_units=False):
         # neutrino setup (see below) is not valid for inverted/normal
         # hierarchies.
     )
- 
+
     pars.InitPower.set_params(As=cosmology["A_s"], ns=cosmology["n_s"],
-        r=0, nt=0.0, ntrun=0.0) # the last three are desperation arguments
+                              r=0, nt=0.0, ntrun=0.0) # the last three are desperation arguments
 
     input_dark_energy(pars, cosmology["w0"], float(cosmology["wa"]))
 
     pars.Transfer.kmax = 10.0 if hubble_units else 10.0 / h
 
     return pars
+
 
 def obtain_pspectrum(pars, redshifts=[0], k_points=100000, hubble_units=False):
     """
@@ -576,12 +589,12 @@ def obtain_pspectrum(pars, redshifts=[0], k_points=100000, hubble_units=False):
     ''' To change the the extent of the k-axis, change the following line as
     well as the "get_matter_power_spectrum" call. '''
     pars.set_matter_power(redshifts=redshifts, kmax=10.0 / pars.h,
-        nonlinear=False)
-    
+                          nonlinear=False)
+
     results = camb.get_results(pars)
 
     sigma12 = results.get_sigmaR(12, hubble_units=False)
-    
+
     '''
     In some cursory tests, the accurate_massive_neutrino_transfers
     flag did not appear to significantly alter the outcome.
@@ -593,7 +606,7 @@ def obtain_pspectrum(pars, redshifts=[0], k_points=100000, hubble_units=False):
         minkh=1e-4 / pars.h, maxkh=10.0 / pars.h, npoints = k_points,
         var1='delta_tot', var2='delta_tot'
     )
-   
+
     # De-nest for the single-redshift case:
     if len(p) == 1:
         p = p[0]
@@ -604,8 +617,9 @@ def obtain_pspectrum(pars, redshifts=[0], k_points=100000, hubble_units=False):
 
     return k, z, p, sigma12
 
+
 def evaluate_cosmology(cosmology, redshifts = [0], fancy_neutrinos=False,
-    k_points=100000, hubble_units=False):
+                       k_points=100000, hubble_units=False):
     """
     Returns the scale axis, redshifts, power spectrum, and sigma12 of a
         cosmological model specified by a dictionary of parameter values.
@@ -633,61 +647,64 @@ def evaluate_cosmology(cosmology, redshifts = [0], fancy_neutrinos=False,
     '''
 
     pars = input_cosmology(cosmology)
-    
+
     if fancy_neutrinos:
         make_neutrinos_fancy(pars, cosmology["nnu_massive"])
-    
+
     apply_universal_output_settings(pars)
-   
+
     return obtain_pspectrum(pars, redshifts, k_points=k_points,
-        hubble_units=hubble_units) 
+                            hubble_units=hubble_units)
+
 
 def obtain_pspectrum_interpolator(pars, redshifts=[0], z_points=150,
-    kmax=1, hubble_units=False):
+                                  kmax=1, hubble_units=False):
     """
     Helper function for kzps.
     Given a fully set-up pars function, return a CAMB PK interpolator object.
 
-    """ 
+    """
     ''' To change the the extent of the k-axis, change the following line as
     well as the "get_matter_power_spectrum" call. '''
     pars.set_matter_power(redshifts=redshifts, kmax=kmax, nonlinear=False)
-    
+
     #results = camb.get_results(pars)
     '''
     In some cursory tests, the accurate_massive_neutrino_transfers
     flag did not appear to significantly alter the outcome.
     '''
-    
+
     #print("kmax is", kmax)
     #print(pars)
 
     PK = camb.get_matter_power_interpolator(pars, zmin=min(redshifts),
-        zmax=max(redshifts), nz_step=z_points, k_hunit=hubble_units, kmax=kmax,
-        nonlinear=False, var1='delta_nonu', var2='delta_nonu',
-        hubble_units=hubble_units
+                                            zmax=max(redshifts), nz_step=z_points, k_hunit=hubble_units, kmax=kmax,
+                                            nonlinear=False, var1='delta_nonu', var2='delta_nonu',
+                                            hubble_units=hubble_units
     )
-   
+
     return PK
 
+
 def kzps_interpolator(cosmology, redshifts = [0], fancy_neutrinos=False,
-    z_points=150, kmax=1, hubble_units=False):
+                      z_points=150, kmax=1, hubble_units=False):
     """
     This is a really rough function, I'm just trying to test out an idea.
     """
     pars = input_cosmology(cosmology, hubble_units)
-    
+
     if fancy_neutrinos:
         make_neutrinos_fancy(pars, cosmology["nnu_massive"])
-    
+
     apply_universal_output_settings(pars)
-    
+
     return obtain_pspectrum_interpolator(pars, redshifts, z_points, kmax,
-        hubble_units) 
+                                         hubble_units)
+
 
 def model_ratios(snap_index, sims, canvas, massive=True, skips=[],
-    subplot_indices=None, active_labels=['x', 'y'], title="Ground truth",
-    omnuh2_str="0.002", models=cosm, suppress_legend=False):
+                 subplot_indices=None, active_labels=['x', 'y'], title="Ground truth",
+                 omnuh2_str="0.002", models=cosm, suppress_legend=False):
     """
     Why is this a different function from above?
     There are a couple of annoying formatting differences with the power nu
@@ -703,15 +720,15 @@ def model_ratios(snap_index, sims, canvas, massive=True, skips=[],
          P_accessor = "P_nu"
     elif massive==False:
         P_accessor = "P_no"
- 
+
     baseline_h = models.loc[0]["h"]
     baseline_k = correct_sims[0][snap_index]["k"]
-    
+
     baseline_p = sims[0][snap_index]["P_nu"] / \
         sims[0][snap_index]["P_no"]
     if P_accessor is not None:
         baseline_p = sims[0][snap_index][P_accessor]
-    
+
     plot_area = canvas # if subplot_indices is None
     if subplot_indices is not None:
         if type(subplot_indices) == int:
@@ -720,7 +737,7 @@ def model_ratios(snap_index, sims, canvas, massive=True, skips=[],
             plot_area = canvas[subplot_indices[0], subplot_indices[1]]
         # No need to add more if cases because an n-d canvas of n > 2 makes no
         # sense.
-    
+
     k_list = []
     rat_list = []
     for i in range(1, len(correct_sims)):
@@ -728,52 +745,53 @@ def model_ratios(snap_index, sims, canvas, massive=True, skips=[],
             continue # Don't know what's going on with model 8
         this_h = models.loc[i]["h"]
         this_k = correct_sims[i][snap_index]["k"]
-        
+
         this_p = correct_sims[i][snap_index]["P_nu"] / \
             correct_sims[i][snap_index]["P_no"]
         if P_accessor is not None:
             this_p = correct_sims[i][snap_index][P_accessor]
-        
+
         truncated_k, truncated_p, aligned_p = \
             truncator(baseline_k, baseline_p, this_k,
-                this_p, interpolation=True)
+                      this_p, interpolation=True)
 
         label_in = "model " + str(i)
         plot_area.plot(truncated_k, aligned_p / truncated_p,
-                 label=label_in, c=colors[i], linestyle=styles[i])
-       
+                       label=label_in, c=colors[i], linestyle=styles[i])
+
         k_list.append(truncated_k)
         rat_list.append(aligned_p / truncated_p)
- 
+
     plot_area.set_xscale('log')
     if 'x' in active_labels:
         plot_area.set_xlabel(r"k [1 / Mpc]")
-   
+
     ylabel =  r"$x_i / x_0$"
     if P_accessor is not None:
         if massive == True:
             ylabel = r"$P_\mathrm{massive} / P_\mathrm{massive, model \, 0}$"
         if massive == False:
             ylabel = r"$P_\mathrm{massless} / P_\mathrm{massless, model \, 0}$"
-    
+
     if 'y' in active_labels:
         plot_area.set_ylabel(ylabel)
-    
+
     plot_area.set_title(title + r": $\omega_\nu$ = " + omnuh2_str + \
-        "; Snapshot " + str(snap_index))
+                        "; Snapshot " + str(snap_index))
     if not suppress_legend:
         plot_area.legend()
 
     return k_list, rat_list
 
+
 def compare_wrappers(k_list, p_list, correct_sims, snap_index,
-    canvas, massive, subscript, title, skips=[], subplot_indices=None,
-    active_labels=['x', 'y']):
+                     canvas, massive, subscript, title, skips=[], subplot_indices=None,
+                     active_labels=['x', 'y']):
     """
     Python-wrapper (i.e. Lukas') simulation variables feature the _py ending
     Fortran (i.e. Ariel's) simulation variables feature the _for ending
     """
-    
+
     P_accessor = None
     if massive == True:
         P_accessor = "P_nu"
@@ -786,22 +804,22 @@ def compare_wrappers(k_list, p_list, correct_sims, snap_index,
     z_index = 4 - snap_index
 
     baseline_h = cosm.loc[0]["h"]
-    
+
     baseline_k_py = k_list[0] * baseline_h
-    
+
     baseline_p_py = None
     if x_mode:
         baseline_p_py = p_list[0][z_index]
     else:
         baseline_p_py = p_list[0][z_index] / baseline_h ** 3
-    
+
     baseline_k_for = correct_sims[0][snap_index]["k"]
-    
+
     baseline_p_for = correct_sims[0][snap_index]["P_nu"] / \
         correct_sims[0][snap_index]["P_no"]
     if P_accessor is not None:
         baseline_p_for = correct_sims[0][snap_index][P_accessor]
-    
+
     plot_area = None
     if subplot_indices is None:
         plot_area = canvas
@@ -815,16 +833,16 @@ def compare_wrappers(k_list, p_list, correct_sims, snap_index,
         if i in skips:
             continue
         this_h = cosm.loc[i]["h"]
-        
+
         this_k_py = k_list[i] * this_h
         this_p_py = None
-        if x_mode==False:
+        if x_mode == False:
             this_p_py = p_list[i][z_index] / this_h ** 3
         else:
             this_p_py = p_list[i][z_index]
 
         this_k_for = correct_sims[i][snap_index]["k"]
-        
+
         this_p_for = correct_sims[i][snap_index]["P_nu"] / \
             correct_sims[i][snap_index]["P_no"]
         if P_accessor is not None:
@@ -832,35 +850,34 @@ def compare_wrappers(k_list, p_list, correct_sims, snap_index,
 
         truncated_k_py, truncated_p_py, aligned_p_py = \
             truncator(baseline_k_py, baseline_p_py, this_k_py,
-                this_p_py, interpolation=this_h != baseline_h)
+                      this_p_py, interpolation=this_h != baseline_h)
         y_py = aligned_p_py / truncated_p_py
 
         truncated_k_for, truncated_p_for, aligned_p_for = \
             truncator(baseline_k_for, baseline_p_for, this_k_for,
-            this_p_for, interpolation=this_h != baseline_h)
+                      this_p_for, interpolation=this_h != baseline_h)
         y_for = aligned_p_for / truncated_p_for
 
         truncated_k, truncated_y_py, aligned_p_for = \
-            truncator_neutral(truncated_k_py, y_py, truncated_k_for, y_for) 
+            truncator_neutral(truncated_k_py, y_py, truncated_k_for, y_for)
 
         label_in = "model " + str(i)
-        plot_area.plot(truncated_k,
-            truncated_y_py / aligned_p_for, label=label_in, c=colors[i],
-            linestyle=styles[i])
+        plot_area.plot(truncated_k, truncated_y_py / aligned_p_for,
+                       label=label_in, c=colors[i], linestyle=styles[i])
 
     plot_area.set_xscale('log')
     if 'x' in active_labels:
         plot_area.set_xlabel(r"k [1 / Mpc]")
-    
+
     ylabel = None
     if x_mode:
         ylabel = r"$ж_i/ж_0$"
     else:
         ylabel = r"$y_\mathrm{py} / y_\mathrm{fortran}$"
-    
+
     if 'y' in active_labels:
         plot_area.set_ylabel(ylabel)
- 
+
     plot_area.set_title(title)
     plot_area.legend()
 
@@ -873,10 +890,13 @@ def truncator(base_x, base_y, obj_x, obj_y):
     # But of course it's terrible form to leave both of these functions here.
     """
     Throw out base_x values until
-        min(base_x) >= min(obj_x) and max(base_x) <= max(obj_x)    
+        min(base_x) >= min(obj_x) and max(base_x) <= max(obj_x)
     then interpolate the object arrays over the truncated base_x domain.
-    @returns:
-        trunc_x: truncated base_x array, which is now common to both y arrays
+
+    Returns
+    -------
+        trunc_base_x: np.ndarray
+            truncated base_x array, which is now common to both y arrays
         trunc_y: truncated base_y array
         aligned_y: interpolation of obj_y over trunc_x
     """
@@ -884,18 +904,17 @@ def truncator(base_x, base_y, obj_x, obj_y):
     lcd_min = max(min(obj_x), min(base_x))
     # What is the most conservative upper bound?
     lcd_max = min(max(obj_x), max(base_x))
-    
+
     # Eliminate points outside the conservative bounds
     mask_base = np.all([[base_x <= lcd_max], [base_x >= lcd_min]], axis=0)[0]
     trunc_base_x = base_x[mask_base]
     trunc_base_y = base_y[mask_base]
-   
+
     mask_obj = np.all([[obj_x <= lcd_max], [obj_x >= lcd_min]], axis=0)[0]
     trunc_obj_x = obj_x[mask_obj]
     trunc_obj_y = obj_y[mask_obj]
- 
+
     interpolator = interp1d(obj_x, obj_y, kind="cubic")
     aligned_y = interpolator(trunc_base_x)
 
-    #print(len(trunc_base_x), len(aligned_y)) 
     return trunc_base_x, trunc_base_y, aligned_y

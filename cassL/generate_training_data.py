@@ -208,7 +208,6 @@ def evaluate_cell(cosmology, standard_k_axis, debug=False):
         cosmology['h'] -= 0.1
         return evaluate_cell(cosmology, standard_k_axis, debug)
 
-    z_step = _redshifts[0] - _redshifts[1]
     interpolator = interp1d(np.flip(_redshifts), np.flip(list_sigma12),
         kind='cubic')
         
