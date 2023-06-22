@@ -23,7 +23,7 @@ path_to_this_repo = path_base + "Master/"
 # reading-in of the file, we make some miner formatting adjustments such as the
 # removal of number signs. Use the unaltered version will cause a segfault.
 path_to_cosms = path_to_this_repo + "cosmologies.dat"
-cosm = pd.read_csv(path_to_cosms, sep='\s+')
+cosm = pd.read_csv(path_to_cosms, sep=r'\s+')
 
 # ! If there is a justification for using these specific values, one would
 # have to ask Ariel for it. I use these values because he used them. Anyway,
@@ -81,6 +81,18 @@ def parse_redshifts(model_num):
     return np.flip(np.sort(np.array(z)))
 
 
+def get_MEMNeC(cosmology):
+    r"""
+    Return a Matter-Equivalent Massless Neutrino Cosmology.
+
+    Parameters:
+    -----------
+    cosmology: dict
+        
+
+    """
+    return 23
+
 def load_benchmark(relative_path, omnuh2_strs=None):
     r"""
     Return a nested dictionary containing the power spectra that Ariel computed
@@ -130,7 +142,7 @@ def load_benchmark(relative_path, omnuh2_strs=None):
                 next_spectrum = pd.read_csv(next_file_name,
                                             names=["k", "P_no", "P_nu",
                                                    "ratio"],
-                                            sep='\s+')
+                                            sep=r'\s+')
                 nested_spectra[i].append(next_spectrum)
 
         return nested_spectra
@@ -342,10 +354,9 @@ def get_random_cosmology():
     return row
 
 
-def boltzmann_battery(omnuh2_floats, omnuh2_strs, skips_omega=[0, 2],
-                      skips_model=[8], skips_snapshot=[1, 2, 3],
-                      hubble_units=False, models=cosm, fancy_neutrinos=False,
-                      k_points=100000):
+def boltzmann_battery(omnuh2_floats, skips_omega=[0, 2], skips_model=[8],
+                      skips_snapshot=[1, 2, 3], hubble_units=False,
+                      models=cosm, fancy_neutrinos=False, k_points=100000):
     """
     !
     We should get rid of omnuh2_strs and make the outer layer a dictionary
@@ -364,13 +375,11 @@ def boltzmann_battery(omnuh2_floats, omnuh2_strs, skips_omega=[0, 2],
 
     Returns
     -------
-    benchmark: dict
+    spectra: dict
         Power spectra nested in a series of arrays and dictionaries. The order
         of layers from outer to inner is as follows:
-            1. A dictionary whose keys are strings representing approximations
-                of the true omega_nu_h2 values to which they correspond. For
-                specific examples of keys and the true vales behind them,
-                compare the global constant arrays OMNU_FLOATS and OMNU_STRS
+            1. A dictionary whose keys are floats representing corresponding to
+                the value of omega_nu_h2 used.
                 defined at the top of camb_interface.py.
             2. An array whose indices correspond to Aletheia model indices.
             3. An array whose indices correspond to snapshot indices. Lower
@@ -384,40 +393,31 @@ def boltzmann_battery(omnuh2_floats, omnuh2_strs, skips_omega=[0, 2],
                 "k": np.ndarray of float64
                     k[i] is the inverse of the physical scale associated with
                     each P_nu[i] and P_no[i]
-
-    Return format uses an architecture that closely agrees with that of Ariel's
-    in the powernu results:
-    spec_sims
-        omnuh2 str
-            model index
-                snapshot index
-                    quantity of interest
-
     """
     assert type(omnuh2_floats) == list or type(omnuh2_floats) == np.ndarray, \
         "if you want only one omega value, you must still nest it in a list"
 
-    spec_sims = {}
+    spectra = {}
 
     for this_omnuh2_index in range(len(omnuh2_floats)):
         print(this_omnuh2_index % 10, end='')
         this_omnuh2_float = omnuh2_floats[this_omnuh2_index]
         if this_omnuh2_index in skips_omega:
-            spec_sims[this_omnuh2_float] = None
+            spectra[this_omnuh2_float] = None
             continue
-        spec_sims[this_omnuh2_float] = []
+        spectra[this_omnuh2_float] = []
         for mindex, row in models.iterrows():
             if mindex in skips_model:
                 # For example, I don't yet understand how to implement model 8
-                spec_sims[this_omnuh2_float].append(None)
+                spectra[this_omnuh2_float].append(None)
                 continue
 
             h = row["h"]
-            spec_sims[this_omnuh2_float].append([])
+            spectra[this_omnuh2_float].append([])
 
             z_input = parse_redshifts(mindex)
             if None in z_input:
-                spec_sims[this_omnuh2_float][m_index] = None
+                spectra[this_omnuh2_float][m_index] = None
                 continue
 
             for snap_index in range(len(z_input)):
@@ -425,7 +425,7 @@ def boltzmann_battery(omnuh2_floats, omnuh2_strs, skips_omega=[0, 2],
                 # snap indices run from z large to z small,
                 # z_index = snap_index in this case and NOT in general.
                 if snap_index in skips_snapshot:
-                    spec_sims[this_omnuh2_float][mindex].append(None)
+                    spectra[this_omnuh2_float][mindex].append(None)
                     continue
 
                 inner_dict = {}
@@ -460,9 +460,9 @@ def boltzmann_battery(omnuh2_floats, omnuh2_strs, skips_omega=[0, 2],
                 assert np.array_equal(massless_tuple[0], massive_tuple[0]), \
                     "assumption of identical k axes not satisfied!"
 
-                spec_sims[this_omnuh2_float][mindex].append(inner_dict)
+                spectra[this_omnuh2_float][mindex].append(inner_dict)
 
-    return spec_sims
+    return spectra
 
 
 def make_neutrinos_fancy(pars, nnu_massive):
@@ -631,17 +631,20 @@ def obtain_pspectrum(pars, redshifts=[0], k_points=100000, hubble_units=False):
 def evaluate_cosmology(cosmology, redshifts=[0], fancy_neutrinos=False,
                        k_points=100000, hubble_units=False):
     """
-    Returns the scale axis, redshifts, power spectrum, and sigma12 of a
+    Return the scale axis, redshifts, power spectrum, and sigma12 of a
         cosmological model specified by a dictionary of parameter values.
-    @param cosmology : a dictionary of value for CAMBparams fields
-    @param redshifts : redshifts at which to evaluate the model
+
+
+    Parameters:
+    -----------
+    cosmology: dict
+        a dictionary of value for CAMBparams fields
+    redshifts: redshifts at which to evaluate the model
         If you would like to fix the sigma12 value, specify this in the mlc
         dictionary and set this parameter to None. If you would not like to
         fix the sigma12 value, make sure that the mlc dictionary does not
         contain a non-None sigma12 entry.
 
-        UPDATE: I changed my mind for now, let's say that z takes in case both
-            are specified.
     @param omnuh2_in : neutrino physical mass density
     @fancy_neutrinos: flag sets whether we attempt to impose a neutrino
         scheme on CAMB after we've already set the physical density. The
@@ -670,7 +673,7 @@ def evaluate_cosmology(cosmology, redshifts=[0], fancy_neutrinos=False,
 def obtain_pspectrum_interpolator(pars, redshifts=[0], z_points=150,
                                   kmax=1, hubble_units=False):
     """
-    Helper function for kzps.
+    Helper function for kzps_interpolator.
     Given a fully set-up pars function, return a CAMB PK interpolator object.
 
     """

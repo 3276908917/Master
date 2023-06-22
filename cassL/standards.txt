@@ -1,0 +1,26 @@
+1. All cosmology configuration dictionaries should follow the same format in
+    order to be correctly interpreted by the various functions in this package.
+    All keys map to floating point numbers.
+    The keys are as follows:
+     
+    'ombh2' physical density of the Universe in baryons
+    'omch2' physical density of the Universe in CDM (Cold Dark Matter)
+    'n_s' spectral index
+    'A_s' scalar mode amplitude
+    'OmK' fractional density of the Universe in curvature
+    'OmL' fractional density of the Universe in DE (Dark Energy)
+    'h' The hubble parameter 
+        PAY ATTENTION! This is NOT H0. It's h. h is H0 / 100, remember.
+    'w0' The w_0 parameter in the CPL (Chevallier-Polarski-Lindner) DE EoS
+        (Equation of State). This corresponds also to w in the constant-DE
+        model
+    'wa' The w_a parameter in the CPL DE EoS 
+    'sigma12' the linear-theory RMS amplitude of mass fluctuations in spheres of
+        radius 12 Mpc
+    'omnuh2' physical density of the Universe in massive neutrinos
+!!!!'mnu' neutrino mass (but if we're using a normal hierarchy, which neutrino
+        gets this mass??) 
+    
+    Keep in mind that the following parameters are never explicitly
+    used: 'OmL'.
+    Therefore, the 'OmL' field is not always updated to its true value.

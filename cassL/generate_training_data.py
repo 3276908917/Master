@@ -183,9 +183,9 @@ def evaluate_cell(cosmology, standard_k_axis, debug=False):
         # Now it's a zero-finding problem
         plt.plot(_redshifts, list_sigma12 - cosmology["sigma12"]);
         plt.axhline(0, c="black")
-        plt.title("$\sigma_{12} - \sigma^{\mathrm{goal}}_{12}$ vs. $z$")
+        plt.title(r"$\sigma_{12} - \sigma^{\mathrm{goal}}_{12}$ vs. $z$")
         plt.xlabel("$z$")
-        plt.ylabel("$\sigma_{12} - \sigma^{\mathrm{goal}}_{12}$")
+        plt.ylabel(r"$\sigma_{12} - \sigma^{\mathrm{goal}}_{12}$")
         plt.show()
     
     list_sigma12 -= cosmology["sigma12"] # now it's a zero-finding problem
