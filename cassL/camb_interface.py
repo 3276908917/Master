@@ -17,24 +17,26 @@ from scipy.optimize import root_scalar
 import copy as cp
 
 path_to_this_repo = path_base + "Master/"
-'''Keep in mind that 'cosmologies.dat' is NOT the same file as the original
-'cosmology_Aletheia.dat' that Ariel provided. In order to facilitate the
-reading-in of the file, we make some miner formatting adjustments such as the
-removal of number signs. Use the unaltered version will cause a segfault.'''
+
+# Keep in mind that 'cosmologies.dat' is NOT the same file as the original
+# 'cosmology_Aletheia.dat' that Ariel provided. In order to facilitate the
+# reading-in of the file, we make some miner formatting adjustments such as the
+# removal of number signs. Use the unaltered version will cause a segfault.
 path_to_cosms = path_to_this_repo + "cosmologies.dat"
 cosm = pd.read_csv(path_to_cosms, sep='\s+')
 
-'''! If there is a justification for using these specific values, one would
-have to ask Ariel for it. I use these values because he used them. Anyway,
-the values used here have nothing to do with the emulator, we are only using
-them as reference values at which to compare code implementations.'''
+# ! If there is a justification for using these specific values, one would
+# have to ask Ariel for it. I use these values because he used them. Anyway,
+# the values used here have nothing to do with the emulator, we are only using
+# them as reference values at which to compare code implementations.
 OMNUH2_FLOATS = np.array([0.0006356, 0.002148659574468, 0.006356, 0.01])
-''' Add corresponding file accessors, to check our work later. These strings,
-which contain approximations of the values in OMNUH2_FLOATS, are used to access
-the power spectra save files provided to us by Ariel.'''
+
+# Add corresponding file accessors, to check our work later. These strings,
+# which contain approximations of the values in OMNUH2_FLOATS, are used to
+# access the power spectra save files provided to us by Ariel.
 OMNUH2_STRS = np.array(["0.0006", "0.002", "0.006", "0.01"])
 
-### Just some standard colors and styles for when I plot several models
+# ! Just some standard colors and styles for when I plot several models
 # together. We should figure out a way to get rid of this.
 colors = ["green", "blue", "brown", "red", "black", "orange", "purple",
           "magenta", "cyan"] * 200
@@ -192,7 +194,7 @@ def match_sigma12(target, tolerance, cosmology,
     
     list_s12 -= target # now it's a zero-finding problem
 
-    # For some reason, flipping both arrays helps the interpolator
+    # !For some reason, flipping both arrays helps the interpolator
     # But I should come back and check this, I'm not sure if this was just a
     # patch for the Newton method
     interpolator = interp1d(np.flip(_redshifts), np.flip(list_s12),
@@ -218,13 +220,6 @@ def match_sigma12(target, tolerance, cosmology,
 def get_As_matched_cosmology(A_s=2.12723788013000E-09):
     """
     !
-    The default A_s value corresponds to model 0
-
-    Warning! You may have to throw out some of the cosmologies that you get
-    from this routine because I am nowhere guaranteeing that the sigma12 you
-    want actually corresponds to a positive redshift... of course, this
-    wouldn't be a problem if CAMB allowed negative redshifts.
-    
     Return a cosmological configuration based on model0 but uniformly
     randomized in:
         h: [0.2, 1]
@@ -232,6 +227,11 @@ def get_As_matched_cosmology(A_s=2.12723788013000E-09):
         w0: [-2, -.5]
         wa: [-.5, .5]
 
+    Warning! You may have to throw out some of the cosmologies that you get
+    from this routine because I am nowhere guaranteeing that the sigma12 you
+    want actually corresponds to a positive redshift... of course, this
+    wouldn't be a problem if CAMB allowed negative redshifts.
+    
     ! This function is nearly the same as get_random_cosmology(). Can we
         collapse the two?
 
@@ -327,10 +327,48 @@ def get_random_cosmology():
 
     return row
         
-def boltzmann_battery(onh2s, onh2_strs, skips_omega = [0, 2],
+def boltzmann_battery(omnuh2_floats, omnuh2_strs, skips_omega = [0, 2],
     skips_model=[8], skips_snapshot=[1, 2, 3], hubble_units=False,
     models=cosm, fancy_neutrinos=False, k_points=100000):
     """
+    !
+    We should get rid of omnuh2_strs and make the outer layer a dictionary
+    where omnuh2_floats are the keys.
+
+    Return a nested dictionary containing power spectra computed by CAMB via
+    the Python interface.
+
+    Parameters
+    ----------
+    omnuh2_floats: list or np.ndarray of float64
+        The values for omnuh2 at which to compute the power spectra for each
+        model and snapshot.
+    omnuh2_strs: list or np.ndarray of str
+        The labels associated with each index of omnuh2_floats.
+
+    Returns
+    -------
+    benchmark: dict
+        Power spectra nested in a series of arrays and dictionaries. The order
+        of layers from outer to inner is as follows:
+            1. A dictionary whose keys are strings representing approximations
+                of the true omega_nu_h2 values to which they correspond. For
+                specific examples of keys and the true vales behind them,
+                compare the global constant arrays OMNU_FLOATS and OMNU_STRS
+                defined at the top of camb_interface.py.
+            2. An array whose indices correspond to Aletheia model indices.
+            3. An array whose indices correspond to snapshot indices. Lower
+                shapshot indices correspond to higher values of redshift.
+            4. A dictionary whose key-value pairs are as follows:
+                "P_nu": np.ndarray of float64
+                    the power spectrum of the cosmology defined by that
+                        particular Aletheia model
+                "P_no": np.ndarray of float64
+                    the power spectrum of its MEMNeC
+                "k": np.ndarray of float64
+                    k[i] is the inverse of the physical scale associated with
+                    each P_nu[i] and P_no[i]
+    
     Return format uses an architecture that closely agrees with that of Ariel's
     in the powernu results:
     spec_sims
@@ -340,81 +378,69 @@ def boltzmann_battery(onh2s, onh2_strs, skips_omega = [0, 2],
                     quantity of interest
 
     """
-    assert type(onh2s) == list or type(onh2s) == np.ndarray, \
+    assert type(omnuh2_floats) == list or type(omnuh2_floats) == np.ndarray, \
         "if you want only one omega value, you must still nest it in a list"
-    assert type(onh2_strs) == list or type(onh2_strs) == np.ndarray, \
-        "if you want only one omega value, you must still nest it in a list"
-    assert len(onh2s) == len(onh2_strs), "more or fewer labels than points"
     
     spec_sims = {}
 
-    for this_omnu_index in range(len(onh2s)):
-        print(this_omnu_index % 10, end='')
-        this_omnu = onh2s[this_omnu_index]
-        this_omnu_str = onh2_strs[this_omnu_index]
-        if this_omnu_index in skips_omega:
-            spec_sims[this_omnu_str] = None
+    for this_omnuh2_index in range(len(omnuh2_floats)):
+        print(this_omnuh2_index % 10, end='')
+        this_omnuh2_float = omnuh2_floats[this_omnuh2_index]
+        if this_omnuh2_index in skips_omega:
+            spec_sims[this_omnuh2_float] = None
             continue
-        spec_sims[this_omnu_str] = []
+        spec_sims[this_omnuh2_float] = []
         for mindex, row in models.iterrows():
             if mindex in skips_model:
                 # For example, I don't yet understand how to implement model 8
-                spec_sims[this_omnu_str].append(None)
+                spec_sims[this_omnuh2_float].append(None)
                 continue
                 
             h = row["h"]
-            spec_sims[this_omnu_str].append([])
+            spec_sims[this_omnuh2_float].append([])
        
             z_input = parse_redshifts(mindex)
             if None in z_input:
-                spec_sims[this_omnu_str][m_index] = None
+                spec_sims[this_omnuh2_float][m_index] = None
                 continue
 
-            #print("z_input", z_input)
-            #print("total Zs", len(z_input)) 
             for snap_index in range(len(z_input)):
-                '''
-                since z_input is ordered from z large to z small,
-                and snap indices run from z large to z small,
-                z_index = snap_index in this case and NOT in general
-                '''
-                #print(z_index)
+                #  Since z_input is ordered from z large to z small, and since
+                # snap indices run from z large to z small,
+                # z_index = snap_index in this case and NOT in general.
                 if snap_index in skips_snapshot:
-                    #print("skipping", z_index)
-                    spec_sims[this_omnu_str][mindex].append(None)
+                    spec_sims[this_omnuh2_float][mindex].append(None)
                     continue
-                #print("using", z_index)
+                
                 inner_dict = {}
                 z = z_input[snap_index]
              
                 massless_nu_cosmology = specify_neutrino_mass(
                     row, 0, nnu_massive_in=0)
-                massless_tuple = evaluate_cosmology(massless_nu_cosmology, redshifts=[z],
-                    fancy_neutrinos=fancy_neutrinos, k_points=k_points,
-                    hubble_units=hubble_units)
+                massless_tuple = evaluate_cosmology(massless_nu_cosmology,
+                    redshifts=[z], fancy_neutrinos=fancy_neutrinos,
+                    k_points=k_points, hubble_units=hubble_units)
                 inner_dict["k"] = massless_tuple[0]
                 inner_dict["P_no"] = massless_tuple[2]
                 inner_dict["s12_massless"] = massless_tuple[3]
 
                 massive_nu_cosmology = specify_neutrino_mass(
-                    row, this_omnu, nnu_massive_in=1)
+                    row, this_omnuh2_float, nnu_massive_in=1)
+               
                 # Adjust CDM density so that we have the same total matter
                 # density as before:
-                massive_nu_cosmology["omch2"] -= this_omnu
+                massive_nu_cosmology["omch2"] -= this_omnuh2_float
 
-                massive_tuple = evaluate_cosmology(massive_nu_cosmology, redshifts=[z],
-                    fancy_neutrinos=fancy_neutrinos, k_points=k_points,
-                    hubble_units=hubble_units)
+                massive_tuple = evaluate_cosmology(massive_nu_cosmology,
+                    redshifts=[z], fancy_neutrinos=fancy_neutrinos,
+                    k_points=k_points, hubble_units=hubble_units)
                 inner_dict["P_nu"] = massive_tuple[2]
                 inner_dict["s12_massive"] = massive_tuple[3]
                 
-                # Temporary addition, for debugging
-                inner_dict["z"] = z_input[snap_index]               
- 
                 assert np.array_equal(massless_tuple[0], massive_tuple[0]), \
                    "assumption of identical k axes not satisfied!"
                     
-                spec_sims[this_omnu_str][mindex].append(inner_dict) 
+                spec_sims[this_omnuh2_float][mindex].append(inner_dict) 
 
     return spec_sims
 
