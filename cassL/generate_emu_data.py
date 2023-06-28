@@ -95,23 +95,23 @@ def fill_hypercube(parameter_values, standard_k_axis, massive_neutrinos=True,
     unwritten_cells = 0
     for i in cell_range:
         #print(i, "computation initiated")
-        p = None
+        this_p = None
         #try:
             #print("beginning p-spectrum computation")
-        cosmology = bundle_parameters(parameter_values[i])
+        this_cosmology = bundle_parameters(parameter_values[i])
 
         # kp returns (in this order): p-spectrum, actual_sigma12, z_best
 
-        p, actual_sigma12, rescaling_parameters = \
-            evaluate_cell(cosmology, standard_k_axis)
+        this_p, this_actual_sigma12, these_rescaling_parameters = \
+            evaluate_cell(this_cosmology, standard_k_axis)
         rescaling_parameters_list = np.append(
-            rescaling_parameters_list, rescaling_parameters)
+            rescaling_parameters_list, these_rescaling_parameters)
 
         # We may actually want to remove this if-condition. For now, though, it
         # allows us to repeatedly evaluate a cosmology with the same
         # deterministic result.
-        if actual_sigma12 is not None:
-            parameter_values[i][3] = actual_sigma12
+        if this_actual_sigma12 is not None:
+            parameter_values[i][3] = this_actual_sigma12
 
         #print("p-spectrum computation complete!")
         #except ValueError:
@@ -125,7 +125,7 @@ def fill_hypercube(parameter_values, standard_k_axis, massive_neutrinos=True,
         #except Exception: 
         #    traceback.print_exc(limit=1, file=sys.stdout)
 
-        samples[i] = p
+        samples[i] = this_p
 
         print(i, "complete")
         unwritten_cells += 1
@@ -133,11 +133,11 @@ def fill_hypercube(parameter_values, standard_k_axis, massive_neutrinos=True,
             np.save("samples_backup_i" + str(i) + "_" + save_label + ".npy",
                 samples, allow_pickle=True)
             np.save("redshifts_backup_i" + str(i) + "_" + save_label + ".npy",
-                redshifts_used, allow_pickle=True)
+                rescaling_parameters_list, allow_pickle=True)
             np.save("hc_backup_i" + str(i) + "_" + save_label + ".npy",
                 parameter_values, allow_pickle=True)
             unwritten_cells = 0
-    return samples, redshifts_used
+    return samples, rescaling_parameters_list
 
 def evaluate_cell(input_cosmology, standard_k_axis, debug=False):
     """
@@ -233,4 +233,4 @@ def evaluate_cell(input_cosmology, standard_k_axis, debug=False):
     # We don't need to return k because we take for granted that all
     # runs will have the same k axis.
 
-    return p, actual_sigma12, (input_cosmology['h'], z_best)
+    return p, actual_sigma12, (input_cosmology['h'], float(z_best))
