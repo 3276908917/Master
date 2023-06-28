@@ -187,9 +187,9 @@ def evaluate_cell(cosmology, standard_k_axis, debug=False):
         plt.xlabel("$z$")
         plt.ylabel(r"$\sigma_{12} - \sigma^{\mathrm{goal}}_{12}$")
         plt.show()
-    
+
     list_sigma12 -= cosmology["sigma12"] # now it's a zero-finding problem
-    
+
     # remember that list_s12[0] corresponds to the highest value z
     if debug:
         print("Discrepancy between maximum achievable sigma12 and target", 
@@ -210,7 +210,7 @@ def evaluate_cell(cosmology, standard_k_axis, debug=False):
 
     interpolator = interp1d(np.flip(_redshifts), np.flip(list_sigma12),
         kind='cubic')
-        
+
     # Newton's method requires that I already almost know the answer, so it's
     # poorly suited to our problem. This generic root finder works better.
     z_best = root_scalar(interpolator,
@@ -233,7 +233,7 @@ def evaluate_cell(cosmology, standard_k_axis, debug=False):
 
     if cosmology['h'] != model0['h']: # we've touched h, we need to interpolate
         print("We had to move h to", np.around(cosmology['h'], 3))
-        
+
         interpolator = interp1d(k, p, kind="cubic")
         p = interpolator(standard_k_axis)
 

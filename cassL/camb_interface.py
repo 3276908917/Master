@@ -130,7 +130,7 @@ def load_benchmark(relative_path, omnuh2_strs=None):
                     each P_nu[i] and P_no[i]
     """
 
-    benchmark_file_base = path_to_shared + relative_path
+    benchmark_file_base = path_to_this_repo + "benchmarks/" + relative_path
 
     def iterate_over_models_and_redshifts(accessor="0.002"):
         nested_spectra = []
@@ -580,6 +580,8 @@ def input_cosmology(cosmology, hubble_units=False):
     # the last three are desperation arguments
     pars.InitPower.set_params(As=cosmology["A_s"], ns=cosmology["n_s"],
                               r=0, nt=0.0, ntrun=0.0)
+
+    #print(cosmology["A_s"], cosmology["mnu"])
 
     input_dark_energy(pars, cosmology["w0"], float(cosmology["wa"]))
 
