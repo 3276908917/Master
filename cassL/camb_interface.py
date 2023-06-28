@@ -457,6 +457,8 @@ def boltzmann_battery(omnuh2_floats, skips_omega=[0, 2], skips_model=[8],
                 inner_dict["P_nu"] = massive_tuple[2]
                 inner_dict["s12_massive"] = massive_tuple[3]
 
+                inner_dict["z"] = z_input[snap_index]
+
                 assert np.array_equal(massless_tuple[0], massive_tuple[0]), \
                     "assumption of identical k axes not satisfied!"
 
