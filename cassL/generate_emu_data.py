@@ -90,7 +90,7 @@ def fill_hypercube(parameter_values, standard_k_axis, massive_neutrinos=True,
             row[3], A_S_DEFAULT, 0)
 
     # This just provides debugging information
-    redshifts_used = np.array([])
+    rescaling_parameters_list = np.array([])
 
     unwritten_cells = 0
     for i in cell_range:
@@ -99,18 +99,20 @@ def fill_hypercube(parameter_values, standard_k_axis, massive_neutrinos=True,
         #try:
             #print("beginning p-spectrum computation")
         cosmology = bundle_parameters(parameter_values[i])
-        
+
         # kp returns (in this order): p-spectrum, actual_sigma12, z_best
-        
-        p, actual_sigma12, z_best = evaluate_cell(cosmology, standard_k_axis)
-        redshifts_used = np.append(redshifts_used, z_best)
-        
+
+        p, actual_sigma12, rescaling_parameters = \
+            evaluate_cell(cosmology, standard_k_axis)
+        rescaling_parameters_list = np.append(
+            rescaling_parameters_list, rescaling_parameters)
+
         # We may actually want to remove this if-condition. For now, though, it
         # allows us to repeatedly evaluate a cosmology with the same
         # deterministic result.
-        if actual_sigma12 is not None:        
+        if actual_sigma12 is not None:
             parameter_values[i][3] = actual_sigma12
-        
+
         #print("p-spectrum computation complete!")
         #except ValueError:
         ''' Don't let unreasonable sigma12 values crash the program; ignore
@@ -122,9 +124,9 @@ def fill_hypercube(parameter_values, standard_k_axis, massive_neutrinos=True,
         #    traceback.print_exc(limit=1, file=sys.stdout)
         #except Exception: 
         #    traceback.print_exc(limit=1, file=sys.stdout)
-        
+
         samples[i] = p
-        
+
         print(i, "complete")
         unwritten_cells += 1
         if write_period is not None and unwritten_cells >= write_period:
@@ -137,7 +139,7 @@ def fill_hypercube(parameter_values, standard_k_axis, massive_neutrinos=True,
             unwritten_cells = 0
     return samples, redshifts_used
 
-def evaluate_cell(cosmology, standard_k_axis, debug=False):
+def evaluate_cell(input_cosmology, standard_k_axis, debug=False):
     """
     Returns the power spectrum in Mpc units and the actual sigma12_tilde value
         to which it corresponds.
@@ -148,7 +150,7 @@ def evaluate_cell(cosmology, standard_k_axis, debug=False):
     # This allows us to roughly find the z corresponding to the sigma12 that we
     # want.
 
-    MEMNeC = cp.deepcopy(cosmology)
+    MEMNeC = cp.deepcopy(input_cosmology)
     MEMNeC['omch2'] += MEMNeC['omnuh2']
     MEMNeC['omnuh2'] = 0
 
@@ -161,7 +163,7 @@ def evaluate_cell(cosmology, standard_k_axis, debug=False):
         print("\nMEMNeC:")
         print_cosmology(MEMNeC)
         print("\nOriginal cosmology:")
-        print_cosmology(cosmology)
+        print_cosmology(input_cosmology)
         print("\n")
 
     _, _, _, list_sigma12 = ci.evaluate_cosmology(MEMNeC, _redshifts,
@@ -175,72 +177,60 @@ def evaluate_cell(cosmology, standard_k_axis, debug=False):
         import matplotlib.pyplot as plt
         # Original intersection problem we're trying to solve
         plt.plot(_redshifts, list_sigma12);
-        plt.axhline(cosmology["sigma12"], c="black")
+        plt.axhline(input_cosmology["sigma12"], c="black")
         plt.title("$\sigma_{12}$ vs. $z$")
         plt.ylabel("$\sigma_{12}$")
         plt.xlabel("$z$")
         plt.show()
-        # Now it's a zero-finding problem
-        plt.plot(_redshifts, list_sigma12 - cosmology["sigma12"]);
-        plt.axhline(0, c="black")
-        plt.title(r"$\sigma_{12} - \sigma^{\mathrm{goal}}_{12}$ vs. $z$")
-        plt.xlabel("$z$")
-        plt.ylabel(r"$\sigma_{12} - \sigma^{\mathrm{goal}}_{12}$")
-        plt.show()
-
-    list_sigma12 -= cosmology["sigma12"] # now it's a zero-finding problem
 
     # remember that list_s12[0] corresponds to the highest value z
     if debug:
-        print("Discrepancy between maximum achievable sigma12 and target", 
-            list_sigma12[len(list_sigma12) - 1])
-        print("Target sigma12:", cosmology["sigma12"])
-    if list_sigma12[len(list_sigma12) - 1] < 0:
-        # we need to start playing with h.
-        if cosmology['h'] <= 0.1:
-            print("\nThis cell is hopeless. Here are the details:\n")
-            print_cosmology(cosmology)
-            print("\nThe extent of failure is:",
-                abs(list_sigma12[len(list_sigma12) - 1] / \
-                cosmology["sigma12"]) * 100, "%\n")
-            return None, None, None
+        print("Target sigma12:", input_cosmology["sigma12"])
 
-        cosmology['h'] -= 0.1
-        return evaluate_cell(cosmology, standard_k_axis, debug)
-
-    interpolator = interp1d(np.flip(_redshifts), np.flip(list_sigma12),
+    interpolator = interp1d(np.flip(list_sigma12), np.flip(_redshifts),
         kind='cubic')
 
-    # Newton's method requires that I already almost know the answer, so it's
-    # poorly suited to our problem. This generic root finder works better.
-    z_best = root_scalar(interpolator,
-        bracket=(np.min(_redshifts), np.max(_redshifts))).root
+    try:
+        z_best = interpolator(input_cosmology["sigma12"])
+    except ValueError:
+        # we need to start playing with h.
+        if input_cosmology['h'] <= 0.1:
+            print("\nThis cell is hopeless. Here are the details:\n")
+            print_cosmology(input_cosmology)
+            print("\nThe extent of failure is:",
+                abs(list_sigma12[len(list_sigma12) - 1] / \
+                input_cosmology["sigma12"]) * 100, "%\n")
+            return None, None, None
+
+        input_cosmology['h'] -= 0.1
+        return evaluate_cell(input_cosmology, standard_k_axis, debug)
 
     if debug:
         print("recommended redshift", z_best)
 
     p = np.zeros(len(standard_k_axis))
 
-    k, _, p, actual_sigma12 = ci.evaluate_cosmology(cosmology,
+    k, _, p, actual_sigma12 = ci.evaluate_cosmology(input_cosmology,
         redshifts=np.array([z_best]), fancy_neutrinos=False,
         k_points=NPOINTS) 
-    if cosmology['omnuh2'] != 0:
+    if input_cosmology['omnuh2'] != 0:
         _, _, _, actual_sigma12 = ci.evaluate_cosmology(MEMNeC,
             redshifts=np.array([z_best]), fancy_neutrinos=False,
             k_points=NPOINTS)
     # De-nest
     actual_sigma12 = actual_sigma12[0]
 
-    if cosmology['h'] != model0['h']: # we've touched h, we need to interpolate
-        print("We had to move h to", np.around(cosmology['h'], 3))
+    if input_cosmology['h'] != model0['h']: # we've touched h,
+        # we need to interpolate
+        print("We had to move h to", np.around(input_cosmology['h'], 3))
 
         interpolator = interp1d(k, p, kind="cubic")
         p = interpolator(standard_k_axis)
 
     if len(p) == 1: # then de-nest
-        p = p[0] 
+        p = p[0]
 
     # We don't need to return k because we take for granted that all
     # runs will have the same k axis.
 
-    return p, actual_sigma12, z_best
+    return p, actual_sigma12, (input_cosmology['h'], z_best)
