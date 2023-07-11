@@ -23,6 +23,7 @@ comet-emu
 # Ignore data files
 *.tar
 *.dat
+*.tar.gz
 
 #  Text editor trash files
 *.kate-swp

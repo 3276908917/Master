@@ -46,7 +46,7 @@ def print_cosmology(cosmology):
 def build_cosmology(om_b_in, om_c_in, ns_in, sigma12_in, As_in, om_nu_in):
     # Use Aletheia model 0 as a base
     cosmology = cp.deepcopy(ci.cosm.iloc[0])
-    
+
     cosmology["ombh2"] = om_b_in
     cosmology["omch2"] = om_c_in
     cosmology["n_s"] = ns_in
@@ -233,4 +233,4 @@ def evaluate_cell(input_cosmology, standard_k_axis, debug=False):
     # We don't need to return k because we take for granted that all
     # runs will have the same k axis.
 
-    return p, actual_sigma12, (input_cosmology['h'], float(z_best))
+    return p, actual_sigma12, np.array((input_cosmology['h'], float(z_best)))
