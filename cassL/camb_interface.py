@@ -592,9 +592,10 @@ def input_cosmology(cosmology, hubble_units=False):
     return pars
 
 
-def obtain_pspectrum(pars, redshifts=[0], k_points=100000, hubble_units=False):
+def get_CAMB_pspectrum(pars, redshifts=[0], k_points=100000,
+                       hubble_units=False):
     """
-    Helper function for kzps.
+    Helper function for evaluate_cosmology.
     Given a fully set-up pars function, return the following in this order:
         scale axis, redshifts used, power spectra, and sigma12 values.
 
@@ -635,15 +636,18 @@ def obtain_pspectrum(pars, redshifts=[0], k_points=100000, hubble_units=False):
 def evaluate_cosmology(cosmology, redshifts=[0], fancy_neutrinos=False,
                        k_points=100000, hubble_units=False):
     """
+    ISSUE! It does not seem like the current state of the code actually
+        supports redshifts=None. We should test and make sure, then correct if
+        necessary.
+
     Return the scale axis, redshifts, power spectrum, and sigma12 of a
         cosmological model specified by a dictionary of parameter values.
-
 
     Parameters:
     -----------
     cosmology: dict
         a dictionary of value for CAMBparams fields
-    redshifts: redshifts at which to evaluate the model
+    redshifts: array of redshift values at which to evaluate the model
         If you would like to fix the sigma12 value, specify this in the mlc
         dictionary and set this parameter to None. If you would not like to
         fix the sigma12 value, make sure that the mlc dictionary does not
@@ -670,19 +674,18 @@ def evaluate_cosmology(cosmology, redshifts=[0], fancy_neutrinos=False,
 
     apply_universal_output_settings(pars)
 
-    return obtain_pspectrum(pars, redshifts, k_points=k_points,
+    return get_CAMB_pspectrum(pars, redshifts, k_points=k_points,
                             hubble_units=hubble_units)
 
 
-def obtain_pspectrum_interpolator(pars, redshifts=[0], z_points=150,
-                                  kmax=1, hubble_units=False):
+def get_CAMB_interpolator(pars, redshifts=[0], kmax=1, hubble_units=False):
     """
-    Helper function for kzps_interpolator.
+    Helper function for cosmology_to_PK_interpolator.
     Given a fully set-up pars function, return a CAMB PK interpolator object.
 
     """
-    ''' To change the the extent of the k-axis, change the following line as
-    well as the "get_matter_power_spectrum" call. '''
+    # To change the the extent of the k-axis, change the following line as well
+    # as the "get_matter_power_spectrum" call.
     pars.set_matter_power(redshifts=redshifts, kmax=kmax, nonlinear=False)
 
     # results = camb.get_results(pars)
@@ -694,15 +697,16 @@ def obtain_pspectrum_interpolator(pars, redshifts=[0], z_points=150,
     # print(pars)
 
     gmpi = camb.get_matter_power_interpolator
-    PK = gmpi(pars, zmin=min(redshifts), zmax=max(redshifts), nz_step=z_points,
-              k_hunit=hubble_units, kmax=kmax, nonlinear=False,
-              var1='delta_nonu', var2='delta_nonu', hubble_units=hubble_units)
+    PK = gmpi(pars, zmin=min(redshifts), zmax=max(redshifts),
+              nz_step=len(redshifts), k_hunit=hubble_units, kmax=kmax,
+              nonlinear=False, var1='delta_nonu', var2='delta_nonu',
+              hubble_units=hubble_units)
 
     return PK
 
 
-def kzps_interpolator(cosmology, redshifts=[0], fancy_neutrinos=False,
-                      z_points=150, kmax=1, hubble_units=False):
+def cosmology_to_PK_interpolator(cosmology, redshifts=[0],
+    fancy_neutrinos=False, kmax=1, hubble_units=False):
     """
     This is a really rough function, I'm just trying to test out an idea.
     """
@@ -713,8 +717,7 @@ def kzps_interpolator(cosmology, redshifts=[0], fancy_neutrinos=False,
 
     apply_universal_output_settings(pars)
 
-    return obtain_pspectrum_interpolator(pars, redshifts, z_points, kmax,
-                                         hubble_units)
+    return get_CAMB_interpolator(pars, redshifts, kmax, hubble_units)
 
 
 def model_ratios(snap_index, sims, canvas, massive=True, skips=[],
