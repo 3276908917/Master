@@ -11,7 +11,7 @@ def get_PK(ombh2, omch2, ns, mnu, H0, As, w0=-1.0, wa=0.0, omk=0.0, de_model='fl
     pars.set_cosmology(H0=H0, ombh2=ombh2, omch2=omch2, mnu=mnu, omk=omk)
     #pars.num_nu_massive = 1
     omnuh2 = np.copy(pars.omnuh2)
-    print (omnuh2)
+    print("Physical density in massive neutrinos", omnuh2)
     pars.InitPower.set_params(ns=ns, As=As)
     pars.set_dark_energy(w=w0, wa=wa, dark_energy_model=de_model)
     pars.NonLinear = model.NonLinear_none
@@ -21,8 +21,8 @@ def get_PK(ombh2, omch2, ns, mnu, H0, As, w0=-1.0, wa=0.0, omk=0.0, de_model='fl
     pars.Transfer.kmax = 10.0 / h
     pars.set_matter_power(redshifts=[0.0], kmax=10.0 / h)
     
-    print (pars.num_nu_massive)
-    print("massive-neutrino sigma12",
+    print("Number of massive neutrinos:", pars.num_nu_massive)
+    print("Massive-neutrino sigma12:",
             camb.get_results(pars).get_sigmaR(12, hubble_units=False))
     PKnu = camb.get_matter_power_interpolator(pars, nonlinear=False,
                                               hubble_units=False, k_hunit=False,
@@ -44,7 +44,7 @@ def get_PK(ombh2, omch2, ns, mnu, H0, As, w0=-1.0, wa=0.0, omk=0.0, de_model='fl
         pars.Accuracy.AccuratePolarization = False
         pars.Transfer.kmax = 10.0 / h
         pars.set_matter_power(redshifts=[0.0], kmax=10.0 / h)
-        print("massless-neutrino sigma12",
+        print("Massless-neutrino sigma12:",
             camb.get_results(pars).get_sigmaR(12, hubble_units=False))
         PK = camb.get_matter_power_interpolator(pars, nonlinear=False,
                                                 hubble_units=False, k_hunit=False,

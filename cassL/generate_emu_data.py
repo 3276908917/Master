@@ -71,7 +71,7 @@ def fill_hypercube(parameter_values, standard_k_axis, massive_neutrinos=True,
 
     @cell_range adjust this value in order to pick up from where you
         left off, and to run this method in saveable chunks.
-        
+
     BE CAREFUL! This function deliberately mutates the parameter_values object,
         replacing the target sigma12 values with the actual sigma12 values used.
     """
@@ -90,7 +90,7 @@ def fill_hypercube(parameter_values, standard_k_axis, massive_neutrinos=True,
             row[3], A_S_DEFAULT, 0)
 
     # This just provides debugging information
-    rescaling_parameters_list = np.array([])
+    rescaling_parameters_list = None
 
     unwritten_cells = 0
     for i in cell_range:
@@ -104,8 +104,12 @@ def fill_hypercube(parameter_values, standard_k_axis, massive_neutrinos=True,
 
         this_p, this_actual_sigma12, these_rescaling_parameters = \
             evaluate_cell(this_cosmology, standard_k_axis)
-        rescaling_parameters_list = np.append(
-            rescaling_parameters_list, these_rescaling_parameters)
+
+        if rescaling_parameters_list is None:
+            rescaling_parameters_list = these_rescaling_parameters
+        else:
+            rescaling_parameters_list = np.vstack((rescaling_parameters_list,
+                these_rescaling_parameters))
 
         # We may actually want to remove this if-condition. For now, though, it
         # allows us to repeatedly evaluate a cosmology with the same
@@ -168,8 +172,6 @@ def evaluate_cell(input_cosmology, standard_k_axis, debug=False):
 
     _, _, _, list_sigma12 = ci.evaluate_cosmology(MEMNeC, _redshifts,
         fancy_neutrinos=False, k_points=NPOINTS, hubble_units=False)
-
-    # debug block
 
     #print(list_s12)
     if debug:

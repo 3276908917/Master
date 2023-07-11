@@ -29,14 +29,14 @@ def get_param_ranges(priors="COMET", massive_neutrinos=True):
             priors, so we need to test this prior suite again and re-assess the
             rate of empty cells.
         "classic": a prior range with widths in between those of "COMET" and
-            "MEGA". We need to test this prior suite again to see if it still
+            "MEGA." We need to test this prior suite again to see if it still
             suffers from a large number of empty cells.
         "COMET" as of 19.06.23, this is the default for the emulator. It is
-            the most restrictive of the three options and it is intended to
-            totally eliminate the problem of empty cells, so that a totally
-            complete LHC can be used to train a demonstration emulator. The
-            hope is for the demonstration emulator to be extremely accurate
-            but confined to a very narrow range in each parameter.
+            the most restrictive of the three options and is intended to
+            totally eliminate the problem of empty cells, so that a complete
+            LHC can be used to train a demonstration emulator. The hope is for
+            the demonstration emulator trained over such priors to be extremely
+            accurate due to the very narrow permissible parameter values.
 
     @massive_neutrinos should be set to False when one is training the emulator
         for massless neutrinos. This is because the massless neutrino emulator
@@ -46,24 +46,24 @@ def get_param_ranges(priors="COMET", massive_neutrinos=True):
     param_ranges = {}
 
     if priors == "MEGA":
-        param_ranges = {                                             
-            'om_b': [0.005, 0.28],                                         
-            'om_c': [0.001, 0.99], # max 0.3?                                     
+        param_ranges = {
+            'om_b': [0.005, 0.28],
+            'om_c': [0.001, 0.99], # max 0.3?
             'n_s': [0.7, 1.3], # expand?
             'sigma12': [0.2, 1], # based on Sanchez et al 21 and
                 # Sanchez 20, fig 2 
         }
     elif priors == "classic": # This is useful for a demo run. 
-        param_ranges = {                                             
-            'om_b': [0.01875, 0.02625],                                         
-            'om_c': [0.05, 0.255],                                   
+        param_ranges = {
+            'om_b': [0.01875, 0.02625],
+            'om_c': [0.05, 0.255],
             'n_s': [0.84, 1.1],
             'sigma12': [0.2, 1], # based on Sanchez et al 21; Sanchez 20 fig 2 
         }
-    elif priors=="COMET": 
-        param_ranges = {                                             
-            'om_b': [0.0205, 0.02415],                                         
-            'om_c': [0.085, 0.155],                                   
+    elif priors=="COMET":
+        param_ranges = {
+            'om_b': [0.0205, 0.02415],
+            'om_c': [0.085, 0.155],
             'n_s': [0.92, 1.01],
             'sigma12': [0.2, 1], # based on Sanchez et al 21; Sanchez 20 fig 2 
         }
@@ -89,7 +89,7 @@ def initialize(num_samples=100, num_trials=100, priors="COMET",
     param_ranges = get_param_ranges(priors, massive_neutrinos)
 
     # We're keeping Omega_K = 0 fixed for now
-    
+
     # tau must be an evolution parameter if we're not including it here
     hc, list_min_dist = lhc.generate_samples(param_ranges, num_samples,
         num_trials)
