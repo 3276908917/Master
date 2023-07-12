@@ -5,6 +5,7 @@ import camb
 import re
 from scipy.interpolate import interp1d
 from scipy.optimize import root_scalar
+from scipy.integrate import quad
 import copy as cp
 
 # In order to redirect the Python session to the correct location of files,
@@ -718,6 +719,18 @@ def cosmology_to_PK_interpolator(cosmology, redshifts=[0],
     apply_universal_output_settings(pars)
 
     return get_CAMB_interpolator(pars, redshifts, kmax, hubble_units)
+
+
+def s12_from_interpolator(PK, z):
+
+    def W(x):
+        return 3.0 * (np.sin(x) - x*np.cos(x)) / x**3
+    def integrand(x):
+        return x**2 * PK.P(z,x) * W(x*12)**2
+
+    s12 = quad(integrand, 1e-4, 5)[0]
+
+    return np.sqrt(s12/(2*np.pi**2))
 
 
 def model_ratios(snap_index, sims, canvas, massive=True, skips=[],

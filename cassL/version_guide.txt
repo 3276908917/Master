@@ -21,3 +21,13 @@ Version G
     * Massless emulator no longer uses As as an input parameter
     * Massive emulator now matches sigma12 of counterpart cosmology with massless
         neutrinos, not the sigma12 of the input cosmology.
+        
+    G2: ?    
+        
+    G3: ?    
+        
+    G4: let's rerun the code this time double checking that the cells line up
+        with the inputs (some file read mistake I guess)    
+        
+    G5: Let's get the interpolator in action instead of the direct evaluation
+        approach
