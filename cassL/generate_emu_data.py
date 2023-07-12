@@ -280,8 +280,8 @@ def interpolate_cell(input_cosmology, standard_k_axis, debug=False):
         print("\n")
 
     MEMNeC_p_interpolator = \
-        ci.cosmology_to_PK_interpolator(
-            MEMNeC, redshifts=_redshifts, kmax=10)
+        ci.andrea_interpolator(
+            MEMNeC)#, redshifts=_redshifts, kmax=10)
     list_sigma12 = np.array([
         ci.s12_from_interpolator(MEMNeC_p_interpolator, z) for z in _redshifts
     ])
@@ -325,8 +325,8 @@ def interpolate_cell(input_cosmology, standard_k_axis, debug=False):
 
     p = np.zeros(len(standard_k_axis))
 
-    p_interpolator = ci.cosmology_to_PK_interpolator(input_cosmology,
-        redshifts=np.array([z_best]), kmax=10)
+    p_interpolator = ci.andrea_interpolator(input_cosmology)#,
+    #    redshifts=np.array([z_best]), kmax=10)
     actual_sigma12 = ci.s12_from_interpolator(p_interpolator, z_best)
 
     if input_cosmology['omnuh2'] != 0:
@@ -335,7 +335,7 @@ def interpolate_cell(input_cosmology, standard_k_axis, debug=False):
     # De-nest
     # actual_sigma12 = actual_sigma12[0]
 
-    p = np.array([p_interpolator.P(z_best, k)[0] for k in standard_k_axis])
+    p = np.array([p_interpolator.P(z_best, k) for k in standard_k_axis])
 
     # We don't need to return k because we take for granted that all
     # runs will have the same k axis.

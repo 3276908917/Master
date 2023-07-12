@@ -3,7 +3,60 @@ from scipy.integrate import quad
 import numpy as np
 from camb import initialpower, model
 
-def get_PK(ombh2, omch2, ns, mnu, H0, As, w0=-1.0, wa=0.0, omk=0.0, de_model='fluid', w_mzero=True): 
+def get_PK(ombh2, omch2, ns, omnuh2, H0, As, w0=-1.0, wa=0.0, omk=0.0, de_model='fluid', w_mzero=True): 
+    
+    #pars = camb.CAMBparams()
+    #pars.set_cosmology(H0=H0, ombh2=ombh2, omch2=omch2, mnu=mnu, omk=omk)
+    pars = camb.set_params(H0=H0, ombh2=ombh2, omch2=omch2, omnuh2=omnuh2, omk=omk)
+    pars.num_nu_massive = 1
+    #omnuh2 = np.copy(pars.omnuh2)
+    #print (omnuh2)
+    pars.InitPower.set_params(ns=ns, As=As)
+    pars.set_dark_energy(w=w0, wa=wa, dark_energy_model=de_model)
+    pars.NonLinear = model.NonLinear_none
+    pars.Accuracy.AccuracyBoost = 3
+    pars.Accuracy.lAccuracyBoost = 3
+    pars.Accuracy.AccuratePolarization = False
+    pars.Transfer.kmax = 20.0
+    pars.set_matter_power(redshifts=[0.0], kmax=20.0)
+    
+    #print (pars.num_nu_massive)
+    
+    PKnu = camb.get_matter_power_interpolator(pars, nonlinear=False,
+                                              hubble_units=False, k_hunit=False,
+                                              kmax=20.0, zmax=20.0,
+                                              var1='delta_nonu', var2='delta_nonu')
+    
+    #print (camb.get_results(pars))
+    
+    if w_mzero:
+        
+        pars = camb.CAMBparams()
+        pars.set_cosmology(H0=H0, ombh2=ombh2, omch2=omch2+omnuh2, mnu=0.0, omk=omk)
+        pars.InitPower.set_params(ns=ns, As=As)
+        pars.set_dark_energy(w=w0, wa=wa, dark_energy_model=de_model)
+        pars.NonLinear = model.NonLinear_none
+        pars.Accuracy.AccuracyBoost = 3
+        pars.Accuracy.lAccuracyBoost = 3
+        pars.Accuracy.AccuratePolarization = False
+        pars.Transfer.kmax = 20.0
+        pars.set_matter_power(redshifts=[0.0], kmax=20.0)
+        PK = camb.get_matter_power_interpolator(pars, nonlinear=False,
+                                                hubble_units=False, k_hunit=False,
+                                                kmax=20.0, zmax=20.0,
+                                                var1='delta_tot', var2='delta_tot')
+    
+    if w_mzero:
+        out = {}
+        out['mzero'] = PK
+        out['mnu'] = PKnu
+    else:
+        out = PKnu
+    
+    return out
+
+
+def get_PK_doubtful(ombh2, omch2, ns, mnu, H0, As, w0=-1.0, wa=0.0, omk=0.0, de_model='fluid', w_mzero=True): 
     
     h = H0 / 100
     
