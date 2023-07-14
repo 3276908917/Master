@@ -108,7 +108,8 @@ def fill_hypercube(parameter_values, standard_k_axis, massive_neutrinos=True,
         #this_p, this_actual_sigma12, these_rescaling_parameters = \
         #    evaluate_cell(this_cosmology, standard_k_axis)
         this_p, this_actual_sigma12, these_rescaling_parameters = \
-            interpolate_cell(this_cosmology, standard_k_axis)
+            interpolate_cell(this_cosmology, standard_k_axis,
+            using_andrea_code=True)
 
         if rescaling_parameters_list is None:
             rescaling_parameters_list = these_rescaling_parameters
