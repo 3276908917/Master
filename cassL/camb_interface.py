@@ -724,6 +724,14 @@ def cosmology_to_PK_interpolator(cosmology, redshifts=[0],
 
 
 def andrea_interpolator(cosmology):
+    """
+    It's dangerous to have this function floating around when we're also
+    closely testing the andreap.py script in the emulator folder of the
+    CAMB_notebooks dir.
+
+    We should consider putting Andrea's code into a special script which
+    will be temporarily included in the cassL code to be pip-installed.
+    """
     H0 = cosmology['h'] * 100
     ombh2 = cosmology['ombh2']
     omch2 = cosmology['omch2']
