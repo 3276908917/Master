@@ -4,4 +4,13 @@ MEMNeC: Matter-Equivalent Massless-Neutrino Cosmology
     1. MEMNeC[omega_cdm_h2] = old_cosmology[omega_cdm_h2] + old_cosmology[omega_nu_h2]
     2. MEMNeC[omega_nu_h2] = 0
     
-  
+r: an abbreviation that I use in the emulator files for a simple redo. Ideally,
+    X_r1 should have been produced in the exact same manner as X was. The reason
+    I make redo files at all is to eliminate any slight doubts that there really
+    was a mistake and X was not made in the way that it was intended to have
+    been made.
+    
+rescalers: an abbrevation for "rescaling parameters." It's an array that should
+    optimally be saved alongside every emu data-generating run. The shape is
+    5000 x 2: for every cell in the LHC, we save also the final value of h used
+    as well as the best value for z that we found.
