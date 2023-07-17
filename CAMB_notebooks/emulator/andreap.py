@@ -3,6 +3,9 @@ from scipy.integrate import quad
 import numpy as np
 from camb import initialpower, model
 
+from cassL import camb_interface as ci
+import copy as cp
+
 def cassL_to_andrea_cosmology(cosm, hybrid=False):
     """
     The 'hybrid' flag indicates whether we should use the original code as
@@ -28,10 +31,10 @@ def cassL_to_andrea_cosmology(cosm, hybrid=False):
         de_model='ppf'
 
     if hybrid:
-        return get_PK(ombh2, omch2, ns, omnuh2, H0, As, w0, wa, OmK, de_model,
-            w_mzero=True)
-    else:
         return get_PK_hybrid(ombh2, omch2, ns, omnuh2, H0, As, w0, wa, OmK,
+            de_model, w_mzero=True)
+    else:
+        return get_PK(ombh2, omch2, ns, omnuh2, H0, As, w0, wa, OmK,
             de_model, w_mzero=True)
 
 def get_PK_hybrid(ombh2, omch2, ns, omnuh2, H0, As, w0=-1.0, wa=0.0, omk=0.0,
@@ -42,15 +45,33 @@ def get_PK_hybrid(ombh2, omch2, ns, omnuh2, H0, As, w0=-1.0, wa=0.0, omk=0.0,
         current interpolator approach ("cosmology_to_PK_interpolator", as
         written in 
     """
-
+    foreign = True
+    pars = None
     #pars = camb.CAMBparams()
     #pars.set_cosmology(H0=H0, ombh2=ombh2, omch2=omch2, mnu=mnu, omk=omk)
-    pars = camb.set_params(H0=H0, ombh2=ombh2, omch2=omch2, omnuh2=omnuh2,
-        omk=omk)
-    pars.num_nu_massive = 1
-    pars.InitPower.set_params(ns=ns, As=As)
-    pars.set_dark_energy(w=w0, wa=wa, dark_energy_model=de_model)
-    pars.Transfer.kmax = 20.0
+    if foreign:
+        cosmology = cp.deepcopy(ci.cosm.iloc[0])
+        cosmology["h"] = H0 / 100
+        cosmology["ombh2"] = ombh2
+        cosmology["omch2"] = omch2
+        cosmology["n_s"] = ns
+        cosmology["A_s"] = As
+        cosmology["omnuh2"] = omnuh2
+        cosmology["w0"] = w0
+        cosmology["wa"] = wa
+        cosmology["OmK"] = omk
+        cosmology["nnu_massive"] = 1 if omnuh2 != 0 else 0
+
+        cosmology = ci.specify_neutrino_mass(cosmology,
+            cosmology["omnuh2"], cosmology["nnu_massive"])
+        pars = ci.input_cosmology(cosmology, hubble_units=False)
+    else:
+        pars = camb.set_params(H0=H0, ombh2=ombh2, omch2=omch2, omnuh2=omnuh2,
+            omk=omk)
+        pars.num_nu_massive = 1
+        pars.InitPower.set_params(ns=ns, As=As)
+        pars.set_dark_energy(w=w0, wa=wa, dark_energy_model=de_model)
+        pars.Transfer.kmax = 20.0
 
     #omnuh2 = np.copy(pars.omnuh2)
     #print (omnuh2)

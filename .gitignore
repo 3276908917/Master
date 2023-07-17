@@ -13,6 +13,7 @@
 *.csv
 *.png
 *.nucomet
+cassL.egg-info
 
 # Ignore generated media and heavy analyses
 communications
