@@ -11,7 +11,9 @@ def cassL_to_andrea_cosmology(cosm, hybrid=False):
     The 'hybrid' flag indicates whether we should use the original code as
         directly given us by Andrea (the function "get_PK", or if we should
         use thy hybrid function "get_PK_hybrid." As a reminder, the purpose
-        of the hybrid function is to bring my code
+        of the hybrid function is to bring my code in line with Andrea's
+        until we find the source of the discrepancy.
+
         ("cosmology_to_PK_interpolator") and Andrea's ("get_PK") closer and
         closer together until this strange discrepancy (as chronicled on the
         "interpolator_CAMB_agreement" notebook) vanishes.
@@ -50,6 +52,7 @@ def get_PK_hybrid(ombh2, omch2, ns, omnuh2, H0, As, w0=-1.0, wa=0.0, omk=0.0,
     #pars = camb.CAMBparams()
     #pars.set_cosmology(H0=H0, ombh2=ombh2, omch2=omch2, mnu=mnu, omk=omk)
     if foreign:
+        print("The if-statement is behaving as expected.")
         cosmology = cp.deepcopy(ci.cosm.iloc[0])
         cosmology["h"] = H0 / 100
         cosmology["ombh2"] = ombh2
@@ -75,37 +78,74 @@ def get_PK_hybrid(ombh2, omch2, ns, omnuh2, H0, As, w0=-1.0, wa=0.0, omk=0.0,
 
     #omnuh2 = np.copy(pars.omnuh2)
     #print (omnuh2)
-    pars.NonLinear = model.NonLinear_none
-    pars.Accuracy.AccuracyBoost = 3
-    pars.Accuracy.lAccuracyBoost = 3
-    pars.Accuracy.AccuratePolarization = False
-    pars.set_matter_power(redshifts=[0.0], kmax=20.0)
-    
-    #print (pars.num_nu_massive)
-    
-    PKnu = camb.get_matter_power_interpolator(pars, nonlinear=False,
-                                              hubble_units=False, k_hunit=False,
-                                              kmax=20.0, zmax=20.0,
-                                              var1='delta_nonu', var2='delta_nonu')
-    
-    #print (camb.get_results(pars))
-    
-    if w_mzero:
-        
-        pars = camb.CAMBparams()
-        pars.set_cosmology(H0=H0, ombh2=ombh2, omch2=omch2+omnuh2, mnu=0.0, omk=omk)
-        pars.InitPower.set_params(ns=ns, As=As)
-        pars.set_dark_energy(w=w0, wa=wa, dark_energy_model=de_model)
+    if foreign:
+        ci.apply_universal_output_settings(pars)
+    else:
         pars.NonLinear = model.NonLinear_none
         pars.Accuracy.AccuracyBoost = 3
         pars.Accuracy.lAccuracyBoost = 3
         pars.Accuracy.AccuratePolarization = False
-        pars.Transfer.kmax = 20.0
+
+    PKnu = None
+
+    if foreign:
+        # Hard-coded just for the sake of comparison
+        _redshifts = np.flip(np.linspace(0, 2.1, 150))
+        PKnu = ci.get_CAMB_interpolator(pars, _redshifts, kmax=10,
+            hubble_units=False)
+    else:
         pars.set_matter_power(redshifts=[0.0], kmax=20.0)
-        PK = camb.get_matter_power_interpolator(pars, nonlinear=False,
-                                                hubble_units=False, k_hunit=False,
-                                                kmax=20.0, zmax=20.0,
-                                                var1='delta_tot', var2='delta_tot')
+        PKnu = camb.get_matter_power_interpolator(
+            pars, nonlinear=False, hubble_units=False, k_hunit=False,
+            kmax=20.0, zmax=20.0, var1='delta_tot', var2='delta_tot')
+    
+    #print (camb.get_results(pars))
+    
+    if w_mzero:
+        if foreign:
+            cosmology = cp.deepcopy(ci.cosm.iloc[0])
+            cosmology["h"] = H0 / 100
+            cosmology["ombh2"] = ombh2
+            cosmology["omch2"] = omch2 + omnuh2
+            cosmology["n_s"] = ns
+            cosmology["A_s"] = As
+            cosmology["omnuh2"] = 0
+            cosmology["w0"] = w0
+            cosmology["wa"] = wa
+            cosmology["OmK"] = omk
+            cosmology["nnu_massive"] = 0
+
+            cosmology = ci.specify_neutrino_mass(cosmology,
+                cosmology["omnuh2"], cosmology["nnu_massive"])
+            pars = ci.input_cosmology(cosmology, hubble_units=False)
+        else:
+            pars = camb.CAMBparams()
+            pars.set_cosmology(H0=H0, ombh2=ombh2, omch2=omch2+omnuh2,
+                mnu=0.0, omk=omk)
+            pars.InitPower.set_params(ns=ns, As=As)
+            pars.set_dark_energy(w=w0, wa=wa, dark_energy_model=de_model)
+            pars.Transfer.kmax = 20.0
+
+        if foreign:
+            ci.apply_universal_output_settings(pars)
+        else:
+            pars.NonLinear = model.NonLinear_none
+            pars.Accuracy.AccuracyBoost = 3
+            pars.Accuracy.lAccuracyBoost = 3
+            pars.Accuracy.AccuratePolarization = False
+
+        PK = None
+
+        if foreign:
+            # Hard-coded just for the sake of comparison
+            _redshifts = np.flip(np.linspace(0, 2.1, 150))
+            PK = ci.get_CAMB_interpolator(pars, _redshifts, kmax=10,
+                hubble_units=False)
+        else:
+            pars.set_matter_power(redshifts=[0.0], kmax=20.0)
+            PK = camb.get_matter_power_interpolator(
+                pars, nonlinear=False, hubble_units=False, k_hunit=False,
+                kmax=20.0, zmax=20.0, var1='delta_tot', var2='delta_tot')
     
     if w_mzero:
         out = {}
