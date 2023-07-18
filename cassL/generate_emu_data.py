@@ -12,7 +12,7 @@ from scipy.optimize import root_scalar
 import camb
 from camb import model, initialpower, get_matter_power_interpolator
 
-import camb_interface as ci
+from cassL import camb_interface as ci
 import copy as cp
 
 cosm = ci.cosm

@@ -39,13 +39,33 @@ def cassL_to_andrea_cosmology(cosm, hybrid=False):
         return get_PK(ombh2, omch2, ns, omnuh2, H0, As, w0, wa, OmK,
             de_model, w_mzero=True)
 
+def get_PK_hybrid2(cosmology): 
+    """
+    The point of this function is to begin with the code "get_PK" given us by
+        Andrea, and to incrementally bring it more and more in line with our
+        current interpolator approach ("cosmology_to_PK_interpolator", as
+        written in camb_interface.py.
+    """
+    pars = ci.input_cosmology(cosmology, hubble_units=False)
+
+    ci.apply_universal_output_settings(pars)
+
+    # Hard-coded just for the sake of comparison
+    _redshifts = np.flip(np.linspace(0, 2.1, 150))
+    PKnu = ci.get_CAMB_interpolator(pars, _redshifts, kmax=10,
+        hubble_units=False)
+
+    #print (camb.get_results(pars))
+
+    return PKnu
+
 def get_PK_hybrid(ombh2, omch2, ns, omnuh2, H0, As, w0=-1.0, wa=0.0, omk=0.0,
     de_model='fluid', w_mzero=True): 
     """
     The point of this function is to begin with the code "get_PK" given us by
         Andrea, and to incrementally bring it more and more in line with our
         current interpolator approach ("cosmology_to_PK_interpolator", as
-        written in 
+        written in camb_interface.py.
     """
     foreign = True
     pars = None
@@ -67,6 +87,7 @@ def get_PK_hybrid(ombh2, omch2, ns, omnuh2, H0, As, w0=-1.0, wa=0.0, omk=0.0,
 
         cosmology = ci.specify_neutrino_mass(cosmology,
             cosmology["omnuh2"], cosmology["nnu_massive"])
+        
         pars = ci.input_cosmology(cosmology, hubble_units=False)
     else:
         pars = camb.set_params(H0=H0, ombh2=ombh2, omch2=omch2, omnuh2=omnuh2,
@@ -103,21 +124,25 @@ def get_PK_hybrid(ombh2, omch2, ns, omnuh2, H0, As, w0=-1.0, wa=0.0, omk=0.0,
     
     if w_mzero:
         if foreign:
-            cosmology = cp.deepcopy(ci.cosm.iloc[0])
-            cosmology["h"] = H0 / 100
-            cosmology["ombh2"] = ombh2
-            cosmology["omch2"] = omch2 + omnuh2
-            cosmology["n_s"] = ns
-            cosmology["A_s"] = As
-            cosmology["omnuh2"] = 0
-            cosmology["w0"] = w0
-            cosmology["wa"] = wa
-            cosmology["OmK"] = omk
-            cosmology["nnu_massive"] = 0
+            MEMNeC = cp.deepcopy(ci.cosm.iloc[0])
+            MEMNeC["h"] = H0 / 100
+            MEMNeC["ombh2"] = ombh2
+            MEMNeC["omch2"] = omch2 + omnuh2
+            MEMNeC["n_s"] = ns
+            MEMNeC["A_s"] = As
+            MEMNeC["omnuh2"] = 0
+            MEMNeC["w0"] = w0
+            MEMNeC["wa"] = wa
+            MEMNeC["OmK"] = omk
+            MEMNeC["nnu_massive"] = 0
 
-            cosmology = ci.specify_neutrino_mass(cosmology,
-                cosmology["omnuh2"], cosmology["nnu_massive"])
-            pars = ci.input_cosmology(cosmology, hubble_units=False)
+            MEMNeC = ci.specify_neutrino_mass(MEMNeC,
+                MEMNeC["omnuh2"], MEMNeC["nnu_massive"])
+            pars = ci.input_cosmology(MEMNeC, hubble_units=False)
+        
+            from cassL import generate_emu_data as ged
+            ged.print_cosmology(MEMNeC)
+
         else:
             pars = camb.CAMBparams()
             pars.set_cosmology(H0=H0, ombh2=ombh2, omch2=omch2+omnuh2,
