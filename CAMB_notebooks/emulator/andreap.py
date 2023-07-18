@@ -6,7 +6,7 @@ from camb import initialpower, model
 from cassL import camb_interface as ci
 import copy as cp
 
-def cassL_to_andrea_cosmology(cosm, hybrid=False):
+def cassL_to_andrea_cosmology(cosm, hybrid=False, foreign=None):
     """
     The 'hybrid' flag indicates whether we should use the original code as
         directly given us by Andrea (the function "get_PK", or if we should
@@ -18,6 +18,9 @@ def cassL_to_andrea_cosmology(cosm, hybrid=False):
         closer together until this strange discrepancy (as chronicled on the
         "interpolator_CAMB_agreement" notebook) vanishes.
     """
+    from cassL import generate_emu_data as ged
+    ged.print_cosmology(cosm)
+    
     ombh2 = cosm['ombh2']
     omch2 = cosm['omch2']
     ns = cosm['n_s']
@@ -34,7 +37,7 @@ def cassL_to_andrea_cosmology(cosm, hybrid=False):
 
     if hybrid:
         return get_PK_hybrid(ombh2, omch2, ns, omnuh2, H0, As, w0, wa, OmK,
-            de_model, w_mzero=True)
+            de_model, w_mzero=True, foreign=foreign)
     else:
         return get_PK(ombh2, omch2, ns, omnuh2, H0, As, w0, wa, OmK,
             de_model, w_mzero=True)
@@ -60,18 +63,19 @@ def get_PK_hybrid2(cosmology):
     return PKnu
 
 def get_PK_hybrid(ombh2, omch2, ns, omnuh2, H0, As, w0=-1.0, wa=0.0, omk=0.0,
-    de_model='fluid', w_mzero=True): 
+    de_model='fluid', w_mzero=True, foreign=None): 
     """
     The point of this function is to begin with the code "get_PK" given us by
         Andrea, and to incrementally bring it more and more in line with our
         current interpolator approach ("cosmology_to_PK_interpolator", as
         written in camb_interface.py.
     """
-    foreign = True
+    if foreign is None:
+        foreign = [False, False, False]
     pars = None
     #pars = camb.CAMBparams()
     #pars.set_cosmology(H0=H0, ombh2=ombh2, omch2=omch2, mnu=mnu, omk=omk)
-    if foreign:
+    if foreign[0]:
         print("The if-statement is behaving as expected.")
         cosmology = cp.deepcopy(ci.cosm.iloc[0])
         cosmology["h"] = H0 / 100
@@ -99,7 +103,7 @@ def get_PK_hybrid(ombh2, omch2, ns, omnuh2, H0, As, w0=-1.0, wa=0.0, omk=0.0,
 
     #omnuh2 = np.copy(pars.omnuh2)
     #print (omnuh2)
-    if foreign:
+    if foreign[1]:
         ci.apply_universal_output_settings(pars)
     else:
         pars.NonLinear = model.NonLinear_none
@@ -109,7 +113,7 @@ def get_PK_hybrid(ombh2, omch2, ns, omnuh2, H0, As, w0=-1.0, wa=0.0, omk=0.0,
 
     PKnu = None
 
-    if foreign:
+    if foreign[2]:
         # Hard-coded just for the sake of comparison
         _redshifts = np.flip(np.linspace(0, 2.1, 150))
         PKnu = ci.get_CAMB_interpolator(pars, _redshifts, kmax=10,
@@ -123,7 +127,7 @@ def get_PK_hybrid(ombh2, omch2, ns, omnuh2, H0, As, w0=-1.0, wa=0.0, omk=0.0,
     #print (camb.get_results(pars))
     
     if w_mzero:
-        if foreign:
+        if foreign[0]:
             MEMNeC = cp.deepcopy(ci.cosm.iloc[0])
             MEMNeC["h"] = H0 / 100
             MEMNeC["ombh2"] = ombh2
@@ -140,8 +144,6 @@ def get_PK_hybrid(ombh2, omch2, ns, omnuh2, H0, As, w0=-1.0, wa=0.0, omk=0.0,
                 MEMNeC["omnuh2"], MEMNeC["nnu_massive"])
             pars = ci.input_cosmology(MEMNeC, hubble_units=False)
         
-            from cassL import generate_emu_data as ged
-            ged.print_cosmology(MEMNeC)
 
         else:
             pars = camb.CAMBparams()
@@ -151,7 +153,7 @@ def get_PK_hybrid(ombh2, omch2, ns, omnuh2, H0, As, w0=-1.0, wa=0.0, omk=0.0,
             pars.set_dark_energy(w=w0, wa=wa, dark_energy_model=de_model)
             pars.Transfer.kmax = 20.0
 
-        if foreign:
+        if foreign[1]:
             ci.apply_universal_output_settings(pars)
         else:
             pars.NonLinear = model.NonLinear_none
@@ -161,9 +163,9 @@ def get_PK_hybrid(ombh2, omch2, ns, omnuh2, H0, As, w0=-1.0, wa=0.0, omk=0.0,
 
         PK = None
 
-        if foreign:
+        if foreign[2]:
             # Hard-coded just for the sake of comparison
-            _redshifts = np.flip(np.linspace(0, 2.1, 150))
+            _redshifts = np.flip(np.linspace(0, 3, 150))
             PK = ci.get_CAMB_interpolator(pars, _redshifts, kmax=10,
                 hubble_units=False)
         else:
