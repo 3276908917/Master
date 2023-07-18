@@ -403,7 +403,7 @@ def boltzmann_battery(omnuh2_floats, skips_omega=[0, 2], skips_model=[8],
     spectra = {}
 
     for this_omnuh2_index in range(len(omnuh2_floats)):
-        print(this_omnuh2_index % 10, end='')
+        #print(this_omnuh2_index % 10, end='')
         this_omnuh2_float = omnuh2_floats[this_omnuh2_index]
         if this_omnuh2_index in skips_omega:
             spectra[this_omnuh2_float] = None

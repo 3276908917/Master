@@ -122,7 +122,7 @@ def get_PK_hybrid(ombh2, omch2, ns, omnuh2, H0, As, w0=-1.0, wa=0.0, omk=0.0,
         pars.set_matter_power(redshifts=[0.0], kmax=20.0)
         PKnu = camb.get_matter_power_interpolator(
             pars, nonlinear=False, hubble_units=False, k_hunit=False,
-            kmax=20.0, zmax=20.0, var1='delta_tot', var2='delta_tot')
+            kmax=20.0, zmax=20.0, var1='delta_nonu', var2='delta_nonu')
     
     #print (camb.get_results(pars))
     
