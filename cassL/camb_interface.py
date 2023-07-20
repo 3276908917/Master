@@ -669,6 +669,9 @@ def evaluate_cosmology(cosmology, redshifts=[0], fancy_neutrinos=False,
         assert "sigma12" not in cosmology.keys() or mlc["sigma12"] is None, \
             "Redshift and sigma12 cannot be supplied simultaneously."
     '''
+    assert isinstance(redshifts, list) or isinstance(redshifts, np.ndarray),
+        "If you want to use a single redshift, you must still nest it in" + \
+        "an array."
 
     pars = input_cosmology(cosmology)
 
