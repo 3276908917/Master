@@ -1,3 +1,4 @@
 1. Neutrino settings:
     Hierarchy
     nnu_massive
+    Every line in that fancy_neutrinos debacle

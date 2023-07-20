@@ -1,7 +1,7 @@
 import numpy as np
 from scipy.interpolate import interp1d
 import GPy
-import lhc
+from cassL import lhc
 
 # In keeping with the format of values typically quoted in the literature for
 # the scalar mode amplitude (see, for example, Spurio Mancini et al, 2021 ),
@@ -13,6 +13,13 @@ A_MAX = np.exp(5) / 10 ** 10
 # (see the function get_param_ranges).
 A_MINI_MIN = np.exp(2.35) / 10 ** 10
 A_MINI_MAX = np.exp(3.91) / 10 ** 10
+
+def percent_error(trusted, tested):
+    """
+    I don't have a great place for this function, but I'm tired of copying and
+    pasting it.
+    """
+    return 100 * (tested - trusted) / trusted
 
 def get_param_ranges(priors="COMET", massive_neutrinos=True):
     """

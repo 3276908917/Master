@@ -684,19 +684,13 @@ def get_CAMB_interpolator(pars, redshifts=[0], kmax=1, hubble_units=False):
     """
     Helper function for cosmology_to_PK_interpolator.
     Given a fully set-up pars function, return a CAMB PK interpolator object.
-
     """
     # To change the the extent of the k-axis, change the following line as well
     # as the "get_matter_power_spectrum" call.
     pars.set_matter_power(redshifts=redshifts, kmax=kmax, nonlinear=False)
 
-    # results = camb.get_results(pars)
-
     # In some cursory tests, the accurate_massive_neutrino_transfers
     # flag did not appear to significantly alter the outcome.
-
-    # print("kmax is", kmax)
-    # print(pars)
 
     gmpi = camb.get_matter_power_interpolator
     PK = gmpi(pars, zmin=min(redshifts), zmax=max(redshifts),
