@@ -408,6 +408,32 @@ I guess we could already start putting a couple of plots here from my existing
 notebooks. I mean, I'm sure none of these plots will survive to the final
 version, but they might help to guide my discussion for a little while.
 
+IN THIS NEXT SECTION WE WILL BE DISCUSSING SOME OF THE VARIOUS CAMB SETTINGS
+AND THE STANDARD VALUES THAT WE USE, INCLUDING BRIEF ILLUSTRATIONS OF THE
+SIGNIFICANCE OF EACH SETTING BY WAY OF EXAMPLE ERROR PLOTS WHEN NONSTANDARD
+VALUES ARE USED.
+
+In figure \ref{fig: spectrum_type}, we can see that requesting of the wrong
+power spectrum type can in some low-$\omega_\nu$ cases yields errors so low
+that we might accidentally overlook them. This error pattern is easily
+recognizable and is a consequence of the definition of the power spectrum: the
+Fourier transform  of the two-point correlation function.
+\textcolor{red}{If we
+have more matter overall, we expect larger correlations.}
+\begin{figure}
+    \centering
+    \begin{minipage}[t]{.49\textwidth}
+        \raggedleft
+        \includegraphics[width=0.99\textwidth]{line_by_line/spectrum_variable/low_omnuh2}
+    \end{minipage}
+    \begin{minipage}[t]{.49\textwidth}
+        \raggedright
+        \includegraphics[width=0.99\textwidth]{line_by_line/spectrum_variable/high_omnuh2}
+    \end{minipage}
+    \caption{Left: small Right: big}
+    \label{fig: spectrum_type}
+\end{figure}
+
 \begin{centering}
 \section{MCMC}
 \end{centering}
