@@ -602,11 +602,10 @@ def get_CAMB_pspectrum(pars, redshifts=[0], k_points=100000,
     Helper function for evaluate_cosmology.
     Given a fully set-up pars function, return the following in this order:
         scale axis, redshifts used, power spectra, and sigma12 values.
-
     """
 
-    ''' To change the the extent of the k-axis, change the following line as
-    well as the "get_matter_power_spectrum" call. '''
+    # To change the the extent of the k-axis, change the following line as
+    # well as the "get_matter_power_spectrum" call.
     pars.set_matter_power(redshifts=redshifts, kmax=10.0 / pars.h,
                           nonlinear=False)
 
@@ -614,16 +613,12 @@ def get_CAMB_pspectrum(pars, redshifts=[0], k_points=100000,
 
     sigma12 = results.get_sigmaR(12, hubble_units=False)
 
-    '''
-    In some cursory tests, the accurate_massive_neutrino_transfers
-    flag did not appear to significantly alter the outcome.
+    # In some cursory tests, the accurate_massive_neutrino_transfers
+    # flag did not appear to significantly alter the outcome.
 
-    The flags var1=8 and var2=8 indicate that we are looking at the
-    power spectrum of CDM + baryons (i.e. neutrinos excluded).
-    '''
     k, z, p = results.get_matter_power_spectrum(
         minkh=1e-4 / pars.h, maxkh=10.0 / pars.h, npoints=k_points,
-        var1='delta_tot', var2='delta_tot'
+        var1='delta_nonu', var2='delta_nonu'
     )
 
     # De-nest for the single-redshift case:
@@ -672,9 +667,9 @@ def evaluate_cosmology(cosmology, redshifts=[0], fancy_neutrinos=False,
     '''
     assert isinstance(redshifts, list) or isinstance(redshifts, np.ndarray), \
         "If you want to use a single redshift, you must still nest it in" + \
-        "an array."
+        " an array."
 
-    pars = input_cosmology(cosmology)
+    pars = input_cosmology(cosmology, hubble_units)
 
     if fancy_neutrinos:
         make_neutrinos_fancy(pars, cosmology["nnu_massive"])
@@ -717,6 +712,10 @@ def cosmology_to_PK_interpolator(cosmology, redshifts=[0],
     """
     This is a really rough function, I'm just trying to test out an idea.
     """
+    assert isinstance(redshifts, list) or isinstance(redshifts, np.ndarray), \
+        "If you want to use a single redshift, you must still nest it in" + \
+        " an array."
+
     pars = input_cosmology(cosmology, hubble_units)
 
     if fancy_neutrinos:
