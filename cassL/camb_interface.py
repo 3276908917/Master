@@ -397,8 +397,9 @@ def boltzmann_battery(omnuh2_floats, skips_omega=[0, 2], skips_model=[8],
                     k[i] is the inverse of the physical scale associated with
                     each P_nu[i] and P_no[i]
     """
-    assert type(omnuh2_floats) == list or type(omnuh2_floats) == np.ndarray, \
-        "if you want only one omega value, you must still nest it in a list"
+    assert isinstance(omnuh2_floats, list) or \
+        isinstance(omnuh2_floats, np.ndarray), "if you want only one" + \
+        " omega value, you must still nest it in a list."
 
     spectra = {}
 
@@ -669,7 +670,7 @@ def evaluate_cosmology(cosmology, redshifts=[0], fancy_neutrinos=False,
         assert "sigma12" not in cosmology.keys() or mlc["sigma12"] is None, \
             "Redshift and sigma12 cannot be supplied simultaneously."
     '''
-    assert isinstance(redshifts, list) or isinstance(redshifts, np.ndarray),
+    assert isinstance(redshifts, list) or isinstance(redshifts, np.ndarray), \
         "If you want to use a single redshift, you must still nest it in" + \
         "an array."
 
