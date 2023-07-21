@@ -6,3 +6,5 @@
     There are multiple places where one can put the line "nonlinear," but I
     think it would be a waste of time to try to determine which location
     overrides which other location.
+    
+Let's cap ourselves at a maximum of three sets of plots without theoretical motivation. Then I should figure out at least one of them.

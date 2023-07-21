@@ -83,19 +83,65 @@ def parse_redshifts(model_num):
 
     return np.flip(np.sort(np.array(z)))
 
-def omnuh2_to_mnu(omnuh2, neutrino_mass_fac=camb.constants.neutrino_mass_fac,
-    nnu=camb.constants.default_nnu):
-    return omnuh2 * neutrino_mass_fac / (nnu / 3.0) ** 0.75
+def omnuh2_to_mnu(omnuh2, nnu=camb.constants.default_nnu):
+    r"""
+    !!! Units?
+    Compute the sum of neutrino masses mnu corresponding to the physical
+    physical density in neutrinos nnu.
 
-def mnu_to_omnuh2(mnu, neutrino_mass_fac=camb.constants.neutrino_mass_fac,
-    nnu=camb.constants.default_nnu):
-    return mnu * (nnu / 3.0) ** 0.75 / neutrino_mass_fac
+    Parameters:
+    ----------
+    omnuh2: float
+        The physical density in neutrinos corresponding to the requested sum of
+        neutrino masses.
+
+        Based off of line 55 from constants.py (CAMB), I think this is supposed
+        to be a sum.
+    nnu: float
+        The effective number of massive neutrino species. According to the
+        Planck best fit, this is 3.044.
+
+    Returns:
+    -------
+    (float)
+        The sum of neutrino masses (in which units??) to which mnu corresponds.
+    """
+    return omnuh2 * camb.constants.neutrino_mass_fac / (nnu / 3.0) ** 0.75
+
+def mnu_to_omnuh2(mnu, nnu=camb.constants.default_nnu):
+    r"""
+    !!! Units?
+    Compute the physical density in neutrinos corresponding to the sum of
+    neutrino masses mnu.
+
+    Parameters:
+    ----------
+    mnu: float
+        The sum of neutrino masses (in what units??) corresponding to the
+        requested physical density in neutrinos.
+        (Besides, is this the neutrino mass per neutrino type or the sum over
+        all three types??)
+
+        Based off of line 55 from constants.py (CAMB), I think this is supposed
+        to be a sum.
+    nnu: float
+        The effective number of massive neutrino species. According to the
+        Planck best fit, this is 3.044.
+
+    Returns:
+    -------
+    (float)
+        The physical density in neutrinos to which mnu corresponds.
+    """
+    return mnu * (nnu / 3.0) ** 0.75 / camb.constants.neutrino_mass_fac
 
 def balance_neutrinos_with_CDM(cosmology, new_omnuh2):
     r"""
-    !!!
-    I'm not sure how we're supposed to label returns if we return a function
-    call rather than a labeled object directly... do I just make up a name?
+    Return a modified cosmology dictionary with a physical density in neutrinos
+    specified by new_omnuh2, but with an equivalent total physical density in
+    matter. This is achieved by drawing from or adding to the physical density
+    in cold dark matter. Therefore, the returned cosmology will be equivalent
+    to the original cosmology for all parameters except for omnuh2 and omch2.
 
     This function reduces to a sort of get_MEMNeC function when new_omnuh2 is
     0.
@@ -119,7 +165,7 @@ def balance_neutrinos_with_CDM(cosmology, new_omnuh2):
 
     Returns
     -------
-    new_cosmology: dict
+    (dict)
         A dictionary of settings for cosmological parameters. The precise
         format is specified in the file "standards.txt".
     """
@@ -583,8 +629,7 @@ def specify_neutrino_mass(mlc, omnuh2_in, nnu_massive_in=1):
     Also, should we replace default_nnu with something else in the
     following expression? Even if we're changing N_massive to 1,
     N_total_eff = 3.046 nonetheless, right?'''
-    full_cosmology["mnu"] = omnuh2_in * camb.constants.neutrino_mass_fac / \
-        (camb.constants.default_nnu / 3.0) ** 0.75
+    full_cosmology["mnu"] = omnuh2_to_mnu(full_cosmology["omnuh2"])
 
     # print("The mnu value", mnu_in, "corresponds to the omnuh2 value",
     #    omnuh2_in)
