@@ -18,8 +18,17 @@
     'sigma12' the linear-theory RMS amplitude of mass fluctuations in spheres of
         radius 12 Mpc
     'omnuh2' physical density of the Universe in massive neutrinos
+        If both this and 'mnu' are missing, the program
+        automatically assumes that both are zero. Furthermore, 'nnu_massive'
+        will be treated as zero regardless of its actual value.
 !!!!'mnu' neutrino mass (but if we're using a normal hierarchy, which neutrino
         gets this mass??) 
+        If both this and 'omnuh2' are missing, the program
+        automatically assumes that both are zero. Furthermore, 'nnu_massive'
+        will be treated as zero regardless of its actual value.
+    'nnu_massive' the number of massive neutrino species.
+        If both 'omnuh2' and 'mnu' are missing from the
+        dictionary, this value will be ignored and treated as zero.
     
     Keep in mind that the following parameters are never explicitly
     used: 'OmL'.

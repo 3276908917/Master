@@ -2,3 +2,7 @@
     Hierarchy
     nnu_massive
     Every line in that fancy_neutrinos debacle
+    
+    There are multiple places where one can put the line "nonlinear," but I
+    think it would be a waste of time to try to determine which location
+    overrides which other location.

@@ -83,18 +83,63 @@ def parse_redshifts(model_num):
 
     return np.flip(np.sort(np.array(z)))
 
+def omnuh2_to_mnu(omnuh2, neutrino_mass_fac=camb.constants.neutrino_mass_fac,
+    nnu=camb.constants.default_nnu):
+    return omnuh2 * neutrino_mass_fac / (nnu / 3.0) ** 0.75
 
-def get_MEMNeC(cosmology):
+def mnu_to_omnuh2(mnu, neutrino_mass_fac=camb.constants.neutrino_mass_fac,
+    nnu=camb.constants.default_nnu):
+    return mnu * (nnu / 3.0) ** 0.75 / neutrino_mass_fac
+
+def balance_neutrinos_with_CDM(cosmology, new_omnuh2):
     r"""
-    Return a Matter-Equivalent Massless Neutrino Cosmology.
+    !!!
+    I'm not sure how we're supposed to label returns if we return a function
+    call rather than a labeled object directly... do I just make up a name?
 
-    Parameters:
-    -----------
+    This function reduces to a sort of get_MEMNeC function when new_omnuh2 is
+    0.
+
+    Parameters
+    ----------
     cosmology: dict
-        
+        A dictionary of settings for cosmological parameters. The precise
+        format is specified in the file "standards.txt". In particular, keep in
+        mind that the cosmology will be assumed to completely lack massive
+        neutrinos in the event that both of the keys 'mnu' and 'omnuh2' are
+        missing.
 
+    new_omnuh2: float
+        The new desired value for the physical density in neutrinos. The
+        returned cosmology dictionary will have
+        new_cosmology["omnuh2"] == new_omnuh2
+        In other words, new_omnuh2 is not a delta, but the new setting, and
+        the function will behave appropriately even if
+        cosmology["omnuh2"] != 0.
+
+    Returns
+    -------
+    new_cosmology: dict
+        A dictionary of settings for cosmological parameters. The precise
+        format is specified in the file "standards.txt".
     """
-    return 23
+    new_cosmology = cp.deepcopy(cosmology)
+
+    old_omnuh2 = 0
+    if "omnuh2" in cosmology:
+        old_omnuh2 = cosmology["omnuh2"]
+    elif "mnu" in cosmology:
+        old_omnuh2 = mnu_to_omnuh2(cosmology["mnu"])
+
+    delta = new_omnuh2 - old_omnuh2
+    assert delta < cosmology["omch2"], "Not enough density in CDM to " + \
+        "complete the desired transfer!"
+    new_cosmology["omch2"] -= delta
+
+    #! It might be dangerous for us to keep assuming '1' when the neutrinos are
+    # massive...
+    new_nnu_massive = 0 if new_omnuh2 == 0 else 1
+    return specify_neutrino_mass(new_cosmology, new_omnuh2, new_nnu_massive)
 
 def load_benchmark(relative_path, omnuh2_strs=None):
     r"""
