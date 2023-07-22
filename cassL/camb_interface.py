@@ -10,23 +10,20 @@ from scipy.optimize import root_scalar
 from scipy.integrate import quad
 import copy as cp
 
-# In order to redirect the Python session to the correct location of files,
-# we set the path_base parameter to one of the four following options.
-path_base_linux = "/home/lfinkbei/Documents/"
-path_base_rex = "C:/Users/Lukas/Documents/GitHub/"
-path_base_otto = "T:/GitHub/"
-path_base_work_laptop = "C:/Users/lfinkbei/Documents/GitHub/"
+import os
+data_prefix = os.path.dirname(os.path.abspath(__file__)) + "/"
 
-path_base = path_base_linux
+try:
+    # Keep in mind that 'cosmologies.dat' is NOT the same file as the original
+    # 'cosmology_Aletheia.dat' that Ariel provided. In order to facilitate the
+    # reading-in of the file, we make some miner formatting adjustments such as
+    # the removal of number signs. Use the unaltered version will cause a
+    # segfault.
+    path_to_cosms = data_prefix + "cosmologies.dat"
+    cosm = pd.read_csv(path_to_cosms, sep=r'\s+')
 
-path_to_this_repo = path_base + "Master/"
-
-# Keep in mind that 'cosmologies.dat' is NOT the same file as the original
-# 'cosmology_Aletheia.dat' that Ariel provided. In order to facilitate the
-# reading-in of the file, we make some miner formatting adjustments such as the
-# removal of number signs. Use the unaltered version will cause a segfault.
-path_to_cosms = path_to_this_repo + "cosmologies.dat"
-cosm = pd.read_csv(path_to_cosms, sep=r'\s+')
+except FileNotFoundError:
+    print("Failure to load table of Aletheia cosmologies.")
 
 # ! If there is a justification for using these specific values, one would
 # have to ask Ariel for it. I use these values because he used them. Anyway,
@@ -223,8 +220,6 @@ def load_benchmark(relative_path, omnuh2_strs=None):
                     k[i] is the inverse of the physical scale associated with
                     each P_nu[i] and P_no[i]
     """
-
-    benchmark_file_base = path_to_this_repo + "benchmarks/" + relative_path
 
     def iterate_over_models_and_redshifts(accessor="0.002"):
         nested_spectra = []
