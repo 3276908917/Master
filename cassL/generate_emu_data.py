@@ -44,7 +44,8 @@ def print_cosmology(cosmology):
     #    print(key, cosmology[key])
 
 
-def build_cosmology(om_b_in, om_c_in, ns_in, sigma12_in, As_in, om_nu_in):
+def build_cosmology(om_b_in, om_c_in, ns_in, sigma12_in, As_in, om_nu_in,
+    param_ranges=None):
     # Use Aletheia model 0 as a base
     cosmology = cp.deepcopy(ci.cosm.iloc[0])
 
@@ -55,16 +56,43 @@ def build_cosmology(om_b_in, om_c_in, ns_in, sigma12_in, As_in, om_nu_in):
     cosmology["sigma12"] = sigma12_in
     cosmology["A_s"] = As_in
 
+    if param_ranges is not None:
+       # ! It's poor form to use different names, e.g. 'om_b' to access
+       # param_ranges whereas we use "ombh2" to access a cosmology dictionary
+
+        prior = param_ranges["om_b"]
+        cosmology["ombh2"] = cosmology["ombh2"] * (prior[1] - prior[0]) + \
+            prior[0]
+
+        prior = param_ranges["om_c"]
+        cosmology["omch2"] = cosmology["omch2"] * (prior[1] - prior[0]) + \
+            prior[0]
+
+        prior = param_ranges["n_s"]
+        cosmology["n_s"] = cosmology["n_s"] * (prior[1] - prior[0]) + prior[0]
+
+        prior = param_ranges["sigma12"]
+        cosmology["sigma12"] = cosmology["sigma12"] * (prior[1] - prior[0]) + \
+            prior[0]
+
+        prior = param_ranges["A_s"]
+        cosmology["A_s"] = cosmology["A_s"] * (prior[1] - prior[0]) + prior[0]
+
     ''' Actually the last argument is not really important and is indeed just
         the default value. I'm writing this out explicitly because we're still
         in the debugging phase and so my code should always err on the verbose
         side.'''
     nnu_massive = 0 if om_nu_in == 0 else 1
 
+    if param_ranges is not None: 
+        prior = param_ranges["om_nu"]
+        om_nu_in = om_nu_in * (prior[1] - prior[0]) + prior[0]
+
     return ci.specify_neutrino_mass(cosmology, om_nu_in,
         nnu_massive_in=nnu_massive)
 
-def fill_hypercube(parameter_values, standard_k_axis, massive_neutrinos=True,
+def fill_hypercube(parameter_values, standard_k_axis,
+    param_ranges=None, massive_neutrinos=True,
     cell_range=None, samples=None, write_period=None, save_label="unlabeled"):
     """
     @parameter_values: this should be a list of tuples to
@@ -84,11 +112,11 @@ def fill_hypercube(parameter_values, standard_k_axis, massive_neutrinos=True,
     # Recent change: now omega_nu comes last
 
     bundle_parameters = lambda row: build_cosmology(row[0], row[1], row[2],
-        row[3], row[4], row[5])
+        row[3], row[4], row[5], param_ranges)
 
     if massive_neutrinos == False:
         bundle_parameters = lambda row: build_cosmology(row[0], row[1], row[2],
-            row[3], A_S_DEFAULT, 0)
+            row[3], A_S_DEFAULT, 0, param_ranges)
 
     # This just provides debugging information
     rescaling_parameters_list = None

@@ -222,3 +222,52 @@ def multithread_LHC_builder(param_ranges, n_samples, label="unlabeled",
         for each dimension. We have to rescale the LHC to match the range
         we want for our cosmological parameters
         '''
+
+def multithread_unit_LHC_builder(dim, n_samples, label="unlabeled",
+    previous_record=0):
+    """
+    Use more CPU to compute more random LHCs, periodically saving the one with
+    the greatest minimum separation. In other words, our LHC generation
+    approach is still fundamentally inefficient (we're hoping to simply get
+    lucky with the minimum separations).
+
+    As of 19.06.23 @ 11:40 am, the records are as follows:
+    * COMET priors
+        * massive case: 0.0802202670064637
+            (saved under "best_lhc_multi2.npy")
+    """
+
+    # This is the external function, 'lhs.' It needs to know the size
+    # of the parameter space, the number of points you want, and the
+    # criterion to select points. 'center' means that it first divides
+    # each dimension of the parameter space into n_samples equispaced
+    # intervals and it picks the middle point of the chosen interval
+    overall_min_dist = previous_record
+    overall_best_lhc = None
+    num_workers = 12
+
+    while True:
+        executor = concurrent.futures.ProcessPoolExecutor(num_workers)
+        futures = [executor.submit(batch, dim) for i in range(num_workers)]
+        min_dists = []
+        lhcs = []
+
+        for future in futures:
+            this_lhc, this_min_dist = future.result()
+            if this_min_dist > overall_min_dist:
+                overall_min_dist = this_min_dist
+                overall_best_lhc = this_lhc
+
+                np.save("best_lhc_" + label + ".npy", overall_best_lhc,
+                    allow_pickle=True)
+
+                print("New best found! New minimum distance is",
+                    str(overall_min_dist) + ".", "Saving...")
+
+        #outs = concurrent.futures.wait(futures)
+
+        '''
+        The lhs function returns a LHC normalized within the range [0,1]
+        for each dimension. We have to rescale the LHC to match the range
+        we want for our cosmological parameters
+        '''
