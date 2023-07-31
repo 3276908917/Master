@@ -6,6 +6,9 @@
 
 #CAKE21/repo
 
+# Eliminate unnecessary backups
+.virtual_documents
+
 ## Misc ad-hoc stuff
 *-checkpoint.ipynb
 *checkpoints
@@ -13,6 +16,7 @@
 *.csv
 *.png
 *.nucomet
+*.cle
 cassL.egg-info
 
 # Ignore generated media and heavy analyses

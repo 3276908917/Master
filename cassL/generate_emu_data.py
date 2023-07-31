@@ -71,9 +71,16 @@ def build_cosmology(om_b_in, om_c_in, ns_in, sigma12_in, As_in, om_nu_in,
         prior = param_ranges["n_s"]
         cosmology["n_s"] = cosmology["n_s"] * (prior[1] - prior[0]) + prior[0]
 
-        prior = param_ranges["sigma12"]
-        cosmology["sigma12"] = cosmology["sigma12"] * (prior[1] - prior[0]) + \
-            prior[0]
+        if "sigma12" in param_ranges:
+            prior = param_ranges["sigma12"]
+            cosmology["sigma12"] = cosmology["sigma12"] * \
+                (prior[1] - prior[0]) + prior[0]
+        elif "sigma12_2" in param_ranges:
+            #! Make the use of sigma12_2 more user-friendly
+            prior = param_ranges["sigma12_2"]
+            # sigma12_in actually describes a sigma12_2 value
+            sigma12_2 = sigma12_in * (prior[1] - prior[0]) + prior[0]
+            cosmology["sigma12"] = np.sqrt(sigma12_2)
 
         prior = param_ranges["A_s"]
         cosmology["A_s"] = cosmology["A_s"] * (prior[1] - prior[0]) + prior[0]
@@ -150,6 +157,19 @@ def fill_hypercube(parameter_values, standard_k_axis,
         # deterministic result.
         if this_actual_sigma12 is not None:
             parameter_values[i][3] = this_actual_sigma12
+            
+            if "sigma12" in param_ranges: # we have to normalize
+                prior = param_ranges["sigma12"]
+                this_normalized_actual_sigma12 = \ 
+                    (this_actual_sigma12 - prior[0]) / (prior[1] - prior[0])
+                parameter_values[i][3] = this_normalized_actual_sigma12
+            #! Make the use of sigma12_2 more user-friendly
+            elif "sigma12_2" in param_ranges: # we have to square and normalize
+                this_actual_sigma12_2 = np.square(this_actual_sigma12)
+                prior = param_ranges["sigma12_2"]
+                this_normalized_actual_sigma12_2 = \
+                    (this_actual_sigma12_2 - prior[0]) / (prior[1] - prior[0])
+                parameter_values[i][3] = this_normalized_actual_sigma12_2
 
         #print("p-spectrum computation complete!")
         #except ValueError:

@@ -224,7 +224,7 @@ def multithread_LHC_builder(param_ranges, n_samples, label="unlabeled",
         '''
 
 def multithread_unit_LHC_builder(dim, n_samples, label="unlabeled",
-    previous_record=0):
+    num_workers=12, previous_record=0):
     """
     Use more CPU to compute more random LHCs, periodically saving the one with
     the greatest minimum separation. In other words, our LHC generation
@@ -244,7 +244,6 @@ def multithread_unit_LHC_builder(dim, n_samples, label="unlabeled",
     # intervals and it picks the middle point of the chosen interval
     overall_min_dist = previous_record
     overall_best_lhc = None
-    num_workers = 12
 
     while True:
         executor = concurrent.futures.ProcessPoolExecutor(num_workers)
