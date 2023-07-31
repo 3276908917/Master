@@ -160,7 +160,7 @@ def fill_hypercube(parameter_values, standard_k_axis,
             
             if "sigma12" in param_ranges: # we have to normalize
                 prior = param_ranges["sigma12"]
-                this_normalized_actual_sigma12 = \ 
+                this_normalized_actual_sigma12 = \
                     (this_actual_sigma12 - prior[0]) / (prior[1] - prior[0])
                 parameter_values[i][3] = this_normalized_actual_sigma12
             #! Make the use of sigma12_2 more user-friendly

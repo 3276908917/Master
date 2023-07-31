@@ -226,7 +226,7 @@ def load_benchmark(relative_path, omnuh2_strs=None):
         for i in range(0, 9):  # iterate over models
             nested_spectra.append([])
             for j in range(0, 5):  # iterate over snapshots
-                next_file_name = benchmark_file_base + accessor + "_caso" + \
+                next_file_name = relative_path + accessor + "_caso" + \
                             str(i) + "_000" + str(j) + ".dat"
                 next_spectrum = pd.read_csv(next_file_name,
                                             names=["k", "P_no", "P_nu",
