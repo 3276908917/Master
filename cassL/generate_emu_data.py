@@ -138,6 +138,8 @@ def fill_hypercube(parameter_values, standard_k_axis,
 
         # kp returns (in this order): p-spectrum, actual_sigma12, z_best
 
+        # print(this_cosmology)
+
         # We're only making the following switch in order to test out the
         # interpolator approach.
         #this_p, this_actual_sigma12, these_rescaling_parameters = \
