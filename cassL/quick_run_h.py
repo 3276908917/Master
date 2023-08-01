@@ -11,7 +11,7 @@ param_ranges = ui.get_param_ranges(massive_neutrinos=massive_neutrinos)
 # param_ranges["sigma12_2"] = [0.04, 1]
 samples_H2, rescalers_H2 = ged.fill_hypercube(
     hc_sigma12_pred, standard_k, param_ranges,
-    massive_neutrinos=massive_neutrinos, write_period=50,
+    massive_neutrinos=massive_neutrinos, write_period=100,
     save_label="h1_unit_train"
 )
 
