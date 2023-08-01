@@ -57,14 +57,11 @@ def build_cosmology(om_b_in, om_c_in, ns_in, sigma12_in, As_in, om_nu_in,
     cosmology["A_s"] = As_in
 
     if param_ranges is not None:
-       # ! It's poor form to use different names, e.g. 'om_b' to access
-       # param_ranges whereas we use "ombh2" to access a cosmology dictionary
-
-        prior = param_ranges["om_b"]
+        prior = param_ranges["ombh2"]
         cosmology["ombh2"] = cosmology["ombh2"] * (prior[1] - prior[0]) + \
             prior[0]
 
-        prior = param_ranges["om_c"]
+        prior = param_ranges["omch2"]
         cosmology["omch2"] = cosmology["omch2"] * (prior[1] - prior[0]) + \
             prior[0]
 
@@ -82,8 +79,10 @@ def build_cosmology(om_b_in, om_c_in, ns_in, sigma12_in, As_in, om_nu_in,
             sigma12_2 = sigma12_in * (prior[1] - prior[0]) + prior[0]
             cosmology["sigma12"] = np.sqrt(sigma12_2)
 
-        prior = param_ranges["A_s"]
-        cosmology["A_s"] = cosmology["A_s"] * (prior[1] - prior[0]) + prior[0]
+        if "A_s" in param_ranges:
+            prior = param_ranges["A_s"]
+            cosmology["A_s"] = cosmology["A_s"] * (prior[1] - prior[0]) + \
+                prior[0]
 
     ''' Actually the last argument is not really important and is indeed just
         the default value. I'm writing this out explicitly because we're still
@@ -91,8 +90,8 @@ def build_cosmology(om_b_in, om_c_in, ns_in, sigma12_in, As_in, om_nu_in,
         side.'''
     nnu_massive = 0 if om_nu_in == 0 else 1
 
-    if param_ranges is not None: 
-        prior = param_ranges["om_nu"]
+    if param_ranges is not None and "omnuh2" in param_ranges:
+        prior = param_ranges["omnuh2"]
         om_nu_in = om_nu_in * (prior[1] - prior[0]) + prior[0]
 
     return ci.specify_neutrino_mass(cosmology, om_nu_in,
@@ -159,7 +158,7 @@ def fill_hypercube(parameter_values, standard_k_axis,
         # deterministic result.
         if this_actual_sigma12 is not None:
             parameter_values[i][3] = this_actual_sigma12
-            
+
             if "sigma12" in param_ranges: # we have to normalize
                 prior = param_ranges["sigma12"]
                 this_normalized_actual_sigma12 = \

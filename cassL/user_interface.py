@@ -54,23 +54,23 @@ def get_param_ranges(priors="COMET", massive_neutrinos=True):
 
     if priors == "MEGA":
         param_ranges = {
-            'om_b': [0.005, 0.28],
-            'om_c': [0.001, 0.99], # max 0.3?
+            'ombh2': [0.005, 0.28],
+            'omch2': [0.001, 0.99], # max 0.3?
             'n_s': [0.7, 1.3], # expand?
             'sigma12': [0.2, 1], # based on Sanchez et al 21 and
                 # Sanchez 20, fig 2 
         }
     elif priors == "classic": # This is useful for a demo run. 
         param_ranges = {
-            'om_b': [0.01875, 0.02625],
-            'om_c': [0.05, 0.255],
+            'ombh2': [0.01875, 0.02625],
+            'omch2': [0.05, 0.255],
             'n_s': [0.84, 1.1],
             'sigma12': [0.2, 1], # based on Sanchez et al 21; Sanchez 20 fig 2 
         }
     elif priors=="COMET":
         param_ranges = {
-            'om_b': [0.0205, 0.02415],
-            'om_c': [0.085, 0.155],
+            'ombh2': [0.0205, 0.02415],
+            'omch2': [0.085, 0.155],
             'n_s': [0.92, 1.01],
             'sigma12': [0.2, 1], # based on Sanchez et al 21; Sanchez 20 fig 2 
         }
@@ -83,7 +83,7 @@ def get_param_ranges(priors="COMET", massive_neutrinos=True):
         elif priors == "COMET": 
             param_ranges['A_s'] = [1.15e-9, A_MINI_MAX]
 
-        param_ranges['om_nu'] = [0., 0.01]
+        param_ranges['omnuh2'] = [0., 0.01]
 
     return param_ranges
 
