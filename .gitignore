@@ -15,14 +15,17 @@ CAMB_demo/planck_2018.ini
 *.pdf
 *.pyc
 *.ini
-*.npy # emulator data sets, i.e. LHC X and Y sets
+# emulator data sets, i.e. LHC X and Y sets
+*.npy
 *.csv
 *.tar
 *.dat
 *.tar.gz
 
-*.nucomet # old name for emulator files
-*.cle # current name for emulator files
+# old name for emulator files
+*.nucomet
+# current name for emulator files
+*.cle 
 
 #  Text editor trash
 *.kate-swp
@@ -47,10 +50,6 @@ CAMB_demo/planck_2018.ini
 *.dvi
 *.xdv
 *-converted-to.*
-# these rules might exclude image files for figures etc.
-# *.ps
-# *.eps
-# *.pdf
 
 ## Generated if empty string is given at
 # "Please type another file name for output:"

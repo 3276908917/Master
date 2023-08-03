@@ -7,7 +7,7 @@ massive_neutrinos=True
 emu_stage = "test"
 # Technically, this variable is not very user-friendly anymore, because we often
 # use hypercubes from older versions...
-emu_vlabel = "H2"
+emu_vlabel = "Hnu2"
 
 file_suffix = emu_vlabel + "_" + emu_stage
 
