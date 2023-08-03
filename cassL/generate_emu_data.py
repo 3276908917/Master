@@ -1,10 +1,7 @@
-# It seems like tkgrid.py might have been intended to help me with this,
-# but I don't know how to use it
-
-# Short-cut:
-# Documents\GitHub\Master\CAKE21\modded_repo
-
 import sys, platform, os
+import traceback
+import copy as cp
+
 import numpy as np
 from scipy.interpolate import interp1d
 from scipy.optimize import root_scalar
@@ -13,41 +10,30 @@ import camb
 from camb import model, initialpower, get_matter_power_interpolator
 
 from cassL import camb_interface as ci
-import copy as cp
 
-cosm = ci.cosm
-model0 = cosm.loc[0]
+model0 = ci.cosm.loc[0]
 
-''' AndreaP thinks that npoints=300 should be a good balance of accuracy and
-computability for our LH.'''
+# AndreaP thinks that npoints=300 should be a good balance of accuracy and
+# computability for our LH.
 NPOINTS = 300
 
-A_S_DEFAULT = 2.12723788013000E-09
-
-import sys, traceback
-import copy as cp
+A_S_DEFAULT = 2.12723788013E-09
 
 # These values help with the following function.
 # However, neither of these belongs here, we should find a different home.
 disregard_keys = ["OmB", "OmC", "OmM", "z(4)", "z(3)", "z(2)", "z(1)", "z(0)",
     "Lbox", "sigma8", "Name", "nnu_massive", "EOmDE"]
 
-# For some reason, these keys are not printed by default, so we need to
-# explicitly mention them.
-# res_keys = ["sigma12", "omnuh2"]
-
 def print_cosmology(cosmology):
     for key in cosmology.keys():
         if key not in disregard_keys:
             print(key, cosmology[key])
-    #for key in res_keys:
-    #    print(key, cosmology[key])
 
 
 def build_cosmology(om_b_in, om_c_in, ns_in, sigma12_in, As_in, om_nu_in,
     param_ranges=None):
     # Use Aletheia model 0 as a base
-    cosmology = cp.deepcopy(ci.cosm.iloc[0])
+    cosmology = cp.deepcopy(model0)
 
     cosmology["ombh2"] = om_b_in
     cosmology["omch2"] = om_c_in
