@@ -1,23 +1,8 @@
-## We may actually want to rewrite this later if we use the CAKE code as a
-# starting point for our own project. Right now, though, I want to avoid
-# bloating the repo with plagiarism.
-
-# Looks like we've already pretty much reached that point!
-
-#CAKE21/repo
-
-# Eliminate unnecessary backups
-.virtual_documents
-
-## Misc ad-hoc stuff
+# Random back-up silliness that I don't want
 *-checkpoint.ipynb
 *checkpoints
-*.npy
-*.csv
-*.png
-*.nucomet
-*.cle
 cassL.egg-info
+.virtual_documents
 
 # Ignore generated media and heavy analyses
 communications
@@ -25,12 +10,18 @@ machines
 cake-workshop-2021
 comet-emu
 
-# Ignore data files
-*.tar
-*.dat
-*.tar.gz
+# Other unnecessary data files
+CAMB_demo/planck_2018.ini
+*.pdf
+*.pyc
+*.ini
+*.npy # emulator data sets, i.e. LHC X and Y sets
+*.csv
 
-#  Text editor trash files
+*.nucomet # old name for emulator files
+*.cle # current name for emulator files
+
+#  Text editor trash
 *.kate-swp
 *.swo
 *~
@@ -337,10 +328,3 @@ TSWLatexianTemp*
 # option is specified. Footnotes are the stored in a file with suffix Notes.bib.
 # Uncomment the next line to have this generated file ignored.
 #*Notes.bib
-
-# Ad-hoc stuff, part 2
-CAMB_demo/planck_2018.ini
-*.pdf
-*.pyc
-*.ini
-*.gif
