@@ -17,6 +17,9 @@ CAMB_demo/planck_2018.ini
 *.ini
 *.npy # emulator data sets, i.e. LHC X and Y sets
 *.csv
+*.tar
+*.dat
+*.tar.gz
 
 *.nucomet # old name for emulator files
 *.cle # current name for emulator files
