@@ -129,15 +129,8 @@ def fill_hypercube(parameter_values, standard_k_axis,
 
     unwritten_cells = 0
     for i in cell_range:
-        #print(i, "computation initiated")
         this_p = None
-        #try:
-            #print("beginning p-spectrum computation")
         this_cosmology = bundle_parameters(parameter_values[i])
-
-        # kp returns (in this order): p-spectrum, actual_sigma12, z_best
-
-        # print(this_cosmology)
 
         # We're only making the following switch in order to test out the
         # interpolator approach.
@@ -171,18 +164,6 @@ def fill_hypercube(parameter_values, standard_k_axis,
                 this_normalized_actual_sigma12_2 = \
                     (this_actual_sigma12_2 - prior[0]) / (prior[1] - prior[0])
                 parameter_values[i][3] = this_normalized_actual_sigma12_2
-
-        #print("p-spectrum computation complete!")
-        #except ValueError:
-        ''' Don't let unreasonable sigma12 values crash the program; ignore
-        them for now. It's not clear to me why unreasonable sigma12 values
-        sometimes (albeit quite rarely) raise ValueErrors. One would think
-        that that situation would be adequately handled by the h=0.01 check
-        in kp.
-        '''
-        #    traceback.print_exc(limit=1, file=sys.stdout)
-        #except Exception: 
-        #    traceback.print_exc(limit=1, file=sys.stdout)
 
         samples[i] = this_p
 
