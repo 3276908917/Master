@@ -57,15 +57,15 @@ factor to results from emulators built on massless-neutrino simulations.  We fin
 \section{Introduction, Theory, and Background}
 \end{centering}
 
-I have a lot of different important concepts that I need to get through, so I can easily imagine this becoming a relatively long introduction for a master's thesis.
+I have a lot of different important concepts that I need to get through, so I can easily imagine this becoming a relatively long introduction compared to other master's theses.
 
 \begin{centering}
 \subsection{The Matter Power Spectrum}
 \end{centering}
 
-First, I want to talk about how a primary goal of cosmology is to specify, as narrowly as possible, the parameters which define our Universe. These include, for example, the overall curvature of the Universe as well as its cold dark matter (CDM) content.
+A primary goal of cosmology is to specify, as narrowly as possible, the parameters which define our Universe. These include, for example, the overall curvature of the Universe as well as its cold dark matter (CDM) content.
 
-Next, I want to talk about one powerful result, the power spectrum. The power spectrum can be probed in many different ways, and it's precise shape and amplitude can tell us about several of these cosmological parameters.
+Next, I want to talk about one powerful result, the power spectrum. The power spectrum can be probed in many different ways, and its precise shape and amplitude can tell us about several of these cosmological parameters.
 
 Actually, the power spectra we are discussing in this thesis are linear-theory power spectra of non-neutrino matter. But anyway, here I will cover some of the tried-and-true basic explanations of what the power spectrum is and why it is interesting for the question of parameter inference. 
 
@@ -73,11 +73,11 @@ Actually, the power spectra we are discussing in this thesis are linear-theory p
 \subsection{Boltzmann Solvers and CAMB}
 \end{centering}
 
-To hint at what's to come, I start off this section by noting that several cosmological parameters have a fairly unique impact on the shape of the power spectrum, while others have a degenerate impact. 
-
-This is mostly just a theoretical discussion of these solvers. The hands-on stuff comes in the non-introductory section on CAMB.
-
 I want to talk about what a Boltzmann solver is and what kinds of equations it is solving.
+
+To hint at what's to come, I start off this section by noting that several cosmological parameters have a fairly unique impact on the shape of the power spectrum, while others have a degenerate impact. Wouldn't it be great if we could know what the power spectrum would look like if we increased parameter $x$? Boltzmann solvers can help us with that.
+
+This will mostly just be a theoretical discussion of these solvers. The hands-on stuff comes in the non-introductory section on CAMB.
 
 I will also mention a couple of specific Boltzmann solvers, like CLASS and CAMB. I will briefly justify our use of CAMB over CLASS.
 
@@ -130,7 +130,6 @@ I'll talk a little about different emulators currently available, such as COMET.
 
 This section will also include an extremely brief summary of Ariel's paper motivating the use of $\sigma_{12}$ instead of $\sigma_8$.
 
-\footnote{
     I have two primary objectives for this section: explain the unit system
     we are using (ditch $h$ factor because it messes up everything--but
     only briefly summarize the main arguments of Sanchez 2020), and briefly
@@ -138,12 +137,10 @@ This section will also include an extremely brief summary of Ariel's paper motiv
     $\sigma_{12}$ in this way. Unfortunately, this second objective will
     almost certainly require you to bust out a few equations, and even to
     manipulate them a little to tease out relations essential to this paper.
-}
 
 Conventional emulator calibration entails the historical units of Mpc / $h$,
 but if we use instead units of Mpc, then we can distill all of the evolution
-parameters into one parameter, $\sigma_{12}$. Since $h$ is already its own
-(shape!) parameter, the conventional $\sigma_8$ parameter is truly a mixture
+parameters into one parameter, $\sigma_{12}$. Since $h$ is already its own parameter, the conventional $\sigma_8$ parameter is truly a mixture
 of two parameters. This presents a host of misleading results  and statistical
 ambiguities (\cbib{San20}) which are outside of the scope of this work but
 which prompt us to abandon $\sigma_8$.
@@ -159,23 +156,7 @@ affect the amplitude of the power spectrum at a particular redshift, while
 \textit{shape} parameters $\mathcal{O}_S$
 (such as $\omega_K$, $\omega_\text{DE}$, w(a))
 affect the shape of the power
-spectrum. \textcolor{orange}{One paper made it sound like shape parameters
-affect both shape and amplitude. Was it one of the S\'{a}nchez papers? I think
-I misunderstood it, but we have to confirm that we can now understand what was
-meant.\footnote{
-    I'm certain that I misread this second description, for the following.
-    The main \textit{problem} with neutrinos (i.e. why they \textit{don't}
-    play nicely with the categories that I am trying to describe here)
-    is that they affect \textit{both} shape and evolution! As far as we know,
-    the physical density in neutrinos is the \textit{only} parameter that
-    is poorly behaved in this way.
-}
-Why does it help to have these categories in the first place?}\footnote{
-    As I understand it, we split the parameters up this way because
-    one category of parameters (I think the evolution parameters)
-    can be entirely funneled through just one parameter
-    (I think it's $\sigma_{12}$, but obviously we should double check that)
-}
+spectrum.
 
 We take, as the evolution mapping relation for the power spectrum, equation 13
 from \cbib{San21}:
@@ -187,9 +168,7 @@ from \cbib{San21}:
     \Delta_L^2 (k | \Theta_s, \sigma_{12} \left( z, \Theta_s, \Theta_e \right))
 \end{equation}
 
-Why is this scheme important? Evolution mapping\footnote{I think we need to
-double check our language here, I think evolution mapping refers to more than
-just the categorization scheme} greatly simplifies the emulator
+Why is this scheme important? Evolution mapping greatly simplifies the emulator
 implementation. Because we can
 funnel all of the evolution parameters through $\sigma_{12}$, we've effectively
 collapsed an entire category of parameters to just one parameter. Fewer
@@ -199,58 +178,13 @@ parameters means that we get a faster emulator.
 and the same values of the parameter combinations $b \sigma_{12}(z)$ and
 $f \sigma_{12}(z)$ will be identical'' (\cbib{San21}).
 
-Anticipating a counterargument: ``For a general cosmology, $h$ is a combination
-of shape and evolution parameters. However, for a $\Lambda$CDM Universe, fixing
-the values of the shape parameters $\omega_b$ and $\omega_c$ and varying $h$
-corresponds to assuming different values of the purely evolutionary parameter
-$\omega_\text{DE}$'' (\cbib{San21}).
-
-From my original assignment email:
-``If the dependence of the transfer function, $T(k)$, on the relevant physical
-density parameters is emulated, it is possible to obtain a prediction for the
-full power spectrum in Mpc units for any choice of evolution parameters and
-redshift. The full shape of $P_L(k|z)$ can be obtained from the output of the
-emulator of $T(k)$ and $n_s$ (and any additional shape parameter controlling
-the scale dependence of the primordial power spectrum). The correct amplitude
-of $P_L(k|z)$ can be obtained by computing the value of $\sigma_{12}(z)$ in
-terms of the desired normalization at $z=0$ and the growth factor $D(z)$ for
-the cosmology being considered. Such a recipe would be valid for a wide range
-of evolution cosmological parameters, including non-standard models, as long as
-the corresponding linear growth factor is scale-independent. The smaller number
-of parameters required to emulate $T(k)$ would increase the overall accuracy of
-the predictions while avoiding the need to sample the redshift evolution of
-$P_L(k|z) P_L(k|z)$ explicitly would greatly simplify the calibration
-procedure'' (A. G. S\'{a}nchez, private communication).
-
-\textcolor{orange}{I believe that $P_L(k|z) P_L(k|z)$ is a typo in the above
-paragraph, but I don't know how else to transcribe Ariel's email. Maybe he
-made a mistake?}
-
-``The time evolution of $\Delta_L^2(k)$ in models with identical shape
-parameters
-but different evolution parameters can be mapped from one to the other by
-relabelling the redshifts that correspond to the same clustering amplitude
-(i.e. $\sigma_{12}(z)$)''.
-(\cbib{San21}).
-
-Now, for the hiccup: this scheme is broken by one parameter, the Universe's
+Now, for the hiccup, which segues into the next section: this scheme is broken by one parameter, the Universe's
 density in neutrinos. (In the next section: why this is so and what we can do
 about it.)
 
 \begin{centering}
 \subsection{Neutrinos and Their Cosmological Impact}
 \end{centering}
-
-\footnote{
-    Here I am violating my traditional rule of ordering sections by
-    increasing complexity, because I consider the $\sigma_{12}$ argument
-    decidedly more esoteric than a summary of the relevant points of neutrino
-    physics. I think we should stick with this structure though, in the
-    interest of narrative. Specifically, neutrinos represent a wrench in the
-    plan. For that development to make sense, we first need to have established
-    what
-    the ``plan'' is: evolution mapping.
-}
 
 (\cbib{Kiakotou}): ``Neutrinos with masses on the eV scale or below will be a
 hot component of the dark matter and will free-stream out of overdensities and
@@ -259,58 +193,20 @@ thus wipe out small-scale structures.''
 ``In general, a larger density of relativistic species leads to a smaller
 growth of matter fluctuations'' (\cbib{Zennaro}).
 
-``Thermal velocities dominate neutrino dynamics during the first time-steps
-(after $z=99$), having a dispersion roughly five orders of magnitude larger
-than the dispersion of peculiar neutrino velocities.''
 
-The evolution of neutrino density, like that of photon density, depends on the
-momentum distribution.
-
-\begin{equation}
-    p_{\nu, i}(z)
-    =
-    \frac{(k_B T_{\nu, 0})^4}{\pi^2}
-    \,
-    (1 + z)^4
-    \,
-    \mathcal{F} \left[ \frac{m_{\nu, i}}{k_B T_{\nu, 0} (1 + z)} \right]
-\end{equation}
-
-where $i$ indexes the neutrino species and
-
-\begin{equation}
-    \mathcal{F}(y) \equiv \int_0^\infty \frac{x^2 \sqrt{x^2 + y^2}}{1 + e^x}
-\end{equation}
-
- (\cbib{Zennaro})
-
-``The two-fluid approximation consists in assuming that neutrino perturbations
-are well described by two variables: density and velocity divergence''
-(\cbib{Zennaro}).
-
-Remember what the point of this section is: why is $\omega_\nu$ bad for the
+The point of this section is: why is $\omega_\nu$ bad for the
 evolution mapping scheme? Because neutrinos exhibit redshift-dependent
 damping of the power-spectrum, and therefore affect both the shape and the
 amplitude of the power spectrum. Whenever massive neutrinos are present,
 the growth factor becomes scale-dependent, which disrupts the
 evolution-mapping scheme.
 
-Why? I \textcolor{orange}{think} that it's because all neutrinos start off as
+Why do they behave in this way? All neutrinos start off as
 relativistic particles in the early Universe, acting as a type of radiation.
 But as the Universe continues to expand and cool, the neutrinos behave
 increasingly like dark matter.
 In this way, the physical density in neutrinos impacts both the shape and the
-evolution. What I don't understand is why we say that this is so when we
-only ever consider the shape of the power spectrum at one redshift. By
-``shape'' I was assuming that S\'{a}nchez meant the shape of $P(k)$ versus
-$k$ but if $\omega_\nu$ is really a problem, then shape should also refer
-to $P(k)$ through all values $z$? I don't quite understand this, but
-\textcolor{green}{maybe we can ask Ariel}.
-
-``The scale where the suppression of power (from neutrino free-streaming) sets
-in is controlled by the comoving Hubble radius at the time when the neutrinos
-became non-relativistic, corresponding to a comoving wave number
-$k_{fs} = 0.10 \Omega_m h \sqrt{f_\nu}$.
+evolution.
 
 ``The popular heuristic formula for the linear theory suppression of the matter
 fluctuations by free-streaming $\nu$, $\Delta P(k) / P(k) \approx -8 f_\nu$, is
@@ -329,13 +225,6 @@ I want to end this section with a vague plan of action: we want to play around w
 \begin{centering}
 \section{CAMB, Initial Setup}
 \end{centering}
-\footnote{
-    At this point, we've built suspense in the reader: we have a goal and
-    we have an idea about how to get to that goal. Therefore, now is the
-    appropriate time to divert into laying the technical groundwork which
-    will allow us to explore our idea through concrete implementations and
-    to test our idea with plots and numbers.
-}
 
 CAMB is a Fortran code with a Python wrapper\footnote{
 \url{https://github.com/cmbant/CAMB}
@@ -346,35 +235,17 @@ To introduce the reader to the scope of CAMB, we will now introduce
 some basic simulated power spectra along with a summary of the dynamic
 parameters which will be of greatest interest to us.
 
-Neutrino mass hierarchy: the options are degenerate, normal, and inverted.
-The CAMB documentation annotates this parameter as ``(1 or 2 eigenstate
-approximation),'' but this is somewhat unclear. Is the degenerate
-hierarchy the single mass eigenstate approximation? Do both normal
-and inverted hierarchies involve two eigenstates?
+I hope to, in painstaking detail, cover many of the lines of the code that I have written to interface with CAMB. I will include plots to indicate, at every step, what incorrect settings cause the power spectrum to look like (or, for subtler errors, what the error curves looked like compared to Ariel's results, which I treated as a sort of "ground truth"). This should also be a good example to flex my physics interpretation skills: why does this incorrect setting produce this undesired pattern?
 
-I guess we could already start putting a couple of plots here from my existing
-notebooks. I mean, I'm sure none of these plots will survive to the final
-version, but they might help to guide my discussion for a little while.
+You might think that this is sort of an inappropriate section for a master's thesis (especially since I have in mind that this be a lengthy section), but I would like to include it unless you feel very strongly. After all, I spent several months of the project debugging at least ten different ways that slight and major errors in the various settings led to irreconcilable results.
 
-IN THIS NEXT SECTION WE WILL BE DISCUSSING SOME OF THE VARIOUS CAMB SETTINGS
-AND THE STANDARD VALUES THAT WE USE, INCLUDING BRIEF ILLUSTRATIONS OF THE
-SIGNIFICANCE OF EACH SETTING BY WAY OF EXAMPLE ERROR PLOTS WHEN NONSTANDARD
-VALUES ARE USED.
+For example, one parameter that tripped me up for a while: neutrino mass hierarchy: the options are degenerate, normal, and inverted. The CAMB documentation annotates this parameter as ``(1 or 2 eigenstate approximation),'' but this is somewhat unclear. Is the degenerate hierarchy the single mass eigenstate approximation? Do both normal and inverted hierarchies involve two eigenstates?
 
 In figure \ref{fig: spectrum_type}, we can see that requesting of the wrong
 power spectrum type can in some low-$\omega_\nu$ cases yields errors so low
 that we might accidentally overlook them. This error pattern is easily
 recognizable and is a consequence of the definition of the power spectrum: the
-Fourier transform  of the two-point correlation function.
-\textcolor{red}{If we
-have more matter overall, we expect larger correlations.
-WE DON'T HAVE MORE MATTER! That's the whole point of the MEMNeC. The amount of
-matter is the same, but cold dark matter clumps more on smaller scales than
-neutrinos do. Wait, sorry, I'm confusing myself. We're talking about just one
-model THEN we look at two different spectra types. Sorry.
-}
-Furthermore, the impact of decreasing redshift is only to shift the inflection
-point towards larger scales.
+Fourier transform  of the two-point correlation function. ...Okay, I'm still thinking about this. I don't understand yet, but I'll be sure to ask you if I'm still struggling about it.
 
 
 \begin{centering}
