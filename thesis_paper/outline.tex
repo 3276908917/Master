@@ -67,7 +67,7 @@ A primary goal of cosmology is to specify, as narrowly as possible, the paramete
 
 Next, I want to talk about one powerful result, the power spectrum. The power spectrum can be probed in many different ways, and its precise shape and amplitude can tell us about several of these cosmological parameters.
 
-Actually, the power spectra we are discussing in this thesis are linear-theory power spectra of non-neutrino matter. But anyway, here I will cover some of the tried-and-true basic explanations of what the power spectrum is and why it is interesting for the question of parameter inference. 
+Actually, the power spectra we are discussing in this thesis are linear-theory power spectra of non-neutrino matter. But anyway, here I will cover some of the tried-and-true basic explanations of what the power spectrum is and why it is interesting for the question of parameter inference. I also want to discuss: why do we care about the linear-theory power spectrum? Why not jump straight to the nonlinear case?
 
 \begin{centering}
 \subsection{Boltzmann Solvers and CAMB}
@@ -241,12 +241,13 @@ You might think that this is sort of an inappropriate section for a master's the
 
 For example, one parameter that tripped me up for a while: neutrino mass hierarchy: the options are degenerate, normal, and inverted. The CAMB documentation annotates this parameter as ``(1 or 2 eigenstate approximation),'' but this is somewhat unclear. Is the degenerate hierarchy the single mass eigenstate approximation? Do both normal and inverted hierarchies involve two eigenstates?
 
-In figure \ref{fig: spectrum_type}, we can see that requesting of the wrong
-power spectrum type can in some low-$\omega_\nu$ cases yields errors so low
-that we might accidentally overlook them. This error pattern is easily
-recognizable and is a consequence of the definition of the power spectrum: the
-Fourier transform  of the two-point correlation function. ...Okay, I'm still thinking about this. I don't understand yet, but I'll be sure to ask you if I'm still struggling about it.
+%In figure \ref{fig: spectrum_type}, we can see that requesting of the wrong
+%power spectrum type can in some low-$\omega_\nu$ cases yields errors so low
+%that we might accidentally overlook them. This error pattern is easily
+%recognizable and is a consequence of the definition of the power spectrum: the
+%Fourier transform  of the two-point correlation function. ...Okay, I'm still thinking about this. I don't understand %yet, but I'll be sure to ask you if I'm still struggling about it.
 
+Another paragraph I want to have in this section: stress the part of the evolution mapping introduction, that the $\sigma_{12}$ value we're using to describe the model is actually the $\sigma_{12}$ value of the model's MEMNeC! This is so important and confusing that maybe I'll even recapitulate again later in the section on the generate\_emu\_data.script.
 
 \begin{centering}
 \section{Cassandra-Linear: a Python Package}
@@ -255,6 +256,38 @@ Fourier transform  of the two-point correlation function. ...Okay, I'm still thi
 This will be a rather long, dry, and technical section with subsections based on each of the core scripts making up the Python package that I have been developing. It will in some ways paraphrase and summarize the documentation, explaining the basic use of the package as well as important limitations. Of course, fairly early on in this section, there will be a footnote linking to my GitHub repository, which will be made public once I'm ready to hand in this thesis.
 
 Even if my code doesn't end up in a bigger repository, I nevertheless think that it's important to the scientific process that I describe in detail the code that I have written. Besides, if any readers want to experiment specifically with the ideas discussed in this thesis, they may find my code more accessible because it is, in a sense, "single-purpose"--that is to say, written almost exclusively to investigate the topics of this paper.
+
+\begin{centering}
+\subsection{camb\_interface.py}
+\end{centering}
+
+This section won't actually introduce much that the reader hasn't already encountered in the section "CAMB, initial setup." This will primarily be a summary of the ``correct'' settings with a couple of new sections describing the particular functions in this script.
+
+\begin{centering}
+\subsection{lhc.py}
+\end{centering}
+
+This section will briefly recapitulate some of the latin hypercube sampling explanation from the introduction. Then we will talk about how this sample is procured in practice, and what our ``solution'' (inelegant though it may be) is to obtaining a sample with a decent minimum separation between the points (remember to briefly repeat why this is important).
+
+We've multithreaded a random LHC generator to allocate a large amount of compute to this brute force approach.
+
+We'll also describe the switch from a rescaled latin hypercube to a unit latin hypercube that we later interpret differently according to the specified priors.
+
+\begin{centering}
+\subsection{generate\_emu\_data.py}
+\end{centering}
+
+This section will describe the process going from a latin hypercube to a set of CAMB power spectra. We will describe how an array of six parameter values is fleshed out into a params object understood by CAMB. We will describe the procedure of modifying $h$ and $z$ until we arrive roughly at the $\sigma_{12}$ value that we desire, as well as the process of writing the \textit{actual} $\sigma_{12}$ value that we obtained back to the original hypercube. Why is this important? Because the latin hypercube is used again later in the user\_interface.py script for the purpose of training the Gaussian emulator object.
+
+\begin{centering}
+\subsection{user\_interface.py}
+\end{centering}
+
+The content of this section is still relatively uncertain. Since I am still tweaking some of the emulator's settings, I haven't spent too much time on a script dedicated purely to simplifying the interaction between the user and the emulator \textit{object} itself.
+
+Anyway, the hope is to provide some clear and simple descriptions of what functions the user should turn to in order to get started predicting power spectra using the results of this thesis. The functions can either create a new emulator object and train it or load an existing one with easy-to-understand functions for interacting with the object.
+
+Here, we will talk about the details of the training as well as the importance of normalization. Since this is still technical, it may not be appropriate for a UI script. So, I am considering breaking out a new script (and therefore a new section), maybe called ``train\_emu.py.''
 
 \begin{centering}
 \section{Results and Analysis}
@@ -285,8 +318,14 @@ Furthermore, I will try to select a couple of cosmologies out of the 5000 (maybe
 Here, I will either include color plots or, as Dante suggests, monochrome plots with error as one axis and parameter value as the other (i.e. $k$ fixed). Then, if I haven't tightened the $\sigma_{12}$ performance by the time of submission, I can talk about how this is the most promising avenue for refinement of the emulator. In any case, I plan to spend some time talking about \textit{why} parameter x is the current biggest problem for the emulator. 
 
 \begin{centering}
-\section{Discussion}
+\section{Discussion and Conclusion}
 \end{centering}
+
+\begin{centering}
+\subsection{Summary of the Paper}
+\end{centering}
+
+What was the main objective of this thesis? What were the key results of this work? Why are they important? How do these results compare with results from papers on similar subjects?
 
 \begin{centering}
 \subsection{Future Work}
