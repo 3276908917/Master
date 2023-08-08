@@ -4,11 +4,14 @@
 cassL.egg-info
 .virtual_documents
 
-# Ignore generated media and heavy analyses
+# Ignore preliminary media and heavy analyses
 communications
 machines
 cake-workshop-2021
 comet-emu
+ringberg
+CAMB_notebooks/plots
+thesis_paper/unstaged
 
 # Other unnecessary data files
 CAMB_demo/planck_2018.ini
