@@ -64,6 +64,12 @@ def build_cosmology(om_b_in, om_c_in, ns_in, sigma12_in, As_in, om_nu_in,
             # sigma12_in actually describes a sigma12_2 value
             sigma12_2 = sigma12_in * (prior[1] - prior[0]) + prior[0]
             cosmology["sigma12"] = np.sqrt(sigma12_2)
+        elif "sigma12_root" in param_ranges:
+            #! Make the use of sigma12_2 more user-friendly
+            prior = param_ranges["sigma12_root"]
+            # sigma12_in actually describes a sigma12_2 value
+            sigma12_root = sigma12_in * (prior[1] - prior[0]) + prior[0]
+            cosmology["sigma12"] = np.square(sigma12_root)
 
         if "A_s" in param_ranges:
             prior = param_ranges["A_s"]
@@ -150,6 +156,14 @@ def fill_hypercube(parameter_values, standard_k_axis,
                 this_normalized_actual_sigma12_2 = \
                     (this_actual_sigma12_2 - prior[0]) / (prior[1] - prior[0])
                 parameter_values[i][3] = this_normalized_actual_sigma12_2
+            elif "sigma12_root" in param_ranges: # we have to square and
+                # normalize
+                this_actual_sigma12_root = np.sqrt(this_actual_sigma12)
+                prior = param_ranges["sigma12_root"]
+                this_normalized_actual_sigma12_root = \
+                    (this_actual_sigma12_root - prior[0]) / \
+                        (prior[1] - prior[0])
+                parameter_values[i][3] = this_normalized_actual_sigma12_root
 
         samples[i] = this_p
 
@@ -173,8 +187,8 @@ def evaluate_cell(input_cosmology, standard_k_axis, debug=False):
     I concede that the function looks like a mess right now, with debug
     statements littered all over the place.
     """
-    # This allows us to roughly find the z corresponding to the sigma12 that we
-    # want.
+    # This allows us to roughly find the z corresponding to the sigma12 that
+    # we want.
 
     MEMNeC = cp.deepcopy(input_cosmology)
     MEMNeC['omch2'] += MEMNeC['omnuh2']
@@ -184,7 +198,7 @@ def evaluate_cell(input_cosmology, standard_k_axis, debug=False):
         MEMNeC['omnuh2'], nnu_massive_in=0)
 
     _redshifts=np.flip(np.linspace(0, 10, 150))
-   
+
     if debug:
         print("\nMEMNeC:")
         print_cosmology(MEMNeC)
