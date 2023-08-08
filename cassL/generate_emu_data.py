@@ -274,8 +274,7 @@ def evaluate_cell(input_cosmology, standard_k_axis, debug=False):
     return p, actual_sigma12, np.array((input_cosmology['h'], float(z_best)))
 
 
-def interpolate_cell(input_cosmology, standard_k_axis, debug=False,
-    using_andrea_code=True):
+def interpolate_cell(input_cosmology, standard_k_axis):
     """
     Returns the power spectrum in Mpc units and the actual sigma12_tilde value
         to which it corresponds.
@@ -303,39 +302,12 @@ def interpolate_cell(input_cosmology, standard_k_axis, debug=False,
         MEMNeC['omnuh2'], nnu_massive_in=0)
 
     _redshifts=np.flip(np.linspace(0, 10, 150))
-
-    if debug:
-        print("\nMEMNeC:")
-        print_cosmology(MEMNeC)
-        print("\nOriginal cosmology:")
-        print_cosmology(input_cosmology)
-        print("\n")
     
-    MEMNeC_p_interpolator = None
-    if using_andrea_code:
-        MEMNeC_p_interpolator = ci.andrea_interpolator(MEMNeC)
-    else:
-        MEMNeC_p_interpolator = ci.cosmology_to_PK_interpolator(MEMNeC,
+    MEMNeC_p_interpolator = ci.cosmology_to_PK_interpolator(MEMNeC,
             redshifts=_redshifts, kmax=10)
     list_sigma12 = np.array([
         ci.s12_from_interpolator(MEMNeC_p_interpolator, z) for z in _redshifts
     ])
-
-    #print(list_s12)
-    if debug:
-        print("Maximum s12:", max(list_sigma12))
-        import matplotlib.pyplot as plt
-        # Original intersection problem we're trying to solve
-        plt.plot(_redshifts, list_sigma12);
-        plt.axhline(input_cosmology["sigma12"], c="black")
-        plt.title("$\sigma_{12}$ vs. $z$")
-        plt.ylabel("$\sigma_{12}$")
-        plt.xlabel("$z$")
-        plt.show()
-
-    # remember that list_s12[0] corresponds to the highest value z
-    if debug:
-        print("Target sigma12:", input_cosmology["sigma12"])
 
     interpolator = interp1d(np.flip(list_sigma12), np.flip(_redshifts),
         kind='cubic')
@@ -350,22 +322,15 @@ def interpolate_cell(input_cosmology, standard_k_axis, debug=False,
             print("\nThe extent of failure is:",
                 abs(list_sigma12[len(list_sigma12) - 1] / \
                 input_cosmology["sigma12"]) * 100, "%\n")
-            return None, None, None
+            return None, None, np.array([np.nan, np.nan])
 
         input_cosmology['h'] -= 0.1
         return interpolate_cell(input_cosmology, standard_k_axis, debug,
             using_andrea_code)
 
-    if debug:
-        print("recommended redshift", z_best)
-
     p = np.zeros(len(standard_k_axis))
 
-    p_interpolator = None
-    if using_andrea_code:
-        p_interpolator = ci.andrea_interpolator(input_cosmology)
-    else:
-        p_interpolator = ci.cosmology_to_PK_interpolator(input_cosmology,
+    p_interpolator = ci.cosmology_to_PK_interpolator(input_cosmology,
             redshifts=np.array([z_best]), kmax=10)
     
     actual_sigma12 = ci.s12_from_interpolator(p_interpolator, z_best)
@@ -373,13 +338,8 @@ def interpolate_cell(input_cosmology, standard_k_axis, debug=False,
     if input_cosmology['omnuh2'] != 0:
         actual_sigma12 = ci.s12_from_interpolator(
             MEMNeC_p_interpolator, z_best)
-    # De-nest
-    # actual_sigma12 = actual_sigma12[0]
-
-    if using_andrea_code:
-        p = np.array([p_interpolator.P(z_best, k) for k in standard_k_axis])
-    else:
-        p = np.array([p_interpolator.P(z_best, k)[0] for k in standard_k_axis])
+    
+    p = np.array([p_interpolator.P(z_best, k)[0] for k in standard_k_axis])
     # We don't need to return k because we take for granted that all
     # runs will have the same k axis.
 
