@@ -89,95 +89,6 @@ def build_cosmology(om_b_in, om_c_in, ns_in, sigma12_in, As_in, om_nu_in,
     return ci.specify_neutrino_mass(cosmology, om_nu_in,
         nnu_massive_in=nnu_massive)
 
-def fill_hypercube(parameter_values, standard_k_axis,
-    param_ranges=None, massive_neutrinos=True,
-    cell_range=None, samples=None, write_period=None, save_label="unlabeled"):
-    """
-    @parameter_values: this should be a list of tuples to
-        evaluate kp at.
-
-    @cell_range adjust this value in order to pick up from where you
-        left off, and to run this method in saveable chunks.
-
-    BE CAREFUL! This function deliberately mutates the parameter_values object,
-        replacing the target sigma12 values with the actual sigma12 values used.
-    """
-    if cell_range is None:
-        cell_range = range(len(parameter_values))
-    if samples is None:
-        samples = np.zeros((len(parameter_values), NPOINTS))
-
-    # Recent change: now omega_nu comes last
-
-    bundle_parameters = lambda row: build_cosmology(row[0], row[1], row[2],
-        row[3], row[4], row[5], param_ranges)
-
-    if massive_neutrinos == False:
-        bundle_parameters = lambda row: build_cosmology(row[0], row[1], row[2],
-            row[3], A_S_DEFAULT, 0, param_ranges)
-
-    # This just provides debugging information
-    rescaling_parameters_list = None
-
-    unwritten_cells = 0
-    for i in cell_range:
-        this_p = None
-        this_cosmology = bundle_parameters(parameter_values[i])
-
-        # We're only making the following switch in order to test out the
-        # interpolator approach.
-        #this_p, this_actual_sigma12, these_rescaling_parameters = \
-        #    evaluate_cell(this_cosmology, standard_k_axis)
-        this_p, this_actual_sigma12, these_rescaling_parameters = \
-            interpolate_cell(this_cosmology, standard_k_axis,
-            using_andrea_code=False)
-
-        if rescaling_parameters_list is None:
-            rescaling_parameters_list = these_rescaling_parameters
-        else:
-            rescaling_parameters_list = np.vstack((rescaling_parameters_list,
-                these_rescaling_parameters))
-
-        # We may actually want to remove this if-condition. For now, though, it
-        # allows us to repeatedly evaluate a cosmology with the same
-        # deterministic result.
-        if this_actual_sigma12 is not None:
-            parameter_values[i][3] = this_actual_sigma12
-
-            if "sigma12" in param_ranges: # we have to normalize
-                prior = param_ranges["sigma12"]
-                this_normalized_actual_sigma12 = \
-                    (this_actual_sigma12 - prior[0]) / (prior[1] - prior[0])
-                parameter_values[i][3] = this_normalized_actual_sigma12
-            #! Make the use of sigma12_2 more user-friendly
-            elif "sigma12_2" in param_ranges: # we have to square and normalize
-                this_actual_sigma12_2 = np.square(this_actual_sigma12)
-                prior = param_ranges["sigma12_2"]
-                this_normalized_actual_sigma12_2 = \
-                    (this_actual_sigma12_2 - prior[0]) / (prior[1] - prior[0])
-                parameter_values[i][3] = this_normalized_actual_sigma12_2
-            elif "sigma12_root" in param_ranges: # we have to square and
-                # normalize
-                this_actual_sigma12_root = np.sqrt(this_actual_sigma12)
-                prior = param_ranges["sigma12_root"]
-                this_normalized_actual_sigma12_root = \
-                    (this_actual_sigma12_root - prior[0]) / \
-                        (prior[1] - prior[0])
-                parameter_values[i][3] = this_normalized_actual_sigma12_root
-
-        samples[i] = this_p
-
-        print(i, "complete")
-        unwritten_cells += 1
-        if write_period is not None and unwritten_cells >= write_period:
-            np.save("samples_backup_i" + str(i) + "_" + save_label + ".npy",
-                samples, allow_pickle=True)
-            np.save("redshifts_backup_i" + str(i) + "_" + save_label + ".npy",
-                rescaling_parameters_list, allow_pickle=True)
-            np.save("hc_backup_i" + str(i) + "_" + save_label + ".npy",
-                parameter_values, allow_pickle=True)
-            unwritten_cells = 0
-    return samples, rescaling_parameters_list
 
 def evaluate_cell(input_cosmology, standard_k_axis, debug=False):
     """
@@ -194,8 +105,8 @@ def evaluate_cell(input_cosmology, standard_k_axis, debug=False):
     MEMNeC['omch2'] += MEMNeC['omnuh2']
     MEMNeC['omnuh2'] = 0
 
-    MEMNeC = ci.specify_neutrino_mass(MEMNeC,
-        MEMNeC['omnuh2'], nnu_massive_in=0)
+    MEMNeC = ci.specify_neutrino_mass(MEMNeC, MEMNeC['omnuh2'],
+        nnu_massive_in=0)
 
     _redshifts=np.flip(np.linspace(0, 10, 150))
 
@@ -238,7 +149,7 @@ def evaluate_cell(input_cosmology, standard_k_axis, debug=False):
             print("\nThe extent of failure is:",
                 abs(list_sigma12[len(list_sigma12) - 1] / \
                 input_cosmology["sigma12"]) * 100, "%\n")
-            return None, None, None
+            return None, None, np.array([np.nan, np.nan])
 
         input_cosmology['h'] -= 0.1
         return evaluate_cell(input_cosmology, standard_k_axis, debug)
@@ -344,3 +255,92 @@ def interpolate_cell(input_cosmology, standard_k_axis):
     # runs will have the same k axis.
 
     return p, actual_sigma12, np.array((input_cosmology['h'], float(z_best)))
+
+def fill_hypercube(parameter_values, standard_k_axis,
+    param_ranges=None, massive_neutrinos=True, eval_func=evaluate_cell,
+    cell_range=None, samples=None, write_period=None, save_label="unlabeled"):
+    """
+    @parameter_values: this should be a list of tuples to
+        evaluate kp at.
+
+    @cell_range adjust this value in order to pick up from where you
+        left off, and to run this method in saveable chunks.
+
+    BE CAREFUL! This function deliberately mutates the parameter_values object,
+        replacing the target sigma12 values with the actual sigma12 values used.
+    """
+    if cell_range is None:
+        cell_range = range(len(parameter_values))
+    if samples is None:
+        samples = np.zeros((len(parameter_values), NPOINTS))
+
+    # Recent change: now omega_nu comes last
+
+    bundle_parameters = lambda row: build_cosmology(row[0], row[1], row[2],
+        row[3], row[4], row[5], param_ranges)
+
+    if massive_neutrinos == False:
+        bundle_parameters = lambda row: build_cosmology(row[0], row[1], row[2],
+            row[3], A_S_DEFAULT, 0, param_ranges)
+
+    # This just provides debugging information
+    rescaling_parameters_list = None
+
+    unwritten_cells = 0
+    for i in cell_range:
+        this_p = None
+        this_cosmology = bundle_parameters(parameter_values[i])
+
+        # We're only making the following switch in order to test out the
+        # interpolator approach.
+        #this_p, this_actual_sigma12, these_rescaling_parameters = \
+        #    evaluate_cell(this_cosmology, standard_k_axis)
+        this_p, this_actual_sigma12, these_rescaling_parameters = \
+            eval_func(this_cosmology, standard_k_axis)
+
+        if rescaling_parameters_list is None:
+            rescaling_parameters_list = these_rescaling_parameters
+        else:
+            rescaling_parameters_list = np.vstack((rescaling_parameters_list,
+                these_rescaling_parameters))
+
+        # We may actually want to remove this if-condition. For now, though, it
+        # allows us to repeatedly evaluate a cosmology with the same
+        # deterministic result.
+        if this_actual_sigma12 is not None:
+            parameter_values[i][3] = this_actual_sigma12
+
+            if "sigma12" in param_ranges: # we have to normalize
+                prior = param_ranges["sigma12"]
+                this_normalized_actual_sigma12 = \
+                    (this_actual_sigma12 - prior[0]) / (prior[1] - prior[0])
+                parameter_values[i][3] = this_normalized_actual_sigma12
+            #! Make the use of sigma12_2 more user-friendly
+            elif "sigma12_2" in param_ranges: # we have to square and normalize
+                this_actual_sigma12_2 = np.square(this_actual_sigma12)
+                prior = param_ranges["sigma12_2"]
+                this_normalized_actual_sigma12_2 = \
+                    (this_actual_sigma12_2 - prior[0]) / (prior[1] - prior[0])
+                parameter_values[i][3] = this_normalized_actual_sigma12_2
+            elif "sigma12_root" in param_ranges: # we have to square and
+                # normalize
+                this_actual_sigma12_root = np.sqrt(this_actual_sigma12)
+                prior = param_ranges["sigma12_root"]
+                this_normalized_actual_sigma12_root = \
+                    (this_actual_sigma12_root - prior[0]) / \
+                        (prior[1] - prior[0])
+                parameter_values[i][3] = this_normalized_actual_sigma12_root
+
+        samples[i] = this_p
+
+        print(i, "complete")
+        unwritten_cells += 1
+        if write_period is not None and unwritten_cells >= write_period:
+            np.save("samples_backup_i" + str(i) + "_" + save_label + ".npy",
+                samples, allow_pickle=True)
+            np.save("redshifts_backup_i" + str(i) + "_" + save_label + ".npy",
+                rescaling_parameters_list, allow_pickle=True)
+            np.save("hc_backup_i" + str(i) + "_" + save_label + ".npy",
+                parameter_values, allow_pickle=True)
+            unwritten_cells = 0
+    return samples, rescaling_parameters_list
