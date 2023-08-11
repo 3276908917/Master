@@ -65,7 +65,7 @@ I have a lot of different important concepts that I need to get through, so I ca
 
 A primary goal of cosmology is to specify, as narrowly as possible, the parameters which define our Universe. These include, for example, the overall curvature of the Universe as well as its cold dark matter (CDM) content.
 
-Next, I want to talk about one powerful result, the power spectrum. The power spectrum can be probed in many different ways, and its precise shape and amplitude can tell us about several of these cosmological parameters.
+Next, I want to talk about one way of describing the matter density contrast field, the power spectrum. The power spectrum can be probed in many different ways, and its precise shape and amplitude can tell us about several of these cosmological parameters.
 
 Actually, the power spectra we are discussing in this thesis are linear-theory power spectra of non-neutrino matter. But anyway, here I will cover some of the tried-and-true basic explanations of what the power spectrum is and why it is interesting for the question of parameter inference. I also want to discuss: why do we care about the linear-theory power spectrum? Why not jump straight to the nonlinear case?
 
@@ -92,7 +92,7 @@ This can be a very brief section, but I want to discuss a little bit of how most
 \subsection{Emulation, Gausian Processes, and Latin Hypercube Sampling}
 \end{centering}
 
-To conduct these MCMC analyses, we need several thousands of power spectra. However, if our Boltzmann solvers take on the order of three seconds to run, then these solvers will become the bottleneck of our analysis.
+To conduct these MCMC analyses, we need several thousands of power spectra. However, if our Boltzmann solvers take on the order of three seconds to run, then these solvers will become the bottleneck of our analysis. \textcolor{red}{Give some specific numbers for this.}
 
 This motivates the introduction of emulation, basically multi-dimensional interpolation, in order to predict the power spectra. These predictions are orders of magnitude less time-expensive. 
 
@@ -122,7 +122,7 @@ simulations, [...] current emulators leave out parameters such as the curvature
 of the Universe or dynamic energy models beyond the standard CPL
 parametrization'' (\cbib{San21}).
 
-I'll talk a little about different emulators currently available, such as COMET. Some emulate non-linear power spectra, for example, but most lack this physical density in neutrinos. That is where Cassandra-linear, the emulator of this thesis, comes in.
+I'll talk a little about different emulators currently available, such as COMET. Some emulate non-linear power spectra, for example, and several even include massive neutrinos. But this thesis will demonstrate that massive neutrinos can be included into our evolution mapping approach (This is good news because the evolution mapping approach greatly simplifies the parameter space, and enhances the accuracy), which is the subject of the next section.
 
 \begin{centering}
 \subsection{Evolution Mapping}
@@ -250,6 +250,12 @@ For example, one parameter that tripped me up for a while: neutrino mass hierarc
 Another paragraph I want to have in this section: stress the part of the evolution mapping introduction, that the $\sigma_{12}$ value we're using to describe the model is actually the $\sigma_{12}$ value of the model's MEMNeC! This is so important and confusing that maybe I'll even recapitulate again later in the section on the generate\_emu\_data.script.
 
 \begin{centering}
+\section{Expansion of the Parameter Space}
+\end{centering}
+
+Here, I will talk about the playing-around that we did, to discover that $A_s$ assisted in the prediction of the suppression due to massive neutrinos.
+
+\begin{centering}
 \section{Cassandra-Linear: a Python Package}
 \end{centering}
 
@@ -258,6 +264,8 @@ This will be a rather long, dry, and technical section with subsections based on
 Even if my code doesn't end up in a bigger repository, I nevertheless think that it's important to the scientific process that I describe in detail the code that I have written. Besides, if any readers want to experiment specifically with the ideas discussed in this thesis, they may find my code more accessible because it is, in a sense, "single-purpose"--that is to say, written almost exclusively to investigate the topics of this paper.
 
 It only takes a couple of sentences, but we also need to describe how to install the package.
+
+\textcolor{red}{Change the subsection titles, they should describe the content, not the script names}
 
 \begin{centering}
 \subsection{camb\_interface.py}
@@ -296,6 +304,14 @@ Here, we will talk about the details of the training as well as the importance o
 \end{centering}
 
 \begin{centering}
+\subsection{Creation of Separate Emulators}
+\end{centering}
+
+This is a brief introductory section motivating the creation of two emulators: unlike the other five parameters, the physical density in massive neutrinos has a hard lower bound. This creates some minor regression problems: TO PROVE THIS, SHOW THE PERFORMANCE OF THE MASSIVE EMULATOR ON MASSLESS-NEUTRINO COSMOLOGIES.
+
+Conclude this section by saying that this integration of multiple emulators into one user-facing script can be further exploited with, for example, different emulators for different neutrino mass hierarchies.
+
+\begin{centering}
 \subsection{Quantifying the Performance of the Emulator}
 \end{centering}
 
@@ -322,6 +338,18 @@ Here, I will either include color plots or, as Dante suggests, monochrome plots 
 \begin{centering}
 \section{Discussion and Conclusion}
 \end{centering}
+
+\begin{centering}
+\subsection{Resolution of k axis}
+\end{centering}
+
+This might go better in the CassL section, but I think I ought to motivate the decision to use length-300 arrays.
+
+\begin{centering}
+\subsection{Number of Training Samples}
+\end{centering}
+
+This might go better in the CassL section, but I think I ought to motivate the decision to use 5000 training arrays.
 
 \begin{centering}
 \subsection{Summary of the Paper}
