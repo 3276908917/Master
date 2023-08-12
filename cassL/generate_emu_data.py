@@ -236,8 +236,7 @@ def interpolate_cell(input_cosmology, standard_k_axis):
             return None, None, np.array([np.nan, np.nan])
 
         input_cosmology['h'] -= 0.1
-        return interpolate_cell(input_cosmology, standard_k_axis, debug,
-            using_andrea_code)
+        return interpolate_cell(input_cosmology, standard_k_axis)
 
     p = np.zeros(len(standard_k_axis))
 
