@@ -10,16 +10,30 @@ These emulators need to be available on all devices:
 * COMET priors, 10k emulator
 	* 5k emulator (300 k points)
 	* 4k emu
+		* buil
+		* fill
 	* 3k emu
-	* It probably would have been better for the plot if I had
-		done 6k and 7k samples... shoot.
+		* buil
+		* fill
+	* 6k
+		* buil
+		* fill
+	* 7k
+		* build hypercube
+		* fill hypercube
 
 	* these do not need their own test cubes
 
 * COMET 5k, 400 k points
 	* Comet 5k, 500 k points
+		* fill train
+		* fill test
 	* Comet 5k, 200 k points
+		* fill train
+		* fill test
 	* Comet 5k, 100 k points? 250? 150?
+		* fill train
+		* fill test
 
 * Runs of varying LHC-quality
 	* Worst of the worst

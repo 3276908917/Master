@@ -247,7 +247,8 @@ def multithread_unit_LHC_builder(dim, n_samples, label="unlabeled",
 
     while True:
         executor = concurrent.futures.ProcessPoolExecutor(num_workers)
-        futures = [executor.submit(batch, dim) for i in range(num_workers)]
+        futures = [executor.submit(batch, dim, n_samples) \
+            for i in range(num_workers)]
         min_dists = []
         lhcs = []
 
