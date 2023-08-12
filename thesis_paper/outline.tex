@@ -81,6 +81,18 @@ This will mostly just be a theoretical discussion of these solvers. The hands-on
 
 I will also mention a couple of specific Boltzmann solvers, like CLASS and CAMB. I will briefly justify our use of CAMB over CLASS.
 
+%%%
+
+In essence, Boltzmann codes solve XXX in order to give us the power spectrum
+of any universe characterized by some set of cosmological parameters. For
+example, figure~\ref{fig: vary_omega_b} shows the impact of varying the
+physical density in baryons, $\omega_b$. 
+
+Several parameters have fairly unique impacts on the power spectrum.
+Therefore, we can imagine building a collection of power spectra labeled by
+their parameter configurations and comparing our real-world observations to
+them. This should allow us to perform parameter inference.
+
 \begin{centering}
 \subsection{Monte Carlo Markov Chains}
 \end{centering}
@@ -182,6 +194,13 @@ Now, for the hiccup, which segues into the next section: this scheme is broken b
 density in neutrinos. (In the next section: why this is so and what we can do
 about it.)
 
+%%%
+
+Three shape parameters of core interest to this paper are the physical density in baryons $\omega_b$ (whose impact on the power spectrum is shown in figure~\ref{fig: omega_b_dependence}), the physical density in cold dark matter $\omega_c$ (figure~\ref{fig: omega_c_dependence}), and the spectral index $n_s$, (figure~\ref{fig: ns_dependence}). The remaining parameters $\sigma_{12}$ and $A_s$, as well as the quantities $z$ and $h$, all shift only the amplitude of the power spectrum, as illustrated in figure~\ref{eq: sig12_dependence}. 
+
+For the sake of completion, we also show the impact of the evolution parameter $\sigma_{12}$ in figure~\ref{fig: sig12_dependence} and stress that the other quantities 
+
+
 \begin{centering}
 \subsection{Neutrinos and Their Cosmological Impact}
 \end{centering}
@@ -222,6 +241,10 @@ current observations (\textcolor{orange}{which?}).
 
 I want to end this section with a vague plan of action: we want to play around with CAMB power spectra to see if there are any simple ways around this limitation in our approach.
 
+%%% New stuff
+
+We already have an approximation for the power spectrum of a massive-neutrino cosmology within the evolution mapping scheme. The $\sigma_{12}$ value that we described earlier is actually the $\sigma_{12}$ value of the model's MEMNeC. can already be approximated within evolution-mapping by slightly altering scheme. \textcolor{red}{Is it fair to say we are adjusting, or was this actually the same scheme as it always was?} We take a MEMNeC and the desired cosmology. The sigma 12 is actually the sigma 12 of the MEMNeC. Then we treat the physical density in neutrinos as a shape parameter along with $A_s$.
+
 \begin{centering}
 \section{CAMB, Initial Setup}
 \end{centering}
@@ -249,6 +272,10 @@ For example, one parameter that tripped me up for a while: neutrino mass hierarc
 
 Another paragraph I want to have in this section: stress the part of the evolution mapping introduction, that the $\sigma_{12}$ value we're using to describe the model is actually the $\sigma_{12}$ value of the model's MEMNeC! This is so important and confusing that maybe I'll even recapitulate again later in the section on the generate\_emu\_data.script.
 
+%%% New stuff
+
+Beware the neutrino settings. The effective number of massive neutrinos is about 3.027
+
 \begin{centering}
 \section{Expansion of the Parameter Space}
 \end{centering}
@@ -268,14 +295,18 @@ It only takes a couple of sentences, but we also need to describe how to install
 \textcolor{red}{Change the subsection titles, they should describe the content, not the script names}
 
 \begin{centering}
-\subsection{camb\_interface.py}
+\subsection{Interfacing with CAMB}
 \end{centering}
+
+% camb\_interface.py
 
 This section won't actually introduce much that the reader hasn't already encountered in the section "CAMB, initial setup." This will primarily be a summary of the ``correct'' settings with a couple of new sections describing the particular functions in this script.
 
 \begin{centering}
-\subsection{lhc.py}
+\subsection{Building the Latin Hypercube Sample}
 \end{centering}
+
+% lhc.py
 
 This section will briefly recapitulate some of the latin hypercube sampling explanation from the introduction. Then we will talk about how this sample is procured in practice, and what our ``solution'' (inelegant though it may be) is to obtaining a sample with a decent minimum separation between the points (remember to briefly repeat why this is important).
 
@@ -284,14 +315,26 @@ We've multithreaded a random LHC generator to allocate a large amount of compute
 We'll also describe the switch from a rescaled latin hypercube to a unit latin hypercube that we later interpret differently according to the specified priors.
 
 \begin{centering}
-\subsection{generate\_emu\_data.py}
+\subsection{Requesting the Sample Spectra from CAMB}
 \end{centering}
+
+% generate\_emu\_data.py
 
 This section will describe the process going from a latin hypercube to a set of CAMB power spectra. We will describe how an array of six parameter values is fleshed out into a params object understood by CAMB. We will describe the procedure of modifying $h$ and $z$ until we arrive roughly at the $\sigma_{12}$ value that we desire, as well as the process of writing the \textit{actual} $\sigma_{12}$ value that we obtained back to the original hypercube. Why is this important? Because the latin hypercube is used again later in the user\_interface.py script for the purpose of training the Gaussian emulator object.
 
 \begin{centering}
-\subsection{user\_interface.py}
+\subsection{Training the Emulator}
 \end{centering}
+
+% train\_emu.py
+
+This section will focus on the particular lines of GPy that we used.
+
+\begin{centering}
+\subsection{Accessing and Using the Emulator}
+\end{centering}
+
+% user\_interface.py
 
 The content of this section is still relatively uncertain. Since I am still tweaking some of the emulator's settings, I haven't spent too much time on a script dedicated purely to simplifying the interaction between the user and the emulator \textit{object} itself.
 

@@ -1,3 +1,16 @@
+These emulators need to be available on all devices:
+* MEGA priors, 5k emulator
+* Classic priors, 5k emulator
+* COMET priors, 10k emulator
+	* 5k emulator (300 k points)
+	* 4k emu
+	* 3k emu
+	* 15k emu
+* COMET 5k, 400 k points
+	* Comet 5k, 500 k points
+	* Comet 5k, 200 k points
+	* Comet 5k, 100 k points? 250? 150?
+
 $ Ariel needs to get back to me about the seminar.
 
 Andrea needs to give me the summary of the results of last year's
