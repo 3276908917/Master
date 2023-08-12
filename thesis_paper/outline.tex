@@ -38,7 +38,7 @@ Spectrum}
 \fontsize{12}{15}
 
 \begin{center}
-Lukas Finkbeiner: Master's Thesis
+Lukas Finkbeiner: Adapting Evolution-Mapping Emulators for Massive-Neutrino Cosmologies
 \end{center}
 
 \tableofcontents
@@ -49,9 +49,18 @@ Lukas Finkbeiner: Master's Thesis
 
 ``The goal of this project is to produce an emulator of the linear-theory
 power spectrum based on evolution mapping'' (A. G. S\'{a}nchez, private
-communication). In particular, this paper seeks to extend the evolution mapping
-scheme of \cbib{San21} to massive-neutrino cosmologies by applying a correction
-factor to results from emulators built on massless-neutrino simulations.  We find that the scalar mode amplitude $A_s$ can be used to quantify the suppression of structure growth due to massive neutrinos. Consequently, by including this parameter, we can successfully train over the physical density of the universe in massive neutrinos.
+communication). In particular, this paper seeks to extend the evolution
+mapping scheme of \cbib{San21} to massive-neutrino cosmologies by applying a
+correction
+factor to results from emulators built on massless-neutrino simulations. We
+find that the scalar mode amplitude $A_s$ can be used to quantify the
+suppression of structure growth due to massive neutrinos. Consequently, by
+including this parameter, we can successfully train over the physical density
+of the universe in massive neutrinos. We introduce a new emulation code,
+Cassandra-Linear, which combines this expanded parameter space with evolution
+mapping. We include various error statistics and show that the emulator
+performs roughly at the level of error associated with CAMB itself
+\textcolor{green}{Do I have a citation for the error associated with CAMB?}
 
 \begin{centering}
 \section{Introduction, Theory, and Background}
@@ -112,21 +121,6 @@ To conduct these MCMC analyses, we need several thousands of power spectra. Howe
 
 This motivates the introduction of emulation, basically multi-dimensional interpolation, in order to predict the power spectra. These predictions are orders of magnitude less time-expensive. 
 
-Most emulators are based on a Gaussian Process (GP). A GP is a Gaussian
-distribution over functions\footnote
-{A GP is the limit of a one-hidden-layer neural network as the number of
-neurons approaches infinity.}, which can be interpreted
-as the infinite-dimensional generalization of the multivariate normal
-distribution. The inference of continuous values with a GP prior
-is known as Gaussian process regression, or Kriging. GP regression is a
-powerful non-linear multivariate interpolation tool. The computational
-complexity of inference and likelihood evaluation within GP regression is cubic
-in the number of points. This makes GP regression an excellent companion to
-Latin hypercube sampling (LHS), which makes highly-efficient use of a limited number of samples. GP-based emulators require fewer training samples than
-neural networks but provide smaller speedups. GP's allow natural propagation of
-uncertainty in predictions to the final posterior distribution; neural
-networks lack this feature.
-
 Emulators interpolate across a high-dimensional parameter space. The primary
 limitation is that the emulator has to be built with every possible parameter
 in mind that an end-user could wish to vary. Yet there is a large number of
@@ -138,15 +132,43 @@ simulations, [...] current emulators leave out parameters such as the curvature
 of the Universe or dynamic energy models beyond the standard CPL
 parametrization'' (\cbib{San21}).
 
-I'll talk a little about different emulators currently available, such as COMET. Some emulate non-linear power spectra, for example, and several even include massive neutrinos. But this thesis will demonstrate that massive neutrinos can be included into our evolution mapping approach (This is good news because the evolution mapping approach greatly simplifies the parameter space, and enhances the accuracy), which is the subject of the next section.
+I'll talk a little about different emulators currently available, such as COMET. Some emulate non-linear power spectra, for example, and several even include massive neutrinos. But this thesis will demonstrate that massive neutrinos can be included into our evolution mapping approach, which will be introduced in section~\ref{sec: ev_mapping}.
+
+% (This is good news because the evolution mapping approach greatly simplifies the parameter space, and enhances the accuracy), which is the subject of the next section.
 
 \begin{centering}
 \subsection{Emulation Platform: Gaussian Processes}
 \end{centering}
 
-What is a Gaussian Process? Why are we using it instead of a neural network?
+% What is a Gaussian Process?
 
-The two reasons I can remember off of the top of my head: 1. NNs generally need much larger sample sizes to reach comparable levels of accuracy. 2. NNs invariably require much more complicated setup and tuning. By contrast, as we explain in section~\ref{sec: emu_training}, a Gaussian process regression is highly straightforward to set up and straightforward to modify.
+Most emulators are based on a Gaussian Process (GP). A GP is a Gaussian
+distribution over functions\footnote
+{A GP is the limit of a one-hidden-layer neural network as the number of
+neurons approaches infinity.}, which can be interpreted
+as the infinite-dimensional generalization of the multivariate normal
+distribution. The inference of continuous values with a GP prior
+is known as Gaussian process regression, or Kriging. GP regression is a
+powerful non-linear multivariate interpolation tool. The computational
+complexity of inference and likelihood evaluation within GP regression is cubic
+in the number of points. This makes GP regression an excellent companion to
+Latin hypercube sampling (LHS), which makes highly-efficient use of a limited 
+number of samples and will be explained in greater depth in section~\ref{sec:
+lhc_intro}.
+
+Neural networks (NNs) generally need much larger sample sizes to reach
+comparable levels of
+accuracy. Due to various alterations in the Cassandra-Linear code over its
+development, several regenerations of the various emulator data sets were
+necessary. This practical constraint motivated the use of a GP for our
+emulator. Furthermore, NNs invariably require much more complicated setup and
+tuning--for example, in the precise architecture of the network (e.g. nodes
+per layer, layer types) as well as the hyperparameters (e.g. learning rate).
+By contrast, as we explain in section~\ref{sec: emu_training}, a Gaussian
+process regression is highly straightforward to set up and modify. Therefore,
+for a demonstration project such as Cassandra-Linear, we elected to base our
+emulator on a GP. Please refer to the section~\ref{sec: future_work} for a
+continuation of this discussion.
 
 \begin{centering}
 \subsection{Sampling Approach: Latin Hypercube}
@@ -202,7 +224,7 @@ Why is this scheme important? Evolution mapping greatly simplifies the emulator
 implementation. Because we can
 funnel all of the evolution parameters through $\sigma_{12}$, we've effectively
 collapsed an entire category of parameters to just one parameter. Fewer
-parameters means that we get a faster emulator.
+parameters means that we get a more accurate emulator.
 
 ``At the linear level, all models characterized by identical shape parameters
 and the same values of the parameter combinations $b \sigma_{12}(z)$ and
@@ -229,7 +251,6 @@ thus wipe out small-scale structures.''
 
 ``In general, a larger density of relativistic species leads to a smaller
 growth of matter fluctuations'' (\cbib{Zennaro}).
-
 
 The point of this section is: why is $\omega_\nu$ bad for the
 evolution mapping scheme? Because neutrinos exhibit redshift-dependent
@@ -326,6 +347,9 @@ This section will briefly recapitulate some of the latin hypercube sampling expl
 We've multithreaded a random LHC generator to allocate a large amount of compute to this brute force approach.
 
 We'll also describe the switch from a rescaled latin hypercube to a unit latin hypercube that we later interpret differently according to the specified priors.
+
+WE SHOULD INCLUDE SOME PLOTS: LOOK AT HOW MANY FUNCTION CALLS IT TAKES TO GET
+TO MINIMUM SEPARATION X.
 
 %! Maybe we should move get_param_ranges to lhc.py. It would be more thematically consistent if the note on priors appeared in this section
 
@@ -447,6 +471,8 @@ This might go better in the CassL section, but I think I ought to motivate the d
 
 This might go better in the CassL section, but I think I ought to motivate the decision to use 5000 training arrays.
 
+I'll have to concede that the results of this section are not entirely comprehensive; we didn't train any emulators over the uncertainties of analogous validation hypercubes. All comparisons here use the simpler pipeline of just two data sets, training and testing.
+
 \begin{centering}
 \subsection{Linear Sampling in Different Parameters}
 \end{centering}
@@ -470,6 +496,7 @@ What was the main objective of this thesis? What were the key results of this wo
 
 \begin{centering}
 \subsection{Future Work}
+\label{sec: future_work}
 \end{centering}
 
 Here I will talk about what kinds of questions we estimate will be most fruitful for further inquiries about this topic and this code.
@@ -479,6 +506,10 @@ Is there a theoretically perfect LHC generator?
 In order to expand the priors, it would be helpful to investigate why CAMB does not allow negative redshifts, in case this can be adapted. Alternatively, CLASS \textcolor{red}{allows} negative redshifts, so it may be worthwhile to repeat the work of this thesis using power spectra from CLASS. This would involve familiarization with a new platform, however, and so this escapes the scope of this thesis. Remember that negative redshifts would be a helpful feature for this work because it would allow us to investigate much broader priors.
 
 Should we use a neural network instead of a Gaussian process for our emulator? AndreaP and Alex Eggemeier are already on the job: they are converting COMET to a neural network approach. We recommend that the reader follow future COMET papers for investigations into this question.
+
+GP's allow natural propagation of
+uncertainty in predictions to the final posterior distribution; neural
+networks lack this feature. At the same time, NNs provide larger speedups \textcolor{green}{CITATIONS}.
 
 \IfFileExists{biblatex.sty} {
     \printbibliography
