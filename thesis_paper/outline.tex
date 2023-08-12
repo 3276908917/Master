@@ -99,9 +99,13 @@ them. This should allow us to perform parameter inference.
 
 This can be a very brief section, but I want to discuss a little bit of how most modern parameter inference works because it motivates the need for extremely fast power spectrum computation. It provides a sort of conceptual bridge between our ``pure'' goal (quantifying the cosmos) and the nitty-gritty bulk of the paper (optimizing emulator performance).
 
+Metropolis-Hastings algorithm.
+
+We don't know what the true probability distribution of power spectra is. In order to build this distribution with simulation results, we simply draw from the distribution. \textcolor{red}{Refer to ``Data to Insights'' lecture notes in order to tighten this description.}
+
 \begin{centering}
-\label{sec: state_of_the_art}
-\subsection{Emulation, Gausian Processes, and Latin Hypercube Sampling}
+\subsection{Emulation: Basic Principles}
+\label{sec: emulation_intro}
 \end{centering}
 
 To conduct these MCMC analyses, we need several thousands of power spectra. However, if our Boltzmann solvers take on the order of three seconds to run, then these solvers will become the bottleneck of our analysis. \textcolor{red}{Give some specific numbers for this.}
@@ -135,6 +139,20 @@ of the Universe or dynamic energy models beyond the standard CPL
 parametrization'' (\cbib{San21}).
 
 I'll talk a little about different emulators currently available, such as COMET. Some emulate non-linear power spectra, for example, and several even include massive neutrinos. But this thesis will demonstrate that massive neutrinos can be included into our evolution mapping approach (This is good news because the evolution mapping approach greatly simplifies the parameter space, and enhances the accuracy), which is the subject of the next section.
+
+\begin{centering}
+\subsection{Emulation Platform: Gaussian Processes}
+\end{centering}
+
+What is a Gaussian Process? Why are we using it instead of a neural network?
+
+The two reasons I can remember off of the top of my head: 1. NNs generally need much larger sample sizes to reach comparable levels of accuracy. 2. NNs invariably require much more complicated setup and tuning. By contrast, as we explain in section~\ref{sec: emu_training}, a Gaussian process regression is highly straightforward to set up and straightforward to modify.
+
+\begin{centering}
+\subsection{Sampling Approach: Latin Hypercube}
+\end{centering}
+
+I imagine this is going to be an extremely short section. We should motivate why we're using this style of sampling.
 
 \begin{centering}
 \subsection{Evolution Mapping}
@@ -282,6 +300,8 @@ Beware the neutrino settings. The effective number of massive neutrinos is about
 
 Here, I will talk about the playing-around that we did, to discover that $A_s$ assisted in the prediction of the suppression due to massive neutrinos.
 
+Remember to explain \textit{why} the prediction of these asymptotes means that $A_s$ will capture all of the unruly behavior of neutrinos. What theory motivates such a judgment? Or are we only guessing?
+
 \begin{centering}
 \section{Cassandra-Linear: a Python Package}
 \end{centering}
@@ -304,6 +324,7 @@ This section won't actually introduce much that the reader hasn't already encoun
 
 \begin{centering}
 \subsection{Building the Latin Hypercube Sample}
+\label{sec: build_lhc}
 \end{centering}
 
 % lhc.py
@@ -313,6 +334,10 @@ This section will briefly recapitulate some of the latin hypercube sampling expl
 We've multithreaded a random LHC generator to allocate a large amount of compute to this brute force approach.
 
 We'll also describe the switch from a rescaled latin hypercube to a unit latin hypercube that we later interpret differently according to the specified priors.
+
+%! Maybe we should move get_param_ranges to lhc.py. It would be more thematically consistent if the note on priors appeared in this section
+
+The priors that we use correspond to those currently used by COMET. \textcolor{orange}{Should I spend any time defending this choice here, or may I put all of the defense in section~\ref{sec: priors}?}
 
 \begin{centering}
 \subsection{Requesting the Sample Spectra from CAMB}
@@ -324,6 +349,7 @@ This section will describe the process going from a latin hypercube to a set of 
 
 \begin{centering}
 \subsection{Training the Emulator}
+\label{sec: emu_training}
 \end{centering}
 
 % train\_emu.py
@@ -355,6 +381,18 @@ This is a brief introductory section motivating the creation of two emulators: u
 Conclude this section by saying that this integration of multiple emulators into one user-facing script can be further exploited with, for example, different emulators for different neutrino mass hierarchies.
 
 \begin{centering}
+\subsection{Emulation over Uncertainties}
+\end{centering}
+
+For a further step of accuracy, we can add a third data set to our pipeline
+and introduce a second layer of emulation.
+
+Up to this point, our pipeline has included a training set and a testing set.
+If we add a validation set, then we can train a second emulator over the
+errors associated with the first emulator's performance on this validation
+set.
+
+\begin{centering}
 \subsection{Quantifying the Performance of the Emulator}
 \end{centering}
 
@@ -365,7 +403,7 @@ I would like to include a brief review of the relevant literature to explain the
 For the purpose of this paper, we use the weak and approximate performance metric of simply generating a large number of additional CAMB spectra and comparing them to the predictions of the emulator.
 
 \begin{centering}
-\subsection{Percent and Absolute Errors on Random Cosmologies}
+\subsection{Percent versus Absolute Errors on Random Cosmologies}
 \end{centering}
 
 This will be a fairly short section, basically just showing the plot of 5000 error curves in these two ways. I may focus in on different k-ranges, but the error curves are currently quite flat, so I don't think that would be a good use of space.
@@ -383,7 +421,22 @@ Here, I will either include color plots or, as Dante suggests, monochrome plots 
 \end{centering}
 
 \begin{centering}
-\subsection{Resolution of k axis}
+\subsection{Tightness of the Priors Used}
+\label{sec: priors}
+\end{centering}
+
+With this section I would like to revisit the specific values for the priors,
+that I only briefly mentioned back in section~\ref{sec: build_lhc}.
+
+First of all, from a purely practical consideration, expanding the priors was
+not feasible due to the high incidence of unsolvable cells.
+
+But second, this may not be a significant limitation to the utility of the
+emulators introduced here, because they are already quite wide compared to
+current state-of-the-art parameter inferences. \textcolor{green}{CITATIONS}.
+
+\begin{centering}
+\subsection{Resolution of the k Axis}
 \end{centering}
 
 This might go better in the CassL section, but I think I ought to motivate the decision to use length-300 arrays.
@@ -393,6 +446,21 @@ This might go better in the CassL section, but I think I ought to motivate the d
 \end{centering}
 
 This might go better in the CassL section, but I think I ought to motivate the decision to use 5000 training arrays.
+
+\begin{centering}
+\subsection{Linear Sampling in Different Parameters}
+\end{centering}
+
+We also tried sampling in $\sigma_{12}^2$ as well as $\sqrt{\sigma_{12}}$.
+Unfortunately, we were unable to conclude anything about the effectiveness of
+these strategies--there appears to have been some mistake in our code, such
+that the errors are much larger than can be explained on account of poor
+sampling.
+
+See figures~\ref{fig: sigsquare_sample} and~\ref{fig: sigroot_sample} for
+illustrations of the problem. In a future work, it would be helpful to
+investigate these problems further. We may find that a different sampling
+strategy will more efficiently reduce the deltas that we see in our emulator.
 
 \begin{centering}
 \subsection{Summary of the Paper}
@@ -405,6 +473,12 @@ What was the main objective of this thesis? What were the key results of this wo
 \end{centering}
 
 Here I will talk about what kinds of questions we estimate will be most fruitful for further inquiries about this topic and this code.
+
+Is there a theoretically perfect LHC generator?
+
+In order to expand the priors, it would be helpful to investigate why CAMB does not allow negative redshifts, in case this can be adapted. Alternatively, CLASS \textcolor{red}{allows} negative redshifts, so it may be worthwhile to repeat the work of this thesis using power spectra from CLASS. This would involve familiarization with a new platform, however, and so this escapes the scope of this thesis. Remember that negative redshifts would be a helpful feature for this work because it would allow us to investigate much broader priors.
+
+Should we use a neural network instead of a Gaussian process for our emulator? AndreaP and Alex Eggemeier are already on the job: they are converting COMET to a neural network approach. We recommend that the reader follow future COMET papers for investigations into this question.
 
 \IfFileExists{biblatex.sty} {
     \printbibliography

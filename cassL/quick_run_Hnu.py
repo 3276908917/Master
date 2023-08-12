@@ -31,6 +31,7 @@ if completed_index is not None:
 samples, rescalers = ged.fill_hypercube(
     hc, standard_k, param_ranges, samples=samples,
     massive_neutrinos=massive_neutrinos, write_period=500,
+    cell_range=range(completed_index + 1, 5000),
     save_label="unit_" + file_suffix
 )
 np.save("samples_unit_" + file_suffix + ".npy", samples, allow_pickle=True)
