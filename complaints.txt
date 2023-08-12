@@ -1,5 +1,8 @@
+I'll still need to read that COMET paper
+
 These emulators need to be available on all devices:
 * MEGA priors, 5k emulator
+	WE'RE STILL USING THE INTERPOLATOR FOR THIS ONE
 	> train on laptop, test BRIEFLY
 	* needs its own test cube
 * Classic priors, 5k emulator
@@ -8,21 +11,26 @@ These emulators need to be available on all devices:
 	* test BRIEFLY
 	* needs its own test cube
 * COMET priors, 10k emulator
+	FOR ALL NON-5Ks, I'M USING DIRECT EVALUATION
 	* 5k emulator (300 k points)
 	* 4k emu
 		* buil
+			lhc.multithread_unit_LHC_builder(6, 4000, num_workers=8, label="unit_4k_massive_train")
 		* fill
 	* 3k emu
 		* buil
+			lhc.multithread_unit_LHC_builder(6, 3000, num_workers=8, label="unit_3k_massive_train")
 		* fill
 	* 6k
 		* buil
+			lhc.multithread_unit_LHC_builder(6, 6000, num_workers=8, label="unit_6k_massive_train")
 		* fill
 	* 7k
-		* build hypercube
+		$ build hypercube
+			best_sep: 0.06922235689340223
 		* fill hypercube
 
-	* these do not need their own test cubes
+	* (these do not need their own test cubes)
 
 * COMET 5k, 400 k points
 	* Comet 5k, 500 k points

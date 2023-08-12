@@ -378,7 +378,11 @@ This section will describe the process going from a latin hypercube to a set of 
 
 % train\_emu.py
 
-This section will focus on the particular lines of GPy that we used.
+This section will focus on the particular lines of GPy that we used, as well
+as the various data-cleaning and normalization statements that we used.
+Normalization will be a really important topic. I want to explain some of
+the theory behind why the emulator performs poorly with values outside of this
+[0, 1] range.
 
 \begin{centering}
 \subsection{Accessing and Using the Emulator}
