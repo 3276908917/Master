@@ -59,7 +59,16 @@ def normalize_X(priors, ):
     # If we're given a unit hc, this function should transform external test
     # points...
 
-class emulator:
+class Emulator_Trainer:
+
+    class Emulator:
+
+        def __init__(self, priors, ymu, ystdev):
+            self.priors = priors
+            self.ymu = ymu
+            self.ystdev = ystdev
+
+        def convert_to_normalized_params(x)
 
     # priors
     # y normalization
@@ -79,42 +88,47 @@ class emulator:
             file_handle = args[0]
             assert isinstance(file_handle, str), constructor_complaint
 
-            self = pickle.load(open(file_handle), "rb")
+            self.emu = pickle.load(open(file_handle), "rb")
 
         elif len(args) == 3:
             self.X = args[0]
+
             self.Y = args[1]
-            self.priors = args[2]
+            priors = args[2]
+
             assert isinstance(self.X, np.ndarray) and \
                 isinstance(self.Y, np.ndarray) and \
                 isinstance(self.priors, dict), constructor_complaint
 
-            self.normalized_Y = normalize_spoctra(self.Y)
+            self.normalized_Y, ymu, ystdev = normalize_spectra(self.Y)
 
+            self.emu = Emulator(priors, ymu, ystdev)
+            self.emu.dim = len(self.X[0])
         else:
             raise Exception(constructor_complaint)
 
     def train(self):
-        assert self.normalized_X is not None and \
-            self.normalized_Y is not None, "No data found over which to train."
+        assert self.X is not None and self.normalized_Y is not None, \
+            "No data found over which to train."
 
         # The dimension is automatically the length of an X element.
-        self.dim = len(self.X[0])
-        remaining_variance = np.var(Y)
+        remaining_variance = np.var(self.normalized_Y)
 
-        kernel1 = GPy.kern.RBF(input_dim=self.dim, variance=remaining_variance,
-                               lengthscale=np.ones(self.dim), ARD=True)
+        kernel1 = GPy.kern.RBF(input_dim=self.emu.dim,
+                               variance=remaining_variance,
+                               lengthscale=np.ones(self.emu.dim), ARD=True)
 
-        kernel2 = GPy.kern.Matern32(input_dim=self.dim,
+        kernel2 = GPy.kern.Matern32(input_dim=self.emu.dim, ARD=True,
                                     variance=remaining_variance,
-                                    lengthscale=np.ones(self.dim), ARD=True)
+                                    lengthscale=np.ones(self.emu.dim))
 
-        kernel3 = GPy.kern.White(input_dim=self.dim,
+        kernel3 = GPy.kern.White(input_dim=self.emu.dim,
                                  variance=remaining_variance)
 
         kernel = kernel1 + kernel2 + kernel3
 
-        self.gpr = Gpy.models.GPRegression(self.X, self.Y, kernel)
+        self.emu.gpr = \
+            Gpy.models.GPRegression(self.X, self.normalized_Y, kernel)
 
     def save(self, file_handle):
         pickle.dump(self, open(name, "wb"), protocol=5)
