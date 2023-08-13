@@ -22,13 +22,13 @@ These emulators need to be available on all devices:
 			lhc.multithread_unit_LHC_builder(6, 3000, num_workers=8, label="unit_3k_massive_train")
 		* fill
 	* 6k
-		* buil
+		$ buil
 			lhc.multithread_unit_LHC_builder(6, 6000, num_workers=8, label="unit_6k_massive_train")
-		* fill
+		>> fill
 	* 7k
 		$ build hypercube
 			best_sep: 0.06922235689340223
-		* fill hypercube
+		$ fill hypercube
 
 	* (these do not need their own test cubes)
 
