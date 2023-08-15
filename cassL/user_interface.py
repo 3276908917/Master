@@ -2,6 +2,7 @@ import numpy as np
 from scipy.interpolate import interp1d
 import GPy
 from cassL import lhc
+from cassL import train_emu as te
 
 # In keeping with the format of values typically quoted in the literature for
 # the scalar mode amplitude (see, for example, Spurio Mancini et al, 2021 ),
@@ -196,4 +197,46 @@ def get_model(X, Y):
     m = GPy.models.GPRegression(X, Y, ker)
     m.optimize(messages=True, max_f_eval=1000)
     return m   
- 
+
+def build_train_and_test_sets(scenario_file_handle)
+    """
+    Options in the scenario file:
+    * A header with a comment explaining, in English, the basic gist of the
+        scenario.
+    * A totally-unique scenario name.
+    * Flag: do we need to also create a corresponding new test hypercube?
+    * Number of k points associated with each spectrum.
+    * Number of samples associated with the hypercube, default 5k.
+    
+    THIS FUNCTION SHOULD ISSUE A VERY LOUD WARNING IF ANY VALUES ARE IMPLIED
+    FROM DEFAULT VALUES!!!
+    
+    (have a very specific directory with the following subdirectories: \
+        1. Initial LHCs (i.e. stuff spat out by lhs.py functions)
+            New directories not necessary, because some scenarios will only
+            generate one file anyway.
+        2. Backups
+            At its peak, this folder will contain six files from the current
+            run: three for the most recent backups and three for the backups
+            before that. Then the old backups will be promptly deleted.
+        3. Final products
+            * Create a new directory for each scenario!!
+    """
+
+def build_and_test_emulator(X_train, Y_train, X_test, Y_test, priors):
+    """
+    Build a new Gaussian process regression over X_train and Y_train, then
+    test its accuracy using X_test and Y_test.
+    This function automatically throws out bad entries in all X and Y inputs.
+    
+    Just like the code in train_emu.py, this cannot yet handle the case of
+    different sampling distributions, e.g. root- or square-sampling in sigma12.
+    """
+    X_train_clean, Y_train_clean = \
+        te.eliminate_unusable_entries(X_train, Y_train)
+    trainer = te.Emulator_Trainer(X_train_clean, Y_train_clean, priors)
+    trainer.train()
+    
+    X_test_clean, Y_test_clean = \
+        te.eliminate_unusable_entries(X_test, Y_test)
+    trainer.test(X

@@ -55,26 +55,52 @@ def normalize_spectra(Y):
     Y_normalized = np.divide(Y_shifted, ystdev)
     return Y_normalized, ymu, ystdev
 
-def normalize_X(priors, ):
-    # If we're given a unit hc, this function should transform external test
-    # points...
-
 class Emulator_Trainer:
+
+    ### To-do:
+    # this should automatically handle different kinds of sampling, i.e. in
+    # sigma_{12}: square linear or root linear stuff. Right now the handling is
+    # incomplete.
 
     class Emulator:
 
-        def __init__(self, priors, ymu, ystdev):
-            self.priors = priors
+        def __init__(self, xmin, xrange, ymu, ystdev):
+            # We're requiring all emulators to follow the same approach:
+            # all mappings can be represented with just the two variables,
+            # xmin and xrange
+            self.xmin = xmin
+            self.xrange = xrange
             self.ymu = ymu
             self.ystdev = ystdev
 
-        def convert_to_normalized_params(x)
-
-    # priors
-    # y normalization
-    # X set is optional
-    # Y set is optional
-    # emu object
+        def convert_to_normalized_params(self, config):
+            """
+            Using the originally input prior, convert a particular cosmological
+            configuration into a set of unit-LHC coordinates.
+            """
+            assert len(x) == self.dim, "This is a " + str(self.dim) + \
+                "-dimensional emulator. Input vector had only " + len(x) + \
+                " dimensions."
+               
+            return (config - self.xmin) / self.xrange
+            
+        def _predict_normalized_spectrum(self, x):
+            """
+            This function should really only be used in debugging cases. To
+            obtain a power spectrum from the emulator, use the function
+            predict_pspectrum
+            """
+            #! Maybe we should actually experiment with these uncertainties and
+            # see if they ever come in handy. Or we could just keep throwing
+            # them out.
+            guess, uncertainties = self.gpr.predict(x)
+            return guess
+            
+        def predict_pspectrum(self, x):
+            # Instead of solving the x formatting complaints by blindly
+            # re-nesting x, let's try to get to the bottom of *why* the
+            # formatting is so messed up in the first place.
+            return inverse_transform(_predict_normalized_spectrum(x))
 
     def __init__(self, *args):
         """
@@ -102,11 +128,39 @@ class Emulator_Trainer:
 
             self.normalized_Y, ymu, ystdev = normalize_spectra(self.Y)
 
-            self.emu = Emulator(priors, ymu, ystdev)
+            xmin = np.array([])
+            xrange = np.array([])
+
+            ### This section is INCREDIBLY unsightly. Let's clean up and
+            # generalize.
+
+            for key in par_ranges.keys():
+                xmin = np.append(xmin, par_ranges[key][0])
+                xrange = np.append(xrange,
+                                   par_ranges[key][1] - par_ranges[key][0])
+
+                if sigma12_sampling != 'linear':
+                    if key == "n_s":
+                        xmin = np.append(xmin, 0)
+                        xrange = np.append(xrange, 0)
+                    if key == "omnuh2":
+                        break
+                
+            if sigma12_sampling == 'root':
+                xmin[3] = 0.2 ** 0.5
+                xrange[3] = 1 - 0.2 ** 0.5
+            elif sigma12_sampling == 'square':    
+                xmin[3] = 0.04
+                xrange[3] = 0.96
+                
+            ### End unsightly section
+
+            self.emu = Emulator(priors, xmin, xrange, ymu, ystdev)
             self.emu.dim = len(self.X[0])
         else:
             raise Exception(constructor_complaint)
-
+            
+            
     def train(self):
         assert self.X is not None and self.normalized_Y is not None, \
             "No data found over which to train."
@@ -129,6 +183,16 @@ class Emulator_Trainer:
 
         self.emu.gpr = \
             Gpy.models.GPRegression(self.X, self.normalized_Y, kernel)
+        
+        # '' is a regex matching all parameter names
+        self.emu.gpr.constrain_positive('')
+        self.emu.gpr.optimize()
+        
+    def test(self, X_test, Y_test):
+        self.X_test = X_test
+        self.Y_test = Y_test
+        self.deltas = 
+        print("Errors computed!")
 
     def save(self, file_handle):
         pickle.dump(self, open(name, "wb"), protocol=5)
