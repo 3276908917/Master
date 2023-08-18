@@ -3,6 +3,11 @@ I'll still need to read that COMET paper
 These emulators need to be available on all devices:
 * MEGA priors, 5k emulator
 	WE'RE STILL USING THE INTERPOLATOR FOR THIS ONE
+	EXCEPT THE QUICK RUN SCRIPT SEEMS TO CONTRADICT ME...
+	MAYBE SOME OF THE TEST CUBE RESULTS ARE DIRECT EVALUTION??
+	IN WHICH CASE WE NEED TO COMPLETELY REDO
+	ALSO THE PRIORS LOOK WRONG ANYWAY...
+	THIS RUN IS PROBABLY WRONG
 	> train on laptop, test BRIEFLY
 	* needs its own test cube
 * Classic priors, 5k emulator

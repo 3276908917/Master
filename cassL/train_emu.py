@@ -81,7 +81,10 @@ class Emulator_Trainer:
             assert len(x) == self.dim, "This is a " + str(self.dim) + \
                 "-dimensional emulator. Input vector had only " + len(x) + \
                 " dimensions."
-               
+
+            # We should do some error checking to make sure that the desired
+            # configuration is actually within the prior ranges.
+
             return (config - self.xmin) / self.xrange
             
         def _predict_normalized_spectrum(self, x):
@@ -189,10 +192,92 @@ class Emulator_Trainer:
         self.emu.gpr.optimize()
         
     def test(self, X_test, Y_test):
+        """
+        This function can also be used to generate training-error curves,
+        simply pass in the training X and Y again, this time as the test X and
+        Y for this function.
+        """
         self.X_test = X_test
         self.Y_test = Y_test
-        self.deltas = 
+
+        self.test_predictions = np.zeros(Y_test.shape)
+
+        for i in range(len(X)):
+            #! This might complain about lack of nesting, but don't just nest,
+            # try to find a better way to resolve the issue.
+            self.test_predictions[i], _ = self.emu.predict_pspectrum(X[i])
+
+        self.deltas = self.preds - Y_test
+        self.sq_errors = np.square(self.deltas)
+        self.rel_errors = self.deltas / Y_test
+
         print("Errors computed!")
+        print("Sum of squared errors across all models:",
+              sum(sum(self.sq_errors)))
+
+    def error_plot(self, plot_every=1, param_index=None, param_label=None,
+        param_range=None, fixed_k=None, save_label=None):
+        """
+        If param_index is None, all error curves are plotted together and in
+        the same color.
+
+        If fixed_k is None, the whole set of scales is plotted together, and
+        the param specified by param_index becomes the new x-axis. A non-None
+        fixed_k value only makes sense with a non-None
+        param_index, so the function will complain if this criterion is unmet.
+
+        Thanks to Dante for the recommendation of the fixed_k functionality!
+        """
+        # We still need to implement the fixed_k functionality!
+        return NotImplemented
+
+        try:
+            self.deltas is not None, "Ouch!"
+        catch AttributeError:
+            raise Exception("Errors have not been computed yet! Use the " + \
+                            "function 'test'")
+
+        assert (param_index is None) ^ (param_label is None) == False, \
+            "If a param_index is given, a param_label must also be given, " + \
+            "and vice versa."
+        if param_range is not None:
+            assert param_index is not None, "A parameter range was given, " + \
+                "but no parameter was specified."
+        if fixed_k is not None:
+            assert param_index is not None, "A fixed-k plot is not " + \
+                "possible without a replacement x-axis. Specify a " + \
+                "cosmological parameter to represent the x coordinate."
+
+        valid_indices = list(range(len(self.X_test[:, param_index])))
+        if param_range is not None:
+            valid_indices = np.where(np.logical_and(
+                self.X_test[:, param_index] < param_range[1],
+                self.X_test[:, param_index] > param_range[0]))[0]
+        valid_vals = self.X_test[:, param_index][valid_indices]
+        normalized_vals = normalize(valid_vals)
+
+        colors = plt.cm.plasma(normalized_vals)
+        valid_errors = rel_errors[valid_indices]
+
+        for i in range(len(valid_errors)):
+            if i % plot_every == 0:
+                pb.plot(scales, valid_errors[i],
+                    color=colors[i], alpha=0.05)
+                pb.xscale('log')
+
+        pb.title(r"Emulator " + emu_vlabel + ", " + str(len(valid_errors)) + \
+                 r" Random Massive-$\nu$ Models" + "\ncolored by " + \
+                 param_label + " value")
+        pb.ylabel("% error between CAMB and CassL")
+        pb.xlabel("scale $k$ [1 / Mpc]")
+        norm = mpl.colors.Normalize(
+            vmin=min(self.X_test[:, param_index][valid_indices]),
+            vmax=max(self.X_test[:, param_index][valid_indices]))
+        pb.colorbar(mpl.cm.ScalarMappable(cmap=pb.cm.plasma, norm=norm))
+        # Momentarily eliminate saving so that we don't keep crashing on the
+        # incomplete file handles.
+        if save_label is not None:
+            pb.savefig("../plots/emulator/performance/" + save_label + ".png")
 
     def save(self, file_handle):
         pickle.dump(self, open(name, "wb"), protocol=5)

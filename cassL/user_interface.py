@@ -198,7 +198,7 @@ def get_model(X, Y):
     m.optimize(messages=True, max_f_eval=1000)
     return m   
 
-def build_train_and_test_sets(scenario_file_handle)
+def build_train_and_test_sets(scenario_file_handle):
     """
     Options in the scenario file:
     * A header with a comment explaining, in English, the basic gist of the
@@ -222,6 +222,7 @@ def build_train_and_test_sets(scenario_file_handle)
         3. Final products
             * Create a new directory for each scenario!!
     """
+    return 23
 
 def build_and_test_emulator(X_train, Y_train, X_test, Y_test, priors):
     """
@@ -239,4 +240,4 @@ def build_and_test_emulator(X_train, Y_train, X_test, Y_test, priors):
     
     X_test_clean, Y_test_clean = \
         te.eliminate_unusable_entries(X_test, Y_test)
-    trainer.test(X
+    # trainer.test(X
