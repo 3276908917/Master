@@ -21,6 +21,34 @@ def percent_error(trusted, tested):
     pasting it.
     """
     return 100 * (tested - trusted) / trusted
+    
+def closest_index(array, target_value):
+    """
+    This function is used in train_emu.
+    But I think we should split off a utils script, because percent_error and
+    closest_index are not exactly user interface functions...
+    """
+    if not isinstance(array, np.ndarray):
+        raise TypeError("array argument must be a numpy array")
+        
+    if array.ndim != 1:
+        raise ValueError("This function can only accept 1D arrays.")
+    
+    for e in array:
+        if not isinstance(e, np.floating) and not isinstance(e, np.integer):
+            raise ValueError("The array must contain only numerical elements.")
+    
+    if not isinstance(target_value, float) and \
+        not isinstance(target_value, int):
+        raise TypeError("value argument must be numerical")
+        
+    if not np.all(array == np.sort(array)):
+        raise ValueError("The array must already be sorted, or else the " +
+            "returned index will be ambiguous.")
+    
+    error_list = abs(array - target_value)
+    return error_list.index(min(error_list))
+    
 
 def get_param_ranges(priors="COMET", massive_neutrinos=True):
     """

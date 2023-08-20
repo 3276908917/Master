@@ -24,7 +24,8 @@ def eliminate_unusable_entries(X_raw, Y_raw,
     Returns: cleaned-up X and Y without
     unusable rows.
     """
-    assert len(X) == len(Y), "X and Y must have the same length"
+    if len(X) != len(Y):
+        raise ValueError("X and Y must have the same length")
     
     def unusable(row, bad_vals):
         for bad_val in bad_vals:
@@ -78,12 +79,16 @@ class Emulator_Trainer:
             Using the originally input prior, convert a particular cosmological
             configuration into a set of unit-LHC coordinates.
             """
-            assert len(x) == self.dim, "This is a " + str(self.dim) + \
-                "-dimensional emulator. Input vector had only " + len(x) + \
-                " dimensions."
+            if len(config) != self.dim:
+                raise ValueError("This is a " + str(self.dim) + \
+                    "-dimensional emulator. Input vector had only " + \
+                    len(config) + " dimensions."
 
-            # We should do some error checking to make sure that the desired
-            # configuration is actually within the prior ranges.
+            for i in range(len(config)):
+                if config[i] < self.xmin[i] or \
+                    config[i] > self.xmin[i] + self.xrange[i]:
+                    raise ValueError("Parameter at index " + str(i) + \
+                        "is outside of the range defined by the prior!")
 
             return (config - self.xmin) / self.xrange
             
@@ -173,8 +178,8 @@ class Emulator_Trainer:
             
             
     def train(self):
-        assert self.X is not None and self.normalized_Y is not None, \
-            "No data found over which to train."
+        if self.X is None or self.normalized_Y is None:
+            raise AttributeError("No data found over which to train.")
 
         # The dimension is automatically the length of an X element.
         remaining_variance = np.var(self.normalized_Y)
@@ -239,7 +244,7 @@ class Emulator_Trainer:
         
         self._scales = scales
 
-    def error_plot(self, deltas=False, plot_every=1, param_index=None,
+    def error_curves(self, deltas=False, plot_every=1, param_index=None,
         param_label=None, param_range=None, fixed_k=None, save_label=None):
         """
         If param_index is None, all error curves are plotted together and in
@@ -252,8 +257,6 @@ class Emulator_Trainer:
 
         Thanks to Dante for the recommendation of the fixed_k functionality!
         """
-        # We still need to implement the fixed_k functionality!
-        return NotImplemented
 
         if not hasattr(self, deltas):
             raise AttributeError("Errors have not been computed yet! Use " + \
@@ -276,8 +279,15 @@ class Emulator_Trainer:
                 "replacement x-axis. Specify a cosmological parameter to " + \
                 "represent the x coordinate.")
 
+        k_index = None
         # Issue a warning if we weren't able to find the exact k value.
-        if fixed_k not in scales
+        if fixed_k not in self._scales:
+            k_index = ui.closest_index(self._scales, fixed_k)
+            raise UserWarning("No exact match was found for the given " + \
+                "fixed k (" + str(fixed_k) + "). Approximating to " + \
+                str(self._scales[k_index]))
+        else:
+            k_index = self._scales.index(fixed_k)
 
         valid_indices = list(range(len(self.X_test[:, param_index])))
         if param_range is not None:
@@ -299,7 +309,7 @@ class Emulator_Trainer:
                     # colors. If it does, we should switch to building plot
                     # points and then plotting all of them together when the
                     # loop is complete.
-                    plt.scatter(self.valid_vals[i], valid_errors[i][KK])
+                    plt.scatter(self.valid_vals[i], valid_errors[i][k_index])
                 else:
                     plt.plot(self._scales, valid_errors[i],
                         color=colors[i], alpha=0.05)
@@ -310,12 +320,10 @@ class Emulator_Trainer:
                  param_label + " value")
         plt.ylabel("% error between CAMB and CassL")
         plt.xlabel("scale $k$ [1 / Mpc]")
-        norm = mpl.colors.Normalize(
-            vmin=min(self.X_test[:, param_index][valid_indices]),
-            vmax=max(self.X_test[:, param_index][valid_indices]))
+        
+        norm = mpl.colors.Normalize(vmin=min(valid_vals), vmax=max(valid_vals))
         plt.colorbar(mpl.cm.ScalarMappable(cmap=plt.cm.plasma, norm=norm))
-        # Momentarily eliminate saving so that we don't keep crashing on the
-        # incomplete file handles.
+        
         if save_label is not None:
             plt.savefig("../plots/emulator/performance/" + save_label + ".png")
 
