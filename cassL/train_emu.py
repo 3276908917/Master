@@ -327,5 +327,46 @@ class Emulator_Trainer:
         if save_label is not None:
             plt.savefig("../plots/emulator/performance/" + save_label + ".png")
 
+    def error_statistics(deltas=False, error_aggregator=np.median):
+        """
+        Maybe this function, like error_curve, should include a parameter range
+        constraint parameter.
+        
+        @error_aggregator: function
+            This should be a numpy aggregator, because this function is always
+            called with the argument "axis=1"
+            Some recommendations:
+                numpy.median
+                numpy.max
+                numpy.min
+                numpy.mean
+                numpy.ptp (i.e. the peak-to-peak, or range)
+                numpy.std (i.e. standard deviation)
+        """
+        errors = self.deltas if deltas else self.rel_errors
+        error_array = error_aggregator(errors, axis=1)
+        
+        print("The chosen error statistic...")
+        print("ranges from", min(meds), "to", max(meds))
+        print("median is", np.median(meds))
+        print("mean is", np.mean(meds))
+        print("st.dev. is", np.std(meds))
+
+    def error_hist(deltas=False, error_aggregator="median", bins=None):
+        """
+        Maybe this function, like error_curve, should include a parameter range
+        constraint parameter.
+        
+        If bins is left as None, the histogram automically uses Sturges' rule.
+        """
+        return NotImplemented
+    
+        plt.hist(100 * meds, bins="sturges")
+        plt.title("Histogram of Median Percent Errors: Emulator " + emu_vlabel)
+        plt.ylabel("Frequency [counts]")
+        plt.xlabel("% Error between CAMB and Cass-L")
+        plt.savefig("../../plots/emulator/performance/err_hist_" + \
+                    emu_vlabel + ".png")
+
     def save(self, file_handle):
         pickle.dump(self, open(name, "wb"), protocol=5)
