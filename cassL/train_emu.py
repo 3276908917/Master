@@ -82,7 +82,7 @@ class Emulator_Trainer:
             if len(config) != self.dim:
                 raise ValueError("This is a " + str(self.dim) + \
                     "-dimensional emulator. Input vector had only " + \
-                    len(config) + " dimensions."
+                    len(config) + " dimensions.")
 
             for i in range(len(config)):
                 if config[i] < self.xmin[i] or \
@@ -217,7 +217,7 @@ class Emulator_Trainer:
                 "dimension of the training X!")
         if len(Y_test[0]) != len(self.Y[0]):
             raise ValueError("Dimension of test Y does not match the " + \
-                "dimension of the training Y!"
+                "dimension of the training Y!")
         
         self.X_test = X_test
         self.Y_test = Y_test
@@ -240,7 +240,7 @@ class Emulator_Trainer:
     def set_scales(self, scales):
         if len(scales) != len(self.Y[0]):
             raise ValueError("The dimension of the given set of scales " + \
-                "does not match the dimension of the spectra!"
+                "does not match the dimension of the spectra!")
         
         self._scales = scales
 

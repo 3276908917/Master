@@ -294,8 +294,18 @@ def fill_hypercube(parameter_values, standard_k_axis,
         # interpolator approach.
         #this_p, this_actual_sigma12, these_rescaling_parameters = \
         #    evaluate_cell(this_cosmology, standard_k_axis)
-        this_p, this_actual_sigma12, these_rescaling_parameters = \
-            eval_func(this_cosmology, standard_k_axis)
+
+        # As of 20.08.2023, this REALLY is a NECESSARY workaround.
+        this_actual_sigma12 = None
+        these_rescaling_parameters = None
+        try:
+            this_p, this_actual_sigma12, these_rescaling_parameters = \
+                eval_func(this_cosmology, standard_k_axis)
+        except camb.CAMBError:
+            print("This cell is unsolvable. However, in this case, we " + \
+                  "observed a CAMBError rather than a negative redshift. " + \
+                  "This is a good sign that there is a problem with the " + \
+                  "input hypercube.")
 
         if rescaling_parameters_list is None:
             rescaling_parameters_list = these_rescaling_parameters
