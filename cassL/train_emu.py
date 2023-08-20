@@ -8,8 +8,8 @@ from cassL import camb_interface as ci
 from cassL import generate_emu_data as ged
 from cassL import user_interface as ui
 
-constructor_complaint = "emu objects require either two NumPy data sets or" + \
-    " an emu file handle."
+constructor_complaint = "emu objects require either two NumPy arrays " + \
+    "(the data sets) or an emu file handle."
 
 ### We should create an emulator object
 
@@ -115,20 +115,28 @@ class Emulator_Trainer:
         if len(args) == 1:
             # We're expecting an already-trained emulator object
             file_handle = args[0]
-            assert isinstance(file_handle, str), constructor_complaint
+            if not isinstance(file_handle, str):
+                raise TypeError(constructor_complaint)
 
             self.emu = pickle.load(open(file_handle), "rb")
 
         elif len(args) == 3:
             self.X = args[0]
-
             self.Y = args[1]
             priors = args[2]
-
-            assert isinstance(self.X, np.ndarray) and \
-                isinstance(self.Y, np.ndarray) and \
-                isinstance(self.priors, dict), constructor_complaint
-
+            
+            if not isinstance(self.X, np.ndarray):
+                raise TypeError(constructor_complaint)
+            
+            if not isinstance(self.Y, np.ndarray):
+                raise TypeError(constructor_complaint)
+            
+            if not isinstance(self.priors, dict):
+                raise TypeError(constructor_complaint)
+            
+            if len(self.X) != len(self.Y):
+                raise ValueError("X and Y are unequal in length!")
+                
             self.normalized_Y, ymu, ystdev = normalize_spectra(self.Y)
 
             xmin = np.array([])
@@ -161,7 +169,7 @@ class Emulator_Trainer:
             self.emu = Emulator(priors, xmin, xrange, ymu, ystdev)
             self.emu.dim = len(self.X[0])
         else:
-            raise Exception(constructor_complaint)
+            raise TypeError(constructor_complaint)
             
             
     def train(self):
@@ -197,6 +205,15 @@ class Emulator_Trainer:
         simply pass in the training X and Y again, this time as the test X and
         Y for this function.
         """
+        if len(X_test) != len(Y_test):
+            raise ValueError("Size of X and Y do not match!")
+        if len(X_test[0]) != len(self.X[0]):
+            raise ValueError("Dimension of test X does not match the " + \
+                "dimension of the training X!")
+        if len(Y_test[0]) != len(self.Y[0]):
+            raise ValueError("Dimension of test Y does not match the " + \
+                "dimension of the training Y!"
+        
         self.X_test = X_test
         self.Y_test = Y_test
 
@@ -215,8 +232,15 @@ class Emulator_Trainer:
         print("Sum of squared errors across all models:",
               sum(sum(self.sq_errors)))
 
-    def error_plot(self, plot_every=1, param_index=None, param_label=None,
-        param_range=None, fixed_k=None, save_label=None):
+    def set_scales(self, scales):
+        if len(scales) != len(self.Y[0]):
+            raise ValueError("The dimension of the given set of scales " + \
+                "does not match the dimension of the spectra!"
+        
+        self._scales = scales
+
+    def error_plot(self, deltas=False, plot_every=1, param_index=None,
+        param_label=None, param_range=None, fixed_k=None, save_label=None):
         """
         If param_index is None, all error curves are plotted together and in
         the same color.
@@ -231,22 +255,29 @@ class Emulator_Trainer:
         # We still need to implement the fixed_k functionality!
         return NotImplemented
 
-        try:
-            self.deltas is not None, "Ouch!"
-        catch AttributeError:
-            raise Exception("Errors have not been computed yet! Use the " + \
-                            "function 'test'")
+        if not hasattr(self, deltas):
+            raise AttributeError("Errors have not been computed yet! Use " + \
+                " the function 'test'")
+        
+        if not hasattr(self, _scales):
+            raise AttributeError("This object has no k values to which " + \
+            "the spectra correspond! Specify them with set_scales")
 
-        assert (param_index is None) ^ (param_label is None) == False, \
-            "If a param_index is given, a param_label must also be given, " + \
-            "and vice versa."
-        if param_range is not None:
-            assert param_index is not None, "A parameter range was given, " + \
-                "but no parameter was specified."
-        if fixed_k is not None:
-            assert param_index is not None, "A fixed-k plot is not " + \
-                "possible without a replacement x-axis. Specify a " + \
-                "cosmological parameter to represent the x coordinate."
+        if (param_index is None) ^ (param_label is None): 
+            raise ValueError("If a param_index is given, a param_label " + \
+                "must also be given, and vice versa.")
+                
+        if param_range is not None and param_index is None:
+            raise ValueError("A parameter range was given, but no " + \
+                "parameter was specified.")
+        
+        if fixed_k is not None and param_index is None:
+            raise ValueError("A fixed-k plot is not possible without a " + \
+                "replacement x-axis. Specify a cosmological parameter to " + \
+                "represent the x coordinate.")
+
+        # Issue a warning if we weren't able to find the exact k value.
+        if fixed_k not in scales
 
         valid_indices = list(range(len(self.X_test[:, param_index])))
         if param_range is not None:
@@ -257,27 +288,36 @@ class Emulator_Trainer:
         normalized_vals = normalize(valid_vals)
 
         colors = plt.cm.plasma(normalized_vals)
-        valid_errors = rel_errors[valid_indices]
+        
+        valid_errors = self.deltas[valid_indices] if deltas \
+            else self.rel_errors[valid_indices]
 
         for i in range(len(valid_errors)):
             if i % plot_every == 0:
-                pb.plot(scales, valid_errors[i],
-                    color=colors[i], alpha=0.05)
-                pb.xscale('log')
+                if fixed_k:
+                    # This approach might generate a bunch of meaningless
+                    # colors. If it does, we should switch to building plot
+                    # points and then plotting all of them together when the
+                    # loop is complete.
+                    plt.scatter(self.valid_vals[i], valid_errors[i][KK])
+                else:
+                    plt.plot(self._scales, valid_errors[i],
+                        color=colors[i], alpha=0.05)
+                    plt.xscale('log')
 
-        pb.title(r"Emulator " + emu_vlabel + ", " + str(len(valid_errors)) + \
+        plt.title(r"Emulator " + emu_vlabel + ", " + str(len(valid_errors)) + \
                  r" Random Massive-$\nu$ Models" + "\ncolored by " + \
                  param_label + " value")
-        pb.ylabel("% error between CAMB and CassL")
-        pb.xlabel("scale $k$ [1 / Mpc]")
+        plt.ylabel("% error between CAMB and CassL")
+        plt.xlabel("scale $k$ [1 / Mpc]")
         norm = mpl.colors.Normalize(
             vmin=min(self.X_test[:, param_index][valid_indices]),
             vmax=max(self.X_test[:, param_index][valid_indices]))
-        pb.colorbar(mpl.cm.ScalarMappable(cmap=pb.cm.plasma, norm=norm))
+        plt.colorbar(mpl.cm.ScalarMappable(cmap=plt.cm.plasma, norm=norm))
         # Momentarily eliminate saving so that we don't keep crashing on the
         # incomplete file handles.
         if save_label is not None:
-            pb.savefig("../plots/emulator/performance/" + save_label + ".png")
+            plt.savefig("../plots/emulator/performance/" + save_label + ".png")
 
     def save(self, file_handle):
         pickle.dump(self, open(name, "wb"), protocol=5)
