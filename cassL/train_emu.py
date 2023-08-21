@@ -48,7 +48,7 @@ def eliminate_unusable_entries(X_raw, Y_raw,
     
     return cleaned_X, cleaned_Y
     
-def normalize_spectra(Y):
+def _normalize_spectra(Y):
     Ylog = np.log(Y)
     ymu = np.mean(Ylog, axis=0)
     Y_shifted = np.substract(Ylog, ymu)
@@ -65,10 +65,11 @@ class Emulator_Trainer:
 
     class Emulator:
 
-        def __init__(self, xmin, xrange, ymu, ystdev):
+        def __init__(self, name, xmin, xrange, ymu, ystdev):
             # We're requiring all emulators to follow the same approach:
             # all mappings can be represented with just the two variables,
             # xmin and xrange
+            self.name = name
             self.xmin = xmin
             self.xrange = xrange
             self.ymu = ymu
@@ -116,8 +117,6 @@ class Emulator_Trainer:
 
             return inverse_transform(_predict_normalized_spectrum(x))
 
-        def save(self, file_handle):
-            pickle.dump(self, open(name, "wb"), protocol=5)
 
     def __init__(self, *args):
         """
@@ -134,10 +133,11 @@ class Emulator_Trainer:
 
             self.emu = pickle.load(open(file_handle), "rb")
 
-        elif len(args) == 3:
-            self.X = args[0]
-            self.Y = args[1]
-            priors = args[2]
+        elif len(args) == 4:
+            emu_name = args[0]
+            self.X = args[1]
+            self.Y = args[2]
+            priors = args[3]
             
             if not isinstance(self.X, np.ndarray):
                 raise TypeError(constructor_complaint)
@@ -151,7 +151,7 @@ class Emulator_Trainer:
             if len(self.X) != len(self.Y):
                 raise ValueError("X and Y are unequal in length!")
                 
-            self.normalized_Y, ymu, ystdev = normalize_spectra(self.Y)
+            self.normalized_Y, ymu, ystdev = _normalize_spectra(self.Y)
 
             xmin = np.array([])
             xrange = np.array([])
@@ -180,7 +180,7 @@ class Emulator_Trainer:
                 
             ### End unsightly section
 
-            self.emu = Emulator(priors, xmin, xrange, ymu, ystdev)
+            self.emu = Emulator(emu_name, priors, xmin, xrange, ymu, ystdev)
             self.emu.dim = len(self.X[0])
         else:
             raise TypeError(constructor_complaint)
@@ -384,3 +384,11 @@ class Emulator_Trainer:
         plt.savefig("../../plots/emulator/performance/err_hist_" + \
                     emu_vlabel + ".png")
 
+    def save(self, file_handle=None):
+        """
+        If file_handle is None, this function saves under the name of the
+        emulator.
+        """
+        if file_handle is None:
+            file_handle = self.emu.name
+        pickle.dump(self, open(file_handle, "wb"), protocol=5)
