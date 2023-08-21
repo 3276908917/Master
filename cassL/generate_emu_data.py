@@ -297,15 +297,15 @@ def fill_hypercube(parameter_values, standard_k_axis,
 
         # As of 20.08.2023, this REALLY is a NECESSARY workaround.
         this_actual_sigma12 = None
-        these_rescaling_parameters = None
+        these_rescaling_parameters = np.array([np.nan, np.nan])
         try:
             this_p, this_actual_sigma12, these_rescaling_parameters = \
                 eval_func(this_cosmology, standard_k_axis)
         except camb.CAMBError:
             print("This cell is unsolvable. However, in this case, we " + \
                   "observed a CAMBError rather than a negative redshift. " + \
-                  "This is a good sign that there is a problem with the " + \
-                  "input hypercube.")
+                  "This suggests that there is a problem with the input " + \
+                  "hypercube.")
 
         if rescaling_parameters_list is None:
             rescaling_parameters_list = these_rescaling_parameters
@@ -347,7 +347,7 @@ def fill_hypercube(parameter_values, standard_k_axis,
         if write_period is not None and unwritten_cells >= write_period:
             np.save("samples_backup_i" + str(i) + "_" + save_label + ".npy",
                 samples, allow_pickle=True)
-            np.save("redshifts_backup_i" + str(i) + "_" + save_label + ".npy",
+            np.save("rescalers_backup_i" + str(i) + "_" + save_label + ".npy",
                 rescaling_parameters_list, allow_pickle=True)
             np.save("hc_backup_i" + str(i) + "_" + save_label + ".npy",
                 parameter_values, allow_pickle=True)

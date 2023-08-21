@@ -849,6 +849,9 @@ def andrea_interpolator(cosmology):
 
 
 def s12_from_interpolator(PK, z):
+    """
+    This, too, is Andrea's code. It would be ideal, to remove this entirely.
+    """
 
     def W(x):
         return 3.0 * (np.sin(x) - x*np.cos(x)) / x**3
