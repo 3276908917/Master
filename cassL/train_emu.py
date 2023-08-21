@@ -108,7 +108,16 @@ class Emulator_Trainer:
             # Instead of solving the x formatting complaints by blindly
             # re-nesting x, let's try to get to the bottom of *why* the
             # formatting is so messed up in the first place.
+            for parameter in x:
+                if parameter < 0 or parameter > 1:
+                    raise ValueError("The input parameters are not " + \
+                                     "correctly normalized. Have you used " + \
+                                     "convert_to_normalized_params?")
+
             return inverse_transform(_predict_normalized_spectrum(x))
+
+        def save(self, file_handle):
+            pickle.dump(self, open(name, "wb"), protocol=5)
 
     def __init__(self, *args):
         """
@@ -352,21 +361,26 @@ class Emulator_Trainer:
         print("mean is", np.mean(meds))
         print("st.dev. is", np.std(meds))
 
-    def error_hist(deltas=False, error_aggregator="median", bins=None):
+    def error_hist(deltas=False, error_aggregator="median",
+                   title="Histogram of Median Relative Errors", bins=None):
         """
         Maybe this function, like error_curve, should include a parameter range
         constraint parameter.
         
         If bins is left as None, the histogram automically uses Sturges' rule.
         """
-        return NotImplemented
-    
-        plt.hist(100 * meds, bins="sturges")
-        plt.title("Histogram of Median Percent Errors: Emulator " + emu_vlabel)
+        errors = self.deltas if deltas else self.rel_errors
+        error_array = error_aggregator(errors, axis=1)
+
+        plt.hist(error_array, bins="sturges")
+        plt.title(title)
         plt.ylabel("Frequency [counts]")
-        plt.xlabel("% Error between CAMB and Cass-L")
+
+        if deltas:
+            plt.xlabel("Delta between CAMB and Cassandra-L Power-spectrum")
+        else:
+            plt.xlabel("Relative error between CAMB and Cass-L P-spectrum")
+
         plt.savefig("../../plots/emulator/performance/err_hist_" + \
                     emu_vlabel + ".png")
 
-    def save(self, file_handle):
-        pickle.dump(self, open(name, "wb"), protocol=5)

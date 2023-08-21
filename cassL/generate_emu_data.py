@@ -76,10 +76,10 @@ def build_cosmology(om_b_in, om_c_in, ns_in, sigma12_in, As_in, om_nu_in,
             cosmology["A_s"] = cosmology["A_s"] * (prior[1] - prior[0]) + \
                 prior[0]
 
-    ''' Actually the last argument is not really important and is indeed just
-        the default value. I'm writing this out explicitly because we're still
-        in the debugging phase and so my code should always err on the verbose
-        side.'''
+    #! Actually the last argument is not really important and is indeed just
+    # the default value. I'm writing this out explicitly because we're still
+    # in the debugging phase and so my code should always err on the verbose
+    # side.
     nnu_massive = 0 if om_nu_in == 0 else 1
 
     if param_ranges is not None and "omnuh2" in param_ranges:
@@ -144,9 +144,10 @@ def evaluate_cell(input_cosmology, standard_k_axis, debug=False):
     except ValueError:
         # we need to start playing with h.
         if input_cosmology['h'] <= 0.1:
-            print("\nThis cell is hopeless. Here are the details:\n")
+            print("\nThis cell cannot be solved with a nonnegative redshift.")
+            print("This is the failed cosmology:\n")
             print_cosmology(input_cosmology)
-            print("\nThe extent of failure is:",
+            print("\nThe closest feasible sigma_12 value is off by:",
                 abs(list_sigma12[len(list_sigma12) - 1] / \
                 input_cosmology["sigma12"]) * 100, "%\n")
             return None, None, np.array([np.nan, np.nan])
@@ -213,7 +214,7 @@ def interpolate_cell(input_cosmology, standard_k_axis):
         MEMNeC['omnuh2'], nnu_massive_in=0)
 
     _redshifts=np.flip(np.linspace(0, 10, 150))
-    
+
     MEMNeC_p_interpolator = ci.cosmology_to_PK_interpolator(MEMNeC,
             redshifts=_redshifts, kmax=10)
     list_sigma12 = np.array([
@@ -228,9 +229,10 @@ def interpolate_cell(input_cosmology, standard_k_axis):
     except ValueError:
         # we need to start playing with h.
         if input_cosmology['h'] <= 0.1:
-            print("\nThis cell is hopeless. Here are the details:\n")
+            print("\nThis cell cannot be solved with a nonnegative redshift.")
+            print("This is the failed cosmology:\n")
             print_cosmology(input_cosmology)
-            print("\nThe extent of failure is:",
+            print("\nThe closest feasible sigma_12 value is off by:",
                 abs(list_sigma12[len(list_sigma12) - 1] / \
                 input_cosmology["sigma12"]) * 100, "%\n")
             return None, None, np.array([np.nan, np.nan])
@@ -242,13 +244,13 @@ def interpolate_cell(input_cosmology, standard_k_axis):
 
     p_interpolator = ci.cosmology_to_PK_interpolator(input_cosmology,
             redshifts=np.array([z_best]), kmax=10)
-    
+
     actual_sigma12 = ci.s12_from_interpolator(p_interpolator, z_best)
 
     if input_cosmology['omnuh2'] != 0:
         actual_sigma12 = ci.s12_from_interpolator(
             MEMNeC_p_interpolator, z_best)
-    
+
     p = np.array([p_interpolator.P(z_best, k)[0] for k in standard_k_axis])
     # We don't need to return k because we take for granted that all
     # runs will have the same k axis.
