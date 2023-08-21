@@ -123,6 +123,14 @@ class Emulator_Trainer:
         There are two ways one can go about instantiating:
         1. provide an X and Y data set as well as a set of priors -> emulator i
             trained
+            
+            IMPORTANT: the X and Y sets should not contain any unusable entries
+                (when in doubt, use eliminate_unusable_entries). Furthermore,
+                the Y set should not already be normalized, because the
+                normalization information (i.e. mean and standard deviation of
+                the log'ed spectra) becomes part of the emulator's prediction
+                pipeline!
+            
         2. provide the file handle associated with a trained emulator object
         """
         if len(args) == 1:

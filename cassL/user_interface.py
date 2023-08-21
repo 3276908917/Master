@@ -1,54 +1,17 @@
 import numpy as np
-from scipy.interpolate import interp1d
-import GPy
 from cassL import lhc
 from cassL import train_emu as te
 
 # In keeping with the format of values typically quoted in the literature for
 # the scalar mode amplitude (see, for example, Spurio Mancini et al, 2021 ),
 # we here define our prior ranges with the use of exponentiation.
-A_MIN = np.exp(1.61) / 10 ** 10
-A_MAX = np.exp(5) / 10 ** 10
+A_MEGA_MIN = np.exp(1.61) / 10 ** 10
+A_MEGA_MAX = np.exp(5) / 10 ** 10
 
 # The MINI qualifier indicates that these belong to the "classic" prior ranges
 # (see the function get_param_ranges).
-A_MINI_MIN = np.exp(2.35) / 10 ** 10
-A_MINI_MAX = np.exp(3.91) / 10 ** 10
-
-def percent_error(trusted, tested):
-    """
-    I don't have a great place for this function, but I'm tired of copying and
-    pasting it.
-    """
-    return 100 * (tested - trusted) / trusted
-    
-def closest_index(array, target_value):
-    """
-    This function is used in train_emu.
-    But I think we should split off a utils script, because percent_error and
-    closest_index are not exactly user interface functions...
-    """
-    if not isinstance(array, np.ndarray):
-        raise TypeError("array argument must be a numpy array")
-        
-    if array.ndim != 1:
-        raise ValueError("This function can only accept 1D arrays.")
-    
-    for e in array:
-        if not isinstance(e, np.floating) and not isinstance(e, np.integer):
-            raise ValueError("The array must contain only numerical elements.")
-    
-    if not isinstance(target_value, float) and \
-        not isinstance(target_value, int):
-        raise TypeError("value argument must be numerical")
-        
-    if not np.all(array == np.sort(array)):
-        raise ValueError("The array must already be sorted, or else the " +
-            "returned index will be ambiguous.")
-    
-    error_list = abs(array - target_value)
-    return error_list.index(min(error_list))
-    
+A_CLASSIC_MIN = np.exp(2.35) / 10 ** 10
+A_CLASSIC_MAX = np.exp(3.91) / 10 ** 10
 
 def get_param_ranges(priors="COMET", massive_neutrinos=True):
     """
@@ -106,125 +69,15 @@ def get_param_ranges(priors="COMET", massive_neutrinos=True):
 
     if massive_neutrinos:
         if priors == "MEGA":
-            param_ranges['A_s'] = [A_MIN, A_MAX]
+            param_ranges['A_s'] = [A_MEGA_MIN, A_MEGA_MAX]
         elif priors == "classic":
-            param_ranges['A_s'] = [A_MINI_MIN, A_MINI_MAX]
+            param_ranges['A_s'] = [A_CLASSIC_MIN, A_CLASSIC_MAX]
         elif priors == "COMET": 
             param_ranges['A_s'] = [1.15e-9, A_MINI_MAX]
 
         param_ranges['omnuh2'] = [0., 0.01]
 
     return param_ranges
-
-def initialize(num_samples=100, num_trials=100, priors="COMET",
-    massive_neutrinos=True):
-    """
-    Try to save the results of previous runs as npy files, to ensure consistency
-    of outcomes.
-    """
-    param_ranges = get_param_ranges(priors, massive_neutrinos)
-
-    # We're keeping Omega_K = 0 fixed for now
-
-    # tau must be an evolution parameter if we're not including it here
-    hc, list_min_dist = lhc.generate_samples(param_ranges, num_samples,
-        num_trials)
-
-    return hc, list_min_dist
-
-def load(hc_file="hc.py", samples_file="samples.npy"):
-    """
-    Return the hypercube and samples arrays based on the given file names. 
-    """
-    return np.load(hc_file), np.load(samples_file)
-
-def homogenize_k_axes(samples):
-    """
-        This takes as input a two-column matrix of arrays (first dimension: k,
-    second dimension: P(k)). Then it takes the first row as the baseline
-    such that all other P(k) are interpolated as though they had the same
-    k axis as the first row.
-    """
-
-    # First, let's find the rows with the smallest k_max and largest k_min:
-    max_min = np.min(samples[0][0])
-    max_min_i =  0   
-    min_max = np.max(samples[0][0])
-    min_max_i = 0
-
-    for i in range(1, len(samples)):
-        min_ = np.min(samples[i][0])
-        max_ = np.max(samples[i][0])
-        if min_ > max_min:
-            max_min = min_
-            max_min_i = i
-        if max_ < min_max:
-            min_max = max_
-            min_max_i = i
-
-    base_k = samples[max_min_i][0]
-    base_P = samples[max_min_i][1]
-    interpd_spectra = np.zeros((len(samples), len(base_k)))
-
-    if max_min_i != min_max_i:
-        obj_k = samples[min_max_i][0]
-        obj_P = samples[max_min_i][1]
-
-        base_k, base_P, aligned_P = truncator(base_k, base_P, obj_k, obj_P) 
-
-        interpd_spectra = np.zeros((len(samples), len(base_k)))
-        interpd_spectra[min_max_i] = aligned_P
-
-    for i in range(len(samples)):
-        if i != max_min_i and i != min_max_i:
-            _, _, interpd_spectra[i] = \
-                truncator(base_k, base_P, samples[i][0], samples[i][1])
-     
-    return base_k, interpd_spectra
-
-def truncator(base_x, base_y, obj_x, obj_y):
-    """
-    Throw out base_x values until
-        min(base_x) >= min(obj_x) and max(base_x) <= max(obj_x)    
-    then interpolate the object arrays over the truncated base_x domain.
-    @returns:
-        trunc_x: truncated base_x array, which is now common to both y arrays
-        trunc_y: truncated base_y array
-        aligned_y: interpolation of obj_y over trunc_x
-    """
-    # What is the most conservative lower bound?
-    lcd_min = max(min(obj_x), min(base_x))
-    # What is the most conservative upper bound?
-    lcd_max = min(max(obj_x), max(base_x))
-    
-    # Eliminate points outside the conservative bounds
-    mask_base = np.all([[base_x <= lcd_max], [base_x >= lcd_min]], axis=0)[0]
-    trunc_base_x = base_x[mask_base]
-    trunc_base_y = base_y[mask_base]
-   
-    mask_obj = np.all([[obj_x <= lcd_max], [obj_x >= lcd_min]], axis=0)[0]
-    trunc_obj_x = obj_x[mask_obj]
-    trunc_obj_y = obj_y[mask_obj]
-
-    #print(min(trunc_obj_x), max(trunc_obj_x))
-    #print(min(obj_x), max(obj_x))
-    #print(min(trunc_base_x), max(trunc_base_x))
- 
-    interpolator = interp1d(obj_x, obj_y, kind="cubic")
-    aligned_y = interpolator(trunc_base_x)
-
-    #print(len(trunc_base_x), len(aligned_y)) 
-    return trunc_base_x, trunc_base_y, aligned_y
-
-def get_model(X, Y):
-    # Does it work if three parameters predict a nine-thousand element array?
-    
-    # Should we use a 3D kernel because the X row is 3D?
-    # Or should the kernel match the Y dimensions?
-    ker = GPy.kern.Matern52(3, ARD=True) + GPy.kern.White(3)
-    m = GPy.models.GPRegression(X, Y, ker)
-    m.optimize(messages=True, max_f_eval=1000)
-    return m   
 
 def build_train_and_test_sets(scenario_file_handle):
     """
@@ -252,7 +105,8 @@ def build_train_and_test_sets(scenario_file_handle):
     """
     return 23
 
-def build_and_test_emulator(X_train, Y_train, X_test, Y_test, priors):
+def build_and_test_emulator(X_train, Y_train, X_test, Y_test, priors,
+    emu_label):
     """
     Build a new Gaussian process regression over X_train and Y_train, then
     test its accuracy using X_test and Y_test.
@@ -268,4 +122,6 @@ def build_and_test_emulator(X_train, Y_train, X_test, Y_test, priors):
     
     X_test_clean, Y_test_clean = \
         te.eliminate_unusable_entries(X_test, Y_test)
+    trainer.test(X_test_clean, Y_test_clean)
+    
     # trainer.test(X
