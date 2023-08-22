@@ -59,11 +59,10 @@ def _normalize_spectra(Y):
     return Y_normalized, ymu, ystdev
 
 def is_normalized_X(X):
-    for x in X:
-        for parameter in x:
-            if parameter < 0 or parameter > 1:
-                return False
-    return True
+    # By default, np.min and np.max, without an explicit axis, will check every
+    # value in the 2D array X
+    return np.min(X) >= 0 and np.max(X) <= 1
+
 
 class Emulator_Trainer:
 
