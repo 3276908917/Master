@@ -224,10 +224,10 @@ class Emulator_Trainer:
 
         self.test_predictions = np.zeros(Y_test.shape)
 
-        for i in range(len(X)):
+        for i in range(len(X_test)):
             #! This might complain about lack of nesting, but don't just nest,
             # try to find a better way to resolve the issue.
-            self.test_predictions[i], _ = self.emu.predict_pspectrum(X[i])
+            self.test_predictions[i], _ = self.emu.predict_pspectrum(X_test[i])
 
         self.deltas = self.preds - Y_test
         self.sq_errors = np.square(self.deltas)
@@ -238,7 +238,7 @@ class Emulator_Trainer:
               sum(sum(self.sq_errors)))
 
     def set_scales(self, scales):
-        if len(scales) != len(self.Y[0]):
+        if len(scales) != len(self.Y_test[0]):
             raise ValueError("The dimension of the given set of scales " + \
                 "does not match the dimension of the spectra!")
         
@@ -382,4 +382,6 @@ class Emulator_Trainer:
         """
         if file_name is None:
             file_name = self.emu.name
+        if file_name[:-4] != ".cle":
+            file_name += ".cle"
         pickle.dump(self, open("emulators/" + file_name, "wb"), protocol=5)

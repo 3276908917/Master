@@ -161,11 +161,11 @@ def build_and_test_emulator(data_dict):
                                   Y_train_clean, data_dict["priors"])
     trainer.train()
     
+    trainer.save()
+    
     X_test_clean, Y_test_clean = \
         te.eliminate_unusable_entries(data_dict["X_test"], data_dict["Y_test"])
     trainer.test(X_test_clean, Y_test_clean)
-
-    trainer.save()
 
     trainer.error_hist()
 
