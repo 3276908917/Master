@@ -58,6 +58,13 @@ def _normalize_spectra(Y):
     Y_normalized = np.divide(Y_shifted, ystdev)
     return Y_normalized, ymu, ystdev
 
+def is_normalized_X(X):
+    for x in X:
+        for parameter in x:
+            if parameter < 0 or parameter > 1:
+                return False
+    return True
+
 class Emulator_Trainer:
 
     ### To-do:
@@ -88,7 +95,7 @@ class Emulator_Trainer:
             """
             if len(config) != self.dim:
                 raise ValueError("This is a " + str(self.dim) + \
-                    "-dimensional emulator. Input vector had only " + \
+                    "-dimensional emulator. Input vector has " + \
                     len(config) + " dimensions.")
 
             for i in range(len(config)):
@@ -98,8 +105,18 @@ class Emulator_Trainer:
                         "is outside of the range defined by the prior!")
 
             return (config - self.xmin) / self.xrange
-            
-        def _predict_normalized_spectrum(self, x):
+
+
+        def inverse_ytransform(self, raw_prediction):
+            """
+            We'll have to write somewhere in the thesis that our emulators
+            currently only support log normalization. i.e. this "np.exp" call
+            is currently fixed.
+            """
+            return np.exp(raw_prediction * self.ystdev + self.ymu)
+
+
+        def _predict_normalized_pspectrum(self, x):
             """
             This function should really only be used in debugging cases. To
             obtain a power spectrum from the emulator, use the function
@@ -110,18 +127,25 @@ class Emulator_Trainer:
             # them out.
             guess, uncertainties = self.gpr.predict(x)
             return guess
-            
-        def predict_pspectrum(self, x):
+
+
+        def predict_pspectrum(self, X):
             # Instead of solving the x formatting complaints by blindly
             # re-nesting x, let's try to get to the bottom of *why* the
             # formatting is so messed up in the first place.
-            for parameter in x:
-                if parameter < 0 or parameter > 1:
-                    raise ValueError("The input parameters are not " + \
-                                     "correctly normalized. Have you used " + \
-                                     "convert_to_normalized_params?")
 
-            return inverse_transform(_predict_normalized_spectrum(x))
+            # I think the reason we need to nest is because the prediction
+            # expects a collection of x, not just a single x point!
+            if not isinstance(X[0], np.ndarray):
+                X = np.array([X]) # nesting necessary to evaluate single config
+
+            if not is_normalized_X(X):
+                raise ValueError("The input parameters are not correctly " + \
+                                 "normalized. Have you used " + \
+                                 "convert_to_normalized_params?")
+
+            normalized_pspec = self._predict_normalized_pspectrum(X)
+            return self.inverse_ytransform(normalized_pspec)
 
 
     def __init__(self, *args):
@@ -230,9 +254,9 @@ class Emulator_Trainer:
         for i in range(len(X_test)):
             #! This might complain about lack of nesting, but don't just nest,
             # try to find a better way to resolve the issue.
-            self.test_predictions[i], _ = self.emu.predict_pspectrum(X_test[i])
+            self.test_predictions[i] = self.emu.predict_pspectrum(X_test[i])
 
-        self.deltas = self.preds - Y_test
+        self.deltas = self.test_predictions - Y_test
         self.sq_errors = np.square(self.deltas)
         self.rel_errors = self.deltas / Y_test
 
@@ -247,6 +271,11 @@ class Emulator_Trainer:
         
         self._scales = scales
 
+    def enforce_error_calculation(self):
+        if not hasattr(self, "deltas"):
+            raise AttributeError("Errors have not been computed yet! Use " + \
+                " the function 'test'")
+
     def error_curves(self, deltas=False, plot_every=1, param_index=None,
         param_label=None, param_range=None, fixed_k=None, save_label=None):
         """
@@ -260,12 +289,9 @@ class Emulator_Trainer:
 
         Thanks to Dante for the recommendation of the fixed_k functionality!
         """
-
-        if not hasattr(self, deltas):
-            raise AttributeError("Errors have not been computed yet! Use " + \
-                " the function 'test'")
+        self.enforce_error_calculation()
         
-        if not hasattr(self, _scales):
+        if not hasattr(self, "_scales"):
             raise AttributeError("This object has no k values to which " + \
             "the spectra correspond! Specify them with set_scales")
 
@@ -330,7 +356,9 @@ class Emulator_Trainer:
         if save_label is not None:
             plt.savefig("../plots/emulator/performance/" + save_label + ".png")
 
-    def error_statistics(deltas=False, error_aggregator=np.median):
+        plt.show()
+
+    def error_statistics(self, deltas=False, error_aggregator=np.median):
         """
         Maybe this function, like error_curve, should include a parameter range
         constraint parameter.
@@ -346,6 +374,8 @@ class Emulator_Trainer:
                 numpy.ptp (i.e. the peak-to-peak, or range)
                 numpy.std (i.e. standard deviation)
         """
+        self.enforce_error_calculation()
+        
         errors = self.deltas if deltas else self.rel_errors
         error_array = error_aggregator(errors, axis=1)
         
@@ -355,7 +385,7 @@ class Emulator_Trainer:
         print("mean is", np.mean(meds))
         print("st.dev. is", np.std(meds))
 
-    def error_hist(deltas=False, error_aggregator="median",
+    def error_hist(self, deltas=False, error_aggregator="median",
                    title="Histogram of Median Relative Errors", bins=None):
         """
         Maybe this function, like error_curve, should include a parameter range
@@ -363,6 +393,8 @@ class Emulator_Trainer:
         
         If bins is left as None, the histogram automically uses Sturges' rule.
         """
+        self.enforce_error_calculation()
+        
         errors = self.deltas if deltas else self.rel_errors
         error_array = error_aggregator(errors, axis=1)
 
@@ -377,6 +409,8 @@ class Emulator_Trainer:
 
         plt.savefig("../../plots/emulator/performance/err_hist_" + \
                     emu_vlabel + ".png")
+
+        plt.show()
 
     def save(self, file_name=None):
         """
