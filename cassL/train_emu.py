@@ -24,7 +24,7 @@ def eliminate_unusable_entries(X_raw, Y_raw,
     Returns: cleaned-up X and Y without
     unusable rows.
     """
-    if len(X) != len(Y):
+    if len(X_raw) != len(Y_raw):
         raise ValueError("X and Y must have the same length")
     
     def unusable(row, bad_vals):
@@ -37,21 +37,23 @@ def eliminate_unusable_entries(X_raw, Y_raw,
     
     bad_row_numbers = np.array([])
     
-    for i in range(len(X)):
-        row_x = X[i]
-        row_y = Y[i]
+    for i in range(len(X_raw)):
+        row_x = X_raw[i]
+        row_y = Y_raw[i]
         if unusable(row_x, bad_X_vals) or unusable(row_y, bad_Y_vals):
             bad_row_numbers = np.append(bad_row_numbers, i)
+   
+    if bad_row_numbers:
+        cleaned_X = np.delete(X_raw, bad_row_numbers, 0)
+        cleaned_Y = np.delete(Y_raw, bad_row_numbers, 0)
+        return cleaned_X, cleaned_Y
     
-    cleaned_X = np.delete(X_raw, bad_row_numbers)
-    cleaned_Y = np.delete(Y_raw, bad_row_numbers)
-    
-    return cleaned_X, cleaned_Y
-    
+    return X_raw, Y_raw
+
 def _normalize_spectra(Y):
     Ylog = np.log(Y)
     ymu = np.mean(Ylog, axis=0)
-    Y_shifted = np.substract(Ylog, ymu)
+    Y_shifted = np.subtract(Ylog, ymu)
     ystdev = np.std(Ylog, axis=0)
     Y_normalized = np.divide(Y_shifted, ystdev)
     return Y_normalized, ymu, ystdev
@@ -145,7 +147,7 @@ class Emulator_Trainer:
             emu_name = args[0]
             self.X = args[1]
             self.Y = args[2]
-            priors = args[3]
+            self.priors = args[3]
             
             if not isinstance(self.X, np.ndarray):
                 raise TypeError(constructor_complaint)
@@ -164,31 +166,12 @@ class Emulator_Trainer:
             xmin = np.array([])
             xrange = np.array([])
 
-            ### This section is INCREDIBLY unsightly. Let's clean up and
-            # generalize.
-
-            for key in par_ranges.keys():
-                xmin = np.append(xmin, par_ranges[key][0])
+            for key in self.priors.keys():
+                xmin = np.append(xmin, self.priors[key][0])
                 xrange = np.append(xrange,
-                                   par_ranges[key][1] - par_ranges[key][0])
+                                   self.priors[key][1] - self.priors[key][0])
 
-                if sigma12_sampling != 'linear':
-                    if key == "n_s":
-                        xmin = np.append(xmin, 0)
-                        xrange = np.append(xrange, 0)
-                    if key == "omnuh2":
-                        break
-                
-            if sigma12_sampling == 'root':
-                xmin[3] = 0.2 ** 0.5
-                xrange[3] = 1 - 0.2 ** 0.5
-            elif sigma12_sampling == 'square':    
-                xmin[3] = 0.04
-                xrange[3] = 0.96
-                
-            ### End unsightly section
-
-            self.emu = Emulator(emu_name, priors, xmin, xrange, ymu, ystdev)
+            self.emu = self.Emulator(emu_name, xmin, xrange, ymu, ystdev)
             self.emu.dim = len(self.X[0])
         else:
             raise TypeError(constructor_complaint)
@@ -215,7 +198,7 @@ class Emulator_Trainer:
         kernel = kernel1 + kernel2 + kernel3
 
         self.emu.gpr = \
-            Gpy.models.GPRegression(self.X, self.normalized_Y, kernel)
+            GPy.models.GPRegression(self.X, self.normalized_Y, kernel)
         
         # '' is a regex matching all parameter names
         self.emu.gpr.constrain_positive('')
@@ -392,11 +375,11 @@ class Emulator_Trainer:
         plt.savefig("../../plots/emulator/performance/err_hist_" + \
                     emu_vlabel + ".png")
 
-    def save(self, file_handle=None):
+    def save(self, file_name=None):
         """
-        If file_handle is None, this function saves under the name of the
+        If file_name is None, this function saves under the name of the
         emulator.
         """
-        if file_handle is None:
-            file_handle = self.emu.name
-        pickle.dump(self, open(file_handle, "wb"), protocol=5)
+        if file_name is None:
+            file_name = self.emu.name
+        pickle.dump(self, open("emulators/" + file_name, "wb"), protocol=5)

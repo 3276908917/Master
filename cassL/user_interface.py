@@ -13,7 +13,7 @@ A_MEGA_MAX = np.exp(5) / 10 ** 10
 A_CLASSIC_MIN = np.exp(2.35) / 10 ** 10
 A_CLASSIC_MAX = np.exp(3.91) / 10 ** 10
 
-def get_param_ranges(priors="COMET", massive_neutrinos=True):
+def get_param_ranges(prior_name="COMET", massive_neutrinos=True):
     """
     !
     Return a dictionary of arrays where each key is a cosmological parameter
@@ -44,7 +44,7 @@ def get_param_ranges(priors="COMET", massive_neutrinos=True):
     """
     param_ranges = {}
 
-    if priors == "MEGA":
+    if prior_name == "MEGA":
         param_ranges = {
             'ombh2': [0.005, 0.28],
             'omch2': [0.001, 0.99], # max 0.3?
@@ -52,14 +52,14 @@ def get_param_ranges(priors="COMET", massive_neutrinos=True):
             'sigma12': [0.2, 1], # based on Sanchez et al 21 and
                 # Sanchez 20, fig 2 
         }
-    elif priors == "classic": # This is useful for a demo run. 
+    elif prior_name == "classic": # This is useful for a demo run. 
         param_ranges = {
             'ombh2': [0.01875, 0.02625],
             'omch2': [0.05, 0.255],
             'n_s': [0.84, 1.1],
             'sigma12': [0.2, 1], # based on Sanchez et al 21; Sanchez 20 fig 2 
         }
-    elif priors=="COMET":
+    elif prior_name=="COMET":
         param_ranges = {
             'ombh2': [0.0205, 0.02415],
             'omch2': [0.085, 0.155],
@@ -68,12 +68,12 @@ def get_param_ranges(priors="COMET", massive_neutrinos=True):
         }
 
     if massive_neutrinos:
-        if priors == "MEGA":
+        if prior_name == "MEGA":
             param_ranges['A_s'] = [A_MEGA_MIN, A_MEGA_MAX]
-        elif priors == "classic":
+        elif prior_name == "classic":
             param_ranges['A_s'] = [A_CLASSIC_MIN, A_CLASSIC_MAX]
-        elif priors == "COMET": 
-            param_ranges['A_s'] = [1.15e-9, A_MINI_MAX]
+        elif prior_name == "COMET": 
+            param_ranges['A_s'] = [1.15e-9, A_CLASSIC_MAX]
 
         param_ranges['omnuh2'] = [0., 0.01]
 
@@ -103,10 +103,49 @@ def build_train_and_test_sets(scenario_file_handle):
         3. Final products
             * Create a new directory for each scenario!!
     """
+
+    # The function needs to auto-detect how much progress we've already made
+    # on each particular scenario.
+
+    # The function needs to store results in carefully organized directories
+
+    # The function needs to automatically delete backups that are no longer
+    # needed.
+
     return 23
 
-def build_and_test_emulator(X_train, Y_train, X_test, Y_test, priors,
-    emu_label):
+def get_data_dict(emu_name, prior_name="COMET"):
+    #! WATCH OUT! THIS FUNCTION ASSUMES MASSIVE NEUTRINOS ALWAYS
+
+    # This will return a dictionary which the new iteration of
+    # build_and_test_emulator will be able to expand into all of the info
+    # necessary to build an emulator.
+    
+    # e.g. emu_name is Hnu2_5k_knockoff
+    
+    # This function will have to be expanded dramatically once we implement
+    # the scenario structure
+    directory = "data_sets/" + emu_name + "/"
+    data_dict = {"emu_name": emu_name}
+
+    X_train = np.load(directory + "lhc_train_final.npy", allow_pickle=False)
+    data_dict["X_train"] = X_train
+
+    Y_train = np.load(directory + "samples_train.npy", allow_pickle=False)
+    data_dict["Y_train"] = Y_train
+
+    X_test = np.load(directory + "lhc_test_final.npy", allow_pickle=False)
+    data_dict["X_test"] = X_test
+    
+    Y_test = np.load(directory + "samples_test.npy", allow_pickle=False)
+    data_dict["Y_test"] = Y_test
+    
+    priors = get_param_ranges(prior_name=prior_name)
+    data_dict["priors"] = priors
+
+    return data_dict
+
+def build_and_test_emulator(data_dict):
     """
     Build a new Gaussian process regression over X_train and Y_train, then
     test its accuracy using X_test and Y_test.
@@ -116,12 +155,19 @@ def build_and_test_emulator(X_train, Y_train, X_test, Y_test, priors,
     different sampling distributions, e.g. root- or square-sampling in sigma12.
     """
     X_train_clean, Y_train_clean = \
-        te.eliminate_unusable_entries(X_train, Y_train)
-    trainer = te.Emulator_Trainer(X_train_clean, Y_train_clean, priors)
+        te.eliminate_unusable_entries(data_dict["X_train"],
+                                      data_dict["Y_train"])
+    trainer = te.Emulator_Trainer(data_dict["emu_name"], X_train_clean,
+                                  Y_train_clean, data_dict["priors"])
     trainer.train()
     
     X_test_clean, Y_test_clean = \
-        te.eliminate_unusable_entries(X_test, Y_test)
+        te.eliminate_unusable_entries(data_dict["X_test"], data_dict["Y_test"])
     trainer.test(X_test_clean, Y_test_clean)
-    
-    # trainer.test(X
+
+    trainer.save()
+
+    trainer.error_hist()
+
+    return trainer
+
