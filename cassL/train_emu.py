@@ -72,10 +72,14 @@ class Emulator_Trainer:
             # all mappings can be represented with just the two variables,
             # xmin and xrange
             self.name = name
+
             self.xmin = xmin
             self.xrange = xrange
+            self.xdim = len(xmin)
+
             self.ymu = ymu
             self.ystdev = ystdev
+            self.ydim = len(ymu)
 
         def convert_to_normalized_params(self, config):
             """
@@ -141,27 +145,27 @@ class Emulator_Trainer:
             if not isinstance(file_handle, str):
                 raise TypeError(constructor_complaint)
 
-            self.emu = pickle.load(open(file_handle), "rb")
+            self.emu = pickle.load(open(file_handle, "rb"))
 
         elif len(args) == 4:
             emu_name = args[0]
-            self.X = args[1]
-            self.Y = args[2]
+            self.X_train = args[1]
+            self.Y_train = args[2]
             self.priors = args[3]
             
-            if not isinstance(self.X, np.ndarray):
+            if not isinstance(self.X_train, np.ndarray):
                 raise TypeError(constructor_complaint)
             
-            if not isinstance(self.Y, np.ndarray):
+            if not isinstance(self.Y_train, np.ndarray):
                 raise TypeError(constructor_complaint)
             
             if not isinstance(self.priors, dict):
                 raise TypeError(constructor_complaint)
             
-            if len(self.X) != len(self.Y):
+            if len(self.X_train) != len(self.Y_train):
                 raise ValueError("X and Y are unequal in length!")
                 
-            self.normalized_Y, ymu, ystdev = _normalize_spectra(self.Y)
+            self.normalized_Y, ymu, ystdev = _normalize_spectra(self.Y_train)
 
             xmin = np.array([])
             xrange = np.array([])
@@ -172,33 +176,32 @@ class Emulator_Trainer:
                                    self.priors[key][1] - self.priors[key][0])
 
             self.emu = self.Emulator(emu_name, xmin, xrange, ymu, ystdev)
-            self.emu.dim = len(self.X[0])
         else:
             raise TypeError(constructor_complaint)
             
             
     def train(self):
-        if self.X is None or self.normalized_Y is None:
+        if self.X_train is None or self.normalized_Y is None:
             raise AttributeError("No data found over which to train.")
 
         # The dimension is automatically the length of an X element.
         remaining_variance = np.var(self.normalized_Y)
 
-        kernel1 = GPy.kern.RBF(input_dim=self.emu.dim,
+        kernel1 = GPy.kern.RBF(input_dim=self.emu.xdim,
                                variance=remaining_variance,
-                               lengthscale=np.ones(self.emu.dim), ARD=True)
+                               lengthscale=np.ones(self.emu.xdim), ARD=True)
 
-        kernel2 = GPy.kern.Matern32(input_dim=self.emu.dim, ARD=True,
+        kernel2 = GPy.kern.Matern32(input_dim=self.emu.xdim, ARD=True,
                                     variance=remaining_variance,
-                                    lengthscale=np.ones(self.emu.dim))
+                                    lengthscale=np.ones(self.emu.xdim))
 
-        kernel3 = GPy.kern.White(input_dim=self.emu.dim,
+        kernel3 = GPy.kern.White(input_dim=self.emu.xdim,
                                  variance=remaining_variance)
 
         kernel = kernel1 + kernel2 + kernel3
 
         self.emu.gpr = \
-            GPy.models.GPRegression(self.X, self.normalized_Y, kernel)
+            GPy.models.GPRegression(self.X_train, self.normalized_Y, kernel)
         
         # '' is a regex matching all parameter names
         self.emu.gpr.constrain_positive('')
@@ -212,10 +215,10 @@ class Emulator_Trainer:
         """
         if len(X_test) != len(Y_test):
             raise ValueError("Size of X and Y do not match!")
-        if len(X_test[0]) != len(self.X[0]):
+        if len(X_test[0]) != self.emu.xdim:
             raise ValueError("Dimension of test X does not match the " + \
                 "dimension of the training X!")
-        if len(Y_test[0]) != len(self.Y[0]):
+        if len(Y_test[0]) != self.emu.ydim:
             raise ValueError("Dimension of test Y does not match the " + \
                 "dimension of the training Y!")
         
@@ -347,7 +350,7 @@ class Emulator_Trainer:
         error_array = error_aggregator(errors, axis=1)
         
         print("The chosen error statistic...")
-        print("ranges from", min(meds), "to", max(meds))
+        print("ranges from", np.min(meds), "to", np.max(meds))
         print("median is", np.median(meds))
         print("mean is", np.mean(meds))
         print("st.dev. is", np.std(meds))
@@ -384,4 +387,4 @@ class Emulator_Trainer:
             file_name = self.emu.name
         if file_name[:-4] != ".cle":
             file_name += ".cle"
-        pickle.dump(self, open("emulators/" + file_name, "wb"), protocol=5)
+        pickle.dump(self.emu, open("emulators/" + file_name, "wb"), protocol=5)
