@@ -1,5 +1,6 @@
 import numpy as np
-import pylab as pb
+import matplotlib.pyplot as plt
+
 import GPy
 import copy as cp
 import pickle
@@ -384,7 +385,7 @@ class Emulator_Trainer:
         print("mean is", np.mean(meds))
         print("st.dev. is", np.std(meds))
 
-    def error_hist(self, deltas=False, error_aggregator="median",
+    def error_hist(self, deltas=False, error_aggregator=np.median,
                    title="Histogram of Median Relative Errors", bins=None):
         """
         Maybe this function, like error_curve, should include a parameter range
@@ -406,8 +407,7 @@ class Emulator_Trainer:
         else:
             plt.xlabel("Relative error between CAMB and Cass-L P-spectrum")
 
-        plt.savefig("../../plots/emulator/performance/err_hist_" + \
-                    emu_vlabel + ".png")
+        plt.savefig("plots/err_hist_" + self.emu.name + ".png")
 
         plt.show()
 

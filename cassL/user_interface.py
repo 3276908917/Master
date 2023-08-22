@@ -13,7 +13,7 @@ A_MEGA_MAX = np.exp(5) / 10 ** 10
 A_CLASSIC_MIN = np.exp(2.35) / 10 ** 10
 A_CLASSIC_MAX = np.exp(3.91) / 10 ** 10
 
-def get_param_ranges(prior_name="COMET", massive_neutrinos=True):
+def get_param_ranges(prior_name="COMET_with_nu"):
     """
     !
     Return a dictionary of arrays where each key is a cosmological parameter
@@ -44,38 +44,19 @@ def get_param_ranges(prior_name="COMET", massive_neutrinos=True):
     """
     param_ranges = {}
 
-    if prior_name == "MEGA":
-        param_ranges = {
-            'ombh2': [0.005, 0.28],
-            'omch2': [0.001, 0.99], # max 0.3?
-            'n_s': [0.7, 1.3], # expand?
-            'sigma12': [0.2, 1], # based on Sanchez et al 21 and
-                # Sanchez 20, fig 2 
-        }
-    elif prior_name == "classic": # This is useful for a demo run. 
-        param_ranges = {
-            'ombh2': [0.01875, 0.02625],
-            'omch2': [0.05, 0.255],
-            'n_s': [0.84, 1.1],
-            'sigma12': [0.2, 1], # based on Sanchez et al 21; Sanchez 20 fig 2 
-        }
-    elif prior_name=="COMET":
-        param_ranges = {
-            'ombh2': [0.0205, 0.02415],
-            'omch2': [0.085, 0.155],
-            'n_s': [0.92, 1.01],
-            'sigma12': [0.2, 1], # based on Sanchez et al 21; Sanchez 20 fig 2 
-        }
-
-    if massive_neutrinos:
-        if prior_name == "MEGA":
-            param_ranges['A_s'] = [A_MEGA_MIN, A_MEGA_MAX]
-        elif prior_name == "classic":
-            param_ranges['A_s'] = [A_CLASSIC_MIN, A_CLASSIC_MAX]
-        elif prior_name == "COMET": 
-            param_ranges['A_s'] = [1.15e-9, A_CLASSIC_MAX]
-
-        param_ranges['omnuh2'] = [0., 0.01]
+    prior_file = "priors/" + prior_name + ".txt"
+    
+    with open(prior_file, 'r') as file:
+        lines = file.readlines()
+        key = None
+        for line in lines:
+            # It's a little weird for "$ " to be used to indicate a required
+            # field rather than a comment. Can we change this?
+            if line[:2] == "# ":
+                key = line[2:].strip()
+            else:
+                bounds = line.split(",")
+                param_ranges[key] = [float(bounds[0]), float(bounds[1])]
 
     return param_ranges
 
