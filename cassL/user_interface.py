@@ -50,17 +50,15 @@ def get_param_ranges(prior_name="COMET_with_nu"):
         lines = file.readlines()
         key = None
         for line in lines:
-            # It's a little weird for "$ " to be used to indicate a required
-            # field rather than a comment. Can we change this?
-            if line[:2] == "# ":
-                key = line[2:].strip()
+            if line[0] == "$":
+                key = line[1:].strip()
             else:
                 bounds = line.split(",")
                 param_ranges[key] = [float(bounds[0]), float(bounds[1])]
 
     return param_ranges
 
-def build_train_and_test_sets(scenario_file_handle):
+def build_train_and_test_sets(scenario_name):
     """
     Options in the scenario file:
     * A header with a comment explaining, in English, the basic gist of the
@@ -84,6 +82,39 @@ def build_train_and_test_sets(scenario_file_handle):
         3. Final products
             * Create a new directory for each scenario!!
     """
+
+    # Step 1: read and error-check scenario file
+    
+    # Keep track of the scenario folder, so that we can save things there...
+    
+    scenario = {}
+    file_handle = "scenarios/" + scenario_name + "/" + scenario_name + ".txt"
+    
+    with open(file_handle, 'r') as file:
+        lines = file.readlines()
+        key = None
+        for line in lines:
+            if line[0] == "$":
+                key = line[1:].strip()
+            else:
+                val = line
+                if line == "None":
+                    val = None
+                elif line.isnumeric():
+                    val = float(line)
+                scenario[key] = val
+    
+    # Step 2: build train LHC
+    
+    # Step 3: fill-in train LHC
+    
+    # Step 4: build test LHC
+    
+    # Step 5: fill-in test LHC
+    
+    # Step 6: call build_and_test_emulator
+
+
 
     # The function needs to auto-detect how much progress we've already made
     # on each particular scenario.

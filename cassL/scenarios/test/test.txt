@@ -1,0 +1,16 @@
+# What is the point of this emulator?
+
+$priors
+COMET
+$paired_with
+None
+$num_sectra_points
+300
+$num_train_samples
+5000
+$min_lhc_quality
+0.1
+$test_scenario
+None
+$num_test_samples
+5000
