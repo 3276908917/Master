@@ -1,0 +1,177 @@
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%            LMU-Vorlage              %%
+%%                                     %%
+%%         zur Erstellung einer        %%
+%%   Dissertation mit pdflatex/latex   %%
+%%                                     %%
+%%  (2002) Robert Dahlke               %%
+%%         & Sigmund Stintzing         %%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\documentclass[12pt]{book}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%   Zusaetzliche Pakete  %%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\usepackage{a4wide}
+\usepackage{fancyhdr}
+\usepackage{graphicx}
+\usepackage{german}
+\usepackage[bookmarks]{hyperref}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% Definition der Kopfzeile %%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\pagestyle{fancyplain}
+\renewcommand{\chaptermark}[1]%
+         {\markboth{\thechapter.\ #1}{}}
+\renewcommand{\sectionmark}[1]%
+         {\markright{\thesection\ #1}}
+\lhead[\fancyplain{}{\bfseries\thepage}]%
+    {\fancyplain{}{\bfseries\rightmark}}
+\rhead[\fancyplain{}{\bfseries\leftmark}]%
+    {\fancyplain{}{\bfseries\thepage}}
+\cfoot{}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%  Definition des Deckblattes und der Titelseite  %%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\newcommand{\LMUTitle}[9]{
+  \thispagestyle{empty}
+  \vspace*{\stretch{1}}
+  {\parindent0cm
+   \rule{\linewidth}{.7ex}}
+  \begin{flushright}
+
+    \vspace*{\stretch{1}}
+    \sffamily\bfseries\Huge
+    #1\\
+    \vspace*{\stretch{1}}
+    \sffamily\bfseries\large
+    #2
+    \vspace*{\stretch{1}}
+  \end{flushright}
+  \rule{\linewidth}{.7ex}
+  \vspace*{\stretch{5}}
+  \begin{center}
+    \includegraphics[width=2in]{siegel}
+  \end{center}
+  \vspace*{\stretch{1}}
+  \begin{center}\sffamily\LARGE{#5}\end{center}
+  \newpage
+  \thispagestyle{empty}
+
+  \cleardoublepage
+  \thispagestyle{empty}
+
+  \vspace*{\stretch{1}}
+  {\parindent0cm
+  \rule{\linewidth}{.7ex}}
+  \begin{flushright}
+    \vspace*{\stretch{1}}
+    \sffamily\bfseries\Huge
+    #1\\
+    \vspace*{\stretch{1}}
+    \sffamily\bfseries\large
+    #2
+    \vspace*{\stretch{1}}
+  \end{flushright}
+  \rule{\linewidth}{.7ex}
+
+  \vspace*{\stretch{3}}
+  \begin{center}
+    \Large Dissertation\\
+    \Large an der #4\\
+    \Large der Ludwig--Maximilians--Universit"at\\
+    \Large M\"unchen\\
+    \vspace*{\stretch{1}}
+    \Large vorgelegt von\\
+    \Large #2\\
+    \Large aus #3\\
+    \vspace*{\stretch{2}}
+    \Large M\"unchen, den #6
+  \end{center}
+
+  \newpage
+  \thispagestyle{empty}
+
+  \vspace*{\stretch{1}}
+
+  \begin{flushleft}
+    \large Erstgutachter:  #7 \\[1mm]
+    \large Zweitgutachter: #8 \\[1mm]
+    \large Tag der m\"undlichen Pr\"ufung: #9\\
+  \end{flushleft}
+
+  \cleardoublepage
+}
+
+
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%  Beginn des Dokuments  %%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{document}
+
+
+  \frontmatter
+
+
+  \LMUTitle
+      {Dies ist Titel der Dissertation \\
+       eventuell mit Untertitel}               % Titel der Arbeit
+      {Lukas Finkbeiner}                       % Vor- und Nachname des Autors
+      {Boston}                             % Geburtsort des Autors
+      {Fakultät für Physik}                         % Name der Fakultaet
+      {M"unchen 2022-23}                          % Ort und Jahr der Erstellung
+      {2. Oktober 2023}                            % Tag der Abgabe
+      {Erstgutachter}                          % Name des Erstgutachters
+      {Zweitgutachter}                         % Name des Zweitgutachters
+      {Pr"ufungsdatum}                         % Datum der muendlichen Pruefung
+
+
+  \tableofcontents
+  \markboth{Inhaltsverzeichnis}{Inhaltsverzeichnis}
+
+
+  \listoffigures
+  \markboth{Abbildungsverzeichnis}{Abbildungsverzeichnis}
+
+
+  \listoftables
+  \markboth{Tabellenverzeichnis}{Tabellenverzeichnis}
+  \cleardoublepage
+
+
+  \markboth{Zusammenfassung}{Zusammenfassung}
+  \include{zusammenfassung}
+
+
+  \mainmatter\setcounter{page}{1}
+  \include{kap_01}
+  \include{kap_02}
+  %\include{kap_03}
+  %\include{kap_04} usw.
+  \include{anhang}
+
+
+  \backmatter
+  \include{bibliographie}
+  \markboth{}{}
+
+
+  \include{danksagung}
+
+
+  \include{lebenslauf}
+
+
+\end{document}
