@@ -21,6 +21,20 @@
 \usepackage{german}
 \usepackage[bookmarks]{hyperref}
 
+% Additional packages just for Lukas' thesis
+\usepackage{xcolor, bbold, graphics}
+\usepackage{amsmath, verbatim}
+
+%\IfFileExists{biblatex.sty} {
+%    \usepackage[style=authoryear]{biblatex}
+%    \addbibresource{literatur.bib}
+%}
+
+% This code formatting sucks but I don't want to output extra spaces.
+\newcommand{\cbib}[1]
+{\IfFileExists{biblatex.sty}
+{\cite{#1}}
+{[citation ``#1'' cannot be linked in the current environment]}}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% Definition der Kopfzeile %%
@@ -126,8 +140,7 @@
 
 
   \LMUTitle
-      {Dies ist Titel der Dissertation \\
-       eventuell mit Untertitel}               % Titel der Arbeit
+      {Adapting Evolution-Mapping Emulators for Massive-Neutrino Cosmologies}               % Titel der Arbeit
       {Lukas Finkbeiner}                       % Vor- und Nachname des Autors
       {Boston}                             % Geburtsort des Autors
       {Fakultät für Physik}                         % Name der Fakultaet
@@ -158,8 +171,10 @@
   \mainmatter\setcounter{page}{1}
   \include{kap_01}
   \include{kap_02}
-  %\include{kap_03}
-  %\include{kap_04} usw.
+  \include{kap_03}
+  \include{kap_04}
+  \include{kap_05}
+  \include{kap_06}
   \include{anhang}
 
 

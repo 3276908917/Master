@@ -1,12 +1,4 @@
-\chapter{Das zweite Kapitel}
-
-Dies ist das zweite Kapitel der Dissertation.
-
-
-\section{Abschnitt Eins}
-
-Dies ist der erste Abschnitt im zweiten Kapitel.
-
+\chapter{CAMB, Initial Setup}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%  Beispiel fuer eine Tabelle  %%
@@ -21,7 +13,35 @@ Eintrag & Eintrag
  \caption[Kurzform f"ur das Tabellenverzeichnis]{Dies ist die Erkl"arung zur Tabelle.}
 \end{table}
 
+CAMB is a Fortran code with a Python wrapper\footnote{
+\url{https://github.com/cmbant/CAMB}
+}which we will be using for the
+entirety of this project.
 
-\section{Abschnitt Zwei}
+To introduce the reader to the scope of CAMB, we will now introduce
+some basic simulated power spectra along with a summary of the dynamic
+parameters which will be of greatest interest to us.
 
-Jetzt kommt der zweite Abschnitt im zweiten Kapitel.
+I hope to, in painstaking detail, cover many of the lines of the code that I
+have written to interface with CAMB. I will include plots to indicate, at
+every step, what incorrect settings cause the power spectrum to look like (or,
+for subtler errors, what the error curves looked like compared to Ariel's
+results, which I treated as a sort of ``ground truth''). This should also be a
+good example to flex my physics interpretation skills: why does this incorrect
+setting produce this undesired pattern?
+
+You might think that this is sort of an inappropriate section for a master's thesis (especially since I have in mind that this be a lengthy section), but I would like to include it unless you feel very strongly. After all, I spent several months of the project debugging at least ten different ways that slight and major errors in the various settings led to irreconcilable results.
+
+For example, one parameter that tripped me up for a while: neutrino mass hierarchy: the options are degenerate, normal, and inverted. The CAMB documentation annotates this parameter as ``(1 or 2 eigenstate approximation),'' but this is somewhat unclear. Is the degenerate hierarchy the single mass eigenstate approximation? Do both normal and inverted hierarchies involve two eigenstates?
+
+%In figure \ref{fig: spectrum_type}, we can see that requesting of the wrong
+%power spectrum type can in some low-$\omega_\nu$ cases yields errors so low
+%that we might accidentally overlook them. This error pattern is easily
+%recognizable and is a consequence of the definition of the power spectrum: the
+%Fourier transform  of the two-point correlation function. ...Okay, I'm still thinking about this. I don't understand %yet, but I'll be sure to ask you if I'm still struggling about it.
+
+Another paragraph I want to have in this section: stress the part of the evolution mapping introduction, that the $\sigma_{12}$ value we're using to describe the model is actually the $\sigma_{12}$ value of the model's MEMNeC! This is so important and confusing that maybe I'll even recapitulate again later in the section on the generate\_emu\_data.script.
+
+%%% New stuff
+
+Beware the neutrino settings. The effective number of massive neutrinos is about 3.027

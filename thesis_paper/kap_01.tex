@@ -1,13 +1,8 @@
-\chapter{Das erste Kapitel}
+\chapter{Introduction, Theory, and Background}
 
-Dies ist das erste Kapitel der Dissertation. Wir zitieren
-\cite{Autor1:02}.
+I have a lot of different important concepts that I need to get through, so I can easily imagine this becoming a relatively long introduction compared to other master's theses.
 
-
-\section{Abschnitt Eins}
-
-Dies ist der erste Abschnitt im ersten Kapitel.
-
+\section{The Matter Power Spectrum}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%  Einbinden einer Grafik  %%
@@ -19,8 +14,200 @@ Dies ist der erste Abschnitt im ersten Kapitel.
   \caption[Kurzform f"ur das Abbildungsverzeichnis]{Dies ist die Erkl"arung zum Bild.}
 \end{figure}
 
+A primary goal of cosmology is to specify, as narrowly as possible, the parameters which define our Universe. These include, for example, the overall curvature of the Universe as well as its cold dark matter (CDM) content.
 
-\section[Kurzform]{Abschnitt Zwei}
+Next, I want to talk about one way of describing the matter density contrast field, the power spectrum. The power spectrum can be probed in many different ways, and its precise shape and amplitude can tell us about several of these cosmological parameters.
 
-Jetzt kommt der zweite Abschnitt im ersten Kapitel
-mit dem Zitat \cite{Autor2:01}.
+Actually, the power spectra we are discussing in this thesis are linear-theory power spectra of non-neutrino matter. But anyway, here I will cover some of the tried-and-true basic explanations of what the power spectrum is and why it is interesting for the question of parameter inference. I also want to discuss: why do we care about the linear-theory power spectrum? Why not jump straight to the nonlinear case?
+
+\section{Boltzmann Solvers and CAMB}
+
+I want to talk about what a Boltzmann solver is and what kinds of equations it is solving.
+
+To hint at what's to come, I start off this section by noting that several cosmological parameters have a fairly unique impact on the shape of the power spectrum, while others have a degenerate impact. Wouldn't it be great if we could know what the power spectrum would look like if we increased parameter $x$? Boltzmann solvers can help us with that.
+
+This will mostly just be a theoretical discussion of these solvers. The hands-on stuff comes in the non-introductory section on CAMB.
+
+I will also mention a couple of specific Boltzmann solvers, like CLASS and CAMB. I will briefly justify our use of CAMB over CLASS.
+
+%%%
+
+In essence, Boltzmann codes solve XXX in order to give us the power spectrum
+of any universe characterized by some set of cosmological parameters. For
+example, figure~\ref{fig: vary_omega_b} shows the impact of varying the
+physical density in baryons, $\omega_b$. 
+
+Several parameters have fairly unique impacts on the power spectrum.
+Therefore, we can imagine building a collection of power spectra labeled by
+their parameter configurations and comparing our real-world observations to
+them. This should allow us to perform parameter inference.
+
+\section{Monte Carlo Markov Chains}
+
+This can be a very brief section, but I want to discuss a little bit of how most modern parameter inference works because it motivates the need for extremely fast power spectrum computation. It provides a sort of conceptual bridge between our ``pure'' goal (quantifying the cosmos) and the nitty-gritty bulk of the paper (optimizing emulator performance).
+
+Metropolis-Hastings algorithm.
+
+We don't know what the true probability distribution of power spectra is. In order to build this distribution with simulation results, we simply draw from the distribution. \textcolor{red}{Refer to ``Data to Insights'' lecture notes in order to tighten this description.}
+
+\section{Emulation: Basic Principles}
+\label{sec: emulation_intro}
+
+To conduct these MCMC analyses, we need several thousands of power spectra. However, if our Boltzmann solvers take on the order of three seconds to run, then these solvers will become the bottleneck of our analysis. \textcolor{red}{Give some specific numbers for this.}
+
+This motivates the introduction of emulation, basically multi-dimensional interpolation, in order to predict the power spectra. These predictions are orders of magnitude less time-expensive. 
+
+Emulators interpolate across a high-dimensional parameter space. The primary
+limitation is that the emulator has to be built with every possible parameter
+in mind that an end-user could wish to vary. Yet there is a large number of
+different cosmological parameters discussed in the modern literature.
+``Currently available emulators only sample a few cosmological parameters,
+often with restrictive ranges, and are not applicable to more general parameter
+spaces'' (\cbib{San21}). ``Due to the high computational cost of the required
+simulations, [...] current emulators leave out parameters such as the curvature
+of the Universe or dynamic energy models beyond the standard CPL
+parametrization'' (\cbib{San21}).
+
+I'll talk a little about different emulators currently available, such as COMET. Some emulate non-linear power spectra, for example, and several even include massive neutrinos. But this thesis will demonstrate that massive neutrinos can be included into our evolution mapping approach, which will be introduced in section~\ref{sec: ev_mapping}.
+
+% (This is good news because the evolution mapping approach greatly simplifies the parameter space, and enhances the accuracy), which is the subject of the next section.
+
+\section{Emulation Platform: Gaussian Processes}
+
+% What is a Gaussian Process?
+
+Most emulators are based on a Gaussian Process (GP). A GP is a Gaussian
+distribution over functions\footnote
+{A GP is the limit of a one-hidden-layer neural network as the number of
+neurons approaches infinity.}, which can be interpreted
+as the infinite-dimensional generalization of the multivariate normal
+distribution. The inference of continuous values with a GP prior
+is known as Gaussian process regression, or Kriging. GP regression is a
+powerful non-linear multivariate interpolation tool. The computational
+complexity of inference and likelihood evaluation within GP regression is cubic
+in the number of points. This makes GP regression an excellent companion to
+Latin hypercube sampling (LHS), which makes highly-efficient use of a limited 
+number of samples and will be explained in greater depth in section~\ref{sec:
+lhc_intro}.
+
+Neural networks (NNs) generally need much larger sample sizes to reach
+comparable levels of
+accuracy. Due to various alterations in the Cassandra-Linear code over its
+development, several regenerations of the various emulator data sets were
+necessary. This practical constraint motivated the use of a GP for our
+emulator. Furthermore, NNs invariably require much more complicated setup and
+tuning--for example, in the precise architecture of the network (e.g. nodes
+per layer, layer types) as well as the hyperparameters (e.g. learning rate).
+By contrast, as we explain in section~\ref{sec: emu_training}, a Gaussian
+process regression is highly straightforward to set up and modify. Therefore,
+for a demonstration project such as Cassandra-Linear, we elected to base our
+emulator on a GP. Please refer to the section~\ref{sec: future_work} for a
+continuation of this discussion.
+
+\section{Sampling Approach: Latin Hypercube}
+
+I imagine this is going to be an extremely short section. We should motivate why we're using this style of sampling.
+
+\section{Evolution Mapping}
+
+This section will also include an extremely brief summary of Ariel's paper motivating the use of $\sigma_{12}$ instead of $\sigma_8$.
+
+    I have two primary objectives for this section: explain the unit system
+    we are using (ditch $h$ factor because it messes up everything--but
+    only briefly summarize the main arguments of Sanchez 2020), and briefly
+    summarize why we can funnel all of the evolution parameters through
+    $\sigma_{12}$ in this way. Unfortunately, this second objective will
+    almost certainly require you to bust out a few equations, and even to
+    manipulate them a little to tease out relations essential to this paper.
+
+Conventional emulator calibration entails the historical units of Mpc / $h$,
+but if we use instead units of Mpc, then we can distill all of the evolution
+parameters into one parameter, $\sigma_{12}$. Since $h$ is already its own parameter, the conventional $\sigma_8$ parameter is truly a mixture
+of two parameters. This presents a host of misleading results  and statistical
+ambiguities (\cbib{San20}) which are outside of the scope of this work but
+which prompt us to abandon $\sigma_8$.
+Similarly, throughout this paper we will refrain from using the conventional
+fractional density parameters $\Omega_i$ in favor of the physical density
+parameters $\omega_i = \Omega_i h^2$ which similarly eliminate the
+dependence on $h$.
+
+(\cbib{San21}) proposes to divide up the full set of cosmological
+parameters into two categories: \textit{evolution} parameters $\mathcal{O}_E$
+(such as $\omega_b$, $\omega_c$, and $\eta_s$)
+affect the amplitude of the power spectrum at a particular redshift, while
+\textit{shape} parameters $\mathcal{O}_S$
+(such as $\omega_K$, $\omega_\text{DE}$, w(a))
+affect the shape of the power
+spectrum.
+
+We take, as the evolution mapping relation for the power spectrum, equation 13
+from \cbib{San21}:
+
+\begin{equation}
+\label{eq: evMapping_pSpectrum}
+    \Delta^2_L (k | z, \Theta_s, \Theta_e)
+    =
+    \Delta_L^2 (k | \Theta_s, \sigma_{12} \left( z, \Theta_s, \Theta_e \right))
+\end{equation}
+
+Why is this scheme important? Evolution mapping greatly simplifies the emulator
+implementation. Because we can
+funnel all of the evolution parameters through $\sigma_{12}$, we've effectively
+collapsed an entire category of parameters to just one parameter. Fewer
+parameters means that we get a more accurate emulator.
+
+``At the linear level, all models characterized by identical shape parameters
+and the same values of the parameter combinations $b \sigma_{12}(z)$ and
+$f \sigma_{12}(z)$ will be identical'' (\cbib{San21}).
+
+Now, for the hiccup, which segues into the next section: this scheme is broken by one parameter, the Universe's
+density in neutrinos. (In the next section: why this is so and what we can do
+about it.)
+
+%%%
+
+Three shape parameters of core interest to this paper are the physical density in baryons $\omega_b$ (whose impact on the power spectrum is shown in figure~\ref{fig: omega_b_dependence}), the physical density in cold dark matter $\omega_c$ (figure~\ref{fig: omega_c_dependence}), and the spectral index $n_s$, (figure~\ref{fig: ns_dependence}). The remaining parameters $\sigma_{12}$ and $A_s$, as well as the quantities $z$ and $h$, all shift only the amplitude of the power spectrum, as illustrated in figure~\ref{eq: sig12_dependence}. 
+
+For the sake of completion, we also show the impact of the evolution parameter $\sigma_{12}$ in figure~\ref{fig: sig12_dependence} and stress that the other quantities 
+
+
+\section{Neutrinos and Their Cosmological Impact}
+
+(\cbib{Kiakotou}): ``Neutrinos with masses on the eV scale or below will be a
+hot component of the dark matter and will free-stream out of overdensities and
+thus wipe out small-scale structures.''
+
+``In general, a larger density of relativistic species leads to a smaller
+growth of matter fluctuations'' (\cbib{Zennaro}).
+
+The point of this section is: why is $\omega_\nu$ bad for the
+evolution mapping scheme? Because neutrinos exhibit redshift-dependent
+damping of the power-spectrum, and therefore affect both the shape and the
+amplitude of the power spectrum. Whenever massive neutrinos are present,
+the growth factor becomes scale-dependent, which disrupts the
+evolution-mapping scheme.
+
+Why do they behave in this way? All neutrinos start off as
+relativistic particles in the early Universe, acting as a type of radiation.
+But as the Universe continues to expand and cool, the neutrinos behave
+increasingly like dark matter.
+In this way, the physical density in neutrinos impacts both the shape and the
+evolution.
+
+``The popular heuristic formula for the linear theory suppression of the matter
+fluctuations by free-streaming $\nu$, $\Delta P(k) / P(k) \approx -8 f_\nu$, is
+valid only on very small scales $k > 0.8 h$ / Mpc, However, it is not of
+practical use as this is in the strongly nonlinear regime of matter
+clustering'' (\cbib{Kiakotou}).
+
+One proposed solution is to treat the neutrinos as a small correction factor
+to the results from an anologous cosmology with the same $\omega_m$ but with
+$\omega_\nu = 0$. This of course limits the applicability of our emulator to
+cosmologies with very small $\omega_\nu$, but this constraint agrees with
+current observations (\textcolor{orange}{which?}).
+
+I want to end this section with a vague plan of action: we want to play around with CAMB power spectra to see if there are any simple ways around this limitation in our approach.
+
+%%% New stuff
+
+We already have an approximation for the power spectrum of a massive-neutrino cosmology within the evolution mapping scheme. The $\sigma_{12}$ value that we described earlier is actually the $\sigma_{12}$ value of the model's MEMNeC. can already be approximated within evolution-mapping by slightly altering scheme. \textcolor{red}{Is it fair to say we are adjusting, or was this actually the same scheme as it always was?} We take a MEMNeC and the desired cosmology. The sigma 12 is actually the sigma 12 of the MEMNeC. Then we treat the physical density in neutrinos as a shape parameter along with $A_s$.
