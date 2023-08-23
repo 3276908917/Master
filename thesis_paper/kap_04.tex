@@ -13,13 +13,19 @@ It only takes a couple of sentences, but we also need to describe how to install
 
 % lhc.py
 
-This section will briefly recapitulate some of the latin hypercube sampling
+\textcolor{blue}{This section will briefly recapitulate some of the latin hypercube sampling
 explanation from the introduction. Then we will talk about how this sample is
 procured in practice, and what our ``solution'' (inelegant though it may be)
 is to obtaining a sample with a decent minimum separation between the points
-(remember to briefly repeat why this is important).
+(remember to briefly repeat why this is important).}
 
-Our current technique for maximizing minimum distance is not very powerful.
+In this section, we will discuss the building of LHSs with the
+Cassandra-linear code. By ``LHSs,'' we are here referring exclusively to the
+process of sampling cosmological parameters given a set of priors. Each entry
+in our LHSs is either a four- or six-dimensional vector, depending on the
+type. For the evaluation of the power spectra, see some other section!!!!!
+
+Our current technique for generating the  maximizing minimum distance is not very powerful.
 Currently we randomly regenerate each dimensionless Latin hypercube many
 times and take the best of these.
 
