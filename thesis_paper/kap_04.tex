@@ -13,9 +13,57 @@ It only takes a couple of sentences, but we also need to describe how to install
 
 % lhc.py
 
-This section will briefly recapitulate some of the latin hypercube sampling explanation from the introduction. Then we will talk about how this sample is procured in practice, and what our ``solution'' (inelegant though it may be) is to obtaining a sample with a decent minimum separation between the points (remember to briefly repeat why this is important).
+This section will briefly recapitulate some of the latin hypercube sampling
+explanation from the introduction. Then we will talk about how this sample is
+procured in practice, and what our ``solution'' (inelegant though it may be)
+is to obtaining a sample with a decent minimum separation between the points
+(remember to briefly repeat why this is important).
 
-We've multithreaded a random LHC generator to allocate a large amount of compute to this brute force approach.
+Our current technique for maximizing minimum distance is not very powerful.
+Currently we randomly regenerate each dimensionless Latin hypercube many
+times and take the best of these.
+
+Our script can be used to generate significant numbers of random LHSs in
+parallel. It’s still a brute force solution, but now we’re assigning
+significantly more computational power to it.
+
+Are there more efficient techniques than this brute force random generation?
+We discuss this later. 
+
+Remember from section~\ref{sec: lhc_theory} that we have an equation for the
+best possible minimum separation that we can achieve with a latin hypercube
+of some given dimension and total number of samples. We choose as the starting
+point for this discussion a massless-neutrino emulator (recall from chapter 3
+that this means a total of four dimensions) trained over five-thousand CAMB
+spectra. If we plug in $d = 4$ and $N=5000$, we get XXY. In figure XXY, we
+show the result of our approach to LHC-generation. For an example of the
+wall-time consequences of this figure, we also include a figure which shows
+the wall-time (work laptop).
+
+Similarly, for our massive-neutrino emulator (a total of six dimensions)
+trained over the same number of spectra, we find a theoretical best
+minimum-separation of XXY. 
+
+It is based on figures XXY and XXY that we may claim that our approach is
+inefficient and not well-suited to the approach of finding LHCs with large
+minimum separations. As mentioned in section~\ref{sec: lhc_theory},
+we value a high minimum separation because it means we are sampling the
+space of cosmologies evenly rather than oversampling particular regions.
+Therefore, we expect the consequence of a low minimum separation in the LHC to
+be a higher error variance as well as a slightly higher average bias.
+
+% One could argue that the variance in oversampled regions will decrease to
+% compensate, right? I need to clarify that the decrease in variance in the
+% oversampled regions would not be able to compensate the increased variance
+% in the undersampled regions, because the space of power spectra is
+% continuous, so closely spaced points reveal less about the true function
+% than well spaced points.
+
+To appreciate the impact of this approach's limitations on the performance of
+the resultant emulator, we direct the reader to
+section~\ref{sec: error_from_lhc}.
+
+
 
 We'll also describe the switch from a rescaled latin hypercube to a unit latin hypercube that we later interpret differently according to the specified priors.
 
@@ -48,6 +96,8 @@ as the various data-cleaning and normalization statements that we used.
 Normalization will be a really important topic. I want to explain some of
 the theory behind why the emulator performs poorly with values outside of this
 [0, 1] range.
+
+I don't know how to justify this kernel that I got from Alex via AndreaP...
 
 \section{Accessing and Using the Emulator}
 
