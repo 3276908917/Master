@@ -6,6 +6,40 @@ Even if my code doesn't end up in a bigger repository, I nevertheless think that
 
 It only takes a couple of sentences, but we also need to describe how to install the package.
 
+\section{Conceptual Outline and Design Choices}
+\label{sec: cassL_concept}
+
+\textcolor{blue}{The point of this section is to introduce the reader to the
+basic structure of the emulator pipeline. Most of the discussion will follow
+from a flow chart showing the various conceptual pieces of the emulator. Also
+in this section, I will introduce various choices made (e.g. 5000 training
+spectra, 300 points for each spectrum) WITHOUT justifying any of them--later,
+in chapter~\ref{chap: disc_and_conc}, we'll justify these decisions and
+talk about the consequences of alternate settings.}
+
+% We're gonna need a flow chart for this puppy. That should be priority number
+% one, because the writing should constantly refer back to it.
+
+Within the current (as of \textcolor{orange}{24.08.2023}) setup of
+Cassandra-Linear, we typically generate two Latin hypercubes for each
+emulator. The first represents our training set and an emulator cannot be
+produced without it. The second one represents our validation set.
+
+\textcolor{orange}{In a future
+release of Cassandra-Linear, this set will be used to train an ``uncertainty''
+emulator, which will train over the errors from the main emulator in order to
+provide the user with an uncertainty estimate for any cosmology located within 
+the space of priors over which the main emulator was trained.} 
+
+\textcolor{orange}{However, this functionality has not yet been implemented. 
+Currently, we are 
+using the validation hypercube more as a test hypercube: we compute the uncertainties at discrete points and examine these uncertainties (e.g. with
+scatterplots and histograms) to assess the performance of the emulator.}
+
+By default, each Latin hypercube consists of $N_s = 5000$ entries. For 
+justification of this quantity, please refer to
+section~\ref{sec: num_samples}.
+
 
 \section{Building the Latin Hypercube}
 \label{sec: build_lhc}
@@ -55,7 +89,7 @@ Through the function parameter \verb|num_workers| the user is free to assign
 any number of CPU threads to the task, so in principle the computer can be
 wholly dedicated to the optimization of the LHS.  
 
-As of the current (\textcolor{orange}{24.08.2023}) version of the
+As of the current (as of \textcolor{orange}{24.08.2023}) version of the
 Cassandra-Linear code, this brute-force approach is the method used to build
 the Latin hypercube samples eventually used to train the emulators. To 
 understand the computational and wall-time costs associated with our
@@ -84,14 +118,11 @@ be a higher error variance as well as a slightly higher average bias.
 % continuous, so closely spaced points reveal less about the true function
 % than well spaced points.
 
-To appreciate the impact of this approach's limitations on the performance of
-the resultant emulator, we direct the reader to
-section~\ref{sec: error_from_lhc}.
-
-%! Maybe we should move get_param_ranges to lhc.py. It would be more thematically consistent if the note on priors appeared in this section
-
-Are there more efficient techniques than this brute force random generation?
-We discuss this later. 
+Later, we will test our expectations by comparing emulators with different
+minimum separations in their LHSs in section~\ref{sec: error_from_lhc}, to
+which we defer remaining concerns about our approach to LHC generation.
+Additionally, we will explore the question of superior methods in
+section~\ref{sec: future_work}
 
 
 \section{Interfacing with CAMB}
