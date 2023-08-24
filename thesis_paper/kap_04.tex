@@ -6,7 +6,7 @@ Even if my code doesn't end up in a bigger repository, I nevertheless think that
 
 It only takes a couple of sentences, but we also need to describe how to install the package.
 
-\section{Conceptual Outline and Design Choices}
+\section{Conceptual Outline}
 \label{sec: cassL_concept}
 
 \textcolor{blue}{The point of this section is to introduce the reader to the
@@ -17,8 +17,37 @@ spectra, 300 points for each spectrum) WITHOUT justifying any of them--later,
 in chapter~\ref{chap: disc_and_conc}, we'll justify these decisions and
 talk about the consequences of alternate settings.}
 
+\textcolor{orange}{This section is getting kind of ambitious. I may break it
+out into a separate chapter, especially because the nature of the discussion
+is fairly different from the rest of this chapter (here very high-level
+and conceptual, later technical and programming-oriented).}
+
 % We're gonna need a flow chart for this puppy. That should be priority number
 % one, because the writing should constantly refer back to it.
+
+\subsection{Design Choices}
+
+By default, each Latin hypercube consists of $N_s = 5000$ entries. For 
+justification of this quantity, please refer to
+section~\ref{sec: num_samples}.
+
+$N_k = 300$.
+
+\subsection{Creation of Separate Emulators}
+
+This is a brief introductory section motivating the creation of two emulators: unlike the other five parameters, the physical density in massive neutrinos has a hard lower bound. This creates some minor regression problems: TO PROVE THIS, SHOW THE PERFORMANCE OF THE MASSIVE EMULATOR ON MASSLESS-NEUTRINO COSMOLOGIES.
+
+Conclude this section by saying that this integration of multiple emulators into one user-facing script can be further exploited with, for example, different emulators for different neutrino mass hierarchies.
+
+\subsection{Emulation over Uncertainties}
+
+For a further step of accuracy, we can add a third data set to our pipeline
+and introduce a second layer of emulation.
+
+Up to this point, our pipeline has included a training set and a testing set.
+If we add a validation set, then we can train a second emulator over the
+errors associated with the first emulator's performance on this validation
+set.
 
 Within the current (as of \textcolor{orange}{24.08.2023}) setup of
 Cassandra-Linear, we typically generate two Latin hypercubes for each
@@ -35,11 +64,6 @@ the space of priors over which the main emulator was trained.}
 Currently, we are 
 using the validation hypercube more as a test hypercube: we compute the uncertainties at discrete points and examine these uncertainties (e.g. with
 scatterplots and histograms) to assess the performance of the emulator.}
-
-By default, each Latin hypercube consists of $N_s = 5000$ entries. For 
-justification of this quantity, please refer to
-section~\ref{sec: num_samples}.
-
 
 \section{Building the Latin Hypercube}
 \label{sec: build_lhc}
