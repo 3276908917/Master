@@ -1,0 +1,3 @@
+Sections in particular that we've expanded:
+
+* 4.1, Building the Latin Hypercube

@@ -106,6 +106,9 @@ def build_train_and_test_sets(scenario_name):
     
     # Step 2: build train LHC
     
+    train_lhc = lhc.multithread_unit_LHC_builder(dim, n_samples, label="unlabeled",
+        num_workers=12, previous_record=0):
+    
     # Step 3: fill-in train LHC
     
     # Step 4: build test LHC

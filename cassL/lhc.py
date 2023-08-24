@@ -11,15 +11,6 @@ from six import iteritems
 from scipy.spatial.distance import cdist
 from collections import OrderedDict
 
-class LhcException(Exception):
-    """
-    Class for Exceptions in the
-    latin hypercube module
-
-    """
-    pass
-
-
 def generate_samples(ranges, n_samples, n_trials=0, validation=False):
     r"""
     Generate samples on a latin hypercube
@@ -104,6 +95,10 @@ def generate_samples(ranges, n_samples, n_trials=0, validation=False):
 
 def long_term_LHC_builder(param_ranges, n_samples, label="unlabeled"):
     n_params = len(param_ranges)
+    """
+    This is like multithread_LHC_builder but not multithreaded...
+    We should really collapse these functions...    
+    """
 
     '''
     This is the external function, 'lhs.' It needs to know the size
@@ -154,7 +149,7 @@ def batch(n_params, n_samples=5000):
     dist = cdist(samples, samples, metric='euclidean')
     min_dist = np.amin(dist[dist > 0])
     # Iterating this for n_trials times
-    for i in range(50):
+    for i in range(49):
         samples_new = lhs(n=n_params, samples=n_samples, criterion='center')
         dist = cdist(samples_new, samples_new, metric='euclidean')
         min_dist_new = np.amin(dist[dist > 0])
@@ -181,6 +176,7 @@ def multithread_LHC_builder(param_ranges, n_samples, label="unlabeled",
             (saved under "best_lhc_multi2.npy")
     """
     n_params = len(param_ranges)
+    total_num_cubes = 0
 
     '''
     This is the external function, 'lhs.' It needs to know the size

@@ -22,9 +22,21 @@ is to obtaining a sample with a decent minimum separation between the points
 \textcolor{red}{This section is currently underway! Avert thine eyes!}
 In this section, we will discuss the building of LHSs with the
 Cassandra-linear code. By ``LHSs,'' we are here referring exclusively to the
-process of sampling cosmological parameters given a set of priors. Each entry
-in our LHSs is either a four- or six-dimensional vector, depending on the
-. For now, we can think of this object as a length-5000 numpy array where each element is a length-six array of parameter values (omega_b, omega_c, n_s, sigma12, A_s, omega_nu). For this step, we integrated demonstration code written by Daniel Farrow (and who else?) during the CAKE 2021 workshop. We begin by invoking the lhs function of pyDOE2 a number of times. Each time we get a random new unit LHC, whose spacing we analyze with the cdist function from scipy.spatial.distance.  Recall from section sec_B1 that our sample more evenly covers the sample space if the minimum separation between the sample points increases. Uneven separations will result in excess error depending on the location of the cosmology in parameter space.
+sample of cosmologies for which we want to compute power spectra. In other 
+words, this section elucidates our procedure for the sampling of cosmological 
+parameters given a set of priors. The resultant array of cosmological
+configurations will act as the $X$ data set when we train our emulator. For 
+the construction of the $Y$ set, see section~\ref{sec: generate_emu_data}.
+
+Each entry in our LHS will be either a four- or six-dimensional vector, 
+depending on the emulator's support for massive neutrinos. When building a
+massless-neutrino emulator, a single LHS entry will describe the $\omega_b$,
+$\omega_\text{CDM}$, $n_s$, and $\sigma_{12}$ values for that cosmology in 
+this order. When building a massive-neutrino emulator, a single LHS entry will 
+additionally describe the $A_s$ and $\omega_\nu$ values for that cosmology, 
+again in this order.
+
+To get started generating LHSs, we integrated demonstration code written by Daniel Farrow \text{red}{(and who else?) add these people to the Danksagung} during the CAKE 2021 workshop. We begin by invoking the lhs function of pyDOE2 a number of times. Each time we get a random new unit LHC, whose spacing we analyze with the cdist function from scipy.spatial.distance.  Recall from section sec\_B1 that our sample more evenly covers the sample space if the minimum separation between the sample points increases. Uneven separations will result in excess error depending on the location of the cosmology in parameter space.
 
 
 For the evaluation of the power spectra, see some other section!!!!!
@@ -93,6 +105,7 @@ The priors that we use correspond to those currently used by COMET. \textcolor{o
 This section won't actually introduce much that the reader hasn't already encountered in the section "CAMB, initial setup." This will primarily be a summary of the ``correct'' settings with a couple of new sections describing the particular functions in this script.
 
 \section{Integrating Evolution Mapping}
+\label{sec: generate_emu_data}
 
 % generate\_emu\_data.py
 
