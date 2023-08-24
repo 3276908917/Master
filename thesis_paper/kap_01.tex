@@ -48,12 +48,12 @@ This can be a very brief section, but I want to discuss a little bit of how most
 
 Metropolis-Hastings algorithm.
 
-We don't know what the true probability distribution of power spectra is. In order to build this distribution with simulation results, we simply draw from the distribution. \textcolor{red}{Refer to ``Data to Insights'' lecture notes in order to tighten this description.}
+We don't know what the true probability distribution of power spectra is. In order to build this distribution with simulation results, we simply draw from the distribution. \textcolor{orange}{Refer to ``Data to Insights'' lecture notes in order to tighten this description.}
 
 \section{Emulation: Basic Principles}
 \label{sec: emulation_intro}
 
-To conduct these MCMC analyses, we need several thousands of power spectra. However, if our Boltzmann solvers take on the order of three seconds to run, then these solvers will become the bottleneck of our analysis. \textcolor{red}{Give some specific numbers for this.}
+To conduct these MCMC analyses, we need several thousands of power spectra. However, if our Boltzmann solvers take on the order of three seconds to run, then these solvers will become the bottleneck of our analysis. \textcolor{orange}{Give some specific numbers for this.}
 
 This motivates the introduction of emulation, basically multi-dimensional interpolation, in order to predict the power spectra. These predictions are orders of magnitude less time-expensive. 
 
