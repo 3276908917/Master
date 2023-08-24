@@ -106,8 +106,12 @@ def build_train_and_test_sets(scenario_name):
     
     # Step 2: build train LHC
     
-    train_lhc = lhc.multithread_unit_LHC_builder(dim, n_samples, label="unlabeled",
-        num_workers=12, previous_record=0):
+    priors = get_param_ranges(scenario["prior_name"])
+    
+    train_lhc = lhc.multithread_unit_LHC_builder(dim=len(priors),
+        n_samples=scenario["num_test_samples"],
+        label=scenario_name,
+        num_workers=12, previous_record=0)
     
     # Step 3: fill-in train LHC
     
