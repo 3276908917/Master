@@ -35,7 +35,18 @@ $N_k = 300$.
 
 \subsection{Creation of Separate Emulators}
 
-This is a brief introductory section motivating the creation of two emulators: unlike the other five parameters, the physical density in massive neutrinos has a hard lower bound. This creates some minor regression problems: TO PROVE THIS, SHOW THE PERFORMANCE OF THE MASSIVE EMULATOR ON MASSLESS-NEUTRINO COSMOLOGIES.
+This is a brief introductory section motivating the creation of two emulators:
+unlike the other five parameters, the physical density in massive neutrinos 
+has a hard lower bound. This creates some minor regression problems (appeal to 
+boundary effects / danger of extrapolation).
+
+To simplify the user experience, this two-emulator solution lives ``under the
+hood'' and by default \textcolor{orange}{will be} hidden behind an interface
+which automatically queries the correct emulator given some user-input
+cosmology.
+
+To justify our decision and to quantify the improvement from this approach, we
+have prepared \textcolor{orange}{some} plots in section~\ref{2emu_improvement}.
 
 Conclude this section by saying that this integration of multiple emulators into one user-facing script can be further exploited with, for example, different emulators for different neutrino mass hierarchies.
 
