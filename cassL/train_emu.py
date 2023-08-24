@@ -32,11 +32,12 @@ def eliminate_unusable_entries(X_raw, Y_raw,
         for bad_val in bad_vals:
             if bad_val in row:
                 return True
-            if np.isnan(bad_val) and True in np.isnan(row):
+            if isinstance(bad_val, float) and np.isnan(bad_val) and \
+                True in np.isnan(row):
                 return True
-            return False
-    
-    bad_row_numbers = np.array([])
+        return False
+        
+    bad_row_numbers = np.array([], dtype=np.int64)
     
     for i in range(len(X_raw)):
         row_x = X_raw[i]
@@ -44,7 +45,7 @@ def eliminate_unusable_entries(X_raw, Y_raw,
         if unusable(row_x, bad_X_vals) or unusable(row_y, bad_Y_vals):
             bad_row_numbers = np.append(bad_row_numbers, i)
    
-    if bad_row_numbers:
+    if len(bad_row_numbers) > 0:
         cleaned_X = np.delete(X_raw, bad_row_numbers, 0)
         cleaned_Y = np.delete(Y_raw, bad_row_numbers, 0)
         return cleaned_X, cleaned_Y
