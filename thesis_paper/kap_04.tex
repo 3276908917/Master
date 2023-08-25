@@ -33,6 +33,26 @@ section~\ref{sec: num_samples}.
 
 $N_k = 300$.
 
+\subsection{Unit LHCs}
+\label{sec: unit_lhc}
+
+The benefit of rescaling later.
+
+The unit LHC will eventually be used to create a set of cosmological
+configurations which will act as the $X$ data set when we train our emulator. 
+We describe the building of the unit LHC in section~\ref{sec: build_lhc}
+and its rescaling (as well as the construction of the $Y$ data set) 
+in~\ref{sec: generate_emu_data}.
+
+\subsection{Default Priors}
+
+% One reason this goes here: priors show up in almost every script,
+% so there isn't a great cass-L subsection in which to put this.
+
+The priors that we use correspond to those currently used by COMET. \textcolor{orange}{Should I spend any time defending this choice here, or should I put all of the defense in section~\ref{sec: priors}?}
+
+\textcolor{orange}{Table goes here.}
+
 \subsection{Creation of Separate Emulators}
 
 This is a brief introductory section motivating the creation of two emulators:
@@ -90,11 +110,14 @@ is to obtaining a sample with a decent minimum separation between the points
 In this section, we will discuss the building of LHSs, which within the
 Cassandra-linear is handled by the \verb|lhs.py| script.
 By ``LHSs,'' we are here referring exclusively to the
-sample of cosmologies for which we want to compute power spectra. In other 
-words, this section elucidates our procedure for the sampling of cosmological 
-parameters given a set of priors. The resultant array of cosmological
-configurations will act as the $X$ data set when we train our emulator. For 
-the construction of the $Y$ set, see section~\ref{sec: generate_emu_data}.
+sample of cosmologies for which we want to compute power spectra.
+However, as mentioned in section~\ref{unit_lhc}, at this stage we are not
+yet committing to a particular set of priors. Instead, each axis is sampled
+from the uniform distribution $\mathcal{U} (0, 1)$.
+
+
+
+We'll also describe the switch from a rescaled Latin hypercube to a unit Latin hypercube that we later interpret differently according to the specified priors.
 
 Each entry in our LHS will be either a four- or six-dimensional vector, 
 depending on the emulator's support for massive neutrinos. When building a
@@ -173,13 +196,13 @@ This section won't actually introduce much that the reader hasn't already encoun
 
 This section will describe the process going from a Latin hypercube to a set of CAMB power spectra. We will describe how an array of six parameter values is fleshed out into a params object understood by CAMB. We will describe the procedure of modifying $h$ and $z$ until we arrive roughly at the $\sigma_{12}$ value that we desire, as well as the process of writing the \textit{actual} $\sigma_{12}$ value that we obtained back to the original hypercube. Why is this important? Because the Latin hypercube is used again later in the user\_interface.py script for the purpose of training the Gaussian emulator object.
 
-We'll also describe the switch from a rescaled Latin hypercube to a unit Latin hypercube that we later interpret differently according to the specified priors.
+Ariel’s idea for speeding up the program: use a best-guess z which only approximates the desired sigma12. Then, when we calculate the power spectrum using this redshift, get the actual sigma12 value from CAMB and replace the LHC entry with the true value.
+We’ve implemented this now. We should definitely talk about how little of a difference that this makes. We should make error plots (comparing the two approaches with hyper cube as a control), but I strongly suspect the error will be negligible.
 
-The priors that we use correspond to those currently used by COMET. \textcolor{orange}{Should I spend any time defending this choice here, or should I put all of the defense in section~\ref{sec: priors}?}
 
 
 \section{Training the Emulator}
-\label{sec: emu_training}
+\label{sec: train_emu}
 
 % train\_emu.py
 

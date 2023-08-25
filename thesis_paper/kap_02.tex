@@ -22,17 +22,32 @@ To introduce the reader to the scope of CAMB, we will now introduce
 some basic simulated power spectra along with a summary of the dynamic
 parameters which will be of greatest interest to us.
 
+\textcolor{blue}{
 I hope to, in painstaking detail, cover many of the lines of the code that I
 have written to interface with CAMB. I will include plots to indicate, at
 every step, what incorrect settings cause the power spectrum to look like (or,
 for subtler errors, what the error curves looked like compared to Ariel's
 results, which I treated as a sort of ``ground truth''). This should also be a
 good example to flex my physics interpretation skills: why does this incorrect
-setting produce this undesired pattern?
+setting produce this undesired pattern?}
 
-You might think that this is sort of an inappropriate section for a master's thesis (especially since I have in mind that this be a lengthy section), but I would like to include it unless you feel very strongly. After all, I spent several months of the project debugging at least ten different ways that slight and major errors in the various settings led to irreconcilable results.
+\textcolor{blue}{You might think that this is sort of an inappropriate section
+for a master's thesis (especially since I have in mind that this be a lengthy 
+section), but I would like to include it unless you feel very strongly. After 
+all, I spent several months of the project debugging at least ten different 
+ways that slight and major errors in the various settings led to 
+irreconcilable results.}
 
-For example, one parameter that tripped me up for a while: neutrino mass hierarchy: the options are degenerate, normal, and inverted. The CAMB documentation annotates this parameter as ``(1 or 2 eigenstate approximation),'' but this is somewhat unclear. Is the degenerate hierarchy the single mass eigenstate approximation? Do both normal and inverted hierarchies involve two eigenstates?
+\textcolor{orange}{Ariel recommends
+just talking about the correct lines, don't talk about what happens when
+they're wrong.}
+
+For example, one parameter that tripped me up for a while: neutrino mass 
+hierarchy: the options are degenerate, normal, and inverted. The CAMB 
+documentation annotates this parameter as ``(1 or 2 eigenstate 
+approximation),'' but this is somewhat unclear. Is the degenerate hierarchy 
+the single mass eigenstate approximation? Do both normal and inverted 
+hierarchies involve two eigenstates?
 
 %In figure \ref{fig: spectrum_type}, we can see that requesting of the wrong
 %power spectrum type can in some low-$\omega_\nu$ cases yields errors so low
@@ -48,7 +63,7 @@ Beware the neutrino settings. The effective number of massive neutrinos is about
 
 %! This is weird, and perhaps inappropriate for a thesis document.
 
-To test this setup, we compare our results with those of Ariel S\'{a}nchez and
+To test this setup, we compare our results with those of Ariel S\'{a}nchez (within the native Fortran framework of CAMB) and
 Andrea Pezzotta for the first seven Aletheia cosmologies and four physical
 densities in neutrinos, for a total of 28 models. The errors are miniscule and
 recorded in figure XXY. After verifying the accuracy of our code in this way,

@@ -399,7 +399,10 @@ class Emulator_Trainer:
         errors = self.deltas if deltas else self.rel_errors
         error_array = error_aggregator(errors, axis=1)
 
-        plt.hist(error_array, bins="sturges")
+        if bins == None:
+            bins="sturges"
+
+        plt.hist(error_array, bins=bins)
         plt.title(title)
         plt.ylabel("Frequency [counts]")
 
