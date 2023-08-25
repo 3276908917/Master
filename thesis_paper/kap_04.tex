@@ -33,6 +33,24 @@ section~\ref{sec: num_samples}.
 
 $N_k = 300$.
 
+\subsection{Creation of Separate Emulators}
+\label{sec: 2emu_intro}
+
+This is a brief introductory section motivating the creation of two emulators:
+unlike the other five parameters, the physical density in massive neutrinos 
+has a hard lower bound. This creates some minor regression problems (appeal to 
+boundary effects / danger of extrapolation).
+
+To simplify the user experience, this two-emulator solution lives ``under the
+hood'' and by default \textcolor{orange}{will be} hidden behind an interface
+which automatically queries the correct emulator given some user-input
+cosmology.
+
+To justify our decision and to quantify the improvement from this approach, we
+have prepared \textcolor{orange}{some} plots in section~\ref{2emu_improvement}.
+
+Conclude this section by saying that this integration of multiple emulators into one user-facing script can be further exploited with, for example, different emulators for different neutrino mass hierarchies.
+
 \subsection{Unit LHCs}
 \label{sec: unit_lhc}
 
@@ -52,23 +70,6 @@ in~\ref{sec: generate_emu_data}.
 The priors that we use correspond to those currently used by COMET. \textcolor{orange}{Should I spend any time defending this choice here, or should I put all of the defense in section~\ref{sec: priors}?}
 
 \textcolor{orange}{Table goes here.}
-
-\subsection{Creation of Separate Emulators}
-
-This is a brief introductory section motivating the creation of two emulators:
-unlike the other five parameters, the physical density in massive neutrinos 
-has a hard lower bound. This creates some minor regression problems (appeal to 
-boundary effects / danger of extrapolation).
-
-To simplify the user experience, this two-emulator solution lives ``under the
-hood'' and by default \textcolor{orange}{will be} hidden behind an interface
-which automatically queries the correct emulator given some user-input
-cosmology.
-
-To justify our decision and to quantify the improvement from this approach, we
-have prepared \textcolor{orange}{some} plots in section~\ref{2emu_improvement}.
-
-Conclude this section by saying that this integration of multiple emulators into one user-facing script can be further exploited with, for example, different emulators for different neutrino mass hierarchies.
 
 \subsection{Emulation over Uncertainties}
 

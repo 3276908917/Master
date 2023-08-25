@@ -1,13 +1,40 @@
 \chapter{Expansion of the Parameter Space}
 
-Here, I will talk about the playing-around that we did, to discover that
-$A_s$ assisted in the prediction of the suppression due to massive neutrinos.
-
 % Section on messing around
 
+Here, I will talk about the playing-around that we did, to discover that
+$A_s$ assisted in the prediction of the suppression due to massive neutrinos.
+Specifically, we just need to add $A_s$ to the set of cosmological parameters
+over which we train our GPR and then we can treat $\omega_\nu$ like a shape
+parameter.
+
+% Maybe it would make more sense to have the large cass-L chapter focus on the
+% creation of a massless-neutrino emulator and THEN a smaller chapter focusing
+% on all the changes necessary for it to become a massive-neutrino emulator.
+% BUT! As of 25-08-23, I'm running way behind on writing actual content for
+% this thesis. I can't risk redoing all the section headers again. We're
+% going to proceed under the current scheme and MAYBE allow ourselves to redo
+% it shortly before submission.
+
+So, our massive-neutrino emulator will be trained over six cosmological
+parameters: $\omega_b$, $\omega_c$, $n_s$, $\sigma_{12}$, $A_s$, and
+$\omega_\nu$. In other words, to predict a linear non-neutrino-matter power
+spectrum $\hat{y}$, the emulator will accept as an input $x$ these six
+parameters.
+
 Besides its relevance to the neutrino suppression of the small-scale power
-spectrum, $A_s$ appears to be an evolution parameter. Therefore, when we
-showcase the performance of emulators without massive neutrinos, 
+spectrum, $A_s$ appears to be an evolution parameter. Therefore, when the
+emulator discussion branches into the massless- and massive-neutrino cases
+(refer to section~\ref{sec: 2emu_intro} for the beginning and motivation of
+this), the reader should keep in mind that the dimension of the parameter
+space decreases in the massless-neutrino case by \textit{two}--$\omega_\nu$ 
+obviously must vanish because we here assume $\omega_\nu=0$. However, $A_s$
+also vanishes because, without massive neutrinos, $A_s$ reduces to an
+evolution parameter and is therefore redundant with $\sigma_{12}$.
+
+% What happens to A_s in the massless-neutrino case? Is it fixed at the
+% default for model 0? I'm pretty sure it is!
 
 Remember to explain \textit{why} the prediction of these asymptotes means that $A_s$ will capture all of the unruly behavior of neutrinos. What theory motivates such a judgment? Or are we only guessing?
+
 
