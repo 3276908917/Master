@@ -1,10 +1,23 @@
 \chapter{Cassandra-Linear: a Python Package}
 
-This will be a rather long, dry, and technical section with subsections based on each of the core scripts making up the Python package that I have been developing. It will in some ways paraphrase and summarize the documentation, explaining the basic use of the package as well as important limitations. Of course, fairly early on in this section, there will be a footnote linking to my GitHub repository, which will be made public once I'm ready to hand in this thesis.
+\textcolor{blue}{This will be a rather long, dry, and technical section with 
+subsections based on each of the core scripts making up the Python package \
+that I have been developing. It will in some ways paraphrase and summarize the 
+documentation, explaining the basic use of the package as well as important 
+limitations. Of course, fairly early on in this section, there will be a 
+footnote linking to my GitHub repository, which will be made public once I'm 
+ready to hand in this thesis.}
 
-Even if my code doesn't end up in a bigger repository, I nevertheless think that it's important to the scientific process that I describe in detail the code that I have written. Besides, if any readers want to experiment specifically with the ideas discussed in this thesis, they may find my code more accessible because it is, in a sense, "single-purpose"--that is to say, written almost exclusively to investigate the topics of this paper.
+\textcolor{blue}{Even if my code doesn't end up in a bigger repository, I 
+nevertheless think that it's important to the scientific process that I 
+describe in detail the code that I have written. Besides, if any readers want 
+to experiment specifically with the ideas discussed in this thesis, they may 
+find my code more accessible because it is, in a sense, "single-purpose"--that 
+is to say, written almost exclusively to investigate the topics of this 
+paper.}
 
-It only takes a couple of sentences, but we also need to describe how to install the package.
+\textcolor{orange}{It only takes a couple of sentences, but we also need to 
+describe how to install the package.}
 
 \section{Conceptual Outline}
 \label{sec: cassL_concept}
@@ -54,13 +67,24 @@ Conclude this section by saying that this integration of multiple emulators into
 \subsection{Unit LHCs}
 \label{sec: unit_lhc}
 
-The benefit of rescaling later.
+The \verb|pyDOE2| function that we will use to generate our LHCs
+returns a result with entries that range from zero to unity. These unit LHCs 
+will eventually be used to create a set of cosmological
+configurations which will act as the $X$ data set when we train our emulator.
 
-The unit LHC will eventually be used to create a set of cosmological
-configurations which will act as the $X$ data set when we train our emulator. 
+In order to these LHC entries into cosmological parameters that we can input 
+into CAMB, we will need to rescale them with our priors for each parameter.
+However, instead of rescaling immediately, we will rescale later: 
+\textcolor{orange}{The benefits of rescaling later are. This is useful not
+just for changing priors but even for changing the way that we sample a
+particular prior (for example, $\sigma_{12}^2$ sampling--although we did not
+get it to work, the infrastructure is still there for whoever comes along in
+the future.}
+ 
 We describe the building of the unit LHC in section~\ref{sec: build_lhc}
 and its rescaling (as well as the construction of the $Y$ data set) 
 in~\ref{sec: generate_emu_data}.
+
 
 \subsection{Default Priors}
 
@@ -116,8 +140,6 @@ However, as mentioned in section~\ref{unit_lhc}, at this stage we are not
 yet committing to a particular set of priors. Instead, each axis is sampled
 from the uniform distribution $\mathcal{U} (0, 1)$.
 
-
-
 We'll also describe the switch from a rescaled Latin hypercube to a unit Latin hypercube that we later interpret differently according to the specified priors.
 
 Each entry in our LHS will be either a four- or six-dimensional vector, 
@@ -146,13 +168,51 @@ wall time, we have written a multithreaded function called
 one, I'm thinking about condensing lhc.py to just a couple of functions.}
 Through the function parameter \verb|num_workers| the user is free to assign
 any number of CPU threads to the task, so in principle the computer can be
-wholly dedicated to the optimization of the LHS.  
+wholly dedicated to the optimization of the LHS. This function represents an
+unending query for LHSs. The user will be notified via command
+line printout whenever an LHS has been generated whose minimum separation is
+higher than the previous record value. Whenever such a superior LHS is
+encountered, the function writes the LHS to a file and continues. Therefore,
+the user may run this script in the background and terminate whenever. The
+function always writes LHSs to the same file, so each new record-setting LHS
+overwrites the old one. When the user terminates the function, whatever output
+file remains represents the best LHS seen since the function was first called.
+
+\begin{comment}
+The \verb|cdist| function can be re-used to compare LHSs loaded from 
+different
+files. However, since there is generally little reason to keep old LHSs
+(except, perhaps, to reconstruct specific emulators), it reduces clutter to
+simply continue overwriting the same file. Therefore, the function
+\verb|multithread_unit_LHC_builder| also includes a parameter
+\verb|previous_record|, which is recommended whenever the user would like to
+stop the function and then resume it later. In such a case, the parameter
+should be set to the \verb|cdist| value of the exis}
+\end{comment}
+
+% I've got a better idea: the function should automatically ask the user if
+% he's sure, in the case that we find a file under the name under which we
+% intend to write. If the user is sure, we take the cdist of that existing
+% file and use it as the previous record!
+
+% we multithreaded the Python script to spawn 12 workers on an 11th gen Intel i7-11700 @ 2.50 GHz. IF YOU ARE USING THE WORK DESKTOP
 
 As of the current (as of \textcolor{orange}{24.08.2023}) version of the
 Cassandra-Linear code, this brute-force approach is the method used to build
 the Latin hypercube samples eventually used to train the emulators. To 
 understand the computational and wall-time costs associated with our
 brute-force solution, we include plots XXY and XXY.
+
+\begin{comment} % The following paragraph says this stuff better
+we left the system to run for three consecutive days. In this time, the 
+largest minimum separation that we generated was approximately 0.08022.  
+Recall from section sec_B1 that the theoretical best possible value for this 
+setup is approximately 0.24183. It would have been more meaningful if you had 
+counted the total number of function calls, but it isn’t too late to set up 
+such a run. So, even after assigning a relatively large amount of compute to 
+this brute force solution, we fail to obtain an LHC of even a third of the 
+best minimum separation.
+\end{comment} 
 
 Remember from section~\ref{sec: lhc_theory} that we have an equation for the
 best possible minimum separation that we can achieve with a Latin hypercube
@@ -181,25 +241,25 @@ Later, we will test our expectations by comparing emulators with different
 minimum separations in their LHSs in section~\ref{sec: error_from_lhc}, to
 which we defer remaining concerns about our approach to LHC generation.
 Additionally, we will explore the question of superior methods in
-section~\ref{sec: future_work}
-
-
-\section{Interfacing with CAMB}
-
-% camb\_interface.py
-
-This section won't actually introduce much that the reader hasn't already encountered in the section "CAMB, initial setup." This will primarily be a summary of the ``correct'' settings with a couple of new sections describing the particular functions in this script.
+section~\ref{sec: future_work}.
 
 \section{Integrating Evolution Mapping}
 \label{sec: generate_emu_data}
 
 % generate\_emu\_data.py
 
-This section will describe the process going from a Latin hypercube to a set of CAMB power spectra. We will describe how an array of six parameter values is fleshed out into a params object understood by CAMB. We will describe the procedure of modifying $h$ and $z$ until we arrive roughly at the $\sigma_{12}$ value that we desire, as well as the process of writing the \textit{actual} $\sigma_{12}$ value that we obtained back to the original hypercube. Why is this important? Because the Latin hypercube is used again later in the user\_interface.py script for the purpose of training the Gaussian emulator object.
+\textcolor{blue}{This section will describe the process going from a Latin 
+hypercube to a set of CAMB power spectra. We will describe how an array of six 
+parameter values is fleshed out into a params object understood by CAMB. We 
+will describe the procedure of modifying $h$ and $z$ until we arrive roughly 
+at the $\sigma_{12}$ value that we desire, as well as the process of writing 
+the \textit{actual} $\sigma_{12}$ value that we obtained back to the original 
+hypercube. Why is this important? Because the Latin hypercube is used again 
+later in the user\_interface.py script for the purpose of training the 
+Gaussian emulator object.}
 
 Ariel’s idea for speeding up the program: use a best-guess z which only approximates the desired sigma12. Then, when we calculate the power spectrum using this redshift, get the actual sigma12 value from CAMB and replace the LHC entry with the true value.
 We’ve implemented this now. We should definitely talk about how little of a difference that this makes. We should make error plots (comparing the two approaches with hyper cube as a control), but I strongly suspect the error will be negligible.
-
 
 
 \section{Training the Emulator}

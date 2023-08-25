@@ -13,6 +13,8 @@ Eintrag & Eintrag
  \caption[Kurzform f"ur das Tabellenverzeichnis]{Dies ist die Erkl"arung zur Tabelle.}
 \end{table}
 
+\section{Introduction to CAMB}
+
 CAMB is a Fortran code with a Python wrapper\footnote{
 \url{https://github.com/cmbant/CAMB}
 }which we will be using for the
@@ -21,6 +23,8 @@ entirety of this project.
 To introduce the reader to the scope of CAMB, we will now introduce
 some basic simulated power spectra along with a summary of the dynamic
 parameters which will be of greatest interest to us.
+
+\section{Configuring CAMB for this Project}
 
 \begin{comment}
 \textcolor{blue}{
@@ -72,6 +76,18 @@ Another paragraph I want to have in this section: stress the part of the evoluti
 
 Beware the neutrino settings. The effective number of massive neutrinos is about 3.027
 
+\section{Convenience Functions}
+
+% camb\_interface.py
+
+\textcolor{blue}{The purpose of this section is to anticipate the Python
+package Cassandra-Linear. The settings we describe in the previous section
+still technically correspond to lines of code of course, but here we tie these
+individually-treated lines into bigger functions that users can quickly use to
+get results from CAMB!}
+
+\section{Verifying Our Settings}
+
 %! This is weird, and perhaps inappropriate for a thesis document.
 
 To test this setup, we compare our results with those of Ariel S\'{a}nchez 
@@ -84,3 +100,4 @@ the accuracy of our code in this way, we proceed to experiment with the power
 spectra in order to explore solutions to the evolution mapping problem.
 
 % Aletheia Model 8 has not been integrated into our code suite yet. We can’t handle its DE weirdness. Instead of bringing up and then discarding model 8, we shouldn’t mention it at all.
+
