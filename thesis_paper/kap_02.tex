@@ -22,6 +22,7 @@ To introduce the reader to the scope of CAMB, we will now introduce
 some basic simulated power spectra along with a summary of the dynamic
 parameters which will be of greatest interest to us.
 
+\begin{comment}
 \textcolor{blue}{
 I hope to, in painstaking detail, cover many of the lines of the code that I
 have written to interface with CAMB. I will include plots to indicate, at
@@ -31,23 +32,33 @@ results, which I treated as a sort of ``ground truth''). This should also be a
 good example to flex my physics interpretation skills: why does this incorrect
 setting produce this undesired pattern?}
 
-\textcolor{blue}{You might think that this is sort of an inappropriate section
+\textcolor{blue}{You might think that this is sort of an inappropriate 
+section
 for a master's thesis (especially since I have in mind that this be a lengthy 
 section), but I would like to include it unless you feel very strongly. After 
 all, I spent several months of the project debugging at least ten different 
 ways that slight and major errors in the various settings led to 
 irreconcilable results.}
+\end{comment}
 
 \textcolor{orange}{Ariel recommends
 just talking about the correct lines, don't talk about what happens when
 they're wrong.}
 
-For example, one parameter that tripped me up for a while: neutrino mass 
+%For example, one parameter that tripped me up for a while:
+The impact of some parameters can be quite subtle, especially (we imagine)
+for users unfamiliar with the nuances of neutrino physics.
+
+Consider the neutrino mass 
 hierarchy: the options are degenerate, normal, and inverted. The CAMB 
 documentation annotates this parameter as ``(1 or 2 eigenstate 
 approximation),'' but this is somewhat unclear. Is the degenerate hierarchy 
 the single mass eigenstate approximation? Do both normal and inverted 
-hierarchies involve two eigenstates?
+hierarchies involve two eigenstates? Besides, even if this description were
+literally accurate, why does use of the normal mass hierarchy lead to
+incorrect results?
+
+% C'mon, Ariel's GOT to let me have this plot. It's a big open question!
 
 %In figure \ref{fig: spectrum_type}, we can see that requesting of the wrong
 %power spectrum type can in some low-$\omega_\nu$ cases yields errors so low
@@ -63,9 +74,13 @@ Beware the neutrino settings. The effective number of massive neutrinos is about
 
 %! This is weird, and perhaps inappropriate for a thesis document.
 
-To test this setup, we compare our results with those of Ariel S\'{a}nchez (within the native Fortran framework of CAMB) and
-Andrea Pezzotta for the first seven Aletheia cosmologies and four physical
-densities in neutrinos, for a total of 28 models. The errors are miniscule and
-recorded in figure XXY. After verifying the accuracy of our code in this way,
-we proceed to experiment with the power spectra in order to explore solutions
-to the evolution mapping problem.
+To test this setup, we compare our results with those of Ariel S\'{a}nchez 
+(within the native Fortran framework of CAMB) and Andrea Pezzotta for the
+first seven Aletheia cosmologies and four $\omega_\nu$ physical densities in
+neutrinos (\textcolor{green}{approximately} 0, 0.0006, 0.002, 0.006.), for a 
+total of 28
+models. The errors are miniscule and recorded in figure XXY. After verifying
+the accuracy of our code in this way, we proceed to experiment with the power
+spectra in order to explore solutions to the evolution mapping problem.
+
+% Aletheia Model 8 has not been integrated into our code suite yet. We can’t handle its DE weirdness. Instead of bringing up and then discarding model 8, we shouldn’t mention it at all.

@@ -8,6 +8,24 @@ Specifically, we just need to add $A_s$ to the set of cosmological parameters
 over which we train our GPR and then we can treat $\omega_\nu$ like a shape
 parameter.
 
+In producing asymptote plots, we find that our predictions line up quite well,
+but not perfectly. This may indicate that our parametrization is insufficient.
+In other words, we may need additional cosmological parameters besides the
+$A_s$ and $\omega_\nu$ and in order to fully characterize the impact of
+massive neutrinos on the power spectrum.
+
+However, the imperfect performance of our predictions may also simply
+indicate that the final form of our asymptote predictions (equation XXY) is
+only an approximation of some true (or at least more accurate) relationship
+between $A_s$, $\omega_\nu$, and the small-scale suppression of the power
+spectrum. A symbolic regression investigation could prove highly effective at
+resolving this ambiguity by efficiently searching out improved formulas. 
+However, we do not consider this a promising avenue
+for the continuation of this work (see section~\ref{future_work} for our
+recommendations), because the error on our predictions is so low. The error
+is so low here that we do not believe the imperfect predictions to
+significantly detract from the performance of the emulator.
+
 % Maybe it would make more sense to have the large cass-L chapter focus on the
 % creation of a massless-neutrino emulator and THEN a smaller chapter focusing
 % on all the changes necessary for it to become a massive-neutrino emulator.
@@ -18,7 +36,7 @@ parameter.
 
 So, our massive-neutrino emulator will be trained over six cosmological
 parameters: $\omega_b$, $\omega_c$, $n_s$, $\sigma_{12}$, $A_s$, and
-$\omega_\nu$. In other words, to predict a linear non-neutrino-matter power
+$\omega_\nu$. In other words, to predict a power
 spectrum $\hat{y}$, the emulator will accept as an input $x$ these six
 parameters.
 
@@ -35,6 +53,6 @@ evolution parameter and is therefore redundant with $\sigma_{12}$.
 % What happens to A_s in the massless-neutrino case? Is it fixed at the
 % default for model 0? I'm pretty sure it is!
 
-Remember to explain \textit{why} the prediction of these asymptotes means that $A_s$ will capture all of the unruly behavior of neutrinos. What theory motivates such a judgment? Or are we only guessing?
-
-
+\textcolor{orange}{Remember to explain \textit{why} the prediction of these 
+asymptotes means that $A_s$ will capture most of the unruly behavior of 
+neutrinos. What theory motivates such a judgment? Or are we only guessing?}
