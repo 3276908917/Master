@@ -13,10 +13,6 @@ from cassL import camb_interface as ci
 
 model0 = ci.cosm.loc[0]
 
-# AndreaP thinks that npoints=300 should be a good balance of accuracy and
-# computability for our LH.
-NPOINTS = 300
-
 A_S_DEFAULT = 2.12723788013E-09
 
 # These values help with the following function.
@@ -98,6 +94,7 @@ def evaluate_cell(input_cosmology, standard_k_axis, debug=False):
     I concede that the function looks like a mess right now, with debug
     statements littered all over the place.
     """
+    num_k_points = len(standard_k_axis)
     # This allows us to roughly find the z corresponding to the sigma12 that
     # we want.
 
@@ -118,7 +115,7 @@ def evaluate_cell(input_cosmology, standard_k_axis, debug=False):
         print("\n")
 
     _, _, _, list_sigma12 = ci.evaluate_cosmology(MEMNeC, _redshifts,
-        fancy_neutrinos=False, k_points=NPOINTS, hubble_units=False)
+        fancy_neutrinos=False, k_points=num_k_points, hubble_units=False)
 
     #print(list_s12)
     if debug:
@@ -162,11 +159,11 @@ def evaluate_cell(input_cosmology, standard_k_axis, debug=False):
 
     k, _, p, actual_sigma12 = ci.evaluate_cosmology(input_cosmology,
         redshifts=np.array([z_best]), fancy_neutrinos=False,
-        k_points=NPOINTS) 
+        k_points=num_k_points) 
     if input_cosmology['omnuh2'] != 0:
         _, _, _, actual_sigma12 = ci.evaluate_cosmology(MEMNeC,
             redshifts=np.array([z_best]), fancy_neutrinos=False,
-            k_points=NPOINTS)
+            k_points=num_k_points)
     # De-nest
     actual_sigma12 = actual_sigma12[0]
 
@@ -273,7 +270,7 @@ def fill_hypercube(parameter_values, standard_k_axis,
     if cell_range is None:
         cell_range = range(len(parameter_values))
     if samples is None:
-        samples = np.zeros((len(parameter_values), NPOINTS))
+        samples = np.zeros((len(parameter_values), len(standard_k_axis))
 
     # Recent change: now omega_nu comes last
 

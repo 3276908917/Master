@@ -4,20 +4,19 @@ from cassL import user_interface as ui
 
 massive_neutrinos=True
 
-emu_stage = "test"
+emu_stage = "train"
 # Technically, this variable is not very user-friendly anymore, because we often
 # use hypercubes from older versions...
-emu_vlabel = "Hnu2_5k"
+emu_vlabel = "Hnu2_5k_100scales"
 hc_vlabel = "5k_massive"
-fending = "knockoff.npy"
+fending = ".npy"
 
-file_suffix = emu_vlabel + "_" + emu_stage + "_" + fending
+file_suffix = emu_vlabel + "_" + emu_stage + fending
 
-standard_k = np.load("current_data_files/standard_k.npy", allow_pickle=True)
-hc = np.load("../best_lhc_unit_" + hc_vlabel + "_" + emu_stage + "_" + fending,
+standard_k = np.load("data_sets/k/100k.npy", allow_pickle=True)
+hc = np.load("../best_lhc_unit_" + hc_vlabel + "_" + emu_stage + fending,
     allow_pickle=True)
-param_ranges = ui.get_param_ranges(priors="COMET",
-    massive_neutrinos=massive_neutrinos)
+param_ranges = ui.get_param_ranges(prior_name="COMET_with_nu")
 # del param_ranges["sigma12"]
 #param_ranges["sigma12_root"] = [0.4472135954999579, 1]
 
