@@ -3,17 +3,13 @@ I'll still need to read that COMET paper
 These emulators need to be available on all devices:
 $ MEGA priors, 5k emulator
 	WE'RE STILL USING THE INTERPOLATOR FOR THIS ONE
-	EXCEPT THE QUICK RUN SCRIPT SEEMS TO CONTRADICT ME...
-	MAYBE SOME OF THE TEST CUBE RESULTS ARE DIRECT EVALUTION??
-	IN WHICH CASE WE NEED TO COMPLETELY REDO
-	ALSO THE PRIORS LOOK WRONG ANYWAY...
-	THIS RUN IS PROBABLY WRONG
 	$ train on laptop, test BRIEFLY
 	$ needs its own test cube
 > Classic priors, 5k emulator
-	>> train
+	$ train
 	* test BRIEFLY
-	* needs its own test cube
+	>> needs its own test cube
+	WE'RE STILL USING THE INTERPOLATOR FOR THIS ONE
 * COMET priors, more samples
 	FOR ALL NON-5Ks, I'M USING DIRECT EVALUATION
 	$ 5k emulator (300 k points)
@@ -48,26 +44,30 @@ $ MEGA priors, 5k emulator
 		* fill train
 		* fill test
 	* Comet 5k, 200 k points
-		* fill train
-		* fill test
-	* Comet 5k, 100 k points? 250? 150? Let's do 100 for now
 		>> fill train
 		* fill test
+	* Comet 5k, 100 k points? 250? 150? Let's do 100 for now
+		$ fill train
+		$ fill test
 
 * Runs of varying LHC-quality
+	* We should always use the same test cube
+
 	* Worst of the worst
-	* Middling
-	* Best that we found
+		* buil
+		* fill
+	* Middling 1
+		* buil
+		* fill
+	* Middling 2
+		* buil
+		* fill
+	* Best that we found: just re-use the standard 5k 300k
 	* (No extra test cubes necessary--we should always be comparing to the same
 		cube)
 	* In case the resulting plot is too coarse, we can always subdivide this
 		interval further; the coarseness I have suggested right now is
 		purely due to the limited time we have.
-
-$ Ariel needs to get back to me about the seminar.
-
-Andrea needs to give me the summary of the results of last year's
-	workshop
 
 I'm really struggling with the terminology and math.
 	Maybe we should make flash cards?

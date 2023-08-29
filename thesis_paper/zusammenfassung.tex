@@ -27,17 +27,29 @@ the parameter space by identifying many cosmological parameters as basically
 the same in their impact on the power spectrum.
 
 The evolution mapping scheme of \cbib{San21} has already achieved success in
-emulators of the nonlinear power spectrum. However, evolution mapping has 
+emulators of the nonlinear power spectrum. However, massive neutrinos do not
+fit neatly into the scheme. Consequently, emulators implementing evolution
+mapping have typically fixed the physical density of the Universe in 
+neutrinos, $\omega_\nu$, to zero.
 
-his work seeks to extend the
-evolution mapping scheme to massive-neutrino cosmologies by applying a
-correction
-factor to results from emulators built on massless-neutrino simulations. We
-find that the scalar mode amplitude $A_s$ can be used to quantify the
-suppression of structure growth due to massive neutrinos. Consequently, by
-including this parameter, we can successfully train over the physical density
-of the universe in massive neutrinos. We introduce a new emulation code,
+This work seeks to extend the evolution mapping scheme to massive-neutrino 
+cosmologies through expansion of the parameter space over which the emulator
+is trained. In particular, we find that the scalar mode amplitude $A_s$, which
+is traditionally treated as an evolution parameter and therefore excluded from 
+the parameter space. can be used to quantify the suppression of structure 
+growth due to massive neutrinos.
+
+We find that, by including $A_s$ in our parameter space, we can successfully 
+train over the physical density of the universe in massive neutrinos. We introduce a new emulation code,
 Cassandra-Linear, which combines this expanded parameter space with evolution
 mapping. We include various error statistics and show that the emulator
 performs roughly at the level of error associated with CAMB itself
 \textcolor{green}{Do I have a citation for the error associated with CAMB?}
+
+\textcolor{orange}{Why does this work? Before, the shape impact of
+$\omega_\nu$ 
+was $z$-dependent. In other words, if we held $\omega_nu$ constant and varied
+$z$, the power spectrum would not vary only in overall amplitude. However, if
+we fix $\omega_\nu$ and $A_s$, $z$ becomes an evolution parameter again. Why
+does fixing $A_s$ accomplish this? That's something for the theorists to 
+figure out!}

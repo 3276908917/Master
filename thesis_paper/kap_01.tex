@@ -64,7 +64,9 @@ IT’s MORE COMPLICATED THAN THAT—TALK ABOUT FLATNESS OF UNIVERSE and critical
 h = H_0 \, \frac{1}{100 }
 \end{equation}
 
-For example, the Planck best-fit value for H_0,  $67 \, \frac{\mathrm{km} / \mathrm{s}}{\mathrm{Mpc}}$, corresponds to the $h$ value $0.67$. 
+For example, the Planck best-fit value for $H_0$,
+$67 \, \frac{\mathrm{km} / \mathrm{s}}{\mathrm{Mpc}}$,
+corresponds to the $h$ value $0.67$. 
 
 Unfortunately, this normalization has its disadvantages. WHAT ARE THEY. In particular, in the context of parameter inference, it is inconvenient to have a parameter composed of other 
 
@@ -131,6 +133,11 @@ right?}
 (2 \pi)^3 \delta_D^{(3)} (\bm{k}_2 \ \bm{k}_1) P(\bm{k})
 \end{equation}
 
+\textcolor{orange}{WE SHOULD DEFINITELY incorporate some of ARIEL'S DISCUSSION 
+OF THE BAO 
+(``WHY ARE THERE
+WIGGLES IN THE POWER SPECTRUM'') AND WE SHOULD DO ENOUGH OF THE MODE / HORIZON
+DISCUSSION TO ELUCIDATE THIS CONCEPT OF A TURNOVER SCALE!!!}
 
 \section{Boltzmann Solvers and CAMB}
 
@@ -273,7 +280,13 @@ from \cbib{San21}:
     \Delta^2_L (k | z, \Theta_s, \Theta_e)
     =
     \Delta_L^2 (k | \Theta_s, \sigma_{12} \left( z, \Theta_s, \Theta_e \right))
-\end{equation}
+\end{equation}\footnote{Varying $z$ has the same effect as varying an
+evolution parameter, which is why it appears on the RHS only as an argument to
+the $\sigma_{12}$ ``function.'' We write it separately from $\Theta_e$ to
+emphasize that $z$ does not describe a property of the Universe, but is
+simply used as a proxy here for \textcolor{red}{conformal?} time
+\textcolor{red}{elapsed since the Big Bang? (but we can only observe up to
+$z = 1100$...)}.}
 
 Why is this scheme important? Evolution mapping greatly simplifies the emulator
 implementation. Because we can
@@ -288,8 +301,6 @@ $f \sigma_{12}(z)$ will be identical'' (\cbib{San21}).
 Now, for the hiccup, which segues into the next section: this scheme is broken by one parameter, the Universe's
 density in neutrinos. (In the next section: why this is so and what we can do
 about it.)
-
-%%%
 
 Three shape parameters of core interest to this paper are the physical density in baryons $\omega_b$ (whose impact on the power spectrum is shown in figure~\ref{fig: omega_b_dependence}), the physical density in cold dark matter $\omega_c$ (figure~\ref{fig: omega_c_dependence}), and the spectral index $n_s$, (figure~\ref{fig: ns_dependence}). The remaining parameters $\sigma_{12}$ and $A_s$, as well as the quantities $z$ and $h$, all shift only the amplitude of the power spectrum, as illustrated in figure~\ref{eq: sig12_dependence}. 
 
