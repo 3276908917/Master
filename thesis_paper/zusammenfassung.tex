@@ -12,10 +12,25 @@ back and looking through the papers I used to get started with this project.}
 \textcolor{red}{I have some confusion about this area and I would appreciate
 feedback from the proofreader.}
 
+\textcolor{red}{I feel like the extreme simplifications in the next paragraph
+would be helpful for someone with no idea about this field, but what do you
+think? Maybe they would be more appropriate for easing the reader into
+particular sections on these topics?}
+
 ``The goal of this project is to produce an emulator of the linear-theory
 power spectrum based on evolution mapping'' (A. G. S\'{a}nchez, private
-communication). In particular, this paper seeks to extend the evolution
-mapping scheme of \cbib{San21} to massive-neutrino cosmologies by applying a
+communication). An emulator can be thought of as a multi-dimensional function
+produced by interpolation across many training points $(x, y)$. The power
+spectrum can be thought of as a statistical description of the ``clumpiness''
+of matter in the Universe. Evolution mapping is a technique for simplifying
+the parameter space by identifying many cosmological parameters as basically
+the same in their impact on the power spectrum.
+
+The evolution mapping scheme of \cbib{San21} has already achieved success in
+emulators of the nonlinear power spectrum. However, evolution mapping has 
+
+his work seeks to extend the
+evolution mapping scheme to massive-neutrino cosmologies by applying a
 correction
 factor to results from emulators built on massless-neutrino simulations. We
 find that the scalar mode amplitude $A_s$ can be used to quantify the

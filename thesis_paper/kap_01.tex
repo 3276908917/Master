@@ -1,8 +1,76 @@
 \chapter{Introduction, Theory, and Background}
 
-I have a lot of different important concepts that I need to get through, so I can easily imagine this becoming a relatively long introduction compared to other master's theses.
+\textcolor{blue}{I have a lot of different important concepts that I need to 
+get through, so I can easily imagine this becoming a relatively long 
+introduction compared to other master's theses.}
+
+A primary goal of cosmology is to specify, as narrowly as possible, the 
+parameters which define our Universe. These include, for example, the overall 
+curvature of the Universe as well as its cold dark matter (CDM) content. These
+parameters determine the full evolution of the Universe after the inflationary
+period (whose beginnings were non-deterministic). \textcolor{green}{citation.
+Probably we can get something from a Komatsu paper.} For example, depending on
+the makeup of the Universe--how much of its total energy budget exists in the
+form of each `ingredient' (cold dark matter, radiation, etc.)--the Universe
+can have a finite lifetime. When the proportion of matter is high enough,
+gravity will cause the Universe to collapse again on itself. By contrast, if
+the proportion of dark energy is high enough, the Universe will continue to
+accelerate in its expansion forever.
+
+Cosmology has rapidly evolved into a high-precision science. For example, with
+COBE (1989-1993) followed by WMAP (2001-2010) followed by Planck (2009-2013),
+the uncertainties on several cosmological parameters have been tightened
+significantly.
+\textcolor{red}{Should I try to offer concrete examples of how these missions
+increased the precision on our parameter values? I feel like that might not be
+a good use of space in the intro.}
+
+Ultimately, the goal of this work is to speed up the kinds of statistical
+analyses which are necessary to tighten these uncertainties.
+These analyses compare our cosmological observations to what we
+would expect to see if we solved the equations of cosmological evolution with
+different values for parameters.
+
+\section{Brief Glossary of Our Cosmological Parameters}
+\label{sec: param_glossary}
+
+\textcolor{blue}{We need to explain what the different parameters mean! The
+big omega terms are likely to be more familiar to readers, we can start with 
+those.}
+
+We will get more specific about terms like ``cosmological observations''
+and ``what we would expect to see'' in the next section (\ref{sec: Pk_intro}, 
+on the matter power spectrum). First, we should briefly introduce concrete
+examples of cosmological parameters in which we are interested.
+
+In this work, we will concentrate on different parameters to different 
+extents.
+
+The most important parameters for this work are $\omega_b$, $\omega_\text{CDM}$, $\omega_\nu$, and $n_s$.
+
+$h$, $z$, and $A_s$ are means to ends
+
+$\omega_k$, $\omega_\text{DE}$, $w_0$, $w_a$ make only minor appearances.
+
+{segue from power spectrum discussion?} There is another facet to densities that will be conceptually important to this work: densities $\rho_i$ of different energy species. Similarly to before, it is common to define a related quantity $\Omega_i$ that is normalized, although here the normalization is enforces
+
+\begin{equation}
+\sum_i \Omega_i = 1
+\end{equation}
+
+IT’s MORE COMPLICATED THAN THAT—TALK ABOUT FLATNESS OF UNIVERSE and critical densities. These $\Omega_i$ parameters are referred to as “fractional energy densities.” The constant of normalization is simply $h^2$. $h$ is merely a different 
+
+\begin{equation}
+h = H_0 \, \frac{1}{100 }
+\end{equation}
+
+For example, the Planck best-fit value for H_0,  $67 \, \frac{\mathrm{km} / \mathrm{s}}{\mathrm{Mpc}}$, corresponds to the $h$ value $0.67$. 
+
+Unfortunately, this normalization has its disadvantages. WHAT ARE THEY. In particular, in the context of parameter inference, it is inconvenient to have a parameter composed of other 
+
 
 \section{The Matter Power Spectrum}
+\label{sec: Pk_intro}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%  Einbinden einer Grafik  %%
@@ -14,11 +82,55 @@ I have a lot of different important concepts that I need to get through, so I ca
   \caption[Kurzform f"ur das Abbildungsverzeichnis]{Dies ist die Erkl"arung zum Bild.}
 \end{figure}
 
-A primary goal of cosmology is to specify, as narrowly as possible, the parameters which define our Universe. These include, for example, the overall curvature of the Universe as well as its cold dark matter (CDM) content.
+How can we describe the Universe in such 
+a way as to allow quantitative definitions of these phrases? As a starting 
+point, we can imagine quantifying the energy density $\rho(\bm{x})$ of the
+Universe at any one point $\bm{x}$ in three-dimensional space.
 
-Next, I want to talk about one way of describing the matter density contrast field, the power spectrum. The power spectrum can be probed in many different ways, and its precise shape and amplitude can tell us about several of these cosmological parameters.
+Let us return to the idea that cosmological parameters determine the the 
+evolution of the Universe.
+% In what ways can we quantify the Universe, in order to be able to describe
+% its evolution? We can simply consider the time dependence of the density.
 
-Actually, the power spectra we are discussing in this thesis are linear-theory power spectra of non-neutrino matter. But anyway, here I will cover some of the tried-and-true basic explanations of what the power spectrum is and why it is interesting for the question of parameter inference. I also want to discuss: why do we care about the linear-theory power spectrum? Why not jump straight to the nonlinear case?
+We can define a similar quantity, a relative density:
+
+\begin{equation}
+\delta(\bm{x}) = \frac{\rho(\bm{x}) - \bar{\rho}}{\bar{\rho}}
+\end{equation}
+
+which we refer to as the ``matter density contrast field.'' $\bar{\rho}$
+represents the average energy density of the entire Universe.
+
+$\delta(\bm{x})$ easier than $\rho(\bm{x})$ to work with since it
+is unitless and especially because it is normalized--the integral of the
+matter density contrast field, taken over the entire Universe, is unity. One particularly popular metric is the cosmic matter density 
+contrast field. evolution of the Universe? The various constituents of the Universe 
+
+Next, I want to talk about one way of describing the matter density contrast 
+field: the power spectrum. The power spectrum can be probed in many different 
+ways, and its precise shape and amplitude can tell us about several of these 
+cosmological parameters.
+
+Actually, the power spectra we are discussing in this thesis are linear-theory
+power spectra of non-neutrino matter. \textcolor{blue}{But anyway, here I will cover some of 
+the tried-and-true basic explanations of what the power spectrum is and why it 
+is interesting for the question of parameter inference. I also want to 
+discuss: why do we care about the linear-theory power spectrum? Why not jump 
+straight to the nonlinear case?}
+
+\textcolor{red}{The argument on the exponential should be a dot product, 
+right?}
+
+\begin{equation}
+\tilde{\delta} (\bm{k}) = \int d^3 x \delta(\bm{x}) \exp(-i \bm{k} \bm{x})
+\end{equation}
+
+\begin{equation}
+\langle \tilde{\delta} (\bm{k}_1) \tilde{\delta} (\bm{k}_2)^* \rangle
+=
+(2 \pi)^3 \delta_D^{(3)} (\bm{k}_2 \ \bm{k}_1) P(\bm{k})
+\end{equation}
+
 
 \section{Boltzmann Solvers and CAMB}
 
@@ -62,9 +174,11 @@ limitation is that the emulator has to be built with every possible parameter
 in mind that an end-user could wish to vary. Yet there is a large number of
 different cosmological parameters discussed in the modern literature.
 ``Currently available emulators only sample a few cosmological parameters,
-often with restrictive ranges, and are not applicable to more general parameter
+often with restrictive ranges, and are not applicable to more general
+parameter
 spaces'' (\cbib{San21}). ``Due to the high computational cost of the required
-simulations, [...] current emulators leave out parameters such as the curvature
+simulations, [...] current emulators leave out parameters such as the
+curvature
 of the Universe or dynamic energy models beyond the standard CPL
 parametrization'' (\cbib{San21}).
 
@@ -72,7 +186,7 @@ I'll talk a little about different emulators currently available, such as COMET.
 
 % (This is good news because the evolution mapping approach greatly simplifies the parameter space, and enhances the accuracy), which is the subject of the next section.
 
-\section{Emulation Platform: Gaussian Processes}
+\section{Gaussian Process Regression}
 
 % What is a Gaussian Process?
 
