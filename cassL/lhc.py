@@ -314,6 +314,10 @@ def nearness_comparator(target):
 
     #! Should we implement error checking here?
     """
-    comparator = lambda a, b: np.abs(a - target) < np.abs(b - target):
+    comparator = lambda a, b: np.abs(a - target) < np.abs(b - target)
     return comparator
+
+def minimum_separation(samples):
+    dist = cdist(samples, samples, metric='euclidean')
+    return np.amin(dist[dist > 0])
 

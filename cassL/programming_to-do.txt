@@ -1,0 +1,13 @@
+0. LHC.py needs to be rewritten until we can track the increase in cube
+    performance over x trials.
+-------- After thesis
+1. Collapse old functions
+    a. Model / wrapper comparisons in camb_interface.py
+    b. Get rid of Andrea code in camb_interface.py
+    c. LHC.py should really only consist of build_LHCs and get_comparator
+        endless_mode can be a flag, otherwise we take the best of x cubes
+        unit can be a flag, otherwise we scale according to given priors
+2. Documentation for EVERY function, in line with the format used in COMET
+3. 
+4. Unit tests for EVERYTHING
+
