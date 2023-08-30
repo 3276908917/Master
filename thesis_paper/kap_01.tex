@@ -241,8 +241,6 @@ Three shape parameters of core interest to this paper are the physical density i
 
 This will mostly just be a theoretical discussion of these solvers. The hands-on stuff comes in the non-introductory section on CAMB.
 
-I will also mention a couple of specific Boltzmann solvers, like CLASS and CAMB. I will briefly justify our use of CAMB over CLASS.
-
 %%%
 
 In essence, Boltzmann codes solve XXX in order to give us the power spectrum
@@ -254,6 +252,24 @@ Several parameters have fairly unique impacts on the power spectrum.
 Therefore, we can imagine building a collection of power spectra labeled by
 their parameter configurations and comparing our real-world observations to
 them. This should allow us to perform parameter inference.
+
+To conclude this section, we make mention of three specific Boltzmann solvers: 
+CLASS, CAMB, and CMBFast.
+CAMB was written in Fortran and comes with a Python wrapper which we
+will use as a starting point (along with GPy) for our Python package
+Cassandra-Linear.
+
+CLASS was written in C and also comes with a Python wrapper.
+%I will briefly justify our use of CAMB over CLASS.
+% Most of our existing emulator pipeline (including the emulator 
+% COMET\footnote{\textcolor{green} {Double check this, does COMET actually 
+% rely on CAMB?}}) DOES THIS EVEN MATTER?
+For this project, we elected to continue with CAMB as the scientists at
+OPINAS at the MPE were better equipped to provide support with CAMB.
+\textcolor{green}{Furthermore, the CLASS documentation
+is not nearly as strong as it is with CAMB, and we already encountered
+extreme difficulty simply in recreating results already previously obtained
+via CAMB!}
 
 \section{Monte Carlo Markov Chains}
 
