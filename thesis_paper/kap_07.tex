@@ -1,0 +1,74 @@
+\chapter{Discussion and Conclusion}
+\label{chap: disc_and_conc}
+
+\section{Tightness of the Priors Used}
+\label{sec: priors}
+
+With this section I would like to revisit the specific values for the priors,
+that I only briefly mentioned back in section~\ref{sec: build_lhc}.
+
+First of all, from a purely practical consideration, expanding the priors was
+not feasible due to the high incidence of unsolvable cells.
+
+But second, this may not be a significant limitation to the utility of the
+emulators introduced here, because they are already quite wide compared to
+current state-of-the-art parameter inferences. \textcolor{green}{CITATIONS}.
+
+\section{Minimum Separation of the Training LHC}
+\label{sec: error_from_lhc}
+
+What is the impact of the minimum separation? Surely the minimum separation
+should be a proxy for the evenness of the coverage of the space of
+cosmologies. Therefore, we expect the error variance to increase much more
+dramatically than, say, the average bias.
+
+How would we
+be able to quantify the error due to this? We could try to compare the
+emulator performance trained on hyper cubes of various minimum distances.
+
+\section{Resolution of the k Axis}
+
+This might go better in the CassL section, but I think I ought to motivate the decision to use length-300 arrays.
+
+\section{Number of Training Samples}
+\label{sec: num_samples}
+
+\textcolor{blue}{Justify choice of 5000 samples for each: maybe we can make a
+trend plot showing diminishing returns in test error?}
+
+% This might go better in the CassL section, but I think I ought to motivate the decision to use 5000 training arrays.
+
+\textcolor{orange}{I'll have to concede that the results of this section are not entirely comprehensive; we didn't train any emulators over the uncertainties of analogous validation hypercubes. All comparisons here use the simpler pipeline of just two data sets, training and testing.}
+
+
+\section{Linear Sampling in Different Parameters}
+
+We also tried sampling in $\sigma_{12}^2$ as well as $\sqrt{\sigma_{12}}$.
+Unfortunately, we were unable to conclude anything about the effectiveness of
+these strategies--there appears to have been some mistake in our code, such
+that the errors are much larger than can be explained on account of poor
+sampling.
+
+See figures~\ref{fig: sigsquare_sample} and~\ref{fig: sigroot_sample} for
+illustrations of the problem. In a future work, it would be helpful to
+investigate these problems further. We may find that a different sampling
+strategy will more efficiently reduce the deltas that we see in our emulator.
+
+\section{Summary of the Paper}
+
+What was the main objective of this thesis? What were the key results of this work? Why are they important? How do these results compare with results from papers on similar subjects?
+
+\section{Future Work}
+\label{sec: future_work}
+
+Here I will talk about what kinds of questions we estimate will be most fruitful for further inquiries about this topic and this code.
+
+Is there a theoretically perfect LHC generator?
+
+In order to expand the priors, it would be helpful to investigate why CAMB does not allow negative redshifts, in case this can be adapted. Alternatively, CLASS \textcolor{green}{allows} negative redshifts, so it may be worthwhile to repeat the work of this thesis using power spectra from CLASS. This would involve familiarization with a new platform, however, and so this escapes the scope of this thesis. Remember that negative redshifts would be a helpful feature for this work because it would allow us to investigate much broader priors.
+
+Should we use a neural network instead of a Gaussian process for our emulator? AndreaP and Alex Eggemeier are already on the job: they are converting COMET to a neural network approach. We recommend that the reader follow future COMET papers for investigations into this question.
+
+GP's allow natural propagation of
+uncertainty in predictions to the final posterior distribution; neural
+networks lack this feature. At the same time, NNs provide larger speedups \textcolor{green}{CITATIONS}.

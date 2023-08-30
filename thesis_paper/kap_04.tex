@@ -1,26 +1,4 @@
-\chapter{Cassandra-Linear: a Python Package}
-
-\textcolor{blue}{This will be a rather long, dry, and technical section with 
-subsections based on each of the core scripts making up the Python package \
-that I have been developing. It will in some ways paraphrase and summarize the 
-documentation, explaining the basic use of the package as well as important 
-limitations. Of course, fairly early on in this section, there will be a 
-footnote linking to my GitHub repository, which will be made public once I'm 
-ready to hand in this thesis.}
-
-\textcolor{blue}{Even if my code doesn't end up in a bigger repository, I 
-nevertheless think that it's important to the scientific process that I 
-describe in detail the code that I have written. Besides, if any readers want 
-to experiment specifically with the ideas discussed in this thesis, they may 
-find my code more accessible because it is, in a sense, "single-purpose"--that 
-is to say, written almost exclusively to investigate the topics of this 
-paper.}
-
-\textcolor{orange}{It only takes a couple of sentences, but we also need to 
-describe how to install the package.}
-
-\section{Conceptual Outline}
-\label{sec: cassL_concept}
+\chapter{Conceptual Outline of Our Emulator Code and Pipeline}
 
 \textcolor{blue}{The point of this section is to introduce the reader to the
 basic structure of the emulator pipeline. Most of the discussion will follow
@@ -65,10 +43,10 @@ have prepared \textcolor{orange}{some} plots in section~\ref{sec: 2emu_improveme
 Conclude this section by saying that this integration of multiple emulators into one user-facing script can be further exploited with, for example, different emulators for different neutrino mass hierarchies.
 
 \subsection{Unit LHCs}
-\label{sec: unit_lhc}
+\label{sec: lhc_flow_chart}
 
 The \verb|pyDOE2| function that we will use to generate our LHCs
-returns a result with entries that range from zero to unity. These unit LHCs 
+returns a result with entries that range from zero to unity. These unit LHCs
 will eventually be used to create a set of cosmological
 configurations which will act as the $X$ data set when we train our emulator.
 
@@ -87,15 +65,31 @@ in~\ref{sec: generate_emu_data}.
 
 
 \subsection{Default Priors}
+\label{sec: default_priors}
 
 % One reason this goes here: priors show up in almost every script,
-% so there isn't a great cass-L subsection in which to put this.
+% so there isn't a great cass-L section in which to put this.
 
 The priors that we use correspond to those currently used by COMET. \textcolor{orange}{Should I spend any time defending this choice here, or should I put all of the defense in section~\ref{sec: priors}?}
 
+As we will explain in section~\ref{sec: build_lhc}, our code generates unit 
+Latin hypercube samples so that a single hypercube can be used to build 
+several different emulators simply by using a different set of priors to 
+rescale the cube.
+
 \textcolor{orange}{Table goes here.}
 
-\subsection{Emulation over Uncertainties}
+In tables XXX-XXZ, we provide the specific upper and lower bounds for each of
+the six cosmological parameters over which our massive-neutrino emulator is 
+trained. All intervals are sampled uniformly, \textcolor{orange}{Although some
+experimental code exists to interpret the same hypercube as a uniform sampling
+in root or square space, for example}. The ``MEGA'' priors 
+(table~\ref{tab: priors}) represent the original goal for this project, which 
+unfortunately suffered from too many unsolvable cells. In
+section~\ref{sec: generate_emu_data}, we will describe what it means for a 
+cell to be unsolvable.
+
+\section{Emulation over Uncertainties}
 
 For a further step of accuracy, we can add a third data set to our pipeline
 and introduce a second layer of emulation.
@@ -120,167 +114,3 @@ the space of priors over which the main emulator was trained.}
 Currently, we are 
 using the validation hypercube more as a test hypercube: we compute the uncertainties at discrete points and examine these uncertainties (e.g. with
 scatterplots and histograms) to assess the performance of the emulator.}
-
-\section{Building the Latin Hypercube}
-\label{sec: build_lhc}
-
-% lhc.py
-
-\textcolor{blue}{This section will briefly recapitulate some of the Latin hypercube sampling
-explanation from the introduction. Then we will talk about how this sample is
-procured in practice, and what our ``solution'' (inelegant though it may be)
-is to obtaining a sample with a decent minimum separation between the points
-(remember to briefly repeat why this is important).}
-
-In this section, we will discuss the building of LHSs, which within the
-Cassandra-linear is handled by the \verb|lhs.py| script.
-By ``LHSs,'' we are here referring exclusively to the
-sample of cosmologies for which we want to compute power spectra.
-However, as mentioned in section~\ref{sec: unit_lhc}, at this stage we are not
-yet committing to a particular set of priors. Instead, each axis is sampled
-from the uniform distribution $\mathcal{U} (0, 1)$.
-
-We'll also describe the switch from a rescaled Latin hypercube to a unit Latin hypercube that we later interpret differently according to the specified priors.
-
-Each entry in our LHS will be either a four- or six-dimensional vector, 
-depending on the emulator's support for massive neutrinos. When building a
-massless-neutrino emulator, a single LHS entry will describe the $\omega_b$,
-$\omega_\text{CDM}$, $n_s$, and $\sigma_{12}$ values for that cosmology in 
-this order. When building a massive-neutrino emulator, a single LHS entry will 
-additionally describe the $A_s$ and $\omega_\nu$ values for that cosmology, 
-again in this order.
-
-To get started generating LHSs, we integrated demonstration code written by 
-Daniel Farrow \text{red}{(and who else?) add these people to the Danksagung} 
-during the CAKE 2021 workshop. We begin by invoking the \verb|lhs| function of
-\verb|pyDOE2| a number of times. Each time we get a random new unit LHC, whose
-spacing we analyze with the \verb|cdist| function from
-\verb|scipy.spatial.distance|.  Recall from section~\ref{sec: lhc_theory} that
-our sample more evenly covers the sample space if the minimum separation 
-between the sample points increases. \textcolor{green}{Uneven separations will
-result in excess error depending on the location of the cosmology in parameter
-space}. Therefore, from among the numerous calls of \verb|lhs| we select the
-hypercube sample with the largest minimum separation.
-
-In order to maximize the number of random hypercubes generated per unit of
-wall time, we have written a multithreaded function called
-\verb|multithread_unit_LHC_builder| \textcolor{orange}{Keep your eye on this
-one, I'm thinking about condensing lhc.py to just a couple of functions.}
-Through the function parameter \verb|num_workers| the user is free to assign
-any number of CPU threads to the task, so in principle the computer can be
-wholly dedicated to the optimization of the LHS. This function represents an
-unending query for LHSs. The user will be notified via command
-line printout whenever an LHS has been generated whose minimum separation is
-higher than the previous record value. Whenever such a superior LHS is
-encountered, the function writes the LHS to a file and continues. Therefore,
-the user may run this script in the background and terminate whenever. The
-function always writes LHSs to the same file, so each new record-setting LHS
-overwrites the old one. When the user terminates the function, whatever output
-file remains represents the best LHS seen since the function was first called.
-
-\begin{comment}
-The \verb|cdist| function can be re-used to compare LHSs loaded from 
-different
-files. However, since there is generally little reason to keep old LHSs
-(except, perhaps, to reconstruct specific emulators), it reduces clutter to
-simply continue overwriting the same file. Therefore, the function
-\verb|multithread_unit_LHC_builder| also includes a parameter
-\verb|previous_record|, which is recommended whenever the user would like to
-stop the function and then resume it later. In such a case, the parameter
-should be set to the \verb|cdist| value of the exis}
-\end{comment}
-
-% I've got a better idea: the function should automatically ask the user if
-% he's sure, in the case that we find a file under the name under which we
-% intend to write. If the user is sure, we take the cdist of that existing
-% file and use it as the previous record!
-
-% we multithreaded the Python script to spawn 12 workers on an 11th gen Intel i7-11700 @ 2.50 GHz. IF YOU ARE USING THE WORK DESKTOP
-
-As of the current (as of \textcolor{orange}{24.08.2023}) version of the
-Cassandra-Linear code, this brute-force approach is the method used to build
-the Latin hypercube samples eventually used to train the emulators. To 
-understand the computational and wall-time costs associated with our
-brute-force solution, we include plots XXY and XXY.
-
-\begin{comment} % The following paragraph says this stuff better
-we left the system to run for three consecutive days. In this time, the 
-largest minimum separation that we generated was approximately 0.08022.  
-Recall from section sec_B1 that the theoretical best possible value for this 
-setup is approximately 0.24183. It would have been more meaningful if you had 
-counted the total number of function calls, but it isn’t too late to set up 
-such a run. So, even after assigning a relatively large amount of compute to 
-this brute force solution, we fail to obtain an LHC of even a third of the 
-best minimum separation.
-\end{comment} 
-
-Remember from section~\ref{sec: lhc_theory} that we have an equation for the
-best possible minimum separation that we can achieve with a Latin hypercube
-of some given dimension and total number of samples. Let us consider a massless-neutrino emulator (a total of four dimensions per cosmology vector)
-trained over five-thousand CAMB spectra. If we plug in $d = 4$ and $N=5000$,
-we get XXY. Similarly, for our massive-neutrino emulator (a total of six 
-dimensions per cosmology) trained over the same number of spectra, we find a 
-theoretical best minimum-separation of XXY. 
-
-It is based on figures XXY and XXY that we may claim that our approach is
-inefficient and not well-suited to the approach of finding LHCs with large
-minimum separations. As mentioned in section~\ref{sec: lhc_theory},
-we value a high minimum separation because it means we are sampling the
-space of cosmologies evenly rather than oversampling particular regions.
-Therefore, we expect the consequence of a low minimum separation in the LHC to
-be a higher error variance as well as a slightly higher average bias.
-
-% One could argue that the variance in oversampled regions will decrease to
-% compensate, right? I need to clarify that the decrease in variance in the
-% oversampled regions would not be able to compensate the increased variance
-% in the undersampled regions, because the space of power spectra is
-% continuous, so closely spaced points reveal less about the true function
-% than well spaced points.
-
-Later, we will test our expectations by comparing emulators with different
-minimum separations in their LHSs in section~\ref{sec: error_from_lhc}, to
-which we defer remaining concerns about our approach to LHC generation.
-Additionally, we will explore the question of superior methods in
-section~\ref{sec: future_work}.
-
-\section{Integrating Evolution Mapping}
-\label{sec: generate_emu_data}
-
-% generate\_emu\_data.py
-
-\textcolor{blue}{This section will describe the process going from a Latin 
-hypercube to a set of CAMB power spectra. We will describe how an array of six 
-parameter values is fleshed out into a params object understood by CAMB. We 
-will describe the procedure of modifying $h$ and $z$ until we arrive roughly 
-at the $\sigma_{12}$ value that we desire, as well as the process of writing 
-the \textit{actual} $\sigma_{12}$ value that we obtained back to the original 
-hypercube. Why is this important? Because the Latin hypercube is used again 
-later in the user\_interface.py script for the purpose of training the 
-Gaussian emulator object.}
-
-Ariel’s idea for speeding up the program: use a best-guess z which only approximates the desired sigma12. Then, when we calculate the power spectrum using this redshift, get the actual sigma12 value from CAMB and replace the LHC entry with the true value.
-We’ve implemented this now. We should definitely talk about how little of a difference that this makes. We should make error plots (comparing the two approaches with hyper cube as a control), but I strongly suspect the error will be negligible.
-
-
-\section{Training the Emulator}
-\label{sec: train_emu}
-
-% train\_emu.py
-
-This section will focus on the particular lines of GPy that we used, as well
-as the various data-cleaning and normalization statements that we used.
-Normalization will be a really important topic. I want to explain some of
-the theory behind why the emulator performs poorly with values outside of this
-[0, 1] range.
-
-I don't know how to justify this kernel that I got from Alex via AndreaP...
-
-\section{Accessing and Using the Emulator}
-
-% user\_interface.py
-
-The content of this section is still relatively uncertain. Since I am still tweaking some of the emulator's settings, I haven't spent too much time on a script dedicated purely to simplifying the interaction between the user and the emulator \textit{object} itself.
-
-Anyway, the hope is to provide some clear and simple descriptions of what functions the user should turn to in order to get started predicting power spectra using the results of this thesis. The functions can either create a new emulator object and train it or load an existing one with easy-to-understand functions for interacting with the object.
-
-Here, we will talk about the details of the training as well as the importance of normalization. Since this is still technical, it may not be appropriate for a UI script. So, I am considering breaking out a new script (and therefore a new section), maybe called ``train\_emu.py.''
