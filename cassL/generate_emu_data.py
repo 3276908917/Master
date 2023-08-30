@@ -28,6 +28,9 @@ def print_cosmology(cosmology):
 
 def build_cosmology(om_b_in, om_c_in, ns_in, sigma12_in, As_in, om_nu_in,
     param_ranges=None):
+    # We should replace this function with a function that assumes, e.g.
+    # index 0 is om_b, index 1 is om_c, etc.
+    
     # Use Aletheia model 0 as a base
     cosmology = cp.deepcopy(model0)
 
@@ -86,7 +89,7 @@ def build_cosmology(om_b_in, om_c_in, ns_in, sigma12_in, As_in, om_nu_in,
         nnu_massive_in=nnu_massive)
 
 
-def evaluate_cell(input_cosmology, standard_k_axis, debug=False):
+def direct_eval_cell(input_cosmology, standard_k_axis, debug=False):
     """
     Returns the power spectrum in Mpc units and the actual sigma12_tilde value
         to which it corresponds.
@@ -150,7 +153,7 @@ def evaluate_cell(input_cosmology, standard_k_axis, debug=False):
             return None, None, np.array([np.nan, np.nan])
 
         input_cosmology['h'] -= 0.1
-        return evaluate_cell(input_cosmology, standard_k_axis, debug)
+        return direct_eval_cell(input_cosmology, standard_k_axis, debug)
 
     if debug:
         print("recommended redshift", z_best)
@@ -255,11 +258,13 @@ def interpolate_cell(input_cosmology, standard_k_axis):
     return p, actual_sigma12, np.array((input_cosmology['h'], float(z_best)))
 
 def fill_hypercube(parameter_values, standard_k_axis,
-    param_ranges=None, massive_neutrinos=True, eval_func=evaluate_cell,
+    param_ranges=None, massive_neutrinos=True, eval_func=direct_eval_cell,
     cell_range=None, samples=None, write_period=None, save_label="unlabeled"):
     """
     @parameter_values: this should be a list of tuples to
         evaluate kp at.
+        #! This is confusing with the param_ranges label. Maybe we can call it
+            cosmo_configs or something?
 
     @cell_range adjust this value in order to pick up from where you
         left off, and to run this method in saveable chunks.
@@ -292,7 +297,7 @@ def fill_hypercube(parameter_values, standard_k_axis,
         # We're only making the following switch in order to test out the
         # interpolator approach.
         #this_p, this_actual_sigma12, these_rescaling_parameters = \
-        #    evaluate_cell(this_cosmology, standard_k_axis)
+        #    direct_eval_cell(this_cosmology, standard_k_axis)
 
         # As of 20.08.2023, this REALLY is a NECESSARY workaround.
         this_actual_sigma12 = None

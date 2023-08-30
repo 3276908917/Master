@@ -47,9 +47,16 @@ have prepared \textcolor{orange}{some} plots in section~\ref{sec: 2emu_improveme
 \label{sec: lhc_flow_chart}
 
 The \verb|pyDOE2| function that we will use to generate our LHCs
-returns a result with entries that range from zero to unity. These unit LHCs
-will eventually be used to create a set of cosmological
-configurations which will act as the $X$ data set when we train our emulator.
+returns a result with entries that range from zero to unity. We will refer
+to such LHCs as \textit{unit} LHCs.\footnote{We will later denote LHCs with 
+the matrix notation $\matr{X}$ and collections of CAMB power spectra as
+$\matr{Y}$ to
+emphasize the roles of these data in the training and testing of the emulator. 
+However, we will continue to use the term ``unit'' as introduced here, and 
+the reader should keep in mind that a unit $\matr{X}$ therefore does not
+indicate an identity matrix.} These unit LHCs will eventually be used 
+to create a set of cosmological configurations which will act as the $X$ data 
+set when we train our emulator.
 
 In order to these LHC entries into cosmological parameters that we can input 
 into CAMB, we will need to rescale them with our priors for each parameter.

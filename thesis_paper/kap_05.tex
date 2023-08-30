@@ -35,13 +35,14 @@ Cassandra-linear is handled by the \verb|lhs.py| script.
 By ``LHSs,'' we are here referring exclusively to the
 sample of cosmologies for which we want to compute power spectra.
 However, as mentioned in section~\ref{sec: lhc_flow_chart}, at this stage we 
-are not
-yet committing to a particular set of priors. Instead, each axis is sampled
-from the uniform distribution $\mathcal{U} (0, 1)$.
+are not yet committing to a particular set of priors. Instead, each axis is 
+sampled from the uniform distribution $\mathcal{U} (0, 1)$.
 
-We'll also describe the switch from a rescaled Latin hypercube to a unit Latin hypercube that we later interpret differently according to the specified priors.
+% We'll also describe the switch from a rescaled Latin hypercube to a unit
+% Latin hypercube that we later interpret differently according to the
+% specified priors.
 
-Each entry in our LHS will be either a four- or six-dimensional vector, 
+Each entry $\bm{x}$ in our LHS $\matr{X}$ will be either a four- or six-dimensional vector, 
 depending on the emulator's support for massive neutrinos. When building a
 massless-neutrino emulator, a single LHS entry will describe the $\omega_b$,
 $\omega_\text{CDM}$, $n_s$, and $\sigma_{12}$ values for that cosmology in 
@@ -157,10 +158,34 @@ hypercube. Why is this important? Because the Latin hypercube is used again
 later in the user\_interface.py script for the purpose of training the 
 Gaussian emulator object.}
 
-Now that we have a ``good enough'' unit LHC, we need to rescale it so that
-each axis, which currently runs from zero to one, runs along a range dictated
-by the parameter to which that axis is intended to correspond. In
-section~\ref{sec: default_priors}, we introduced different  priors an
+Now that we have a ``good enough'' unit LHC $\matr{X}$, we need to rescale it 
+so that each axis, which currently runs from zero to one, runs along a range 
+dictated by one of the cosmological parameters over which we are training the 
+emulator. This rescaling is handled by the function \verb|build_cosmology| in
+the \verb|generate_emu_data| script. It accepts as parameters the values of
+$\omega_b$, $\omega_c$, $n_s$, $\sigma_{12}$, $A_s$, $\omega_nu$, and, 
+optionally, a dictionary of parameter ranges. If the
+parameter ranges are not provided, the cosmological parameters are assumed to
+already have been rescaled. 
+% We really should redo build_cosmology so that it assumes indices match to
+% the same parameters every time! This is how the rest of the code works,
+% after all.
+
+\textcolor{orange}{And yet build cosmology is doing so much more than just
+that! Talk about using Aletheia model 0 as the default for all other stuffs!}
+
+\textcolor{orange}{What are the equations for rescaling that build cosmology
+uses?}
+
+%s Now talk about fill_hypercube, a central function of this script
+
+\verb|fill_hypercube| iterates through the rows $\bm{x}$ of the unit LHC
+$\matr{X}$, packages them into a fully-specified cosmology using the function
+\verb|build_cosmology|, and passes them to one of the evaluation functions,
+which combines the CAMB calls from the \verb|camb_interface| script with the
+principles of evolution mapping. Currently, the default evaluation function is
+\verb|direct_eval_cell|, which relies on the \verb|evaluate_cosmology|
+function from the \verb|camb_interface| script.
 
 We need to scale each of the six dimensions in order to match one of the six cosmological parameter ranges. In tables XXX-XXZ, we provide the specific upper and lower bounds for each of the six cosmological parameters over which our massive-neutrino emulator is trained. The ``MEGA'' priors represent the original goal for this project, which unfortunately suffered from too many unsolvable cells. In section XXW, we describe the process of rescaling a cosmology with the evolution parameters z and h in order to match the desired $\sigma_{12}$ value. For the purposes of this treatment, we refer to any cell, for which this approach does not work, as an unsolvable cell. In practice, this means that even at the lowest h values supported by CAMB (what are these, and why is it unsafe to just use 0.01, even though that is sometimes allowed?), we cannot match the desired sigma 12 value with a nonnegative redshift. CAMB does not allow for negative redshifts, although it may be interesting to try to resolve this issue with a code that does allow negative redshifts, such as CLASS. Why didn’t we use CLASS for this project? The code has gone through several crucial bug fixes since switching to a different set of priors, so we need to test this prior suite again and re-assess the rate of unsolvable cells. The ``classic'' priors represent a middle ground between those of ``COMET'' and ``MEGA''. We need to test this prior suite again to see if it still suffers from the large number of unsolvable cells which prompted us to switch to the set of priors called ``COMET.'' As of 19.06.23, ``COMET'' is the default for the emulator. It is the most restrictive of the three options and is intended to totally eliminate the problem of unsolvable cells, so that a complete LHC can be used to train a demonstration emulator. The hope is for the demonstration emulator to be extremely accurate but confined to a very narrow range in each parameter. That way, with a relatively limited sample size, we can still achieve encouraging levels of error. In principal, if the demonstration emulator performs well, we can ``scale up'' the approach by expanding the priors as well as the total number of training samples. However, it is not clear if we can scale up the emulator past the point at which unsolvable cells begin to appear. It seems reasonable to think that unsolvable cells indicate extreme regions of the parameter space, rather than isolated holes. Therefore, it would be misleading to claim that the final emulator corresponded to, for example, any prior ranges in table 00A; in truth, the emulator would correspond to a potentially (this is a dangerous word and opens you up to hard questions) complicated shape inscribed within the six-dimensional rectangular hyperprism.
 
@@ -192,3 +217,20 @@ The content of this section is still relatively uncertain. Since I am still twea
 Anyway, the hope is to provide some clear and simple descriptions of what functions the user should turn to in order to get started predicting power spectra using the results of this thesis. The functions can either create a new emulator object and train it or load an existing one with easy-to-understand functions for interacting with the object.
 
 Here, we will talk about the details of the training as well as the importance of normalization. Since this is still technical, it may not be appropriate for a UI script. So, I am considering breaking out a new script (and therefore a new section), maybe called ``train\_emu.py.''
+
+% Now talk about the use of prior files
+
+In section~\ref{sec: default_priors}, we introduced different priors 
+included with CL, as well as their file names. These file names come into play 
+when calling the function \verb|prior_file_to_dict|, which reads a prior file
+into a Python dictionary. The reader is encouraged to add additional prior
+files based on the format of the files provided in the \verb|priors|
+subdirectory of the CL code.
+
+%which is a helper function
+% to \verb|get_data_dict|, which in turn is a helper function to the 
+%\textcolor{orange}{unfinished} build_train_and_test_sets, which is a helper
+% function to... ENOUGH!
+
+\verb|build_train_and_test_sets|. in the
+\verb|generate_emu_data| script.

@@ -9,11 +9,11 @@ A_MEGA_MIN = np.exp(1.61) / 10 ** 10
 A_MEGA_MAX = np.exp(5) / 10 ** 10
 
 # The MINI qualifier indicates that these belong to the "classic" prior ranges
-# (see the function get_param_ranges).
+# (see the function prior_file_to_dict).
 A_CLASSIC_MIN = np.exp(2.35) / 10 ** 10
 A_CLASSIC_MAX = np.exp(3.91) / 10 ** 10
 
-def get_param_ranges(prior_name="COMET_with_nu"):
+def prior_file_to_dict(prior_name="COMET_with_nu"):
     """
     !
     Return a dictionary of arrays where each key is a cosmological parameter
@@ -60,6 +60,13 @@ def get_param_ranges(prior_name="COMET_with_nu"):
 
 def build_train_and_test_sets(scenario_name):
     """
+    #! This situation's misconfigured. This function should only build the
+    data sets, it shouldn't also be training the emulator!
+    
+    That should be a separate function which marries this one with
+        build_and_test_emulator
+    
+    
     Options in the scenario file:
     * A header with a comment explaining, in English, the basic gist of the
         scenario.
@@ -106,7 +113,7 @@ def build_train_and_test_sets(scenario_name):
     
     # Step 2: build train LHC
     
-    priors = get_param_ranges(scenario["prior_name"])
+    priors = prior_file_to_dict(scenario["prior_name"])
     
     train_lhc = lhc.multithread_unit_LHC_builder(dim=len(priors),
         n_samples=scenario["num_test_samples"],
@@ -159,7 +166,7 @@ def get_data_dict(emu_name, prior_name="COMET"):
     Y_test = np.load(directory + "samples_test.npy", allow_pickle=False)
     data_dict["Y_test"] = Y_test
     
-    priors = get_param_ranges(prior_name=prior_name)
+    priors = prior_file_to_dict(prior_name=prior_name)
     data_dict["priors"] = priors
 
     return data_dict
