@@ -53,8 +53,8 @@ $ MEGA priors, 5k emulator
 		$ fill test
 			SUSPECT
 	* 400k
-		* fill train
-		* fill test
+		$ fill train
+		>> fill test
 
 * Runs of varying LHC-quality
 	* We should always use the same test cube

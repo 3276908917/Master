@@ -8,15 +8,16 @@ spectra, 300 points for each spectrum) WITHOUT justifying any of them--later,
 in chapter~\ref{chap: disc_and_conc}, we'll justify these decisions and
 talk about the consequences of alternate settings.}
 
-\textcolor{orange}{This section is getting kind of ambitious. I may break it
-out into a separate chapter, especially because the nature of the discussion
-is fairly different from the rest of this chapter (here very high-level
-and conceptual, later technical and programming-oriented).}
+In order to simplify the process of testing different emulator setups, and to make power
+spectra more accessible to beginners in the field, we have developed a Python package,
+which we call Cassandra-Linear (CL)1. CL represents a full emulation pipeline from the
+generation of training and testing data to the plotting of error statistics associated with
+the emulation.
 
 % We're gonna need a flow chart for this puppy. That should be priority number
 % one, because the writing should constantly refer back to it.
 
-\subsection{Design Choices}
+\section{Design Choices}
 
 By default, each Latin hypercube consists of $N_s = 5000$ entries. For 
 justification of this quantity, please refer to
@@ -24,7 +25,7 @@ section~\ref{sec: num_samples}.
 
 $N_k = 300$.
 
-\subsection{Creation of Separate Emulators}
+\section{Creation of Separate Emulators}
 \label{sec: 2emu_intro}
 
 This is a brief introductory section motivating the creation of two emulators:
@@ -40,9 +41,9 @@ cosmology.
 To justify our decision and to quantify the improvement from this approach, we
 have prepared \textcolor{orange}{some} plots in section~\ref{sec: 2emu_improvement}.
 
-Conclude this section by saying that this integration of multiple emulators into one user-facing script can be further exploited with, for example, different emulators for different neutrino mass hierarchies.
+\textcolor{orange}{Conclude this section by saying that this integration of multiple emulators into one user-facing script can be further exploited with, for example, different emulators for different neutrino mass hierarchies.}
 
-\subsection{Unit LHCs}
+\section{Unit LHCs}
 \label{sec: lhc_flow_chart}
 
 The \verb|pyDOE2| function that we will use to generate our LHCs
@@ -64,18 +65,21 @@ and its rescaling (as well as the construction of the $Y$ data set)
 in~\ref{sec: generate_emu_data}.
 
 
-\subsection{Default Priors}
+\section{Default Priors}
 \label{sec: default_priors}
 
 % One reason this goes here: priors show up in almost every script,
 % so there isn't a great cass-L section in which to put this.
 
-The priors that we use correspond to those currently used by COMET. \textcolor{orange}{Should I spend any time defending this choice here, or should I put all of the defense in section~\ref{sec: priors}?}
-
 As we will explain in section~\ref{sec: build_lhc}, our code generates unit 
 Latin hypercube samples so that a single hypercube can be used to build 
 several different emulators simply by using a different set of priors to 
 rescale the cube.
+
+CL is packaged with three pairs of prior files. Depending on which priors the user selects,
+the emulator will automatically become a massive-neutrino or massless-neutrino emulator.
+\textcolor{orange}{This needs to be linked to the convenience section, on how to add scenario files and what
+not. But this feature is not finished yet! We may have to punt it to “future work.”}
 
 \textcolor{orange}{Table goes here.}
 
@@ -88,6 +92,12 @@ in root or square space, for example}. The ``MEGA'' priors
 unfortunately suffered from too many unsolvable cells. In
 section~\ref{sec: generate_emu_data}, we will describe what it means for a 
 cell to be unsolvable.
+
+The priors that we use correspond to those currently used by COMET. \textcolor{orange}{Should I spend any time defending this choice here, or should I put all of the defense in section~\ref{sec: priors}?}
+
+The default priors that we use correspond to those currently used by COMET. \textcolor{orange}{Two
+justifications for this choice: unsolvable cells, but more than that, simplicity and accuracy
+for the ``demo'' run.}
 
 \section{Emulation over Uncertainties}
 
