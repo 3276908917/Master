@@ -8,7 +8,8 @@ A primary goal of cosmology is to specify, as narrowly as possible, the
 parameters which define our Universe. These include, for example, the overall 
 curvature of the Universe as well as its cold dark matter (CDM) content. These
 parameters determine the full evolution of the Universe after the inflationary
-period (whose beginnings were non-deterministic). \textcolor{green}{citation.
+period (whose beginnings were thought to be non-deterministic). 
+\textcolor{green}{citation.
 Probably we can get something from a Komatsu paper.} For example, depending on
 the makeup of the Universe--how much of its total energy budget exists in the
 form of each `ingredient' (cold dark matter, radiation, etc.)--the Universe
@@ -40,25 +41,53 @@ those.}
 
 We will get more specific about terms like ``cosmological observations''
 and ``what we would expect to see'' in the next section (\ref{sec: Pk_intro}, 
-on the matter power spectrum). First, we should briefly introduce concrete
+on the matter power spectrum). First, we will briefly introduce concrete
 examples of cosmological parameters in which we are interested.
 
 In this work, we will concentrate on different parameters to different 
-extents.
+extents. By the end of this thesis, we will have built and tested two main
+emulators, each of which is trained over a different parameter
+space.\footnote{Emulators will be described in greater detail in
+section~\ref{sec: emulation_intro}. For now, the extremely simple definition 
+from the summary will suffice.}
+Each emulator accepts as $x$ a set of values for cosmological parameters and
+predicts as $\hat{y}$ a type of power spectrum. 
 
-The most important parameters for this work are $\omega_b$, $\omega_\text{CDM}$, $\omega_\nu$, and $n_s$.
+A secondary, ``support'' emulator has been trained over four parameters:
+$\omega_b$, $\omega_\text{CDM}$, $n_s$, and $\sigma_{12}$.
+The primary emulator for this work has been trained over two additional
+parameters: $A_s$ and $\omega_\nu$. Later in this section, we will also 
+introduce the terms $h$ and $z$, which are not subject to emulation but which 
+will be important to the generation of training data for the emulator (see 
+section~\ref{sec: train_emu}. Finally, we will very briefly define terms such 
+as $\Omega_k$, $\omega_\text{DE}$, $w_0$, $w_a$ since they make only minor 
+appearances in this work.
 
-$h$, $z$, and $A_s$ are means to ends
+The various $\omega_i$ and $\Omega_i$ terms are all related, and describe the
+energy density of the Universe in different energy species.
 
-$\omega_k$, $\omega_\text{DE}$, $w_0$, $w_a$ make only minor appearances.
+While baryons and cold dark matter (CDM) are both pressureless\footnote{This 
+is of
+course an approximation, but it is a very good one. While a hot baryonic gas 
+certainly exerts a pressure, this pressure is negligible in comparison to the energy density of the gas. \textcolor{red}{Where are we getting a unitless
+pressure term such that we can compare it in this way to energy density?
+Otherwise, terms of different units cannot be compared. I understand that we
+can get a unitless energy density by making it relative. Is there a similar
+procedure for pressure terms?}}, CDM appears to interact only gravitationally
+with other matter. This lack of collisional and radiative self-interaction
+prevents CDM clouds from collapsing in the same way that, for example,
+baryons can collapse to form stars and planets. Because of the significantly
+different behaviors of these two species of matter, we treat them separately
+even in cosmological contexts.
 
-{segue from power spectrum discussion?} There is another facet to densities that will be conceptually important to this work: densities $\rho_i$ of different energy species. Similarly to before, it is common to define a related quantity $\Omega_i$ that is normalized, although here the normalization is enforces
+{segue from power spectrum discussion?} There is another facet to densities that will be conceptually important to this work: densities $\rho_i$ of different energy species. Similarly to before, it is common to define a related quantity $\Omega_i$ that is normalized, although here the normalization is enforce
 
 \begin{equation}
 \sum_i \Omega_i = 1
 \end{equation}
 
-IT’s MORE COMPLICATED THAN THAT—TALK ABOUT FLATNESS OF UNIVERSE and critical densities. These $\Omega_i$ parameters are referred to as “fractional energy densities.” The constant of normalization is simply $h^2$. $h$ is merely a different 
+IT’s MORE COMPLICATED THAN THAT—TALK ABOUT FLATNESS OF UNIVERSE and critical densities. These $\Omega_i$ parameters are referred to as “fractional energy densities.” The constant of normalization is simply $h^2$. $h$ is known as
+the dimensionless Hubble parameter and is merely a different 
 
 \begin{equation}
 h = H_0 \, \frac{1}{100 }
@@ -68,8 +97,37 @@ For example, the Planck best-fit value for $H_0$,
 $67 \, \frac{\mathrm{km} / \mathrm{s}}{\mathrm{Mpc}}$,
 corresponds to the $h$ value $0.67$. 
 
-Unfortunately, this normalization has its disadvantages. WHAT ARE THEY. In particular, in the context of parameter inference, it is inconvenient to have a parameter composed of other 
+Unfortunately, this normalization has its disadvantages. WHAT ARE THEY. In particular, in the context of parameter inference, it is inconvenient to try to constrain a term consisting of multiple uncertain parameters. In this case, $h$ is itself a parameter that we would like to constrain, so it would be better to keep it separate. This situation is made more drastic due to the Hubble tension, which leaves the value of $h$ significantly unclear compared to other parameters.
 
+throughout this paper we will refrain from using the conventional
+fractional density parameters $\Omega_i$ and use instead the physical density
+parameters $\omega_i$.
+
+The parameter $n_s$ is called the spectral index and describes the power laws
+to which the power spectrum may be fit. We will delay its explanation to
+section~\ref{sec: Pk_intro}, where we introduce the power spectrum.
+
+% sigma12 versus sigma8. This should come last as it is by far the most
+% challenging of the parameters to explain.
+
+\textcolor{orange}{We should also have the $\sigma_8$ section here! This 
+section will include an extremely brief summary of Ariel's paper motivating 
+the use of $\sigma_{12}$ instead of $\sigma_8$.}
+
+When comparing $\sigma_8$ results from different analyses, for example, the significance of the parameter itself is easily lost. Whenever two analyses differ, even slightly, in their values for $h$, the meaning of sigma 8 changes!
+
+Since $h$ is already its own parameter, the conventional $\sigma_8$ parameter 
+is truly a mixture of two parameters. This presents a host of misleading 
+results and statistical ambiguities (\cbib{San20}) which are outside of the 
+scope of this work (\textcolor{orange}{Nevertheless I would like to summarize 
+a couple of key arguments}) but which prompt us to abandon $\sigma_8$.
+
+In the end, however, the argument in favor of $\sigma_{12}$ most relevant to
+this paper is the evolution mapping argument. We can greatly simplify the
+parameter space of emulators with the help of $\sigma_{12}$, and $\sigma_8$
+is simply incapable of exploiting the parameter degeneracies to the same
+extent.
+ 
 
 \section{The Matter Power Spectrum}
 \label{sec: Pk_intro}
@@ -133,17 +191,53 @@ right?}
 (2 \pi)^3 \delta_D^{(3)} (\bm{k}_2 \ \bm{k}_1) P(\bm{k})
 \end{equation}
 
+%s Why do we care?
+
+The power spectrum is of great importance to parameter inference because of
+its unique dependence on certain parameters.
+% Here: refer to specific P(k) equations where omega_b and n_s showed up,
+% turnover scale.
+In section~\ref{sec: boltzmann_intro}, we will include several figures 
+illustrating more clearly what we mean by this.
+
+%s What is the BAO, what is the turnover scale
+
 \textcolor{orange}{WE SHOULD DEFINITELY incorporate some of ARIEL'S DISCUSSION 
 OF THE BAO 
 (``WHY ARE THERE
 WIGGLES IN THE POWER SPECTRUM'') AND WE SHOULD DO ENOUGH OF THE MODE / HORIZON
 DISCUSSION TO ELUCIDATE THIS CONCEPT OF A TURNOVER SCALE!!!}
 
+%s Everyone else uses h units. Why don't we?
+
+\textcolor{blue}{This section will also reiterate some parts of 
+section~\ref{sec: param_glossary} and further develop our moving-away from 
+$h$, this time in terms of units on power spectra plots. explain the unit system
+    we are using (ditch $h$ factor because it messes up everything--but
+    only briefly summarize the main arguments of Sanchez 2020)}
+
+%! Try to more carefully explain why it doesn't work: h is not a parameter
+% over which we emulate--sigma12 is. Therefore we cannot show h in the final
+% plots. This is a much subtler issue than the h complaints in the
+% previous section.
+
+Conventional emulator calibration entails the historical units of Mpc / $h$,
+but if we use instead units of Mpc, then we can distill all of the evolution
+parameters into one parameter, $\sigma_{12}$. 
+
+
 \section{Boltzmann Solvers and CAMB}
+\label{sec: boltzmann_intro}
 
 I want to talk about what a Boltzmann solver is and what kinds of equations it is solving.
 
 To hint at what's to come, I start off this section by noting that several cosmological parameters have a fairly unique impact on the shape of the power spectrum, while others have a degenerate impact. Wouldn't it be great if we could know what the power spectrum would look like if we increased parameter $x$? Boltzmann solvers can help us with that.
+
+% Examples of great results from Boltzmann solvers
+
+Three shape parameters of core interest to this paper are the physical density in baryons $\omega_b$ (whose impact on the power spectrum is shown in figure~\ref{fig: omega_b_dependence}), the physical density in cold dark matter $\omega_c$ (figure~\ref{fig: omega_c_dependence}), and the spectral index $n_s$, (figure~\ref{fig: ns_dependence}). The remaining parameters $\sigma_{12}$ and $A_s$, as well as the quantities $z$ and $h$, all shift only the amplitude of the power spectrum. We show the amplitude shift associated with various $\sigma_{12}$ values in figure~\ref{fig: sig12_dependence} and stress that the same plot only needs to be relabeled in order to illustrate the impact of $A_s$, $z$, $h$, etc. 
+
+% What are they solving?
 
 This will mostly just be a theoretical discussion of these solvers. The hands-on stuff comes in the non-introductory section on CAMB.
 
@@ -189,7 +283,7 @@ curvature
 of the Universe or dynamic energy models beyond the standard CPL
 parametrization'' (\cbib{San21}).
 
-I'll talk a little about different emulators currently available, such as COMET. Some emulate non-linear power spectra, for example, and several even include massive neutrinos. But this thesis will demonstrate that massive neutrinos can be included into our evolution mapping approach, which will be introduced in section~\ref{sec: ev_mapping}.
+I'll talk a little about different emulators currently available, such as COMET. Some emulate non-linear power spectra, for example, and several even include massive neutrinos. But this thesis will demonstrate that massive neutrinos can be included into our evolution mapping approach, which will be introduced in section~\ref{sec: ev_mapping_intro}.
 
 % (This is good news because the evolution mapping approach greatly simplifies the parameter space, and enhances the accuracy), which is the subject of the next section.
 
@@ -207,9 +301,9 @@ is known as Gaussian process regression, or Kriging. GP regression is a
 powerful non-linear multivariate interpolation tool. The computational
 complexity of inference and likelihood evaluation within GP regression is cubic
 in the number of points. This makes GP regression an excellent companion to
-Latin hypercube sampling (LHS), which makes highly-efficient use of a limited 
-number of samples and will be explained in greater depth in section~\ref{sec:
-lhc_intro}.
+Latin hypercube sampling (LHS), which makes highly efficient use of a limited 
+number of samples and whose basic idea will be explained in section~\ref{sec:
+lhc_theory}.
 
 Neural networks (NNs) generally need much larger sample sizes to reach
 comparable levels of
@@ -219,7 +313,7 @@ necessary. This practical constraint motivated the use of a GP for our
 emulator. Furthermore, NNs invariably require much more complicated setup and
 tuning--for example, in the precise architecture of the network (e.g. nodes
 per layer, layer types) as well as the hyperparameters (e.g. learning rate).
-By contrast, as we explain in section~\ref{sec: emu_training}, a Gaussian
+By contrast, as we explain in section~\ref{sec: train_emu}, a Gaussian
 process regression is highly straightforward to set up and modify. Therefore,
 for a demonstration project such as Cassandra-Linear, we elected to base our
 emulator on a GP. Please refer to the section~\ref{sec: future_work} for a
@@ -240,28 +334,17 @@ What is the theoretical best LHC that we could make?
 
 Besides, can we explain this equation?
 
+
 \section{Evolution Mapping}
+\label{sec: ev_mapping_intro}
 
-This section will also include an extremely brief summary of Ariel's paper motivating the use of $\sigma_{12}$ instead of $\sigma_8$.
-
-    I have two primary objectives for this section: explain the unit system
-    we are using (ditch $h$ factor because it messes up everything--but
-    only briefly summarize the main arguments of Sanchez 2020), and briefly
-    summarize why we can funnel all of the evolution parameters through
-    $\sigma_{12}$ in this way. Unfortunately, this second objective will
-    almost certainly require you to bust out a few equations, and even to
-    manipulate them a little to tease out relations essential to this paper.
-
-Conventional emulator calibration entails the historical units of Mpc / $h$,
-but if we use instead units of Mpc, then we can distill all of the evolution
-parameters into one parameter, $\sigma_{12}$. Since $h$ is already its own parameter, the conventional $\sigma_8$ parameter is truly a mixture
-of two parameters. This presents a host of misleading results  and statistical
-ambiguities (\cbib{San20}) which are outside of the scope of this work but
-which prompt us to abandon $\sigma_8$.
-Similarly, throughout this paper we will refrain from using the conventional
-fractional density parameters $\Omega_i$ in favor of the physical density
-parameters $\omega_i = \Omega_i h^2$ which similarly eliminate the
-dependence on $h$.
+\textcolor{blue}{I want to briefly summarize why we can funnel all of the 
+evolution parameters through $\sigma_{12}$ in this way. This objective may be
+too ambitious for this paper, because I would have to go through each
+evolution parameter and derive its evolution nature in a few lines of 
+equations.} \textcolor{orange}{Maybe I can just do the same thing as Ariel
+recommended with the GPR kernel: ``we played around and found that this
+works.''}
 
 (\cbib{San21}) proposes to divide up the full set of cosmological
 parameters into two categories: \textit{evolution} parameters $\mathcal{O}_E$
@@ -302,10 +385,6 @@ Now, for the hiccup, which segues into the next section: this scheme is broken b
 density in neutrinos. (In the next section: why this is so and what we can do
 about it.)
 
-Three shape parameters of core interest to this paper are the physical density in baryons $\omega_b$ (whose impact on the power spectrum is shown in figure~\ref{fig: omega_b_dependence}), the physical density in cold dark matter $\omega_c$ (figure~\ref{fig: omega_c_dependence}), and the spectral index $n_s$, (figure~\ref{fig: ns_dependence}). The remaining parameters $\sigma_{12}$ and $A_s$, as well as the quantities $z$ and $h$, all shift only the amplitude of the power spectrum, as illustrated in figure~\ref{eq: sig12_dependence}. 
-
-For the sake of completion, we also show the impact of the evolution parameter $\sigma_{12}$ in figure~\ref{fig: sig12_dependence} and stress that the other quantities 
-
 
 \section{Neutrinos and Their Cosmological Impact}
 
@@ -345,5 +424,7 @@ current observations (\textcolor{orange}{which?}).
 I want to end this section with a vague plan of action: we want to play around with CAMB power spectra to see if there are any simple ways around this limitation in our approach.
 
 %%% New stuff
+
+% what is a MEMNeC?
 
 We already have an approximation for the power spectrum of a massive-neutrino cosmology within the evolution mapping scheme. The $\sigma_{12}$ value that we described earlier is actually the $\sigma_{12}$ value of the model's MEMNeC. can already be approximated within evolution-mapping by slightly altering scheme. \textcolor{red}{Is it fair to say we are adjusting, or was this actually the same scheme as it always was?} We take a MEMNeC and the desired cosmology. The sigma 12 is actually the sigma 12 of the MEMNeC. Then we treat the physical density in neutrinos as a shape parameter along with $A_s$.

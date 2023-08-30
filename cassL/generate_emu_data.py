@@ -270,7 +270,7 @@ def fill_hypercube(parameter_values, standard_k_axis,
     if cell_range is None:
         cell_range = range(len(parameter_values))
     if samples is None:
-        samples = np.zeros((len(parameter_values), len(standard_k_axis))
+        samples = np.zeros((len(parameter_values), len(standard_k_axis)))
 
     # Recent change: now omega_nu comes last
 
