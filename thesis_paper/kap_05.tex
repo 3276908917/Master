@@ -237,6 +237,14 @@ interesting to try to resolve this issue with a code that does allow negative
 redshifts, such as CLASS. \textcolor{orange}{Re-iterate the discussion from
 section~\ref{sec: boltzmann_intro}: why didn’t we use CLASS for this project?}
 
+%s Don't give up skeleton!
+
+The consequences of unsolvable cells will be discussed more in
+section~\ref{prior_woes}. Despite the discouraging situation described there,
+unsolvable cells do not immediately sink the entire data set. The remaining
+still be used to train an emulator as long as even one cell has been solved.
+\textcolor{orange}{This will be explained in section~\ref{sec: train_emu}}.
+
 %s Bonus section that doesn't really fit anywhere specific: speed-up
 
 Ariel’s idea for speeding up the program: use a best-guess z which only approximates the desired sigma12. Then, when we calculate the power spectrum using this redshift, get the actual sigma12 value from CAMB and replace the LHC entry with the true value.
@@ -248,13 +256,45 @@ We’ve implemented this now. We should definitely talk about how little of a di
 
 % train\_emu.py
 
-This section will focus on the particular lines of GPy that we used, as well
+\textcolor{blue}{This section will focus on the particular lines of}
+\verb|GPy| \textcolor{blue}{that we used, as well
 as the various data-cleaning and normalization statements that we used.
 Normalization will be a really important topic. I want to explain some of
 the theory behind why the emulator performs poorly with values outside of this
-[0, 1] range.
+[0, 1] range.}
 
 I don't know how to justify this kernel that I got from Alex via AndreaP...
+\textcolor{orange}{That's no problem; Ariel says, just say ``we played around
+and found that this works best.''}
+
+\textcolor{blue}{Briefly explain what GPy is doing—don’t treat it like some black box.}
+
+This script contains the functions used to build an emulator from the 
+generated data sets. To train a new emulator, one instantiates the
+\verb|Emulator_Trainer| class. We will henceforth refer to objects therefrom 
+as trainers.
+
+We separate the \verb|Emulator_Trainer| class from the \verb|Emulator| class
+to make saving and loading more efficient. When transferring an emulator to a
+different computer, for example, it is not necessary to transfer all of the
+data sets used.
+% Although these data sets only turn out to be 2\% as large as the GPR object, 
+% which is provided by GPy and which performs the predictions. Maybe the
+% situation justifies my approach with the large-k data sets? I don't think
+% so--I think the GPR object simply gets bigger to keep the proportion the
+% same...
+However, we still need the \verb|Emulator| class to hold more than just the 
+GPR, for example the normalization parameters.
+
+Each emulator is an instance of
+the \verb|Emulator| class with a \verb|GPy| GPR object at its core. We will 
+henceforth refer to such instances as emulator objects. Besides the GPR object 
+at the core, emulator objects also convert $\bm{x}$ inputs and
+$\bm{y}$ outputs in order to facilitate scientific access. Specifically, 
+the GPR itself accepts $\bm{x}$ inputs and predicts $\bm{y}$ outputs 
+in a normalized fashion which will not be easily understood unless first 
+appropriately transformed.
+
 
 \section{Accessing and Using the Emulator}
 
