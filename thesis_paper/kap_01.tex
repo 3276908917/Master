@@ -53,6 +53,9 @@ from the summary will suffice.}
 Each emulator accepts as $x$ a set of values for cosmological parameters and
 predicts as $\hat{y}$ a type of power spectrum. 
 
+\textcolor{orange}{This paragraph needs to be rewritten. It's way too messy to 
+talk about parameters in order of importance!}
+
 A secondary, ``support'' emulator has been trained over four parameters:
 $\omega_b$, $\omega_\text{CDM}$, $n_s$, and $\sigma_{12}$.
 The primary emulator for this work has been trained over two additional
@@ -103,12 +106,27 @@ throughout this paper we will refrain from using the conventional
 fractional density parameters $\Omega_i$ and use instead the physical density
 parameters $\omega_i$.
 
+%s omega_k
+
+According to Andrea P., $\omega_k$ is an evolution parameter only in a narrow 
+band around zero--specifically, over roughly the range [-0.05, 0.05].
+\textcolor{red}{By how much does evolution mapping fail here? And, if 
+$\omega_k$ is truly a shape parameter, why does Ariel's FECS call $\omega_k$
+an evolution parameter?} We do not emulate over $\omega_k$ but assume take
+it to be zero for all cells. However, as we explain in
+section~\ref{sec: ev_mapping_intro}, this does not limit the applicability of
+our emulators. The use of nonzero $\omega_k$ values will simply entail a
+relabeling of the emulated power spectra. \textcolor{orange}{Then again, I'm
+holding $\sigma_{12}$ fixed, so does it change anything at all?}
+
+%s n_s
+
 The parameter $n_s$ is called the spectral index and describes the power laws
 to which the power spectrum may be fit. We will delay its explanation to
 section~\ref{sec: Pk_intro}, where we introduce the power spectrum.
 
-% sigma12 versus sigma8. This should come last as it is by far the most
-% challenging of the parameters to explain.
+%s sigma12 versus sigma8. This should come last as it is by far the most
+%s challenging of the parameters to explain.
 
 \textcolor{orange}{We should also have the $\sigma_8$ section here! This 
 section will include an extremely brief summary of Ariel's paper motivating 

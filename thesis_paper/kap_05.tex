@@ -159,6 +159,14 @@ hypercube. Why is this important? Because the Latin hypercube is used again
 later in the user\_interface.py script for the purpose of training the 
 Gaussian emulator object.}
 
+%s Preface the script as a whole. Where do I put this?
+\verb|generate_emu_data.py| includes more complicated functions that apply the 
+framework established in \verb|camb_interface.py| to the filling in of the 
+hypercube object that we obtained from \verb|lhc.py| over
+\verb|user_interface.py|.
+
+%s Introduce the build_cosmology script
+
 Now that we have a ``good enough'' unit LHC $\matr{X}$, we need to rescale it 
 so that each axis, which currently runs from zero to one, runs along a range 
 dictated by one of the cosmological parameters over which we are training the 
@@ -172,11 +180,34 @@ already have been rescaled.
 % the same parameters every time! This is how the rest of the code works,
 % after all.
 
-\textcolor{orange}{And yet build cosmology is doing so much more than just
-that! Talk about using Aletheia model 0 as the default for all other stuffs!}
-
 \textcolor{orange}{What are the equations for rescaling that build cosmology
 uses?}
+
+The \verb|build_cosmology| function bridges the gap between the LHC format and 
+the format expected by CAMB. Remember as described in
+section~\ref{sec: 2emu_intro} that our LHC has either four or six dimensions 
+depending on whether the neutrinos have mass. Separate from this, when 
+computing a CAMB power spectrum, we need to
+specify\footnote{By ``specify,'' we also mean the parameters for which CAMB
+provides default values.}
+several more parameters. These include, among others, the Hubble constant 
+$H_0$ as well as the DE EOS parameters $w_a$ and $w_0$.
+
+In practice, we split these parameters into two categories: we modify the
+values of $h$ and $z$ until we obtain the desired value of $\sigma_{12}$
+(this will be explained later in this section), and the rest are parameters
+that we set to set to ``default'' values according to Aletheia model 0.
+So long as the power spectrum's value for $\sigma_{12}$ agrees with the
+prior-scaled value from the LHS, \textcolor{green}{it should not matter that 
+we use the model 0 values, as these are evolution parameters}.
+\textit{red}{Or should it? If this logic really held, shouldn't we be able to 
+modify $w_a$ and $w_0$ in order to get the correct value of $\sigma_{12}$? But
+I'm almost certain these are evolution parameters! Also: $\omega_\text{DE}$
+is only an evolution parameter when everything else (all other omegas) is 
+fixed...}
+
+So, \verb|build_cosmology| makes a copy of the full Aletheia model 0 cosmology 
+and replaces four or six entries depending on the dimensionality of the LHC. 
 
 %s Now talk about fill_hypercube, a central function of this script
 
