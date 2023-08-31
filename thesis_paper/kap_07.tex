@@ -14,6 +14,51 @@ But second, this may not be a significant limitation to the utility of the
 emulators introduced here, because they are already quite wide compared to
 current state-of-the-art parameter inferences. \textcolor{green}{CITATIONS}.
 
+As of 19.06.23, ``COMET'' is the default for the emulator. It is the most 
+restrictive of the three options and was implemented in order to totally 
+eliminate the problem of unsolvable cells, allowing us to train our 
+demonstration emulator over an LHS without any significant gaps.
+
+Our hope was that the narrow parameter ranges would furthermore help the 
+demonstration emulator to achieve high accuracy--in principal, success here
+means that we can simply ``scale up'' the approach of this work by
+simultaneously expanding the priors as well as the total number of training
+samples. Unfortunately, it is not clear if we can scale up the emulator past
+the point at which unsolvable cells begin to appear. Since Latin hypercube
+sampling is designed to evenly sample a space, unsolvable cells certainly
+indicate that parts of the parameter space lack representation in the training
+data. In these regions, our emulator will be forced to interpolate across
+large gaps, or worse, extrapolate (if the unsolvable cells occur at the edges
+of the parameter space \textcolor{orange}{This is something that I should have
+shown... i.e. with plots}).
+% Andrea recommends a plot coloring points by the "extremeness" in our sample
+% space.
+
+We predict that increasing the total number of cells will only marginally
+reduce the issue of unsolvable cells \textcolor{orange}{This is something that 
+I should have shown... i.e. with plots}). We can imagine the subspace of
+solvable points as some hypervolume within a hypercube determined by our
+priors, and the emulator's training coverage as an approximation of this 
+hypervolume with small hypercubes whose size is determined by the separation 
+between points in the sample. In the ideal case, the space of solvable points 
+is the same as the Latin hypercube. When this is not so, we can at least
+reduce the error associated with our approximation of the space of solvable
+points by shrinking the hypercubes we use in our approximation (i.e. by
+increasing the total number of points in our sample). \textcolor{orange}{
+To give a sense of the marginal nature of this error reduction, we can
+consider how small our hypercubes already are. For simplicity, let's examine
+just one axis of the hypercube. With 5000 samples in the ``MEGA'' priors,
+the length of the training coverage MOST STRONGLY DETERMINED BY ONE HYPERCUBE
+IS: UNFINISHED THOUGHT}
+
+It seems reasonable to think that unsolvable cells indicate extreme regions of 
+the parameter space, rather than isolated holes. Therefore, it would be 
+misleading to claim that the final ``MEGA'' emulator corresponds to, for 
+example, any prior ranges in table 00A; in truth, the emulator would 
+correspond to a potentially (this is a dangerous word and opens you up to hard 
+questions) complicated shape inscribed within the six-dimensional rectangular 
+hyperprism.
+
 \section{Minimum Separation of the Training LHC}
 \label{sec: error_from_lhc}
 

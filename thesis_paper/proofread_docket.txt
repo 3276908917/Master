@@ -1,5 +1,1 @@
 Sections in particular that I've expanded:
-
-* Content scattered throughout the introduction has been put in proper places. In particular, the evolution mapping section (1.8) is much better focused than before.
-* Minor improvements in the paramater glossary (1.1) and P(k) (1.2) sections
-* Chapter 4 was broken out of chapter 5 (the former chapter 4), since the conceptual outline was getting too big. Both chapters have been expanded slightly with the nuts and bolts of the emulator.
