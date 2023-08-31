@@ -28,10 +28,66 @@ $N_k = 300$.
 \section{Creation of Separate Emulators}
 \label{sec: 2emu_intro}
 
-This is a brief introductory section motivating the creation of two emulators:
+\textcolor{blue}{This is a brief introductory section motivating the creation 
+of two emulators:
 unlike the other five parameters, the physical density in massive neutrinos 
 has a hard lower bound. This creates some minor regression problems (appeal to 
-boundary effects / danger of extrapolation).
+boundary effects / danger of extrapolation).}
+
+One potential weakness of \textcolor{orange}{this} emulator outline emerges 
+from the prior range for the physical density in neutrinos. The lower bound 
+($\omega_\nu = 0$) of this range for the physical density in neutrinos is 
+highly firm; any negative value would be totally unphysical. However, this 
+lower bound is also inclusive in the sense that the massless neutrino case is 
+still very much of interest to us. GP predictions are, naturally, at their 
+strongest in the regions densest with training samples. Since the massless 
+neutrino case represents the end of a parameter range, the sampling must be 
+less dense there. Indeed, no massless-neutrino cases are even in our training 
+sample, XXX being the minimum value of $\omega_\nu$ in our 
+LHS.\footnote{\textcolor{orange}{What should I say to people who complain: 
+``why not just manually add massless-neutrino samples to the original training 
+set? Why not simply have one emulator trained over a more diverse training 
+set?'' I think it would be better if we simply focus on the $\omega_\nu = 0$
+case not being adequately captured by interpolation, since we don't have any
+samples on the ``left'' side of $\omega_\nu = 0$.}}
+Therefore, the massless-neutrino case is actually \textcolor{green}{a slight
+extrapolation} from our training data, which is dangerous for accuracy.
+
+To 
+address this unique problem among our parameter ranges, CL can automatically 
+access one of two emulators depending on the user’s input. The primary 
+emulator is trained over the aforementioned prior range in $\omega_\nu$
+(table~\ref{tab: neutrino_priors}). In addition to this, we’ve trained a 
+separate emulator specifically to handle the massless neutrino case. In 
+practice, this entails the same prior ranges for the parameters $\omega_b$, 
+$\omega_c$, $n_s$, and $\sigma_{12}$. However, here we no longer need $A_s$;
+as discussed in chapter~\ref{chap: As}, $A_s$ helps to characterize the
+structure growth suppression induced by massive neutrinos. Besides this, for 
+the purposes of our training and validation data, $A_s$ is redundant since it
+is otherwise an evolution parameter, and we are already specifying the 
+amplitude of the power spectrum through sigma12. 
+
+To train this massless-neutrino emulator, we use the same code as described in 
+in this chapter and chapter~\ref{chap: implementation}. Since the
+massless-neutrino emulator is trained over just four parameters, and since we 
+nevertheless continue to train over 5000 samples, we expect the
+massless-neutrino emulator to be universally more accurate. However, as
+discussed and plotted in section~\ref{sec: num_samples}, our decision to train 
+over 5000 is justified by the rapidly diminishing returns in additional 
+accuracy.
+
+\textcolor{orange}{The following paragraph is bad. I'm not sure yet if I can
+salvage anything. The claims are not true and the work is not yet done.}
+
+Therefore, the reason why the massless-neutrino emulator is more 
+accurate is because massive neutrinos in particular have a highly complicated 
+impact on the power spectrum. Even with the inclusion of the $\omega_\nu$ and 
+$A_s$ parameters, our investigations in chapter~\ref{chap: As} reveal that
+these two parameters may not be sufficient to fully characterize the 
+suppression of the power spectrum by massive neutrinos. Of course, we would 
+like to reiterate that, though we have applied a symbolic regression approach 
+in order to independently justify our analytical expression from
+chapter~\ref{chap: As}, this by no means guarantees that we have found the optimal analytical expression.
 
 To simplify the user experience, this two-emulator solution lives ``under the
 hood'' and by default \textcolor{orange}{will be} hidden behind an interface
@@ -42,6 +98,8 @@ To justify our decision and to quantify the improvement from this approach, we
 have prepared \textcolor{orange}{some} plots in section~\ref{sec: 2emu_improvement}.
 
 \textcolor{orange}{Conclude this section by saying that this integration of multiple emulators into one user-facing script can be further exploited with, for example, different emulators for different neutrino mass hierarchies.}
+
+
 
 \section{Unit LHCs}
 \label{sec: lhc_flow_chart}
@@ -83,10 +141,11 @@ Latin hypercube samples so that a single hypercube can be used to build
 several different emulators simply by using a different set of priors to 
 rescale the cube.
 
-CL is packaged with three pairs of prior files. Depending on which priors the user selects,
-the emulator will automatically become a massive-neutrino or massless-neutrino emulator.
-\textcolor{orange}{This needs to be linked to the convenience section, on how to add scenario files and what
-not. But this feature is not finished yet! We may have to punt it to “future work.”}
+CL is packaged with three pairs of prior files. Depending on which priors the 
+user selects, the emulator will automatically become a massive-neutrino or 
+massless-neutrino emulator. \textcolor{orange}{This needs to be linked to the 
+convenience section, on how to add scenario files and what not. But this 
+feature is not finished yet! We may have to punt it to “future work.”}
 
 \textcolor{orange}{Table goes here.}
 % Caption for one table: The ``classic'' priors represent a middle ground 
@@ -96,11 +155,19 @@ In tables XXX-XXZ, we provide the specific upper and lower bounds for each of
 the six cosmological parameters over which our massive-neutrino emulator is 
 trained. All intervals are sampled uniformly, \textcolor{orange}{Although some
 experimental code exists to interpret the same hypercube as a uniform sampling
-in root or square space, for example}. The ``MEGA'' priors 
-(table~\ref{tab: priors}) represent the original goal for this project, which 
-unfortunately suffered from too many unsolvable cells. In
-section~\ref{sec: generate_emu_data}, we will describe what it means for a 
-cell to be unsolvable.
+in root or square space, for example}. At first, we used the highly ambitious 
+(relative to modern uncertainty bars) ``MEGA'' set of priors
+(table~\ref{tab: priors}),
+whose values we decided based on the recent emulator papers from
+\textcolor{green}{Spurio Mancini et al 2021. and the other paper, I can't
+remember the name.} However, during the process of generating training data, 
+we found that CAMB was not able to match all of the necessary $\sigma_{12}$ 
+values. We refer to such a situation as an unsolvable cell, and will explain
+why it happens in section~\ref{sec: generate_emu_data}, which covers the
+application of evolution mapping principles within the CL code.
+
+\textcolor{orange}{Talk a little more about the prior ranges, what are their
+values in words??}
 
 The priors that we use correspond to those currently used by COMET. \textcolor{orange}{Should I spend any time defending this choice here, or should I put all of the defense in section~\ref{sec: priors}?}
 
@@ -126,7 +193,7 @@ produced without it. The second one represents our validation set.
 \textcolor{orange}{In a future
 release of Cassandra-Linear, this set will be used to train an ``uncertainty''
 emulator, which will train over the errors from the main emulator in order to
-provide the user with an uncertainty estimate for any cosmology located within 
+provide the user with an uncertainty estimate for any cosmology located within
 the space of priors over which the main emulator was trained.} 
 
 \textcolor{orange}{However, this functionality has not yet been implemented. 
