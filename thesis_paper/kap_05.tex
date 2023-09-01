@@ -289,12 +289,29 @@ GPR, for example the normalization parameters.
 
 Each emulator is an instance of
 the \verb|Emulator| class with a \verb|GPy| GPR object at its core. We will 
-henceforth refer to such instances as emulator objects. Besides the GPR object 
-at the core, emulator objects also convert $\bm{x}$ inputs and
+henceforth refer to such instances as emulator \textit{objects}. Besides the 
+GPR object at the core, emulator objects also convert $\bm{x}$ inputs and
 $\bm{y}$ outputs in order to facilitate scientific access. Specifically, 
 the GPR itself accepts $\bm{x}$ inputs and predicts $\bm{y}$ outputs 
 in a normalized fashion which will not be easily understood unless first 
 appropriately transformed.
+
+%s Now talk about normalization
+
+\textcolor{orange}{Needs segue.}
+The normalizations are necessary for the high performance of the emulators. 
+This need goes beyond numerical instabilities. For example, if a parameter's 
+prior range falls within the relatively reasonable [0.0001, 0.0006] interval, 
+its emulation will still be improved by normalizing it to a [0, 1] interval. 
+Nonetheless, the improvement will be more dramatic the further away a prior is 
+from this [0, 1] interval. The prior in $A_s$, as given in
+table~\ref{neutrino_priors}, covers extremely small values. Consequently, 
+without the appropriate normalization, the trained GPR will be nearly 
+insensitive to the impact of $A_s$ and \textcolor{green}{almost behave like a 
+massless-neutrino emulator}; the lack of neutrino dependence would dominate 
+the error in the resultant emulator.
+\textcolor{orange}{Great start! But can we add some material in
+section~\ref{sec: gpr_intro}: why is GPR vulnerable in this way?}
 
 \section{Testing the Emulator}
 \label{test_emu}
