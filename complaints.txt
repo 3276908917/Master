@@ -42,7 +42,7 @@ $ MEGA priors, 5k emulator
 * COMET 5k, 400 k points
 	* Comet 5k, 500 k points
 		$ fill train
-		>> fill test
+		$ fill test
 	* Comet 5k, 200 k points
 		$ fill train
 		$ fill test
@@ -57,14 +57,14 @@ $ MEGA priors, 5k emulator
 	* We should always use the same test cube
 
 	* Worst of the worst
-		>> buil
+		$ buil
 		* fill
 	* Middling 1
-		>> buil
+		$ buil
 		* fill
 	* Middling 2
-		>> buil
-		* fill
+		$ buil
+		>> fill
 	* Best that we found: just re-use the standard 5k 300k
 	* (No extra test cubes necessary--we should always be comparing to the same
 		cube)

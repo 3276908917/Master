@@ -313,6 +313,7 @@ the error in the resultant emulator.
 \textcolor{orange}{Great start! But can we add some material in
 section~\ref{sec: gpr_intro}: why is GPR vulnerable in this way?}
 
+
 \section{Testing the Emulator}
 \label{test_emu}
 
@@ -381,13 +382,12 @@ heavy access in the previous sections.}
 \textcolor{blue}{The content of this section is still relatively uncertain. 
 Since I am still tweaking some of the emulator's settings, I haven't spent too 
 much time on a script dedicated purely to simplifying the interaction between 
-the user and the emulator \textit{object} itself.}
+the user and the emulator \textit{object} itself. Anyway, the hope is to 
+provide some clear and simple 
+descriptions of what functions the user should turn to in order to get started 
+predicting power spectra using the results of this thesis.}
 
-Anyway, the hope is to provide some clear and simple descriptions of what functions the user should turn to in order to get started predicting power spectra using the results of this thesis. The functions can either create a new emulator object and train it or load an existing one with easy-to-understand functions for interacting with the object.
-
-Here, we will talk about the details of the training as well as the importance of normalization. Since this is still technical, it may not be appropriate for a UI script. So, I am considering breaking out a new script (and therefore a new section), maybe called ``train\_emu.py.''
-
-% Now talk about the use of prior files
+%s Now talk about the use of prior files
 
 In section~\ref{sec: default_priors}, we introduced different priors 
 included with CL, as well as their file names. These file names come into play 
@@ -400,6 +400,3 @@ subdirectory of the CL code.
 % to \verb|get_data_dict|, which in turn is a helper function to the 
 %\textcolor{orange}{unfinished} build_train_and_test_sets, which is a helper
 % function to... ENOUGH!
-
-\verb|build_train_and_test_sets|. in the
-\verb|generate_emu_data| script.
