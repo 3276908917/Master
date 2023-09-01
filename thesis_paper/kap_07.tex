@@ -110,10 +110,28 @@ Here I will talk about what kinds of questions we estimate will be most fruitful
 
 Is there a theoretically perfect LHC generator?
 
-In order to expand the priors, it would be helpful to investigate why CAMB does not allow negative redshifts, in case this can be adapted. Alternatively, CLASS \textcolor{green}{allows} negative redshifts, so it may be worthwhile to repeat the work of this thesis using power spectra from CLASS. This would involve familiarization with a new platform, however, and so this escapes the scope of this thesis. Remember that negative redshifts would be a helpful feature for this work because it would allow us to investigate much broader priors.
+Symbolic regression for the perfect $A_s$ formula? Or this could even reveal
+that we need more parameters!
 
-Should we use a neural network instead of a Gaussian process for our emulator? AndreaP and Alex Eggemeier are already on the job: they are converting COMET to a neural network approach. We recommend that the reader follow future COMET papers for investigations into this question.
+In order to expand the priors, it would be helpful to investigate why CAMB 
+does not allow negative redshifts, in case this can be adapted. Alternatively, 
+CLASS \textcolor{green}{allows} negative redshifts, so it may be worthwhile to 
+repeat the work of this thesis using power spectra from CLASS. This would 
+involve familiarization with a new platform, however, and so this escapes the 
+scope of this thesis. Remember that negative redshifts would be a helpful 
+feature for this work because it would allow us to investigate much broader 
+priors.
+
+Should we use a neural network instead of a Gaussian process for our emulator? 
+AndreaP and Alex Eggemeier are already on the job: they are converting COMET 
+to a neural network approach. We recommend that the reader follow future COMET 
+papers for investigations into this question.
 
 GP's allow natural propagation of
 uncertainty in predictions to the final posterior distribution; neural
 networks lack this feature. At the same time, NNs provide larger speedups \textcolor{green}{CITATIONS}.
+
+The code should be expanded with documentation and unit tests. Also, the
+user interface script is still in progress.
+
+Build an emulator over uncertainties!

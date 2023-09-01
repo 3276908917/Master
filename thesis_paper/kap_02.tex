@@ -72,7 +72,53 @@ incorrect results?
 
 Another paragraph I want to have in this section: stress the part of the evolution mapping introduction, that the $\sigma_{12}$ value we're using to describe the model is actually the $\sigma_{12}$ value of the model's MEMNeC! This is so important and confusing that maybe I'll even recapitulate again later in the section on the generate\_emu\_data.script.
 
-%%% New stuff
+%s Now discuss individual settings
+
+In principle, the accuracy boost should increase the variance in our models but should not affect the bias. The line is
+
+\verb|pars.Accuracy.AccuracyBoost = 3|
+
+\textcolor{orange}{But what does it do?}
+
+\verb|pars.NonLinear = camb.model.NonLinear_none|
+
+% Why is CAMB set up this way anyway? Why do I have to put in a model object 
+% instead of simply flipping a Boolean? {probably not a relevant question for
+% this thesis.}
+
+\verb|pars.WantCls = False|
+
+``\verb|WantCls| – (boolean) Calculate C\_L.'' \textcolor{orange}{This entry 
+of
+the CAMB documentation is NOT helpful. Looks like we’ll have to do some
+detective work.}
+
+\verb|pars.WantScalars = False|
+
+``\verb|WantScalars| – (boolean) Calculates scalar modes.'' We should briefly 
+talk about what they are, then say ``we are not interested in these, let's 
+save time by skipping the computation.''
+
+\verb|pars.Want_CMB = False|
+
+``Calculate the temperature and polarization power spectra.'' We're not 
+interested in these quantities; in order to apply computational resources more 
+efficiently, we should avoid these calculations and therefore set this to 
+\verb|False|.
+
+\verb|pars.DoLensing = False|
+
+``Include CMB lensing'' but \textcolor{red}{why don't we care about this? Does
+this not affect the power spectrum results in any way that we can appreciate
+within the confines of the MCMC experiment that we're testing here?}
+
+\verb|pars.YHe = 0.24|
+
+\verb|pars.Accuracy.lAccuracyBoost = 3|
+
+\verb|pars.Accuracy.AccuratePolarization = False|
+
+%s Small things
 
 Beware the neutrino settings. The effective number of massive neutrinos is about 3.027
 
