@@ -68,7 +68,7 @@ section~\ref{sec: train_emu}. Finally, we will very briefly define terms such
 as $\Omega_k$, $\omega_\text{DE}$, $w_0$, $w_a$ since they make only minor 
 appearances in this work.
 
-%s First: elucidate the density parameters
+%s First: introduce equations until we can explain h and omega_i
 
 The various $\omega_i$  terms are all related. To arrive at these
 terms, we begin with the concept of the Universe's energy density $\rho_i$
@@ -77,8 +77,13 @@ These densities are frequently rewritten with the help of various constants
 and cosmological parameters.
 
 The reason these $\rho_i$ terms are rewritten is because of their appearance
-in the equations that govern the evolution of the Universe. One way of
-writing the first Friedmann equation is:
+in the equations that govern the evolution of the Universe. This discussion
+will very closely follow section 2.2 from \cbib{FECS}. The reader is
+encouraged to engage this source in the event of confusion, as our discussion 
+here will be brief and therefore assume a great deal of cosmological 
+background from the reader.
+
+One way of writing the first Friedmann equation is:
 
 %!s This whole next section is ripped from FECS. Should I be concerned?
 
@@ -88,7 +93,8 @@ writing the first Friedmann equation is:
 \end{equation}
 
 Where the dimensionless scale factor $a$ is a way of describing the size of
-the Universe (which is, by convention set to unity at the present day), and $K$ characterizes the Universe's curvature as
+the Universe (which is, by convention set to unity at the present day), and
+$K$ characterizes the Universe's curvature as
 
 \begin{equation}
 ^{(3)}R = \frac{6K}{a^2}
@@ -119,36 +125,70 @@ where the nought indicates the value today.
 We can combine this with \ref{eq: Friedmann1} to write:
 
 \begin{equation}
+\label{eq: Friedmann1_sum}
 \left( \frac{\dot{a}}{a} \right)^2
 =
 \frac{8 \pi G}{3} \, \sum_i \frac{\rho_{i, 0}}{a^{3(1 + w_i)}} - \frac{K}{a^2}
 \end{equation}
 
-%s First talk about what \omega and \Omega mean, then talk about what the
-%s subscripts mean
+%s Introduce h
 
-{segue from power spectrum discussion?} There is another facet to densities that will be conceptually important to this work: densities $\rho_i$ of different energy species. Similarly to before, it is common to define a related quantity $\Omega_i$ that is normalized, although here the normalization is enforce
-
-\begin{equation}
-\sum_i \Omega_i = 1
-\end{equation}
-
-IT’s MORE COMPLICATED THAN THAT—TALK ABOUT FLATNESS OF UNIVERSE and critical densities. These $\Omega_i$ parameters are referred to as “fractional energy densities.” The constant of normalization is simply $h^2$. $h$ is known as
-the dimensionless Hubble parameter and is merely a different 
+At this point, we have tied in all of the physics that will be necessary to
+explain the $\omega$ and $h$ parameters--now it is just a matter of rewriting 
+terms. First, we define the \textit{Hubble parameter}
+$H \equiv \frac{\dot{a}}{a}$ and evaluate \ref{eq: Friedmann1_sum}
+for the present:
 
 \begin{equation}
-h = H_0 \, \frac{1}{100 }
+\label{eq: Friedmann1_present}
+H_0^2 = \frac{8 \pi G}{3} \, \sum_i \rho_{i, 0} - K
 \end{equation}
 
-For example, the Planck best-fit value for $H_0$,
-$67 \, \frac{\mathrm{km} / \mathrm{s}}{\mathrm{Mpc}}$,
-corresponds to the $h$ value $0.67$. 
+$H$ is customarily written in units of
+$\frac{\mathrm{km}}{\mathrm{s} \mathrm{Mpc}}$, and the constant
+$H_{100} = 100 \, \frac{\mathrm{km}}{\mathrm{s} \mathrm{Mpc}}$ can be used to
+define the \textit{dimensionless Hubble parameter} $h = \frac{H_0}{H_{100}}$.
 
-Unfortunately, this normalization has its disadvantages. WHAT ARE THEY. In particular, in the context of parameter inference, it is inconvenient to try to constrain a term consisting of multiple uncertain parameters. In this case, $h$ is itself a parameter that we would like to constrain, so it would be better to keep it separate. This situation is made more drastic due to the Hubble tension, which leaves the value of $h$ significantly unclear compared to other parameters.
+%\textcolor{red}{Why do we bother with $H_{100}$ at all? Why didn't we just
+%define }
 
-throughout this paper we will refrain from using the conventional
-fractional density parameters $\Omega_i$ and use instead the physical density
-parameters $\omega_i$.
+In terms of $h$, equation \ref{eq: Friedmann1_present} becomes
+
+\begin{equation}
+h^2 = \frac{8 \pi G}{3 H_{100}^2} \, \sum_i \rho_{i, 0} - \frac{K}{H^2_{100}}
+\end{equation}
+
+%s Introduce \omega and \Omega  
+
+Since the coefficient has units of density, it is convenient to define the
+dimensionless \textit{physical density parameters}
+
+\begin{equation}
+\omega_i \equiv \frac{8 \pi G}{3 H_{100}^2} \rho_{i, 0}
+\end{equation}
+
+The analog for curvature is defined separately as
+
+\begin{equation}
+\omega_{K} \equiv -\frac{K}{H_{100}^2}
+\end{equation}
+
+The dimensionless physical density parameters are traditionally bypassed in
+favor of the \textit{fractional density parameters} $\Omega_i$:
+
+\begin{equation}
+\Omega_i \equiv \frac{\omega_i}{h^2}
+\end{equation} % = \frac{\rho_{i, 0}}{\rho_c}
+
+which has the conceptual advantage of summing to unity when the Universe is
+flat. However, the inclusion of $h^2$ in the definitions of the density
+parameters can lead to misconceptions which are beyond the scope of this
+work. The simplest argument against the use of $\Omega_i$ for the purposes of
+this treatment is that $\Omega_i$ combines two unknowns, $h$ and $\rho_i$
+together, which complicates parameter inference.\footnote{This situation is 
+made more drastic due to the Hubble tension, which leaves the value of $h$ 
+fairly unclear compared to other parameters.} Therefore, for this work we
+will use $\omega_i$ instead.
 
 %s What do the subscripts mean?
 
@@ -162,6 +202,8 @@ $B$ or $b$ & Baryons \\
 $C$, $c$, or CDM & Cold dark matter \\
 $\nu$ & Neutrinos \\
 $M$ & Matter ($b$, CDM, and $\nu$ together) \\
+DE & Dark Energy \\
+$\Lambda$ & Cosmological constant (one proposal for DE)
 $K$, $k$, or $\kappa$ & Curvature \\ \hline
 \end{tabular}
  \caption[Energy species symbols]{The various energy species into which the 
@@ -169,12 +211,16 @@ $K$, $k$, or $\kappa$ & Curvature \\ \hline
  \label{tab: species_symbols}
 \end{table}
 
-Table~\ref{tab: species_symbols} gives the various subscripts and the energy species to which
-they correspond. We note that $\omega_\gamma$ does not appear in this thesis;
+Now that we have explained the meaning of the $\omega_i$ term in general, we
+can discuss the different specific species of energy and the subscripts that
+we use to denote them. This information is summarized in
+table~\ref{tab: species_symbols}.
+We note that $\omega_\gamma$ does not appear in this thesis;
 while radiation is critically important in the early stages of the
 Universe, it rapidly becomes inconsequential
 and radiation-matter equality occurs only 55,000 years after the
-beginning of the Universe (\cbib{CO}, page 1194).
+beginning of the Universe (\cbib{CO}, page 1194)\footnote{For those who are
+curious, $\omega_\gamma$ ends up being a shape parameter \cbib{FECS}.}.
 
 % Distinguish baryons from CDM
 
@@ -194,14 +240,15 @@ even in cosmological contexts.
 
 %s omega_k
 
-According to Andrea P., $\omega_k$ is an evolution parameter only in a narrow 
+\textcolor{red}{According to Andrea P., $\omega_K$ is an evolution parameter 
+only in a narrow 
 band around zero--specifically, over roughly the range [-0.05, 0.05].
-\textcolor{red}{By how much does evolution mapping fail here? And, if 
-$\omega_k$ is truly a shape parameter, why does Ariel's FECS call $\omega_k$
-an evolution parameter?} We do not emulate over $\omega_k$ but assume take
+By how much does evolution mapping fail here? And, if 
+$\omega_K$ is truly a shape parameter, why does Ariel's FECS call $\omega_K$
+an evolution parameter?} We do not emulate over $\omega_K$ but assume take
 it to be zero for all cells. However, as we explain in
 section~\ref{sec: ev_mapping_intro}, this does not limit the applicability of
-our emulators. The use of nonzero $\omega_k$ values will simply entail a
+our emulators. The use of nonzero $\omega_K$ values will simply entail a
 relabeling of the emulated power spectra. \textcolor{orange}{Then again, I'm
 holding $\sigma_{12}$ fixed, so does it change anything at all?}
 
