@@ -295,12 +295,75 @@ the GPR itself accepts $\bm{x}$ inputs and predicts $\bm{y}$ outputs
 in a normalized fashion which will not be easily understood unless first 
 appropriately transformed.
 
+\section{Testing the Emulator}
+\label{test_emu}
+
+The majority of the quantification and visualization of the performance of the
+emulator are left to the user. However, a couple of functions are provided for 
+the sake of simple ``eyeball'' evaluation of the emulator's accuracy.
+The \verb|test| function in the \verb|Emulator_Trainer| class (in the
+\verb|train_emu| script) takes a set of $\matr{X}$ and $\matr{Y}$ test data 
+and computes errors automatically. Specifically, it stores three sets of error 
+metrics as class attributes for the trainer object: \verb|deltas| (the simple 
+difference between the predicted spectra $\hat{\bm{y}}$ and the test spectra
+$\bm{y}$, \verb|rel_errors| (the ratio of \verb|deltas| to the $\bm{y}$), and
+\verb|sq_errors| (the squares of \verb|deltas|).
+
+It follows from the definition of these error metrics that all of them have 
+the same shape: each is a set of arrays equal in number to the $bm{y}$; and 
+the size of each element array is determined by the number of scales at which 
+the training power spectra were evaluated. \textcolor{orange}{In the current
+version of the code, this number of scales must be equal in the training and
+testing sets. But, if we add another layer of interpolation, we could easily
+eliminate this limitation}.
+
+The \verb|error_curves| function graphs the performance on the given test set 
+using a collection of overplotted error curves, where each curve represents a 
+single cosmology. By default, the $y$-axis is relative error and the
+$x$-axis is the inverse scale, $k$. To break down the performance based on 
+individual cosmological parameters, there is a \verb|param_index| function
+parameter which will automatically color each curve according to its value in 
+the chosen cosmological parameter. Since colors can sometimes be difficult to 
+quickly compare, there is also a \verb|fixed_k| function parameter. When a 
+fixed value for the inverse scale is provided, the plot becomes a scatter 
+plot, with percent error as the $y$-axis and the chosen cosmological parameter 
+as the $x$-axis.
+
+%! Did I make sure to refer to priors correctly when transcribing ^ this 
+%! function into train_emu.py? I think so… but it wouldn’t hurt to look one 
+%! more time, especially since the X values are now automatically unit!
+
+The \verb|error_statistics| function issues a rudimentary summary of the 
+application of some NumPy aggregator\footnote{The user may also pass in
+non-NumPy aggregators as long as they can be called in the exact same
+way--the \verb|error_statistics| and \verb|error_hist| functions always
+perform the call \verb|error_aggregator(errors, axis=1)|.}
+\verb|error_aggregator|, which condenses each error array to a single point,
+to one of the various error metrics described earlier. The 
+most useful aggregators will be \verb|mean|, \verb|median|, and \verb|std|, 
+but interesting information can also be gathered from, for example, the
+\verb|min|, \verb|max|, and \verb|ptp| aggregators.
+\verb|error_statistics| simply prints various statistics associated with the 
+aggregation, such as the median of the aggregates.
+
+The \verb|error_hist| function is essentially a visualization of the 
+information printed out by the \verb|error_statistics| function: an aggregator
+function is applied to the selected error array, then the aggregates are 
+binned and plotted as a histogram. The user can specify the number of bins,
+otherwise Sturges' rule is used.
+
 
 \section{Accessing and Using the Emulator}
 
 % user\_interface.py
 
-The content of this section is still relatively uncertain. Since I am still tweaking some of the emulator's settings, I haven't spent too much time on a script dedicated purely to simplifying the interaction between the user and the emulator \textit{object} itself.
+\textcolor{orange}{Maybe we should rename this section, we're already doing
+heavy access in the previous sections.}
+
+\textcolor{blue}{The content of this section is still relatively uncertain. 
+Since I am still tweaking some of the emulator's settings, I haven't spent too 
+much time on a script dedicated purely to simplifying the interaction between 
+the user and the emulator \textit{object} itself.}
 
 Anyway, the hope is to provide some clear and simple descriptions of what functions the user should turn to in order to get started predicting power spectra using the results of this thesis. The functions can either create a new emulator object and train it or load an existing one with easy-to-understand functions for interacting with the object.
 

@@ -41,32 +41,29 @@ $ MEGA priors, 5k emulator
 
 * COMET 5k, 400 k points
 	* Comet 5k, 500 k points
-		>> fill train
-		* fill test
+		$ fill train
+		>> fill test
 	* Comet 5k, 200 k points
 		$ fill train
-			SUSPECT
-		>> fill test
+		$ fill test
 	* Comet 5k, 100 k points? 250? 150? Let's do 100 for now
 		$ fill train
-			SUSPECT
-		$ fill test
-			SUSPECT
+		>> fill test
 	* 400k
 		$ fill train
-		>> fill test
+		$ fill test
 
 * Runs of varying LHC-quality
 	* We should always use the same test cube
 
 	* Worst of the worst
-		* buil
+		>> buil
 		* fill
 	* Middling 1
-		* buil
+		>> buil
 		* fill
 	* Middling 2
-		* buil
+		>> buil
 		* fill
 	* Best that we found: just re-use the standard 5k 300k
 	* (No extra test cubes necessary--we should always be comparing to the same
