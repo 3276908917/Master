@@ -49,8 +49,11 @@ emulators, each of which is trained over a different parameter
 space.\footnote{Emulators will be described in greater detail in
 section~\ref{sec: emulation_intro}. For now, the extremely simple definition 
 from the summary will suffice.}
-Each emulator accepts as $x$ a set of values for cosmological parameters and
-predicts as $\hat{y}$ a type of power spectrum. 
+Each emulator accepts as $\matr{X}$ sets of tuples of values for cosmological 
+parameters and predicts as $\hat{\matr{Y}}$ the power spectra to which these
+tuples correspond. 
+
+%s Introduce the parameter names, THEN talk about what they mean
 
 \textcolor{orange}{This paragraph needs to be rewritten. It's way too messy to 
 talk about parameters in order of importance!}
@@ -65,8 +68,39 @@ section~\ref{sec: train_emu}. Finally, we will very briefly define terms such
 as $\Omega_k$, $\omega_\text{DE}$, $w_0$, $w_a$ since they make only minor 
 appearances in this work.
 
+%s First: elucidate the density parameters
+
 The various $\omega_i$ and $\Omega_i$ terms are all related, and describe the
 energy density of the Universe in different energy species.
+
+%s First talk about what \omega and \Omega mean, then talk about what the
+%s subscripts mean
+
+%s What do the subscripts mean?
+
+\begin{table}[htb]
+\centering
+\begin{tabular}{l|l}
+\hline
+Symbol & Energy Species \\ \hline
+$\gamma$ & Relativistic (i.e. radiation, photons) \\
+$B$ or $b$ & Baryons \\
+$C$, $c$, or CDM & Cold dark matter \\
+$\nu$ & Neutrinos \\
+$M$ & Matter ($b$, CDM, and $\nu$ together) \\
+$K$, $k$, or $\kappa$ & Curvature \\ \hline
+\end{tabular}
+ \caption[Energy species symbols]{The various energy species into which the 
+ 	contents of the Universe are categorized, and their conventional symbols.}
+ \label{tab: species_symbols}
+\end{table}
+
+Table~\ref{tab: species_symbols} gives the various subscripts and the energy species to which
+they correspond. We note that $\omega_\gamma$ does not appear in this thesis;
+while radiation is critically important in the early stages of the
+Universe, it rapidly becomes inconsequential
+and radiation-matter equality occurs only 55,000 years after the
+beginning of the Universe (\cbib{CO}, page 1194).
 
 While baryons and cold dark matter (CDM) are both pressureless\footnote{This 
 is of

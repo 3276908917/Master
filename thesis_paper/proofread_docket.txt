@@ -1,5 +1,5 @@
 Sections in particular that I've expanded:
-* 1.1 omega_K added
+* 1.1
 * 2.2
 * 4.1
 * 4.2
