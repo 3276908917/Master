@@ -55,8 +55,8 @@ tuples correspond.
 
 %s Introduce the parameter names, THEN talk about what they mean
 
-\textcolor{orange}{This paragraph needs to be rewritten. It's way too messy to 
-talk about parameters in order of importance!}
+\textcolor{orange}{This paragraph needs to be rewritten. It's way too messy
+to talk about parameters in order of importance!}
 
 A secondary, ``support'' emulator has been trained over four parameters:
 $\omega_b$, $\omega_\text{CDM}$, $n_s$, and $\sigma_{12}$.
@@ -70,11 +70,85 @@ appearances in this work.
 
 %s First: elucidate the density parameters
 
-The various $\omega_i$ and $\Omega_i$ terms are all related, and describe the
-energy density of the Universe in different energy species.
+The various $\omega_i$  terms are all related. To arrive at these
+terms, we begin with the concept of the Universe's energy density $\rho_i$
+in some energy species associated with the label $i$ (for example, radiation).
+These densities are frequently rewritten with the help of various constants
+and cosmological parameters.
+
+The reason these $\rho_i$ terms are rewritten is because of their appearance
+in the equations that govern the evolution of the Universe. One way of
+writing the first Friedmann equation is:
+
+%!s This whole next section is ripped from FECS. Should I be concerned?
+
+\begin{equation}
+\label{eq: Friedmann1}
+\left( \frac{\dot{a}}{a} \right)^2 = \frac{8 \pi G}{3} \, \rho - \frac{K}{a^2}
+\end{equation}
+
+Where the dimensionless scale factor $a$ is a way of describing the size of
+the Universe (which is, by convention set to unity at the present day), and $K$ characterizes the Universe's curvature as
+
+\begin{equation}
+^{(3)}R = \frac{6K}{a^2}
+\end{equation}
+
+\textcolor{red}{where $R$ is the scalar of curvature. How are we indexing
+into a scalar??.}
+
+All of the energy species that make up the Universe can be approximated as
+barotropic fluids with a constant of proportionality $w$ between the
+pressure $p$ and the density $\rho$ of the fluid, i.e. $p = w \rho$.
+
+Energy conservation (\textcolor{orange}{Look up a derivation}) tells us that
+
+\begin{equation}
+\rho_i \propto a^{-3 (1 + w_i)}
+\end{equation}
+
+As long as the different energy species do not interact, this relation will
+apply to each species separately, and we can sum over all species to write:
+
+\begin{equation}
+\rho = \sum_i \frac{\rho_{i, 0}}{a^{3(1 + w_i)}}
+\end{equation}
+
+where the nought indicates the value today.
+
+We can combine this with \ref{eq: Friedmann1} to write:
+
+\begin{equation}
+\left( \frac{\dot{a}}{a} \right)^2
+=
+\frac{8 \pi G}{3} \, \sum_i \frac{\rho_{i, 0}}{a^{3(1 + w_i)}} - \frac{K}{a^2}
+\end{equation}
 
 %s First talk about what \omega and \Omega mean, then talk about what the
 %s subscripts mean
+
+{segue from power spectrum discussion?} There is another facet to densities that will be conceptually important to this work: densities $\rho_i$ of different energy species. Similarly to before, it is common to define a related quantity $\Omega_i$ that is normalized, although here the normalization is enforce
+
+\begin{equation}
+\sum_i \Omega_i = 1
+\end{equation}
+
+IT’s MORE COMPLICATED THAN THAT—TALK ABOUT FLATNESS OF UNIVERSE and critical densities. These $\Omega_i$ parameters are referred to as “fractional energy densities.” The constant of normalization is simply $h^2$. $h$ is known as
+the dimensionless Hubble parameter and is merely a different 
+
+\begin{equation}
+h = H_0 \, \frac{1}{100 }
+\end{equation}
+
+For example, the Planck best-fit value for $H_0$,
+$67 \, \frac{\mathrm{km} / \mathrm{s}}{\mathrm{Mpc}}$,
+corresponds to the $h$ value $0.67$. 
+
+Unfortunately, this normalization has its disadvantages. WHAT ARE THEY. In particular, in the context of parameter inference, it is inconvenient to try to constrain a term consisting of multiple uncertain parameters. In this case, $h$ is itself a parameter that we would like to constrain, so it would be better to keep it separate. This situation is made more drastic due to the Hubble tension, which leaves the value of $h$ significantly unclear compared to other parameters.
+
+throughout this paper we will refrain from using the conventional
+fractional density parameters $\Omega_i$ and use instead the physical density
+parameters $\omega_i$.
 
 %s What do the subscripts mean?
 
@@ -102,6 +176,8 @@ Universe, it rapidly becomes inconsequential
 and radiation-matter equality occurs only 55,000 years after the
 beginning of the Universe (\cbib{CO}, page 1194).
 
+% Distinguish baryons from CDM
+
 While baryons and cold dark matter (CDM) are both pressureless\footnote{This 
 is of
 course an approximation, but it is a very good one. While a hot baryonic gas 
@@ -115,29 +191,6 @@ prevents CDM clouds from collapsing in the same way that, for example,
 baryons can collapse to form stars and planets. Because of the significantly
 different behaviors of these two species of matter, we treat them separately
 even in cosmological contexts.
-
-{segue from power spectrum discussion?} There is another facet to densities that will be conceptually important to this work: densities $\rho_i$ of different energy species. Similarly to before, it is common to define a related quantity $\Omega_i$ that is normalized, although here the normalization is enforce
-
-\begin{equation}
-\sum_i \Omega_i = 1
-\end{equation}
-
-IT’s MORE COMPLICATED THAN THAT—TALK ABOUT FLATNESS OF UNIVERSE and critical densities. These $\Omega_i$ parameters are referred to as “fractional energy densities.” The constant of normalization is simply $h^2$. $h$ is known as
-the dimensionless Hubble parameter and is merely a different 
-
-\begin{equation}
-h = H_0 \, \frac{1}{100 }
-\end{equation}
-
-For example, the Planck best-fit value for $H_0$,
-$67 \, \frac{\mathrm{km} / \mathrm{s}}{\mathrm{Mpc}}$,
-corresponds to the $h$ value $0.67$. 
-
-Unfortunately, this normalization has its disadvantages. WHAT ARE THEY. In particular, in the context of parameter inference, it is inconvenient to try to constrain a term consisting of multiple uncertain parameters. In this case, $h$ is itself a parameter that we would like to constrain, so it would be better to keep it separate. This situation is made more drastic due to the Hubble tension, which leaves the value of $h$ significantly unclear compared to other parameters.
-
-throughout this paper we will refrain from using the conventional
-fractional density parameters $\Omega_i$ and use instead the physical density
-parameters $\omega_i$.
 
 %s omega_k
 

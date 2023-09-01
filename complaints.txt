@@ -48,7 +48,7 @@ $ MEGA priors, 5k emulator
 		$ fill test
 	* Comet 5k, 100 k points? 250? 150? Let's do 100 for now
 		$ fill train
-		>> fill test
+		$ fill test
 	* 400k
 		$ fill train
 		$ fill test
@@ -58,7 +58,7 @@ $ MEGA priors, 5k emulator
 
 	* Worst of the worst
 		$ buil
-		* fill
+		>> fill
 	* Middling 1
 		$ buil
 		* fill
