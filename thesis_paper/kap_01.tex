@@ -335,36 +335,32 @@ defined as
 \sigma_8
 =
 \sqrt{\left\langle \left(
-	\frac{\delta M}{M} (8 \, \mathrm{Mpc} h^{-1})
+	\frac{\delta M}{M} (8 \, \mathrm{Mpc} \, h^{-1})
 \right)^2 \right\rangle}
 \end{equation}
 
-Notice that this is not the same as replacing 12 with 8 in
+Notice that this is \textit{not} the same as replacing 12 with 8 in
 equation~\ref{eq: sigma12}! The subscript in $\sigma_8$ is misleading:
-$\sigma_{8}$ is the linear-theory RMS mass variance in spheres of radius
-$8 / h$ Mpc. Recall that $h$ is not a constant but its own cosmological
-parameter to be 
+$\sigma_8$ is the linear-theory RMS mass variance in spheres of radius
+$8 / h$ Mpc, not 8 Mpc. Recall that $h$ is not a constant but its own 
+cosmological parameter whose value is subject to further observations. This
+becomes especially problematic when comparing the results of different papers;
+if the quoted $h$ values differ even slightly between two works, the same
+symbol $\sigma_8$ will refer to different concepts--that is, mass variances on
+different scales. Therefore $\sigma_8$ comparisons will typically lead to
+confusion, such as the $\sigma_8$ tension, which basically vanishes when using
+$\sigma_{12}$. For a fuller treatment of the advantages of $\sigma_{12}$, we
+refer the reader to \cbib{San20}.
 
-%This 
-%section will include an extremely brief summary of Ariel's paper motivating 
-%the use of $\sigma_{12}$ instead of $\sigma_8$.}
+The issue with $\sigma_8$ most relevant to this work is that, like the
+fractional density parameters $\Omega_i$, $\sigma_8$ combines two uncertain
+cosmological quantities: the amplitude of the power spectrum, and the
+relative expansion rate of the Universe. Even more important is the evolution 
+mapping argument. We can greatly simplify the
+parameter space of emulators with the help of $\sigma_{12}$
+(see section~\ref{sec: ev_mapping_intro} for details), and $\sigma_8$
+is simply incapable of exploiting the parameter degeneracies in the same way.
 
-When comparing $\sigma_8$ results from different analyses, for example, the significance of the parameter itself is easily lost. Whenever two analyses differ, even slightly, in their values for $h$, the meaning of sigma 8 changes!
-
-Since $h$ is already its own parameter, the conventional $\sigma_8$ parameter 
-is truly a mixture of two parameters. This presents a host of misleading 
-results and statistical ambiguities (\cbib{San20}) which are outside of the 
-scope of this work (\textcolor{orange}{Nevertheless I would like to summarize 
-a couple of key arguments}) but which prompt us to abandon $\sigma_8$.
-
-In the end, however, the argument in favor of $\sigma_{12}$ most relevant to
-this paper is the evolution mapping argument
-(see section~\ref{sec: ev_mapping_intro} for details). We can greatly simplify 
-the
-parameter space of emulators with the help of $\sigma_{12}$, and $\sigma_8$
-is simply incapable of exploiting the parameter degeneracies to the same
-extent.
- 
 
 \section{The Matter Power Spectrum}
 \label{sec: Pk_intro}
@@ -379,13 +375,16 @@ extent.
   \caption[Kurzform f"ur das Abbildungsverzeichnis]{Dies ist die Erkl"arung zum Bild.}
 \end{figure}
 
-How can we describe the Universe in such 
-a way as to allow quantitative definitions of these phrases? As a starting 
-point, we can imagine quantifying the energy density $\rho(\bm{x})$ of the
-Universe at any one point $\bm{x}$ in three-dimensional space.
+Now that we have at least briefly introduced the various cosmological
+parameters of interest to us, we can define what we meant in the opening
+paragraphs by ``cosmological observations'' and ``what we would expect to
+see.'' How can we describe the Universe in such a way as to allow quantitative 
+definitions of these phrases? As a starting point, we can imagine quantifying 
+the energy density $\rho(\bm{x})$ of the Universe at any one point $\bm{x}$ in 
+three-dimensional space.
 
-Let us return to the idea that cosmological parameters determine the the 
-evolution of the Universe.
+%Let us return to the idea that cosmological parameters determine the the 
+%evolution of the Universe.
 % In what ways can we quantify the Universe, in order to be able to describe
 % its evolution? We can simply consider the time dependence of the density.
 
@@ -401,7 +400,7 @@ represents the average energy density of the entire Universe.
 $\delta(\bm{x})$ easier than $\rho(\bm{x})$ to work with since it
 is unitless and especially because it is normalized--the integral of the
 matter density contrast field, taken over the entire Universe, is unity. One particularly popular metric is the cosmic matter density 
-contrast field. evolution of the Universe? The various constituents of the Universe 
+contrast field.
 
 Next, I want to talk about one way of describing the matter density contrast 
 field: the power spectrum. The power spectrum can be probed in many different 
@@ -463,6 +462,8 @@ Conventional emulator calibration entails the historical units of Mpc / $h$,
 but if we use instead units of Mpc, then we can distill all of the evolution
 parameters into one parameter, $\sigma_{12}$. 
 
+\textcolor{orange}{Also in this section: talk about why we're always plotting
+power spectra in ABSOLUTE UNITS!}
 
 \section{Boltzmann Solvers and CAMB}
 \label{sec: boltzmann_intro}
