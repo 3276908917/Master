@@ -1,8 +1,8 @@
 \chapter{Introduction, Theory, and Background}
 
-\textcolor{blue}{I have a lot of different important concepts that I need to 
-get through, so I can easily imagine this becoming a relatively long 
-introduction compared to other master's theses.}
+%\textcolor{blue}{I have a lot of different important concepts that I need to 
+%get through, so I can easily imagine this becoming a relatively long 
+%introduction compared to other master's theses.}
 
 A primary goal of cosmology is to specify, as narrowly as possible, the 
 parameters which define our Universe. These include, for example, the overall 
@@ -44,39 +44,82 @@ on the matter power spectrum). First, we will briefly introduce concrete
 examples of cosmological parameters in which we are interested.
 
 In this work, we will concentrate on different parameters to different 
-extents. By the end of this thesis, we will have built and tested two main
+extents. 
+% The six parameters over which our emulator is trained are
+% $\omega_b$, $\omega_c$, $n_s$, $\sigma_{12}$, $A_s$, and $\omega_\nu$.
+By the end of this thesis, we will have built and tested two main
 emulators, each of which is trained over a different parameter
 space.\footnote{Emulators will be described in greater detail in
 section~\ref{sec: emulation_intro}. For now, the extremely simple definition 
 from the summary will suffice.}
-Each emulator accepts as $\matr{X}$ sets of tuples of values for cosmological 
+Each emulator accepts as $\matr{X}$ arrays of tuples of values for 
+cosmological 
 parameters and predicts as $\hat{\matr{Y}}$ the power spectra to which these
 tuples correspond. 
 
 %s Introduce the parameter names, THEN talk about what they mean
 
+\begin{comment}
+
 \textcolor{orange}{This paragraph needs to be rewritten. It's way too messy
 to talk about parameters in order of importance!}
 
-A secondary, ``support'' emulator has been trained over four parameters:
-$\omega_b$, $\omega_\text{CDM}$, $n_s$, and $\sigma_{12}$.
-The primary emulator for this work has been trained over two additional
-parameters: $A_s$ and $\omega_\nu$. Later in this section, we will also 
-introduce the terms $h$ and $z$, which are not subject to emulation but which 
-will be important to the generation of training data for the emulator (see 
-section~\ref{sec: train_emu}. Finally, we will very briefly define terms such 
-as $\Omega_k$, $\omega_\text{DE}$, $w_0$, $w_a$ since they make only minor 
-appearances in this work.
+\end{comment}
+
+The primary emulator for this work has been trained over six parameters:
+$\omega_b$, $\omega_\text{CDM}$, $n_s$, $\sigma_{12}$, $A_s$ and $\omega_\nu$.
+A secondary, ``support'' emulator has been trained over just the first four of
+these. The terms $h$ and $z$ are not subject to emulation but will be 
+important to the generation of training data for the emulator (see 
+section~\ref{sec: train_emu}. Cosmological terms beyond these (such as
+$\Omega_k$, $\omega_\text{DE}$, $w_0$, $w_a$) make only minor appearances in 
+this work.
 
 %s First: introduce equations until we can explain h and omega_i
 
-The various $\omega_i$  terms are all related. To arrive at these
-terms, we begin with the concept of the Universe's energy density $\rho_i$
-in some energy species associated with the label $i$ (for example, radiation).
-These densities are frequently rewritten with the help of various constants
-and cosmological parameters.
+Our first goal will be to define the various $\omega_i$ terms, although along
+the way it will be convenient to point out other terms. To arrive at
+definitions for $\omega_i$, we will begin with the concept of the Universe's 
+energy density $\rho_i$
+in some energy species associated with the label $i$. We list the various
+energy species and their corresponding labels in
+table~\ref{tab: species_symbols}.
+We note that $\gamma$ does not play a role in this thesis;
+while radiation is critically important in the early stages of the
+Universe, it rapidly becomes inconsequential; after the Universe was a mere
+55,000 years old, the
+era of radiation domination gave way to the era of matter domination 
+(\cbib{CO}, page 1194)\footnote{For those who are
+curious, $\omega_\gamma$ ends up being a shape parameter \cbib{FECS}.}.
 
-The reason these $\rho_i$ terms are rewritten is because of their appearance
+%s What do the subscripts mean?
+
+\begin{table}[htb]
+\centering
+\begin{tabular}{l|l}
+\hline
+Symbol & Energy Species \\ \hline
+$\gamma$ & Relativistic (i.e. radiation, photons) \\
+$B$ or $b$ & Baryons \\
+$C$, $c$, or CDM & Cold dark matter \\
+$\nu$ & Neutrinos \\
+$M$ & Matter ($b$, CDM, and $\nu$ together) \\
+DE & Dark Energy \\
+$\Lambda$ & Cosmological constant (one proposal for DE) \\
+$K$, $k$, or $\kappa$ & Curvature \\ \hline
+\end{tabular}
+ \caption[Energy species symbols]{The various energy species into which the 
+ 	contents of the Universe are categorized, and their conventional symbols.}
+ \label{tab: species_symbols}
+\end{table}
+
+% Now that we have explained the meaning of the $\omega_i$ term in general, we
+% can discuss the different specific species of energy and the subscripts that
+% we use to denote them.
+
+These densities $\rho_i$ are frequently rewritten with the help of various 
+constants and cosmological parameters. We rewrite the $\rho_i$ terms are based 
+on their appearance
 in the equations that govern the evolution of the Universe. This discussion
 will very closely follow section 2.2 from \cbib{FECS}. The reader is
 encouraged to engage this source in the event of confusion, as our discussion 
@@ -96,7 +139,10 @@ Where the dimensionless scale factor $a$ is a way of describing the size of
 the Universe (which, by convention, is set to unity at the present day). As 
 the universe expands, the wavelength of traveling light is stretched out, and
 photons lose energy. As far as we understand cosmology today, the Universe has
-always been expanding (although the expansion rate has evolved). Therefore, we
+always been expanding (although the expansion rate has evolved).
+Therefore,\footnote{\textcolor{red}{Actually, equation~\ref{eq: a_to_z}}
+should hold regardless of that fact, right? So this ``therefore'' is wrong,
+right?} we
 can use cosmological redshift $z$ as a proxy for the age of the Universe at 
 which any photon, which we receive, was emitted from the source we are 
 observing.\footnote{Photons can of course be redshifted also according to the
@@ -105,7 +151,13 @@ observation). On the scale of cosmological observations, cosmological redshift
 certainly dominates, but distortions due to Doppler-shifted light,
 called redshift space distortions, can cause problems for cosmological 
 analyses. These problems lie outside the scope of this work.
-\textcolor{green}{citation}.}
+\textcolor{green}{citation}.} Specifically, the redshift of incoming light can
+be related to the scale factor at the time of its emission as:
+
+\begin{equation}
+\label{eq: a_to_z}
+a = \frac{1}{1 + z}
+\end{equation}
 
 \textcolor{red}{Is it really important that I produce some sketch to show the
 effect of cosmological expansion on light wavelenghth, for example? I don't
@@ -120,11 +172,25 @@ $K$ characterizes the Universe's curvature as
 \textcolor{red}{where $R$ is the scalar of curvature. How are we indexing
 into a scalar??.}
 
-All of the energy species that make up the Universe can be approximated as
+All the energy species that make up the Universe can be approximated as
 barotropic fluids with a constant of proportionality $w$ between the
-pressure $p$ and the density $\rho$ of the fluid, i.e. $p = w \rho$.
+pressure $p$ and the density $\rho$ of the fluid, i.e. $p = w \rho$. $w$ is
+referred to as the equation of state parameter and in most cases is a
+well-known constant (for example, $w_\gamma = 1/3$ and $w_m = 0$). However, in
+the case of dark energy, the constancy cannot be taken for granted and we
+adopt a more general form called the Chevallier-Polarski-Linder (CPL) 
+parameterization \cbib{Scherrer}:
 
-Energy conservation (\textcolor{orange}{Look up a derivation}) tells us that
+\begin{equation}
+w_\text{DE} = w_0 + w_a (1 - a)
+\end{equation}
+
+These $w_0$ and $w_a$ are cosmological parameters which also appear in our
+statistical analyses, although our observations so far appear to support
+a cosmological constant solution: $w_0 = -1$ and $w_a$ = 0.
+
+We can combine the equations of state for the barotropic fluids with energy 
+conservation (\textcolor{orange}{Look up a derivation}) to find that
 
 \begin{equation}
 \rho_i \propto a^{-3 (1 + w_i)}
@@ -199,47 +265,16 @@ favor of the \textit{fractional density parameters} $\Omega_i$:
 
 which has the conceptual advantage of summing to unity when the Universe is
 flat. However, the inclusion of $h^2$ in the definitions of the density
-parameters can lead to misconceptions which are beyond the scope of this
-work. The simplest argument against the use of $\Omega_i$ for the purposes of
+parameters can lead to misconceptions which are relevant to the content of
+this work but are beyond its scope. The simplest argument against the use of 
+$\Omega_i$ for the purposes of
 this treatment is that $\Omega_i$ combines two unknowns, $h$ and $\rho_i$
 together, which complicates parameter inference.\footnote{This situation is 
 made more drastic due to the Hubble tension, which leaves the value of $h$ 
 fairly unclear compared to other parameters.} Therefore, for this work we
 will use $\omega_i$ instead.
 
-%s What do the subscripts mean?
-
-\begin{table}[htb]
-\centering
-\begin{tabular}{l|l}
-\hline
-Symbol & Energy Species \\ \hline
-$\gamma$ & Relativistic (i.e. radiation, photons) \\
-$B$ or $b$ & Baryons \\
-$C$, $c$, or CDM & Cold dark matter \\
-$\nu$ & Neutrinos \\
-$M$ & Matter ($b$, CDM, and $\nu$ together) \\
-DE & Dark Energy \\
-$\Lambda$ & Cosmological constant (one proposal for DE) \\
-$K$, $k$, or $\kappa$ & Curvature \\ \hline
-\end{tabular}
- \caption[Energy species symbols]{The various energy species into which the 
- 	contents of the Universe are categorized, and their conventional symbols.}
- \label{tab: species_symbols}
-\end{table}
-
-Now that we have explained the meaning of the $\omega_i$ term in general, we
-can discuss the different specific species of energy and the subscripts that
-we use to denote them. This information is summarized in
-table~\ref{tab: species_symbols}.
-We note that $\omega_\gamma$ does not appear in this thesis;
-while radiation is critically important in the early stages of the
-Universe, it rapidly becomes inconsequential
-and radiation-matter equality occurs only 55,000 years after the
-beginning of the Universe (\cbib{CO}, page 1194)\footnote{For those who are
-curious, $\omega_\gamma$ ends up being a shape parameter \cbib{FECS}.}.
-
-% Distinguish baryons from CDM
+%s Distinguish baryons from CDM
 
 While baryons and cold dark matter (CDM) are both pressureless\footnote{This 
 is of
@@ -278,9 +313,41 @@ section~\ref{sec: Pk_intro}, where we introduce the power spectrum.
 %s sigma12 versus sigma8. This should come last as it is by far the most
 %s challenging of the parameters to explain.
 
-\textcolor{orange}{We should also have the $\sigma_8$ section here! This 
-section will include an extremely brief summary of Ariel's paper motivating 
-the use of $\sigma_{12}$ instead of $\sigma_8$.}
+To conclude this section, we will briefly introduce the parameter
+$\sigma_{12}$, which will be fleshed out in section~\ref{sec: Pk_intro}. 
+$\sigma_{12}$ is defined as the linear-theory RMS mass variance in spheres
+of radius 12 Mpc:
+
+\begin{equation}
+\label{eq: sigma12}
+\sigma_{12}
+=
+\sqrt{\left\langle \left(
+	\frac{\delta M}{M} (12 \, \mathrm{Mpc})
+\right)^2 \right\rangle}
+\end{equation}
+
+As with the $\omega_i$ parameters, there is a more conventional parameter
+which again relies on the dimensionless Hubble parameter. $\sigma_8$ is
+defined as
+
+\begin{equation}
+\sigma_8
+=
+\sqrt{\left\langle \left(
+	\frac{\delta M}{M} (8 \, \mathrm{Mpc} h^{-1})
+\right)^2 \right\rangle}
+\end{equation}
+
+Notice that this is not the same as replacing 12 with 8 in
+equation~\ref{eq: sigma12}! The subscript in $\sigma_8$ is misleading:
+$\sigma_{8}$ is the linear-theory RMS mass variance in spheres of radius
+$8 / h$ Mpc. Recall that $h$ is not a constant but its own cosmological
+parameter to be 
+
+%This 
+%section will include an extremely brief summary of Ariel's paper motivating 
+%the use of $\sigma_{12}$ instead of $\sigma_8$.}
 
 When comparing $\sigma_8$ results from different analyses, for example, the significance of the parameter itself is easily lost. Whenever two analyses differ, even slightly, in their values for $h$, the meaning of sigma 8 changes!
 
@@ -291,7 +358,9 @@ scope of this work (\textcolor{orange}{Nevertheless I would like to summarize
 a couple of key arguments}) but which prompt us to abandon $\sigma_8$.
 
 In the end, however, the argument in favor of $\sigma_{12}$ most relevant to
-this paper is the evolution mapping argument. We can greatly simplify the
+this paper is the evolution mapping argument
+(see section~\ref{sec: ev_mapping_intro} for details). We can greatly simplify 
+the
 parameter space of emulators with the help of $\sigma_{12}$, and $\sigma_8$
 is simply incapable of exploiting the parameter degeneracies to the same
 extent.
