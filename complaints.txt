@@ -58,13 +58,13 @@ $ MEGA priors, 5k emulator
 
 	* Worst of the worst
 		$ buil
-		>> fill
+		$ fill
 	* Middling 1
 		$ buil
-		* fill
+		$ fill
 	* Middling 2
 		$ buil
-		>> fill
+		$ fill
 	* Best that we found: just re-use the standard 5k 300k
 	* (No extra test cubes necessary--we should always be comparing to the same
 		cube)
