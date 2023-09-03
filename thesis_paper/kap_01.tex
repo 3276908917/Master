@@ -399,8 +399,50 @@ represents the average energy density of the entire Universe.
 
 $\delta(\bm{x})$ easier than $\rho(\bm{x})$ to work with since it
 is unitless and especially because it is normalized--the integral of the
-matter density contrast field, taken over the entire Universe, is unity. One particularly popular metric is the cosmic matter density 
-contrast field.
+matter density contrast field, taken over the entire Universe, is unity.
+
+$\delta(\bm{x})$ may in turn be used to define the two-point correlation 
+function:
+
+\begin{equation}
+\xi(\bm{r})
+=
+\langle \delta (\mathbf{x}) \delta(\mathbf{x} + \mathbf{r})\rangle
+\end{equation}
+
+This may be rewritten as $\xi(r)$ (i.e., the separation vector becomes a
+separation scalar) by application of the cosmological principle: on large
+enough scales (\textcolor{green}{hundreds of Megaparsecs}), the Universe
+looks statistically homogeneous and isotropic. That is, there are neither 
+preferred regions nor directions, but rather all parts of the Universe are
+indistinguishable.
+
+Unlike $\delta(\bm{x})$, $\xi(r)$ follows from our cosmological
+observations. Consider a basic galaxy redshift survey scenario: the
+measured redshift acts as a proxy for the line-of-sight distance (subject to
+the application of some fiducial model) between the observer and the galaxy. 
+By combining this distance with the sky position (the two angles $\theta$ and
+$\phi$), we can locate each galaxy in three-dimensional space. Then, $\xi(r)$ 
+may be estimated via analysis of every pair of galaxies in our data. Simply
+put, within such a survey, $\xi(r)$\footnote{Technically, this is a statement
+about $\xi_g(r)$, the two-point correlation function of galaxies. Although we
+are using galaxies to approximate the distribution of all matter, there will
+be some bias in our approach because galaxies (as extraordinarily dense 
+structures) represent peaks in the $\delta$ field.} can be thought
+of as the probability that some galaxy will be located at a distance of $r$
+from any other galaxy. \textcolor{orange}{
+I get that $\xi(r)$ is a correlation, not a
+probability, but I'm trying to find a way of formulating this sentence that is
+as easy as possible for a beginner to understand. What would be a more
+accurate way of repeating this sentence without just saying ``correlation,''
+which is a significantly more abstract concept than ``probability''?}
+
+Lastly, to 
+
+
+We have included this description of the two-point correlation function
+because we find it a highly accessible introduction to the power spectrum,
+but BUT WHAT?
 
 Next, I want to talk about one way of describing the matter density contrast 
 field: the power spectrum. The power spectrum can be probed in many different 
