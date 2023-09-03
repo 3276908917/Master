@@ -395,8 +395,7 @@ We can define a similar quantity, a relative density:
 \end{equation}
 
 which we refer to as the ``matter density contrast field.'' $\bar{\rho}$
-represents the average energy density of the entire Universe.
-
+represents the average energy density of the entire Universe. 
 $\delta(\bm{x})$ easier than $\rho(\bm{x})$ to work with since it
 is unitless and especially because it is normalized--the integral of the
 matter density contrast field, taken over the entire Universe, is unity.
@@ -437,55 +436,81 @@ as easy as possible for a beginner to understand. What would be a more
 accurate way of repeating this sentence without just saying ``correlation,''
 which is a significantly more abstract concept than ``probability''?}
 
-Lastly, to 
-
-
-We have included this description of the two-point correlation function
-because we find it a highly accessible introduction to the power spectrum,
-but BUT WHAT?
-
-Next, I want to talk about one way of describing the matter density contrast 
-field: the power spectrum. The power spectrum can be probed in many different 
-ways, and its precise shape and amplitude can tell us about several of these 
-cosmological parameters.
-
-Actually, the power spectra we are discussing in this thesis are linear-theory
-power spectra of non-neutrino matter. \textcolor{blue}{But anyway, here I will cover some of 
-the tried-and-true basic explanations of what the power spectrum is and why it 
-is interesting for the question of parameter inference. I also want to 
-discuss: why do we care about the linear-theory power spectrum? Why not jump 
-straight to the nonlinear case?}
-
-\textcolor{red}{The argument on the exponential should be a dot product, 
-right?}
+Lastly, to arrive at the object of primary interest to this work, we will
+consider the Fourier transform of $\xi(r)$, which gives us the power spectrum:
 
 \begin{equation}
-\tilde{\delta} (\bm{k}) = \int d^3 x \delta(\bm{x}) \exp(-i \bm{k} \bm{x})
+P(k) = \int d^3 r \, \xi(r) \exp [i \bm{r} \cdot \bm{k}]
 \end{equation}
 
-\begin{equation}
-\langle \tilde{\delta} (\bm{k}_1) \tilde{\delta} (\bm{k}_2)^* \rangle
-=
-(2 \pi)^3 \delta_D^{(3)} (\bm{k}_2 \ \bm{k}_1) P(\bm{k})
-\end{equation}
+%s Why isn't this project obsolete, what with nonlinear emulators?
 
-%s Why do we care?
+The power spectrum describes the variance of the amplitudes of the Fourier
+modes. Actually, the power spectra we are discussing in this thesis are 
+linear-theory power spectra of non-neutrino matter. \textcolor{red}{What
+was Andrea's complaint here?} Emulators of non-linear power spectra are 
+already available, but linear-theory power spectra are still important.
+For example, they can be used to predict non-linear power spectra, like in 
+perturbation theory approaches. Furthermore, most non-linear emulators
+actually predict the ratio of the non-linear power spectrum to its linear
+counterpart, so the linear power spectrum is still necessary to evaluate the
+non-linear power spectrum (A. G. S\'{a}nchez, private communication, 2022).
 
-The power spectrum is of great importance to parameter inference because of
-its unique dependence on certain parameters.
-% Here: refer to specific P(k) equations where omega_b and n_s showed up,
-% turnover scale.
-In section~\ref{sec: boltzmann_intro}, we will include several figures 
-illustrating more clearly what we mean by this.
+POWER SPECTRUM GOES HERE.
+what should go in the caption? just the model definition? Yeah, then we can
+talk about BAO and turnover scale later.
 
+A standard Planck $\Lambda$CDM model is shown in
+figure~\ref{fig: first_power_spectrum}. TALK ABOUT THE ALETHEIA MODEL.
 %s What is the BAO, what is the turnover scale
-
 \textcolor{orange}{WE SHOULD DEFINITELY incorporate some of ARIEL'S DISCUSSION 
 OF THE BAO 
 (``WHY ARE THERE
 WIGGLES IN THE POWER SPECTRUM'') AND WE SHOULD DO ENOUGH OF THE MODE / HORIZON
 DISCUSSION TO ELUCIDATE THIS CONCEPT OF A TURNOVER SCALE!!!}
 \cbib{FECS}
+
+Matter density fluctuations grow at different rates depending on 
+the dominant energy species in the Universe, and so far the Universe has
+undergone two major periods of domination (the Universe having only relatively
+recently entered a third period, dominated by dark energy): first by 
+radiation, then by matter. The power spectrum displays this history, as the
+smaller Fourier modes, So, depending on when a Fourier mode enters the
+``horizon'' (the ), this power spectrum can be fit
+During the matter-dominated era, 
+
+\begin{equation}
+P(k) \propto 
+\begin{cases}
+      k^{n_s} & k \ll k_\text{eq} \\
+      k^{n_s - 4} [\ln (k)]^2 & k \gg k_\text{eq} \\ 
+    \end{cases}\,.
+\end{equation}
+
+Where $n_s$ is the spectral index mentioned in
+section~\ref{sec: param_glossary} and
+
+\begin{equation}
+k_\text{eq} = 0.073 \, \omega_m \, \mathrm{Mpc}^{-1}
+\end{equation}
+
+is called the turn-over scale.
+
+%s Why do we care about the power spectrum?
+
+So, already from these two equations, we can
+appreciate that the power spectrum helps us to constrain two key cosmological
+parameters: $n_s$ and $\omega_m$. It turns out that the precise shape and
+amplitude of the power spectrum can tell us about all of the six primary
+parameters that we introduced in section~\ref{sec: param_glossary}:
+$\omega_b$, $\omega_c$, $n_s$, $\sigma_{12}$, $A_s$, and $\omega_\nu$. 
+Specifically, the power spectrum is useful for parameter inference because of
+its \textit{unique} dependence on each of these parameters.
+% Here: refer to specific P(k) equations where omega_b and n_s showed up,
+% turnover scale.
+
+In section~\ref{sec: boltzmann_intro}, we will include several figures 
+illustrating more clearly what these different dependencies look like.
 
 %s Everyone else uses h units. Why don't we?
 
@@ -503,9 +528,6 @@ $h$, this time in terms of units on power spectra plots. explain the unit system
 Conventional emulator calibration entails the historical units of Mpc / $h$,
 but if we use instead units of Mpc, then we can distill all of the evolution
 parameters into one parameter, $\sigma_{12}$. 
-
-\textcolor{orange}{Also in this section: talk about why we're always plotting
-power spectra in ABSOLUTE UNITS!}
 
 \section{Boltzmann Solvers and CAMB}
 \label{sec: boltzmann_intro}
