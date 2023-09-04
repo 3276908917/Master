@@ -342,8 +342,31 @@ defined as
 Notice that this is \textit{not} the same as replacing 12 with 8 in
 equation~\ref{eq: sigma12}! The subscript in $\sigma_8$ is misleading:
 $\sigma_8$ is the linear-theory RMS mass variance in spheres of radius
-$8 / h$ Mpc, not 8 Mpc. Recall that $h$ is not a constant but its own 
-cosmological parameter whose value is subject to further observations. This
+$8 / h$ Mpc, not 8 Mpc. Recall that $h$ is not a well-known constant but its 
+own  cosmological parameter whose value is subject to further observations.
+
+$h$ units (which will appear again in section~\ref{sec: Pk_intro}) became
+conventional with the first galaxy redshift surveys (GRSs). The conversion of
+redshifts into comoving distances $\chi(z)$ requires the assumption of a set 
+of
+cosmological parameters called a \textit{fiducial cosmology}. However, the
+earliest surveys probed a limited range of small redshifts, where the
+comoving distance may be estimated as follows:
+
+\begin{equation}
+\xi(z) \approx \frac{c}{H_0} \, z
+\end{equation}
+
+Therefore, use of $h^{-1}$ Mpc units allowed analyses of these early GRSs
+to quote results without assuming a fiducial cosmology. This
+approximation loses its validity for later GRSs because they covered larger
+redshift ranges. Without this approximation then, the analyses of these later
+surveys had to assume a full fiducial cosmology anyway. This means that
+$h^{-1}$ Mpc units lack their original justification, although out of
+convention they continue to be used (\cbib{San20}).
+
+Unfortunately, the use of $h^{-1}$ Mpc units represents not just a harmless
+convention. Our incomplete understanding of $h$
 becomes especially problematic when comparing the results of different papers;
 if the quoted $h$ values differ even slightly between two works, the same
 symbol $\sigma_8$ will refer to different concepts--that is, mass variances on
@@ -407,7 +430,7 @@ preferred regions nor directions, but rather all parts of the Universe are
 indistinguishable.
 
 Unlike $\delta(\bm{x})$, $\xi(r)$ follows from our cosmological
-observations. Consider a basic galaxy redshift survey scenario: the
+observations. Consider a basic GRS scenario: the
 measured redshift acts as a proxy for the line-of-sight distance (subject to
 the application of some fiducial model) between the observer and the galaxy. 
 By combining this distance with the sky position (the two angles $\theta$ and
@@ -446,12 +469,54 @@ actually predict the ratio of the non-linear power spectrum to its linear
 counterpart, so the linear power spectrum is still necessary to evaluate the
 non-linear power spectrum (A. G. S\'{a}nchez, private communication, 2022).
 
+Matter density fluctuations grow at different rates depending on 
+the dominant energy species in the Universe, and so far the Universe has
+undergone two major periods of domination (the Universe having only relatively
+recently entered a third period, dominated by dark energy): first by 
+radiation, then by matter. The power spectrum displays this history, as the
+smaller Fourier modes, So, depending on when a Fourier mode enters the
+``horizon'' (the ), this power spectrum can be fit
+During the matter-dominated era, 
+
+\begin{equation}
+P(k) \propto 
+\begin{cases}
+      k^{n_s} & k \ll k_\text{eq} \\
+      k^{n_s - 4} [\ln (k)]^2 & k \gg k_\text{eq} \\ 
+    \end{cases}\,.
+\end{equation}
+
+Where $n_s$ is the spectral index mentioned in
+section~\ref{sec: param_glossary} and
+
+\begin{equation}
+\label{eq: turnover}
+k_\text{eq} = 0.073 \, \omega_m \, \mathrm{Mpc}^{-1}
+\end{equation}
+
+is called the turn-over scale.
+
+%s Why do we care about the power spectrum?
+
+So, already from these two equations, we can
+appreciate that the power spectrum helps us to constrain two key cosmological
+parameters: $n_s$ and $\omega_m$. It turns out that the precise shape and
+amplitude of the power spectrum can tell us about all of the six primary
+parameters that we introduced in section~\ref{sec: param_glossary}:
+$\omega_b$, $\omega_c$, $n_s$, $\sigma_{12}$, $A_s$, and $\omega_\nu$. 
+Specifically, the power spectrum is useful for parameter inference because of
+its \textit{unique} dependence on each of these parameters. In 
+section~\ref{sec: boltzmann_intro}, we will include several figures 
+illustrating more clearly what these different dependencies look like.
+
+%s Now show a picture
+
 \begin{figure}[htb]
   \centering
   \includegraphics[scale=1.0]{intro/m0_Pk}
   \caption[Aletheia Model 0 Power Spectrum]{This is power spectrum was
   computed by CAMB for Aletheia model 0 without massive neutrinos.
-  Table~\ref{tab: Aleitheia_m0} defines this model in terms
+  Table~\ref{tab: Aletheia_m0} defines this model in terms
   of the parameters essential to this work.}
   \label{fig: first_power_spectrum}
 \end{figure}
@@ -478,70 +543,35 @@ $A_s$ & $2.1272 \cdot 10^{-9}$ \\ \hline
  \label{tab: Aletheia_m0}
 \end{table}
 
-
-POWER SPECTRUM GOES HERE.
-what should go in the caption? just the model definition? Yeah, then we can
-talk about BAO and turnover scale later.
-
 A standard Planck $\Lambda$CDM model is shown in
-figure~\ref{fig: first_power_spectrum}. TALK ABOUT THE ALETHEIA MODEL.
-%s What is the BAO, what is the turnover scale
-\textcolor{orange}{WE SHOULD DEFINITELY incorporate some of ARIEL'S DISCUSSION 
-OF THE BAO 
-(``WHY ARE THERE
-WIGGLES IN THE POWER SPECTRUM'') AND WE SHOULD DO ENOUGH OF THE MODE / HORIZON
-DISCUSSION TO ELUCIDATE THIS CONCEPT OF A TURNOVER SCALE!!!}
-\cbib{FECS}
-
-Matter density fluctuations grow at different rates depending on 
-the dominant energy species in the Universe, and so far the Universe has
-undergone two major periods of domination (the Universe having only relatively
-recently entered a third period, dominated by dark energy): first by 
-radiation, then by matter. The power spectrum displays this history, as the
-smaller Fourier modes, So, depending on when a Fourier mode enters the
-``horizon'' (the ), this power spectrum can be fit
-During the matter-dominated era, 
+figure~\ref{fig: first_power_spectrum}. The turnover scale $k_\text{eq}$
+(eq~\ref{eq: turnover}) marks
+the transition between the radiation- and matter-dominated epochs, as
+$k_\text{eq}$ is the first (and therefore) smallest Fourier mode to enter the 
+comoving particle horizon $\chi_h$ during the era of matter domination, where
 
 \begin{equation}
-P(k) \propto 
-\begin{cases}
-      k^{n_s} & k \ll k_\text{eq} \\
-      k^{n_s - 4} [\ln (k)]^2 & k \gg k_\text{eq} \\ 
-    \end{cases}\,.
+\chi_h = \int_0^{t_0} \, \frac{dt}{a(t)}
 \end{equation}
 
-Where $n_s$ is the spectral index mentioned in
-section~\ref{sec: param_glossary} and
-
-\begin{equation}
-k_\text{eq} = 0.073 \, \omega_m \, \mathrm{Mpc}^{-1}
-\end{equation}
-
-is called the turn-over scale.
-
-%s Why do we care about the power spectrum?
-
-So, already from these two equations, we can
-appreciate that the power spectrum helps us to constrain two key cosmological
-parameters: $n_s$ and $\omega_m$. It turns out that the precise shape and
-amplitude of the power spectrum can tell us about all of the six primary
-parameters that we introduced in section~\ref{sec: param_glossary}:
-$\omega_b$, $\omega_c$, $n_s$, $\sigma_{12}$, $A_s$, and $\omega_\nu$. 
-Specifically, the power spectrum is useful for parameter inference because of
-its \textit{unique} dependence on each of these parameters.
-% Here: refer to specific P(k) equations where omega_b and n_s showed up,
-% turnover scale.
-
-In section~\ref{sec: boltzmann_intro}, we will include several figures 
-illustrating more clearly what these different dependencies look like.
+Figure~\ref{fig: first_power_spectrum} also shows the baryon acoustic
+oscillation (BAO) as a set of shallow wiggles on inverse scales of roughly
+$0.04 < k \, \text{Mpc} < 0.2$. The BAO is beyond the scope of this paper but,
+briefly put, is the signature of a shock wave generated during the epoch of
+radiation domination before baryons decoupled from photons. As baryons
+collapsed into dark matter gravitational potential wells, the radiation
+pressure eventually became high enough to reverse the collapse.
 
 %s Everyone else uses h units. Why don't we?
 
-\textcolor{blue}{This section will also reiterate some parts of 
-section~\ref{sec: param_glossary} and further develop our moving-away from 
-$h$, this time in terms of units on power spectra plots. explain the unit system
-    we are using (ditch $h$ factor because it messes up everything--but
-    only briefly summarize the main arguments of Sanchez 2020)}
+Experienced readers will notice that our power spectrum in
+figure~\ref{fig: first_power_spectrum} does not use the customary $h$ units:
+our $x$-axis uses units of Mpc$^{-1}$ rather than $h$ Mpc$^{-1}$ and our
+$y$-axis uses units of Mpc$^3$ rather than Mpc$^3 \, h^{-3}$. This is yet
+another instance of customary factors of $h$ (see also the $\Omega_i$ and
+$\sigma_8$ discussions in section~\ref{sec: param_glossary}). As mentioned
+for $\sigma_8$, these units became customary in the times when GRS redshift 
+ranges \textcolor{orange}{IN PROGRESS}.
 
 %! Try to more carefully explain why it doesn't work: h is not a parameter
 % over which we emulate--sigma12 is. Therefore we cannot show h in the final
