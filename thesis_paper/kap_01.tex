@@ -365,16 +365,6 @@ is simply incapable of exploiting the parameter degeneracies in the same way.
 \section{The Matter Power Spectrum}
 \label{sec: Pk_intro}
 
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%%  Einbinden einer Grafik  %%
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
-\begin{figure}[htb]
-  \centering
-  \includegraphics[scale=0.5]{siegel}
-  \caption[Kurzform f"ur das Abbildungsverzeichnis]{Dies ist die Erkl"arung zum Bild.}
-\end{figure}
-
 Now that we have at least briefly introduced the various cosmological
 parameters of interest to us, we can define what we meant in the opening
 paragraphs by ``cosmological observations'' and ``what we would expect to
@@ -455,6 +445,39 @@ perturbation theory approaches. Furthermore, most non-linear emulators
 actually predict the ratio of the non-linear power spectrum to its linear
 counterpart, so the linear power spectrum is still necessary to evaluate the
 non-linear power spectrum (A. G. S\'{a}nchez, private communication, 2022).
+
+\begin{figure}[htb]
+  \centering
+  \includegraphics[scale=1.0]{intro/m0_Pk}
+  \caption[Aletheia Model 0 Power Spectrum]{This is power spectrum was
+  computed by CAMB for Aletheia model 0 without massive neutrinos.
+  Table~\ref{tab: Aleitheia_m0} defines this model in terms
+  of the parameters essential to this work.}
+  \label{fig: first_power_spectrum}
+\end{figure}
+
+\begin{table}[htb]
+\centering
+\begin{tabular}{l|l}
+\hline
+Parameter & Value \\ \hline
+$\omega_b$ & 0.022445 \\
+$\omega_c$ & 0.120567 \\
+$n_s$ & 0.96 \\
+$\sigma_{12}$ & 0.82476153 \\
+$A_s$ & $2.1272 \cdot 10^{-9}$ \\ \hline
+\end{tabular}
+ \caption[Aletheia Model 0 Parameters]{This table describes
+ figure~\ref{fig: first_power_spectrum} in terms of the parameters
+ essential to this work. $A_s$ is truncated to five significant figures.
+ Model 0 is a helpful benchmark model because it uses
+ best-fit values from the Planck CMB measurements. Aletheia model 0 does not
+ itself specify a physical density in neutrinos, but we will typically use
+ $\omega_\nu = 0$. Unlike the rest of model 0, this setting is strongly 
+ 	discounted by our current cosmological observations.}
+ \label{tab: Aletheia_m0}
+\end{table}
+
 
 POWER SPECTRUM GOES HERE.
 what should go in the caption? just the model definition? Yeah, then we can
