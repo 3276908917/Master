@@ -425,8 +425,8 @@ function:
 
 This may be rewritten as $\xi(r)$ (i.e., the separation vector becomes a
 separation scalar) by application of the cosmological principle: on large
-enough scales, the Universe looks statistically homogeneous and isotropic
-(\cbib{Ntelis}). That is, there are neither 
+enough scales ($r \gtrsim 100$ Mpc) \, the Universe looks statistically 
+homogeneous and isotropic (\cbib{Ntelis}). That is, there are neither 
 preferred regions nor directions, but rather all parts of the Universe are
 indistinguishable.
 
@@ -442,7 +442,7 @@ about $\xi_g(r)$, the two-point correlation function of galaxies. Although we
 are using galaxies to approximate the distribution of all matter, there will
 be some bias in our approach because galaxies (as extraordinarily dense 
 structures) represent peaks in the $\delta$ field.} can be thought
-of as the excess probability that some galaxy will be located at a distance of 
+of as the excess probability that some galaxy will be located at a distance
 $r$ from any other galaxy.
 
 Lastly, to arrive at the object of primary interest to this work, we will
@@ -456,29 +456,30 @@ P(k) = \int d^3 r \, \xi(r) \exp [i \bm{r} \cdot \bm{k}]
 
 The power spectrum describes the variance of the amplitudes of the Fourier
 modes. Actually, the power spectra we are discussing in this thesis are 
-linear-theory power spectra of non-neutrino matter.
-\footnote{\textcolor{red}{Andrea added the following comment: ``We should 
+\textit{linear-theory} power spectra $P_\text{L}(k)$ of \textit{non-neutrino} 
+matter.\footnote{\textcolor{red}{Andrea added the following comment: ``We 
+should 
 justify this assumption. It is standard practice to assume that the galaxy 
 density field is determined only by the underlying cdm+b density field, 
 without taking into consideration the cold neutrino component (which also 
 behaves as matter).'' Do you have recommendations for sources I can consult in
 order to add this information to this paragraph?}} Emulators of non-linear 
-power spectra are 
+power spectra $P_\text{NL}(k)$ are 
 already available, but linear-theory power spectra are still important.
-For example, they can be used to predict non-linear power spectra, like in 
+For example, they can be used to predict $P_\text{NL}(k)$, like in 
 perturbation theory approaches. Furthermore, most non-linear emulators
 actually predict the ratio of the non-linear power spectrum to its linear
-counterpart, so the linear power spectrum is still necessary to evaluate the
-non-linear power spectrum (A. G. S\'{a}nchez, private communication, 2022).
+counterpart, so $P_\text{L}(k)$ is still necessary to evaluate
+$P_\text{NL}(k)$ (A. G. S\'{a}nchez, private communication, 2022).
 
 Matter density fluctuations grow at different rates depending on 
 the dominant energy species in the Universe, and so far the Universe has
-undergone two major periods of domination (the Universe having only relatively
-recently entered a third period, dominated by dark energy): first by 
-radiation, then by matter. The power spectrum displays this history. The
+undergone two major periods of domination (only relatively
+recently have we entered a third period, dominated by dark energy): first by 
+radiation, then by matter. The power spectrum captures this history. The
 smaller Fourier modes, which entered the \textit{comoving particle horizon} 
 (maximum
-separation of two particles in causal contact) $chi_h$ first, were strongly
+separation of two particles in causal contact) $\chi_h$ first, were strongly
 suppressed by radiation, with
 
 \begin{equation}
@@ -488,8 +489,7 @@ suppressed by radiation, with
 By contrast, the larger Fourier modes, which
 entered the horizon during matter domination, more easily grew in structure
 (\cbib{Dodelson}). The power spectrum can be fit by a piecewise function of 
-two parts, depending 
-on when a Fourier mode enters the horizon
+two parts, depending on when a Fourier mode enters the horizon.
 During the matter-dominated era, 
 
 \begin{equation}
@@ -586,8 +586,8 @@ another instance of customary factors of $h$ (see also the $\Omega_i$ and
 $\sigma_8$ discussions in section~\ref{sec: param_glossary}). As mentioned
 for $\sigma_8$, these units were introduced in the times when GRS redshift 
 ranges justified the use of equation~\ref{eq: comov_dist_approx}. This
-convention also persists in emulator literature (\cbib{Arico} and
-\cbib{Mancini}).
+convention also persists in emulator literature (see, for example,
+\cbib{Arico} and \cbib{Mancini}).
 
 % The following plots were generated with h_units_bad.ipynb
 \begin{figure}[htb]
@@ -604,7 +604,8 @@ convention also persists in emulator literature (\cbib{Arico} and
         \centering
     \caption{Non-neutrino matter power spectra at $z=0$ for three different
     		models based on model zero (refer to table~\ref{tab: Aletheia_m0} 
-    		for details) and varying only in the value of $h$. These two plots
+    		for details) and varying only in the value of $h$. These two
+    		panels
     		differ only in the units used. Observe that, in absolute units, we
     		can easily identify the impact of $h$ as a simple change in
     		amplitude. The use of $h$ units obscures this effect. This figure 
@@ -618,9 +619,9 @@ convention also persists in emulator literature (\cbib{Arico} and
 % previous section.
 
 Again, we refer the reader to \cbib{San20} for a detailed case against the
-use of $h$ units in observational cosmology. We illustrate here in
+use of $h$ units in observational cosmology. We illustrate in
 figure~\ref{fig: h_unit_Pk} one significant problem related to the
-unstable meaning of $\sigma_8$: changes in $h$ change not only the power 
+unstable meaning of $\sigma_8$: varying $h$ changes not only the power 
 spectrum, but also the axes used to represent the power spectrum. Comparison 
 of power spectra from different 
 models is hindered because the $x$ and $y$ axes correspond to different ranges
