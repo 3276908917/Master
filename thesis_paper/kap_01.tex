@@ -354,7 +354,8 @@ earliest surveys probed a limited range of small redshifts, where the
 comoving distance may be estimated as follows:
 
 \begin{equation}
-\xi(z) \approx \frac{c}{H_0} \, z
+\label{eq: comov_dist_approx}
+\chi(z) \approx \frac{c}{H_0} \, z
 \end{equation}
 
 Therefore, use of $h^{-1}$ Mpc units allowed analyses of these early GRSs
@@ -365,9 +366,9 @@ surveys had to assume a full fiducial cosmology anyway. This means that
 $h^{-1}$ Mpc units lack their original justification, although out of
 convention they continue to be used (\cbib{San20}).
 
-Unfortunately, the use of $h^{-1}$ Mpc units represents not just a harmless
-convention. Our incomplete understanding of $h$
-becomes especially problematic when comparing the results of different papers;
+This convention is not without serious drawbacks.
+For example, our incomplete understanding of $h$
+becomes problematic when comparing the results of different papers;
 if the quoted $h$ values differ even slightly between two works, the same
 symbol $\sigma_8$ will refer to different concepts--that is, mass variances on
 different scales. Therefore $\sigma_8$ comparisons will typically lead to
@@ -570,8 +571,24 @@ our $x$-axis uses units of Mpc$^{-1}$ rather than $h$ Mpc$^{-1}$ and our
 $y$-axis uses units of Mpc$^3$ rather than Mpc$^3 \, h^{-3}$. This is yet
 another instance of customary factors of $h$ (see also the $\Omega_i$ and
 $\sigma_8$ discussions in section~\ref{sec: param_glossary}). As mentioned
-for $\sigma_8$, these units became customary in the times when GRS redshift 
-ranges \textcolor{orange}{IN PROGRESS}.
+for $\sigma_8$, these units were introduced in the times when GRS redshift 
+ranges justified the use of equation~\ref{eq: comov_dist_approx}. \textcolor{orange}{IN PROGRESS}.
+
+\begin{figure}[htb]
+    \begin{subfigure}{0.45 \textwidth}
+    \centering
+ 		\includegraphics[width=\textwidth]{intro/h_impact_h_units}
+ 		\label{fig: h_units}
+    \end{subfigure}
+    \begin{subfigure}{0.45 \textwidth}
+    \centering
+ 		\includegraphics[width=\textwidth]{intro/h_impact_absolute_units}
+ 		\label{fig: without_h_units}
+    \end{subfigure}
+        \centering
+    \caption{$h$ units confuse}
+    \label{fig: h_unit_Pk}
+\end{figure}
 
 %! Try to more carefully explain why it doesn't work: h is not a parameter
 % over which we emulate--sigma12 is. Therefore we cannot show h in the final
