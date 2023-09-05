@@ -572,8 +572,10 @@ $y$-axis uses units of Mpc$^3$ rather than Mpc$^3 \, h^{-3}$. This is yet
 another instance of customary factors of $h$ (see also the $\Omega_i$ and
 $\sigma_8$ discussions in section~\ref{sec: param_glossary}). As mentioned
 for $\sigma_8$, these units were introduced in the times when GRS redshift 
-ranges justified the use of equation~\ref{eq: comov_dist_approx}. \textcolor{orange}{IN PROGRESS}.
+ranges justified the use of equation~\ref{eq: comov_dist_approx}. This
+convention also persists in emulator literature (\textcolor{green}{citation}).
 
+% The following plots were generated with h_units_bad.ipynb
 \begin{figure}[htb]
     \begin{subfigure}{0.45 \textwidth}
     \centering
@@ -586,7 +588,13 @@ ranges justified the use of equation~\ref{eq: comov_dist_approx}. \textcolor{ora
  		\label{fig: without_h_units}
     \end{subfigure}
         \centering
-    \caption{$h$ units confuse}
+    \caption{Non-neutrino matter power spectra at $z=0$ for three different
+    		models based on model zero (refer to table~\ref{tab: Aletheia_m0} 
+    		for details) and varying only in the value of $h$. These two plots
+    		differ only in the units used. Observe that, in absolute units, we
+    		can easily identify the impact of $h$ as a simple change in
+    		amplitude. The use of $h$ units obscures this effect. This figure 
+    		is an imitation of figure 1 from \cbib{San20}.}
     \label{fig: h_unit_Pk}
 \end{figure}
 
@@ -595,9 +603,23 @@ ranges justified the use of equation~\ref{eq: comov_dist_approx}. \textcolor{ora
 % plots. This is a much subtler issue than the h complaints in the
 % previous section.
 
-Conventional emulator calibration entails the historical units of Mpc / $h$,
-but if we use instead units of Mpc, then we can distill all of the evolution
-parameters into one parameter, $\sigma_{12}$. 
+Again, we refer the reader to \cbib{San20} for a detailed case against the
+use of $h$ units in observational cosmology. We illustrate here in
+figure~\ref{fig: h_unit_Pk} one significant problem related to the
+unstable meaning of $\sigma_8$: changes in $h$ change not only the power 
+spectrum, but also the axes used to represent the power spectrum. Comparison 
+of power spectra from different 
+models is hindered because the $x$ and $y$ axes correspond to different ranges
+for each curve. If we use instead units of Mpc, then changes in $h$ change
+only the power spectrum, and we can much more readily appreciate its true
+impact (that of an amplitude change).
+
+As with our choice of $\sigma_{12}$ instead of $\sigma_8$, our choice of
+absolute units will facilitate the application of evolution mapping described
+in~\ref{sec: ev_mapping_intro}. Since $h$ only affects the amplitude of the
+power spectrum, we do not need to train our emulator over it at all. Absolute 
+units are not only clearer but allow us to confine all of the significance of
+the value of $h$ to its impact on the value of $\sigma_{12}$.
 
 \section{Boltzmann Solvers and CAMB}
 \label{sec: boltzmann_intro}
