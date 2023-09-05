@@ -425,8 +425,8 @@ function:
 
 This may be rewritten as $\xi(r)$ (i.e., the separation vector becomes a
 separation scalar) by application of the cosmological principle: on large
-enough scales (\textcolor{green}{hundreds of Megaparsecs}), the Universe
-looks statistically homogeneous and isotropic. That is, there are neither 
+enough scales, the Universe looks statistically homogeneous and isotropic
+(\cbib{Ntelis}). That is, there are neither 
 preferred regions nor directions, but rather all parts of the Universe are
 indistinguishable.
 
@@ -442,13 +442,8 @@ about $\xi_g(r)$, the two-point correlation function of galaxies. Although we
 are using galaxies to approximate the distribution of all matter, there will
 be some bias in our approach because galaxies (as extraordinarily dense 
 structures) represent peaks in the $\delta$ field.} can be thought
-of as the probability that some galaxy will be located at a distance of $r$
-from any other galaxy. \textcolor{orange}{
-I get that $\xi(r)$ is a correlation, not a
-probability, but I'm trying to find a way of formulating this sentence that is
-as easy as possible for a beginner to understand. What would be a more
-accurate way of repeating this sentence without just saying ``correlation,''
-which is a significantly more abstract concept than ``probability''?}
+of as the excess probability that some galaxy will be located at a distance of 
+$r$ from any other galaxy.
 
 Lastly, to arrive at the object of primary interest to this work, we will
 consider the Fourier transform of $\xi(r)$, which gives us the power spectrum:
@@ -461,8 +456,14 @@ P(k) = \int d^3 r \, \xi(r) \exp [i \bm{r} \cdot \bm{k}]
 
 The power spectrum describes the variance of the amplitudes of the Fourier
 modes. Actually, the power spectra we are discussing in this thesis are 
-linear-theory power spectra of non-neutrino matter. \textcolor{red}{What
-was Andrea's complaint here?} Emulators of non-linear power spectra are 
+linear-theory power spectra of non-neutrino matter.
+\footnote{\textcolor{red}{Andrea added the following comment: ``We should 
+justify this assumption. It is standard practice to assume that the galaxy 
+density field is determined only by the underlying cdm+b density field, 
+without taking into consideration the cold neutrino component (which also 
+behaves as matter).'' Do you have recommendations for sources I can consult in
+order to add this information to this paragraph?}} Emulators of non-linear 
+power spectra are 
 already available, but linear-theory power spectra are still important.
 For example, they can be used to predict non-linear power spectra, like in 
 perturbation theory approaches. Furthermore, most non-linear emulators
@@ -585,7 +586,8 @@ another instance of customary factors of $h$ (see also the $\Omega_i$ and
 $\sigma_8$ discussions in section~\ref{sec: param_glossary}). As mentioned
 for $\sigma_8$, these units were introduced in the times when GRS redshift 
 ranges justified the use of equation~\ref{eq: comov_dist_approx}. This
-convention also persists in emulator literature (\textcolor{green}{citation}).
+convention also persists in emulator literature (\cbib{Arico} and
+\cbib{Mancini}).
 
 % The following plots were generated with h_units_bad.ipynb
 \begin{figure}[htb]
