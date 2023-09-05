@@ -610,7 +610,8 @@ convention also persists in emulator literature (see, for example,
  		\label{fig: without_h_units}
     \end{subfigure}
         \centering
-    \caption{Non-neutrino matter power spectra at $z=0$ for three different
+    \caption[Impact of $h$ on $P(k)$]
+    		{Non-neutrino matter power spectra at $z=0$ for three different
     		models based on model zero (refer to table~\ref{tab: Aletheia_m0} 
     		for details) and varying only in the value of $h$. These two
     		panels
@@ -653,7 +654,36 @@ To hint at what's to come, I start off this section by noting that several cosmo
 
 % Examples of great results from Boltzmann solvers
 
-Three shape parameters of core interest to this paper are the physical density in baryons $\omega_b$ (whose impact on the power spectrum is shown in figure~\ref{fig: omega_b_dependence}), the physical density in cold dark matter $\omega_c$ (figure~\ref{fig: omega_c_dependence}), and the spectral index $n_s$, (figure~\ref{fig: ns_dependence}). The remaining parameters $\sigma_{12}$ and $A_s$, as well as the quantities $z$ and $h$, all shift only the amplitude of the power spectrum. We show the amplitude shift associated with various $\sigma_{12}$ values in figure~\ref{fig: sig12_dependence} and stress that the same plot only needs to be relabeled in order to illustrate the impact of $A_s$, $z$, $h$, etc. 
+Three shape parameters of core interest to this paper are the physical density in baryons $\omega_b$ (whose impact on the power spectrum is shown in figure~\ref{fig: omega_b_dependence}), the physical density in cold dark matter $\omega_c$ (figure~\ref{fig: omega_c_dependence}), and the spectral index $n_s$, (figure~\ref{fig: n_s_dependence}). The remaining parameters $\sigma_{12}$ and $A_s$, as well as the quantities $z$ and $h$, all shift only the amplitude of the power spectrum. We show the amplitude shift associated with various $A_s$ values in figure~\ref{fig: A_s_dependence} and stress that the same plot only needs to be relabeled in order to illustrate the impact of $\sigma_{12}$, $z$, $h$, etc. 
+
+\begin{figure}[htb]
+  \centering
+  \includegraphics[scale=1.0]{intro/parameter_demos/ombh2_impact_on_Pk}
+  \caption[Impact of $\omega_b$ on $P(k)$]{Impact of $\omega_b$.}
+  \label{fig: omega_b_dependence}
+\end{figure}
+
+\begin{figure}[htb]
+  \centering
+  \includegraphics[scale=1.0]{intro/parameter_demos/omch2_impact_on_Pk}
+  \caption[Impact of $\omega_c$ on $P(k)$]{Impact of $\omega_c$.}
+  \label{fig: omega_c_dependence}
+\end{figure}
+
+\begin{figure}[htb]
+  \centering
+  \includegraphics[scale=1.0]{intro/parameter_demos/n_s_impact_on_Pk}
+  \caption[Impact of $n_s$ on $P(k)$]{Impact of $n_s$.}
+  \label{fig: n_s_dependence}
+\end{figure}
+
+\begin{figure}[htb]
+  \centering
+  \includegraphics[scale=1.0]{intro/parameter_demos/A_s_impact_on_Pk}
+  \caption[Impact of $\omega_b$ on $P(k)$]{Impact of $\omega_b$.}
+  \label{fig: A_s_dependence}
+\end{figure}
+
 
 % What are they solving?
 
@@ -663,7 +693,7 @@ This will mostly just be a theoretical discussion of these solvers. The hands-on
 
 In essence, Boltzmann codes solve XXX in order to give us the power spectrum
 of any universe characterized by some set of cosmological parameters. For
-example, figure~\ref{fig: vary_omega_b} shows the impact of varying the
+example, figure~\ref{fig: omega_b_dependence} shows the impact of varying the
 physical density in baryons, $\omega_b$. 
 
 Several parameters have fairly unique impacts on the power spectrum.
