@@ -684,36 +684,34 @@ parameters.
 %s Pics? Not so fast. Let's pick one.
 
 Before we proceed to concrete demonstrations, it will be expedient to settle
-on a single Boltzmann solver. As of today, the two As the researchers in our group have much more
-experience with CAMB, we elected to use CAMB for our paper.
+on a single Boltzmann solver. As of today, the two Boltzmann codes
+CAMB\footnote{\url{https://github.com/cmbant/CAMB}} and
+CLASS\footnote{\url{https://lesgourg.github.io/class_public/class.html}} offer
+the largest suites of features and are also actively developed. CAMB and
+CLASS were written in different languages (Fortran-90 and C, respectively)
+but both come with Python wrappers. These codes have been shown to be in 
+excellent agreement with each other (see \cbib{Lesgourges}), and their
+differences consist primarily of different approaches in algorithms (including 
+speedup tricks) and user interfaces and customization options.
 
-In principal, to maximize the generality of the
-results introduced in this work, we would demonstrate their compatibility with
-different Boltzmann solvers. In practice, the Boltzmann codes have already
-been shown to be in excellent agreement with each other (\cbib{Seljak},
-\cbib{Lesgourges}). However, later in this work, we will discover an
-independent reason to consider alternate 
+As the researchers in our group have much more experience with CAMB, we 
+elected to use CAMB as a starting point for our Python package
+Cassandra-Linear. In principal, to maximize the generality of 
+the results introduced in this 
+work, we would demonstrate their compatibility with at least CLASS as well. In 
+practice, since these codes agree so well, we prioritize other lines of 
+inquiry
+for this work. However, later, in section~\ref{sec: generate_emu_data}, we 
+will concede an important, 
+independent reason to consider use of CLASS, which becomes a promising route
+for continuation of this work (see section~\ref{sec: future_work}).
 
-In the future, of course, it will be beneficial
-to 
-
-To conclude this section, we make mention of three specific Boltzmann solvers: 
-CLASS, CAMB, and CMBFast.
-CAMB was written in Fortran and comes with a Python wrapper which we
-will use as a starting point (along with GPy) for our Python package
-Cassandra-Linear.
-
-CLASS was written in C and also comes with a Python wrapper.
-%I will briefly justify our use of CAMB over CLASS.
-% Most of our existing emulator pipeline (including the emulator 
-% COMET\footnote{\textcolor{green} {Double check this, does COMET actually 
-% rely on CAMB?}}) DOES THIS EVEN MATTER?
-For this project, we elected to continue with CAMB as the scientists at
-OPINAS at the MPE were better equipped to provide support with CAMB.
+\begin{comment}
 \textcolor{green}{Furthermore, the CLASS documentation
 is not nearly as strong as it is with CAMB, and we already encountered
 extreme difficulty simply in recreating results already previously obtained
 via CAMB!}
+\end{comment}
 
 %s Examples of great results from Boltzmann solvers
 
@@ -784,10 +782,12 @@ order to illustrate the impact of $\sigma_{12}$, $z$, $h$, etc.
 
 %s Segue into the next section
 
-Several parameters have fairly unique impacts on the power spectrum.
-Therefore, we can imagine building a collection of power spectra labeled by
-their parameter configurations and comparing our real-world observations to
-them. This should allow us to perform parameter inference.
+Since many of these parameters have fairly unique impacts on the power 
+spectrum, we can imagine building a collection of power spectra labeled by
+their parameter configurations and then comparing our real-world observations 
+to them. We can ask to which of these theoretical power spectra our 
+observations most closely agree. This question is quantitatively answered by 
+parameter inference in the form of a Monte Carlo Markov Chain (MCMC) analysis, whose basic idea will be discussed in the next section.
 
 
 \section{Monte Carlo Markov Chains}
