@@ -315,7 +315,7 @@ section~\ref{sec: Pk_intro}, where we introduce the power spectrum.
 
 The parameter $A_s$ is called the \textit{scalar mode amplitude} and describes
 the amplitude of the primordial power spectrum. We will explore the subtlety of this parameter's impact in
-chapter~\ref{chap: As}.
+chapter~\ref{chap: A_s}.
 
 %s sigma12 versus sigma8. This should come last as it is by far the most
 %s challenging of the parameters to explain.
@@ -501,6 +501,7 @@ two parts, depending on when a Fourier mode enters the horizon.
 During the matter-dominated era, 
 
 \begin{equation}
+\label{eq: n_s}
 P(k) \propto 
 \begin{cases}
       k^{n_s} & k \ll k_\text{eq} \\
@@ -602,11 +603,13 @@ convention also persists in emulator literature (see, for example,
     \begin{subfigure}{0.45 \textwidth}
     \centering
  		\includegraphics[width=\textwidth]{intro/h_impact_h_units}
+ 		\caption{Using $h$ units.}
  		\label{fig: h_units}
     \end{subfigure}
     \begin{subfigure}{0.45 \textwidth}
     \centering
  		\includegraphics[width=\textwidth]{intro/h_impact_absolute_units}
+ 		\caption{Using absolute units.}
  		\label{fig: without_h_units}
     \end{subfigure}
         \centering
@@ -791,14 +794,24 @@ order to illustrate the impact of $\sigma_{12}$, $z$, $h$, etc.
 \begin{figure}[htb]
   \centering
   \includegraphics[scale=1.0]{intro/parameter_demos/n_s_impact_on_Pk}
-  \caption[Impact of $n_s$ on $P(k)$]{Impact of $n_s$.}
+  \caption[Impact of $n_s$ on $P(k)$]{Impact of $n_s$. The $n_s$ can be
+  thought of as a kind of rotation of the power spectrum, although this
+  is only coarse description. The differences shown here are
+  adequately captured by equation~\ref{eq: n_s}.}
   \label{fig: n_s_dependence}
 \end{figure}
 
 \begin{figure}[htb]
   \centering
   \includegraphics[scale=1.0]{intro/parameter_demos/A_s_impact_on_Pk}
-  \caption[Impact of $\omega_b$ on $P(k)$]{Impact of $\omega_b$.}
+  \caption[Impact of $A_s$ on $P(k)$]{Impact of $A_s$. Differences produce
+  	only a change in the overall amplitude of the power spectrum. We stress
+  	that this simple description applies only in the case of massless
+  	neutrinos. The more subtle impact of $A_s$ will be demonstrated in
+  	chapter~\ref{chap: A_s}. In the massless case, $A_s$ is completely
+  	degenerate with $h$ (see figure~\ref{fig: without_h_units}) and with
+  	$\sigma_{12}$ (not shown). This degeneracy is central to evolution
+  	mapping, which will be discussed in section~\ref{sec: ev_mapping_intro}.}
   \label{fig: A_s_dependence}
 \end{figure}
 
