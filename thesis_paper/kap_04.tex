@@ -61,7 +61,7 @@ emulator is trained over the aforementioned prior range in $\omega_\nu$
 separate emulator specifically to handle the massless neutrino case. In 
 practice, this entails the same prior ranges for the parameters $\omega_b$, 
 $\omega_c$, $n_s$, and $\sigma_{12}$. However, here we no longer need $A_s$;
-as discussed in chapter~\ref{chap: As}, $A_s$ helps to characterize the
+as discussed in chapter~\ref{chap: A_s}, $A_s$ helps to characterize the
 structure growth suppression induced by massive neutrinos. Besides this, for 
 the purposes of our training and validation data, $A_s$ is redundant since it
 is otherwise an evolution parameter, and we are already specifying the 
@@ -82,12 +82,12 @@ salvage anything. The claims are not true and the work is not yet done.}
 Therefore, the reason why the massless-neutrino emulator is more 
 accurate is because massive neutrinos in particular have a highly complicated 
 impact on the power spectrum. Even with the inclusion of the $\omega_\nu$ and 
-$A_s$ parameters, our investigations in chapter~\ref{chap: As} reveal that
+$A_s$ parameters, our investigations in chapter~\ref{chap: A_s} reveal that
 these two parameters may not be sufficient to fully characterize the 
 suppression of the power spectrum by massive neutrinos. Of course, we would 
 like to reiterate that, though we have applied a symbolic regression approach 
 in order to independently justify our analytical expression from
-chapter~\ref{chap: As}, this by no means guarantees that we have found the optimal analytical expression.
+chapter~\ref{chap: A_s}, this by no means guarantees that we have found the optimal analytical expression.
 
 To simplify the user experience, this two-emulator solution lives ``under the
 hood'' and by default \textcolor{orange}{will be} hidden behind an interface
