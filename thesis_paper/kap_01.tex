@@ -648,13 +648,101 @@ the value of $h$ to its impact on the value of $\sigma_{12}$.
 \section{Boltzmann Solvers and CAMB}
 \label{sec: boltzmann_intro}
 
-I want to talk about what a Boltzmann solver is and what kinds of equations it is solving.
+%s What kinds of equations do we need to solve?
 
-To hint at what's to come, I start off this section by noting that several cosmological parameters have a fairly unique impact on the shape of the power spectrum, while others have a degenerate impact. Wouldn't it be great if we could know what the power spectrum would look like if we increased parameter $x$? Boltzmann solvers can help us with that.
+The power spectrum can be predicted with great accuracy via linear 
+approximations. However, the evolution equations are involved (running, for
+example, over many different cosmological parameters) and can be
+stiff, which calls for different approaches in different regimes. Furthermore,
+its solutions are highly oscillatory and therefore susceptible to numerical
+errors (\cbib{Seljak}). Full solutions consist of many different steps, whose
+descriptions fall outside of the scope of this work. We refer readers curious
+about these equations to the history in the introduction of \cbib{Seljak},
+which cites papers important to their development. 
 
-% Examples of great results from Boltzmann solvers
+%s Equations are hard. Who can save us?
 
-Three shape parameters of core interest to this paper are the physical density in baryons $\omega_b$ (whose impact on the power spectrum is shown in figure~\ref{fig: omega_b_dependence}), the physical density in cold dark matter $\omega_c$ (figure~\ref{fig: omega_c_dependence}), and the spectral index $n_s$, (figure~\ref{fig: n_s_dependence}). The remaining parameters $\sigma_{12}$ and $A_s$, as well as the quantities $z$ and $h$, all shift only the amplitude of the power spectrum. We show the amplitude shift associated with various $A_s$ values in figure~\ref{fig: A_s_dependence} and stress that the same plot only needs to be relabeled in order to illustrate the impact of $\sigma_{12}$, $z$, $h$, etc. 
+The so-called \textit{Boltzmann codes} have been 
+developed in order to leverage modern computational power and automate the
+solution of these equations of evolution. Typically, Boltzmann codes offer as
+outputs CMB spectra and matter power spectra. The latter is the focus of this
+work.
+
+%s What can our savior do?
+
+As input, Boltzmann codes accept a set of values for different 
+cosmological parameters, many of which were defined in section~\ref{sec: 
+param_glossary}. Boltzmann codes enable us to pick from wide ranges of 
+accepted values for these parameters and to consider the power 
+spectrum for almost any combination of these parameters. Of course, there are 
+still limitations. For example, CAMB does not currently support negative 
+redshifts (which, we will later see, becomes a problem), and the minimum 
+allowed value of $H_0$ is 1 km / s / Mpc, although slightly higher values have 
+been observed to cause runtime errors in the presence of other extreme 
+parameters.
+
+%s Pics? Not so fast. Let's pick one.
+
+Before we proceed to concrete demonstrations, it will be expedient to settle
+on a single Boltzmann solver. As of today, the two As the researchers in our group have much more
+experience with CAMB, we elected to use CAMB for our paper.
+
+In principal, to maximize the generality of the
+results introduced in this work, we would demonstrate their compatibility with
+different Boltzmann solvers. In practice, the Boltzmann codes have already
+been shown to be in excellent agreement with each other (\cbib{Seljak},
+\cbib{Lesgourges}). However, later in this work, we will discover an
+independent reason to consider alternate 
+
+In the future, of course, it will be beneficial
+to 
+
+To conclude this section, we make mention of three specific Boltzmann solvers: 
+CLASS, CAMB, and CMBFast.
+CAMB was written in Fortran and comes with a Python wrapper which we
+will use as a starting point (along with GPy) for our Python package
+Cassandra-Linear.
+
+CLASS was written in C and also comes with a Python wrapper.
+%I will briefly justify our use of CAMB over CLASS.
+% Most of our existing emulator pipeline (including the emulator 
+% COMET\footnote{\textcolor{green} {Double check this, does COMET actually 
+% rely on CAMB?}}) DOES THIS EVEN MATTER?
+For this project, we elected to continue with CAMB as the scientists at
+OPINAS at the MPE were better equipped to provide support with CAMB.
+\textcolor{green}{Furthermore, the CLASS documentation
+is not nearly as strong as it is with CAMB, and we already encountered
+extreme difficulty simply in recreating results already previously obtained
+via CAMB!}
+
+%s Examples of great results from Boltzmann solvers
+
+\textcolor{blue}{To hint at what's to come, I start off this section by noting that several cosmological parameters have a fairly unique impact on the shape of the power spectrum, while others have a degenerate impact. Wouldn't it be great if we could know what the power spectrum would look like if we increased parameter $x$? Boltzmann solvers can help us with that.}
+
+To connect this section with~\ref{sec: param_glossary}, we can visualize the
+impact of each of this work's core parameters on the power spectrum. One
+simple way to set this up for parameter $\Theta_i$ is to designate Aletheia 
+model 0 as a middle ground and to create two copies of model 0, with each
+copy tweaked to have an increased or decreased value of $\Theta_i$. This
+approach works for every parameter except for $\omega_\nu$, where one of the
+copy cosmologies describes the middle ground since the default value
+$\omega_nu = 0$ is already at a hard boundary.
+
+When feeding these cosmologies into CAMB, our Boltzmann solver of choice, we
+obtain figures~\ref{fig: omega_b_dependence}, \ref{fig: omega_c_dependence}, 
+\ref{fig: n_s_dependence}, and \ref{fig: omega_nu_dependence}. It should be
+clear to the reader that each parameter has a special impact on the power
+spectrum. None of these parameters is completely degenerate in the others,
+although in the case of massless neutrinos $A_s$ and $\sigma_{12}$ are
+completely degenerate, which is why we have not included an analogous plot for
+$\sigma_{12}$ (the other reason being that CAMB does not accept $\sigma_{12}$
+as an input--see section~\ref{sec: generate_emu_data}.
+
+The remaining parameters $\sigma_{12}$ and $A_s$, as well as the quantities 
+$z$ and $h$, all shift only the amplitude of the power spectrum. We show the 
+amplitude shift associated with various $A_s$ values in figure~\ref{fig: 
+A_s_dependence} and stress that the same plot only needs to be relabeled in 
+order to illustrate the impact of $\sigma_{12}$, $z$, $h$, etc. 
 
 \begin{figure}[htb]
   \centering
@@ -694,40 +782,13 @@ Three shape parameters of core interest to this paper are the physical density i
   \label{fig: omega_nu_dependence}
 \end{figure}
 
-
-% What are they solving?
-
-This will mostly just be a theoretical discussion of these solvers. The hands-on stuff comes in the non-introductory section on CAMB.
-
-%%%
-
-In essence, Boltzmann codes solve XXX in order to give us the power spectrum
-of any universe characterized by some set of cosmological parameters. For
-example, figure~\ref{fig: omega_b_dependence} shows the impact of varying the
-physical density in baryons, $\omega_b$. 
+%s Segue into the next section
 
 Several parameters have fairly unique impacts on the power spectrum.
 Therefore, we can imagine building a collection of power spectra labeled by
 their parameter configurations and comparing our real-world observations to
 them. This should allow us to perform parameter inference.
 
-To conclude this section, we make mention of three specific Boltzmann solvers: 
-CLASS, CAMB, and CMBFast.
-CAMB was written in Fortran and comes with a Python wrapper which we
-will use as a starting point (along with GPy) for our Python package
-Cassandra-Linear.
-
-CLASS was written in C and also comes with a Python wrapper.
-%I will briefly justify our use of CAMB over CLASS.
-% Most of our existing emulator pipeline (including the emulator 
-% COMET\footnote{\textcolor{green} {Double check this, does COMET actually 
-% rely on CAMB?}}) DOES THIS EVEN MATTER?
-For this project, we elected to continue with CAMB as the scientists at
-OPINAS at the MPE were better equipped to provide support with CAMB.
-\textcolor{green}{Furthermore, the CLASS documentation
-is not nearly as strong as it is with CAMB, and we already encountered
-extreme difficulty simply in recreating results already previously obtained
-via CAMB!}
 
 \section{Monte Carlo Markov Chains}
 
