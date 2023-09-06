@@ -709,16 +709,14 @@ will concede an important,
 independent reason to consider use of CLASS, which becomes a promising route
 for continuation of this work (see section~\ref{sec: future_work}).
 
-\begin{comment}
+\begin{comment} %%%
 \textcolor{green}{Furthermore, the CLASS documentation
 is not nearly as strong as it is with CAMB, and we already encountered
 extreme difficulty simply in recreating results already previously obtained
 via CAMB!}
-\end{comment}
+\end{comment} %%%
 
 %s Examples of great results from Boltzmann solvers
-
-\textcolor{blue}{To hint at what's to come, I start off this section by noting that several cosmological parameters have a fairly unique impact on the shape of the power spectrum, while others have a degenerate impact. Wouldn't it be great if we could know what the power spectrum would look like if we increased parameter $x$? Boltzmann solvers can help us with that.}
 
 To connect this section with~\ref{sec: param_glossary}, we can visualize the
 impact of each of this work's core parameters on the power spectrum. One
@@ -817,11 +815,17 @@ order to illustrate the impact of $\sigma_{12}$, $z$, $h$, etc.
 
 \begin{figure}[htb]
   \centering
-  \includegraphics[scale=1.0]{intro/parameter_demos/omega_nu_impact_on_Pk}
-  \caption[Impact of $\omega_\nu$ on $P(k)$]{Impact of $\omega_\nu$ for a
-  	fixed redshift. $\omega_\nu$ is not like other parameters--combining
-  	a change in $\omega_\nu$ with a change in $z$ is not a simple sum of the
-  	operations. This sounds awkward, let's rewrite...}
+  \includegraphics[scale=1.0]{intro/parameter_demos/omnuh2_impact_on_Pk}
+  \caption[Impact of $\omega_\nu$ on $P(k)$]{Impact of $\omega_\nu$ for the
+  	fixed redshift $z=0$. Massive neutrinos suppress structure formation in
+  	a manner highly reminiscent of radiation. This similarity arises from the
+  	combination of neutrinos' large velocities with the weakness of their 
+  	interaction with other particles.
+  	For the other primary parameters of this work,
+  	the impact on power spectrum is independent of the value of $z$. This is
+  	not the case with massive neutrinos
+  	(see figure~\ref{fig: neutrinos_and_redshift}), which we will discuss in
+  	section~\ref{sec: neutrino_problem}.}
   \label{fig: omega_nu_dependence}
 \end{figure}
 
@@ -968,6 +972,7 @@ about it.)
 
 
 \section{Neutrinos and Their Cosmological Impact}
+\label{sec: neutrino_problem}
 
 \begin{figure}[htb]
   \centering
