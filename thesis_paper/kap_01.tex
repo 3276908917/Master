@@ -44,11 +44,25 @@ fluctuations. These mysteries can be explored by testing our observations
 against several extensions of the $\Lambda$CDM model, such as a nonzero 
 curvature component or a time-dependent dark energy equation of state. 
 
-Ultimately, the goal of this work is to speed up the kinds of statistical
-analyses which are necessary to tighten these uncertainties.
-These analyses compare our cosmological observations to what we
-would expect to see if we solved the equations of cosmological evolution with
-different values for parameters.
+Statistical analyses to answer these questions rely on great numbers of
+evaluations of cosmological theory in order to build probability 
+distributions, from which we obtain estimates for parameters and their
+uncertainties. These evaluations of cosmological theory entail the solutions
+of computationally-expensive equations (see
+section~\ref{sec: boltzmann_intro}). The time spent on these evaluations
+represents a bottleneck of the analysis which can be alleviated by the
+use of an emulator, a kind of multi-dimensional interpolator.
+
+After training an emulator over many theory evaluations, we can use the
+emulator instead of continuing to solve the equations. Furthermore, in
+a technique known as \textit{evolution mapping}
+(section~\ref{sec: ev_mapping_intro}), we can exploit a degeneracy between 
+several parameters and dramatically reduce the number of parameters over which
+we need to train. 
+
+In summary, the goal of this work is to extend the applicability of
+evolution-mapping emulators to cosmologies with massive neutrinos by
+including a parameter otherwise behaving as a degenerate parameter. 
 
 \section{Brief Glossary of Our Cosmological Parameters}
 \label{sec: param_glossary}
@@ -849,6 +863,9 @@ to them. We can ask to which of these theoretical power spectra our
 observations most closely agree. This question is quantitatively answered by 
 parameter inference in the form of a Monte Carlo Markov Chain (MCMC) analysis, whose basic idea will be discussed in the next section.
 
+%%% We're sinking this section! It's not relevant enough and I don't know 
+%%% enough.
+\begin{comment}
 
 \section{Monte Carlo Markov Chains}
 
@@ -865,6 +882,59 @@ This can be a very brief section, but I want to discuss a little bit of how most
 Metropolis-Hastings algorithm.
 
 We don't know what the true probability distribution of power spectra is. In order to build this distribution with simulation results, we simply draw from the distribution. \textcolor{orange}{Refer to ``Data to Insights'' lecture notes in order to tighten this description.}
+
+\end{comment}
+%%%
+
+\section{Evolution Mapping}
+\label{sec: ev_mapping_intro}
+
+\textcolor{blue}{I want to briefly summarize why we can funnel all of the 
+evolution parameters through $\sigma_{12}$ in this way. This objective may be
+too ambitious for this paper, because I would have to go through each
+evolution parameter and derive its evolution nature in a few lines of 
+equations.} \textcolor{orange}{Maybe I can just do the same thing as Ariel
+recommended with the GPR kernel: ``we played around and found that this
+works.''}
+
+(\cbib{San21}) proposes to divide up the full set of cosmological
+parameters into two categories: \textit{evolution} parameters $\mathcal{O}_E$
+(such as $\omega_b$, $\omega_c$, and $\eta_s$)
+affect the amplitude of the power spectrum at a particular redshift, while
+\textit{shape} parameters $\mathcal{O}_S$
+(such as $\omega_K$, $\omega_\text{DE}$, w(a))
+affect the shape of the power
+spectrum.
+
+We take, as the evolution mapping relation for the power spectrum, equation 13
+from \cbib{San21}:
+
+\begin{equation}
+\label{eq: evMapping_pSpectrum}
+    \Delta^2_L (k | z, \Theta_s, \Theta_e)
+    =
+    \Delta_L^2 (k | \Theta_s, \sigma_{12} \left( z, \Theta_s, \Theta_e \right))
+\end{equation}\footnote{Varying $z$ has the same effect as varying an
+evolution parameter, which is why it appears on the RHS only as an argument to
+the $\sigma_{12}$ ``function.'' We write it separately from $\Theta_e$ to
+emphasize that $z$ does not describe a property of the Universe, but is
+simply used as a proxy here for \textcolor{red}{conformal?} time
+\textcolor{red}{elapsed since the Big Bang? (but we can only observe up to
+$z = 1100$...)}.}
+
+Why is this scheme important? Evolution mapping greatly simplifies the emulator
+implementation. Because we can
+funnel all of the evolution parameters through $\sigma_{12}$, we've effectively
+collapsed an entire category of parameters to just one parameter. Fewer
+parameters means that we get a more accurate emulator.
+
+``At the linear level, all models characterized by identical shape parameters
+and the same values of the parameter combinations $b \sigma_{12}(z)$ and
+$f \sigma_{12}(z)$ will be identical'' (\cbib{San21}).
+
+Now, for the hiccup, which segues into the next section: this scheme is broken by one parameter, the Universe's
+density in neutrinos. (In the next section: why this is so and what we can do
+about it.)
 
 \section{Emulation: Basic Principles}
 \label{sec: emulation_intro}
@@ -937,57 +1007,6 @@ I imagine this is going to be an extremely short section. We should motivate why
 What is the theoretical best LHC that we could make?
 
 Besides, can we explain this equation?
-
-
-\section{Evolution Mapping}
-\label{sec: ev_mapping_intro}
-
-\textcolor{blue}{I want to briefly summarize why we can funnel all of the 
-evolution parameters through $\sigma_{12}$ in this way. This objective may be
-too ambitious for this paper, because I would have to go through each
-evolution parameter and derive its evolution nature in a few lines of 
-equations.} \textcolor{orange}{Maybe I can just do the same thing as Ariel
-recommended with the GPR kernel: ``we played around and found that this
-works.''}
-
-(\cbib{San21}) proposes to divide up the full set of cosmological
-parameters into two categories: \textit{evolution} parameters $\mathcal{O}_E$
-(such as $\omega_b$, $\omega_c$, and $\eta_s$)
-affect the amplitude of the power spectrum at a particular redshift, while
-\textit{shape} parameters $\mathcal{O}_S$
-(such as $\omega_K$, $\omega_\text{DE}$, w(a))
-affect the shape of the power
-spectrum.
-
-We take, as the evolution mapping relation for the power spectrum, equation 13
-from \cbib{San21}:
-
-\begin{equation}
-\label{eq: evMapping_pSpectrum}
-    \Delta^2_L (k | z, \Theta_s, \Theta_e)
-    =
-    \Delta_L^2 (k | \Theta_s, \sigma_{12} \left( z, \Theta_s, \Theta_e \right))
-\end{equation}\footnote{Varying $z$ has the same effect as varying an
-evolution parameter, which is why it appears on the RHS only as an argument to
-the $\sigma_{12}$ ``function.'' We write it separately from $\Theta_e$ to
-emphasize that $z$ does not describe a property of the Universe, but is
-simply used as a proxy here for \textcolor{red}{conformal?} time
-\textcolor{red}{elapsed since the Big Bang? (but we can only observe up to
-$z = 1100$...)}.}
-
-Why is this scheme important? Evolution mapping greatly simplifies the emulator
-implementation. Because we can
-funnel all of the evolution parameters through $\sigma_{12}$, we've effectively
-collapsed an entire category of parameters to just one parameter. Fewer
-parameters means that we get a more accurate emulator.
-
-``At the linear level, all models characterized by identical shape parameters
-and the same values of the parameter combinations $b \sigma_{12}(z)$ and
-$f \sigma_{12}(z)$ will be identical'' (\cbib{San21}).
-
-Now, for the hiccup, which segues into the next section: this scheme is broken by one parameter, the Universe's
-density in neutrinos. (In the next section: why this is so and what we can do
-about it.)
 
 
 \section{Neutrinos and Their Cosmological Impact}
