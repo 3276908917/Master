@@ -5,25 +5,44 @@
 %introduction compared to other master's theses.}
 
 A primary goal of cosmology is to specify, as narrowly as possible, the 
-parameters which define our Universe. These include, for example, the overall 
-curvature of the Universe as well as its cold dark matter (CDM) content. These
-parameters determine the full evolution of the Universe after the inflationary
-period (whose beginnings were thought to be non-deterministic)
-\cbib{Caravano}. For example, depending on
-the makeup of the Universe--how much of its total energy budget exists in the
-form of each `ingredient' (cold dark matter, radiation, etc.)--the Universe
-can have a finite lifetime. When the proportion of matter is high enough,
+parameters that define our Universe. These include, for example, the overall 
+curvature of the Universe as well as its cold dark matter (CDM) content. The 
+evolution of the Universe depends on its contents. For example, when the 
+proportion of matter is high enough,
 gravity will cause the Universe to collapse again on itself. By contrast, if
 the proportion of dark energy is high enough, the Universe will continue to
 accelerate in its expansion forever.
 
-Cosmology has rapidly evolved into a high-precision science. For example, with
+Cosmology has rapidly evolved into a high-precision science. The cosmic
+microwave background (CMB) is the most powerful cosmological probe and
+several. With
 COBE (1989-1993) \cbib{COBE} followed by WMAP (2001-2010) \cbib{WMAP} followed 
 by Planck (2009-2013) \cbib{Planck}, the uncertainties on several cosmological 
 parameters have been tightened significantly.
-\textcolor{red}{Should I try to offer concrete examples of how these missions
-increased the precision on our parameter values? I feel like that might not be
-a good use of space in the intro.}
+Galaxy clustering is another important probe, with similarly ambitious
+improvements over the years. The original Sloan Digital Sky Surveys (SDSS) I
+and II covered about one million galaxies in a redshift range of $0.07 < 0.2$
+and were completed over the periods 2000-2005 and 2005-2008, respectively.
+The Dark Energy Spectroscopic Instrument, which had its first light in 2019, is expected to complete its mission of 30 million targets in 2026.
+\cbib{Finkbeiner}. These probes allow us to describe the matter power spectrum
+with greater precision. The power spectrum is the amplitude of density
+fluctuations as a function of scale. It is therefore a representation of how
+matter clustering depends on physical separation.
+
+The CMB and galaxy clustering probes have been crucial to the establishment
+of the $\Lambda$CDM model as the standard model of cosmology. Under this
+model, the Universe is dominated by a dark energy component in the form of a
+cosmological constant $\Lambda$, which behaves like a vacuum energy constant
+in density across space and time. This model also posits a dark matter
+component which is ``cold'' (meaning a negligible velocity dispersion and
+therefore a negligible pressure) and constitutes the vast majority of matter
+in the Universe.
+
+There are several related mysteries about the Universe that we would like to
+explore, such as the nature of dark energy and the origin of primordial
+fluctuations. These mysteries can be explored by testing our observations
+against several extensions of the $\Lambda$CDM model, such as a nonzero 
+curvature component or a time-dependent dark energy equation of state. 
 
 Ultimately, the goal of this work is to speed up the kinds of statistical
 analyses which are necessary to tighten these uncertainties.
@@ -33,10 +52,6 @@ different values for parameters.
 
 \section{Brief Glossary of Our Cosmological Parameters}
 \label{sec: param_glossary}
-
-\textcolor{blue}{We need to explain what the different parameters mean! The
-big omega terms are likely to be more familiar to readers, we can start with 
-those.}
 
 We will get more specific about terms like ``cosmological observations''
 and ``what we would expect to see'' in the next section (\ref{sec: Pk_intro}, 
@@ -58,13 +73,6 @@ parameters and predicts as $\hat{\matr{Y}}$ the power spectra to which these
 tuples correspond. 
 
 %s Introduce the parameter names, THEN talk about what they mean
-
-\begin{comment}
-
-\textcolor{orange}{This paragraph needs to be rewritten. It's way too messy
-to talk about parameters in order of importance!}
-
-\end{comment}
 
 The primary emulator for this work has been trained over six parameters:
 $\omega_b$, $\omega_\text{CDM}$, $n_s$, $\sigma_{12}$, $A_s$ and $\omega_\nu$.
@@ -150,8 +158,9 @@ Doppler shift (the motion of bodies along the line-of-sight of the
 observation). On the scale of cosmological observations, cosmological redshift
 certainly dominates, but distortions due to Doppler-shifted light,
 called redshift space distortions, can cause problems for cosmological 
-analyses. These problems lie outside the scope of this work.
-\textcolor{green}{citation}.} Specifically, the redshift of incoming light can
+analyses. These problems lie outside the scope of this work. For a detailed
+treatment on RSD, see chapter 8 of \cbib{FECS}}. Specifically, the redshift of
+incoming light can
 be related to the scale factor at the time of its emission as:
 
 \begin{equation}
@@ -709,12 +718,14 @@ will concede an important,
 independent reason to consider use of CLASS, which becomes a promising route
 for continuation of this work (see section~\ref{sec: future_work}).
 
-\begin{comment} %%%
+%%%
+\begin{comment}
 \textcolor{green}{Furthermore, the CLASS documentation
 is not nearly as strong as it is with CAMB, and we already encountered
 extreme difficulty simply in recreating results already previously obtained
 via CAMB!}
-\end{comment} %%%
+\end{comment}
+%%%
 
 %s Examples of great results from Boltzmann solvers
 
@@ -840,6 +851,14 @@ parameter inference in the form of a Monte Carlo Markov Chain (MCMC) analysis, w
 
 
 \section{Monte Carlo Markov Chains}
+
+%Bayes' theorem states that
+
+%\begin{equation}
+%P(\bm{\pi} | \bm{d}) 
+%\end{equation}
+
+%We can assign a probability $P(\bm{\pi} | d$
 
 This can be a very brief section, but I want to discuss a little bit of how most modern parameter inference works because it motivates the need for extremely fast power spectrum computation. It provides a sort of conceptual bridge between our ``pure'' goal (quantifying the cosmos) and the nitty-gritty bulk of the paper (optimizing emulator performance).
 
