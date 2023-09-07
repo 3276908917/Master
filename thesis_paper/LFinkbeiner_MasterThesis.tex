@@ -24,7 +24,7 @@
 \usepackage{a4wide}
 \usepackage{fancyhdr}
 \usepackage{graphicx}
-\usepackage{german}
+%\usepackage{english}
 \usepackage[bookmarks]{hyperref}
 
 % Additional packages just for Lukas' thesis
@@ -35,6 +35,8 @@
 \usepackage{caption}
 \usepackage{subcaption}
 
+\usepackage{natbib}
+
 %\IfFileExists{biblatex.sty} {
 %    \usepackage[style=authoryear]{biblatex}
 %    \addbibresource{literatur.bib}
@@ -43,12 +45,13 @@
 % This code formatting sucks but I don't want to output extra spaces.
 \newcommand{\cbib}[1]
 {\IfFileExists{biblatex.sty}
-{\cite{#1}}
+{\citep{#1}}
 {[citation ``#1'' cannot be linked in the current environment]}}
 
 \newcommand{\matr}[1]{\bm{#1}}  % ISO convention, according to egreg on
 % StackExchange
 
+\newcommand*{\lang}{en-GB}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% Definition der Kopfzeile %%
@@ -116,7 +119,7 @@
   \begin{center}
     \Large Dissertation\\
     \Large an der #4\\
-    \Large der Ludwig--Maximilians--Universit"at\\
+    \Large der Ludwig--Maximilians--Universit\"at\\
     \Large M\"unchen\\
     \vspace*{\stretch{1}}
     \Large vorgelegt von\\
@@ -132,9 +135,9 @@
   \vspace*{\stretch{1}}
 
   \begin{flushleft}
-    \large Erstgutachter:  #7 \\[1mm]
-    \large Zweitgutachter: #8 \\[1mm]
-    \large Tag der m\"undlichen Pr\"ufung: #9\\
+    \large First referee:  #7 \\[1mm]
+    \large Second referee: #8 \\[1mm]
+    \large Date of oral exam: #9\\
   \end{flushleft}
 
   \cleardoublepage
@@ -156,11 +159,11 @@
       {Lukas Finkbeiner}                       % Vor- und Nachname des Autors
       {Boston}                             % Geburtsort des Autors
       {Fakultät für Physik}                         % Name der Fakultaet
-      {M"unchen 2022-23}                          % Ort und Jahr der Erstellung
+      {M\"unchen 2022-23}                          % Ort und Jahr der Erstellung
       {2. Oktober 2023}                            % Tag der Abgabe
       {Erstgutachter}                          % Name des Erstgutachters
       {Zweitgutachter}                         % Name des Zweitgutachters
-      {Pr"ufungsdatum}                         % Datum der muendlichen Pruefung
+      {Pr\"ufungsdatum}                         % Datum der muendlichen Pruefung
 
 
   \tableofcontents
@@ -188,7 +191,7 @@
   \include{kap_05}
   \include{kap_06}
   \include{kap_07}
-  \include{anhang}
+  %\include{anhang}
 
 
   \backmatter
@@ -199,7 +202,7 @@
   \include{danksagung}
 
 
-  \include{lebenslauf}
+  %\include{lebenslauf}
 
 
 \end{document}
