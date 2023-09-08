@@ -23,8 +23,9 @@ Galaxy clustering is another important probe, with similarly ambitious
 improvements over the years. The original Sloan Digital Sky Surveys (SDSS) I
 and II covered about one million galaxies in a redshift range of $0.07 < 0.2$
 and were completed over the periods 2000-2005 and 2005-2008, respectively.
-The Dark Energy Spectroscopic Instrument, which had its first light in 2019, is expected to complete its mission of 30 million targets in 2026.
-\cbib{Finkbeiner}. These probes allow us to describe the matter power spectrum
+The Dark Energy Spectroscopic Instrument, which had its first light in 2019, is expected to complete its mission of 30 million targets in 2026
+\cbib{Finkbeiner}. \textcolor{orange}{Redshift range?}
+These probes allow us to describe the matter power spectrum
 with greater precision. The power spectrum is the amplitude of density
 fluctuations as a function of scale. It is therefore a representation of how
 matter clustering depends on physical separation.
@@ -328,11 +329,6 @@ even in cosmological contexts.
 \section{The Matter Power Spectrum}
 \label{sec: Pk_intro}
 
-% Say this in 1.2
-Each energy species impacts the evolution of the Universe in different ways.
-
--------------
-
 Although the cosmological principle appears to hold well on large scales,
 we know from our observations of structure in the Universe that it is not 
 homogeneous. To characterize these inhomogeneities, we can imagine quantifying 
@@ -533,16 +529,62 @@ pressure eventually became high enough to reverse the collapse.
 
 %s Everyone else uses h units. Why don't we?
 
-Experienced readers will notice that our power spectrum in
+Our power spectrum in
 figure~\ref{fig: first_power_spectrum} does not use the customary $h$ units:
 our $x$-axis uses units of Mpc$^{-1}$ rather than $h$ Mpc$^{-1}$ and our
-$y$-axis uses units of Mpc$^3$ rather than Mpc$^3 \, h^{-3}$. This is yet
-another instance of customary factors of $h$ (see also the $\Omega_i$ and
+$y$-axis uses units of Mpc$^3$ rather than Mpc$^3 \, h^{-3}$. 
+Customary factors of $h$ (such as those that appeared in the $\Omega_i$
+terms in section~\ref{sec: param_glossary}) are common in observational
+cosmology.
+
+The $h$-based units were introduced in the times when GRS redshift 
+ranges contained very narrow redshift distributions. As mentioned in the
+discussion on $\xi(r)$, the observed redshift of a galaxy can be transformed
+into a comoving\footnote{the comoving coordinate system expands in the same
+way as the Universe. Two objects without any relative velocity will always
+remain at the same comoving separation from each other.} line-of-sight 
+distance:
+
+\begin{equation}
+D_c (z)
+=
+\int_0^z \frac{c \, dz}{H_{100}}
+\,
+\left[
+	\sum_i \omega_i (1 + z)^{3(1 + w_i)}
+	+
+	\omega_K (1 + z)^2
+\right]^{-1/2}
+\end{equation}
+
+This requires the assumption of a \textit{fiducial cosmology}: a set of 
+canonical values for cosmological parameters. However, at low
+redshifts, this distance may be approximated as:
+
+\begin{equation}
+\label{eq: comov_dist_approx}
+D_c(z) \approx \frac{c}{H_0} \, z
+\end{equation}
+
+consequently, the use of $h$ units allowed early GRSs to present results
+without committing to a fiducial cosmology. This
+approximation loses its validity for later GRSs because they covered larger
+redshift ranges. Consequently, analyses of later GRSs needed to assume full 
+fiducial cosmologies anyway, and the use of $h^{-1}$ Mpc units is no longer
+advantageous. Nevertheless, they became convention and continue to be used 
+\cbib{San20}.
+
+We illustrate in figure~\ref{fig: h_unit_Pk} one significant problem with the
+use of $h$ units: varying $h$ changes not only the power 
+spectrum, but also the axes used to represent the power spectrum. Comparison 
+of power spectra from different 
+models is hindered because the $x$ and $y$ axes correspond to different ranges
+for each curve. If we use instead units of Mpc, then changes in $h$ change
+only the power spectrum, and we can much more readily appreciate its true
+impact--that of an amplitude change.
+
 $\sigma_8$ discussions in section~\ref{sec: param_glossary}). As mentioned
-for $\sigma_8$, these units were introduced in the times when GRS redshift 
-ranges justified the use of equation~\ref{eq: comov_dist_approx}. This
-convention also persists in emulator literature (see, for example,
-\cbib{Arico} and \cbib{Mancini}).
+for $\sigma_8$, 
 
 % The following plots were generated with h_units_bad.ipynb
 \begin{figure}[htb]
@@ -576,16 +618,7 @@ convention also persists in emulator literature (see, for example,
 % plots. This is a much subtler issue than the h complaints in the
 % previous section.
 
-Again, we refer the reader to \cbib{San20} for a detailed case against the
-use of $h$ units in observational cosmology. We illustrate in
-figure~\ref{fig: h_unit_Pk} one significant problem related to the
-unstable meaning of $\sigma_8$: varying $h$ changes not only the power 
-spectrum, but also the axes used to represent the power spectrum. Comparison 
-of power spectra from different 
-models is hindered because the $x$ and $y$ axes correspond to different ranges
-for each curve. If we use instead units of Mpc, then changes in $h$ change
-only the power spectrum, and we can much more readily appreciate its true
-impact (that of an amplitude change).
+
 
 As with our choice of $\sigma_{12}$ instead of $\sigma_8$, our choice of
 absolute units will facilitate the application of evolution mapping described
@@ -629,27 +662,6 @@ equation~\ref{eq: sigma12}! The subscript in $\sigma_8$ is misleading:
 $\sigma_8$ is the linear-theory RMS mass variance in spheres of radius
 $8 / h$ Mpc, not 8 Mpc. Recall that $h$ is not a well-known constant but its 
 own  cosmological parameter whose value is subject to further observations.
-
-$h$ units (which will appear again in section~\ref{sec: Pk_intro}) became
-conventional with the first galaxy redshift surveys (GRSs). The conversion of
-redshifts into comoving distances $\chi(z)$ requires the assumption of a set 
-of
-cosmological parameters called a \textit{fiducial cosmology}. However, the
-earliest surveys probed a limited range of small redshifts, where the
-comoving distance may be estimated as follows:
-
-\begin{equation}
-\label{eq: comov_dist_approx}
-\chi(z) \approx \frac{c}{H_0} \, z
-\end{equation}
-
-Therefore, use of $h^{-1}$ Mpc units allowed analyses of these early GRSs
-to quote results without assuming a fiducial cosmology. This
-approximation loses its validity for later GRSs because they covered larger
-redshift ranges. Without this approximation then, the analyses of these later
-surveys had to assume a full fiducial cosmology anyway. This means that
-$h^{-1}$ Mpc units lack their original justification, although out of
-convention they continue to be used (\cbib{San20}).
 
 This convention is not without serious drawbacks.
 For example, our incomplete understanding of $h$
