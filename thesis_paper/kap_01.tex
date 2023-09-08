@@ -349,20 +349,11 @@ chapter~\ref{chap: A_s}.
 
 -------------
 
-Now that we have at least briefly introduced the various cosmological
-parameters of interest to us, we can define what we meant in the opening
-paragraphs by ``cosmological observations'' and ``what we would expect to
-see.'' How can we describe the Universe in such a way as to allow quantitative 
-definitions of these phrases? As a starting point, we can imagine quantifying 
+Although the cosmological principle appears to hold well on large scales,
+we know from our observations of structure in the Universe that it is not 
+homogeneous. To characterize these inhomogeneities, we can imagine quantifying 
 the energy density $\rho(\bm{x})$ of the Universe at any one point $\bm{x}$ in 
-three-dimensional space.
-
-%Let us return to the idea that cosmological parameters determine the the 
-%evolution of the Universe.
-% In what ways can we quantify the Universe, in order to be able to describe
-% its evolution? We can simply consider the time dependence of the density.
-
-We can define a similar quantity, a relative density:
+three-dimensional space. From this we can define a similar quantity, a relative density fluctuation:
 
 \begin{equation}
 \delta(\bm{x}) = \frac{\rho(\bm{x}) - \bar{\rho}}{\bar{\rho}}
@@ -372,7 +363,9 @@ which we refer to as the ``matter density contrast field.'' $\bar{\rho}$
 represents the average energy density of the entire Universe. 
 $\delta(\bm{x})$ easier than $\rho(\bm{x})$ to work with since it
 is unitless and especially because it is normalized--the integral of the
-matter density contrast field, taken over the entire Universe, is unity.
+matter density contrast field, taken over the entire Universe, is zero.
+If the Universe is approximately homogeneous, we can hope to describe any
+deviations from homogeneity perturbatively.
 
 $\delta(\bm{x})$ may in turn be used to define the two-point correlation 
 function:
@@ -398,11 +391,23 @@ about $\xi_g(r)$, the two-point correlation function of galaxies. Although we
 are using galaxies to approximate the distribution of all matter, there will
 be some bias in our approach because galaxies (as extraordinarily dense 
 structures) represent peaks in the $\delta$ field.} can be thought
-of as the excess probability that some galaxy will be located at a distance
-$r$ from any other galaxy.
+of as the excess probability, with respect to a homogeneous distribution, that 
+some galaxy will be located at a distance $r$ from any other galaxy.
 
-Lastly, to arrive at the object of primary interest to this work, we will
-consider the Fourier transform of $\xi(r)$, which gives us the power spectrum:
+When dealing with density fluctuations, it is convenient to work in Fourier
+space. The two-point correlation
+function of perturbations in Fourier space
+defines the \textit{power spectrum}:
+
+\begin{equation}
+\langle \delta (\bm{k}) \delta (\bm{k}')^* \rangle
+=
+(2 \pi)^3 \delta_D (\mathbm{k} - \mathbm{k}') P(k)
+\end{equation}
+
+where $\delta_D$ is the three-dimensional Dirac delta function.
+Equivalently, the power spectrum can be obtained
+via Fourier transform of $\xi(r)$:
 
 \begin{equation}
 P(k) = \int d^3 r \, \xi(r) \exp [i \bm{r} \cdot \bm{k}]
@@ -412,21 +417,11 @@ P(k) = \int d^3 r \, \xi(r) \exp [i \bm{r} \cdot \bm{k}]
 
 The power spectrum describes the variance of the amplitudes of the Fourier
 modes. Actually, the power spectra we are discussing in this thesis are 
-\textit{linear-theory} power spectra $P_\text{L}(k)$ of \textit{non-neutrino} 
-matter.\footnote{\textcolor{red}{Andrea added the following comment: ``We 
-should 
-justify this assumption. It is standard practice to assume that the galaxy 
-density field is determined only by the underlying cdm+b density field, 
-without taking into consideration the cold neutrino component (which also 
-behaves as matter).'' Do you have recommendations for sources I can consult in
-order to add this information to this paragraph?}} Emulators of non-linear 
-power spectra $P_\text{NL}(k)$ are 
-already available, but linear-theory power spectra are still important.
-For example, they can be used to predict $P_\text{NL}(k)$, like in 
-perturbation theory approaches. Furthermore, most non-linear emulators
-actually predict the ratio of the non-linear power spectrum to its linear
-counterpart, so $P_\text{L}(k)$ is still necessary to evaluate
-$P_\text{NL}(k)$ (A. G. S\'{a}nchez, private communication, 2022).
+\textit{linear-theory} power spectra $P_\text{L}(k)$. This means that we
+are including only linear terms in a perturbative expansion of $\delta (x)$.
+This entails that we neglect all but the dominant energy species' impact on
+the growth of density fluctuations in any given period of the Universe's
+history.
 
 Matter density fluctuations grow at different rates depending on 
 the dominant energy species in the Universe, and so far the Universe has
@@ -966,6 +961,27 @@ holding $\sigma_{12}$ fixed, so does it change anything at all?}
 
 \section{Emulation: Basic Principles}
 \label{sec: emulation_intro}
+
+\textcolor{blue}{I'm not sure where the following chunk should go. I'm storing
+it here for now!}
+
+ of \textit{non-neutrino} 
+matter.\footnote{\textcolor{red}{Andrea added the following comment: ``We 
+should 
+justify this assumption. It is standard practice to assume that the galaxy 
+density field is determined only by the underlying cdm+b density field, 
+without taking into consideration the cold neutrino component (which also 
+behaves as matter).'' Do you have recommendations for sources I can consult in
+order to add this information to this paragraph?}} Emulators of non-linear 
+power spectra $P_\text{NL}(k)$ are 
+already available, but linear-theory power spectra are still important.
+For example, they can be used to predict $P_\text{NL}(k)$, like in 
+perturbation theory approaches. Furthermore, most non-linear emulators
+actually predict the ratio of the non-linear power spectrum to its linear
+counterpart, so $P_\text{L}(k)$ is still necessary to evaluate
+$P_\text{NL}(k)$ (A. G. S\'{a}nchez, private communication, 2022).
+
+----
 
 To conduct these MCMC analyses, we need several thousands of power spectra. However, if our Boltzmann solvers take on the order of three seconds to run, then these solvers will become the bottleneck of our analysis. \textcolor{orange}{Give some specific numbers for this.}
 
