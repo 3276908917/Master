@@ -243,8 +243,8 @@ H_0^2 = \frac{8 \pi G}{3} \, \sum_i \rho_{i, 0} - K
 \end{equation}
 
 $H$ is customarily written in units of
-$\frac{\mathrm{km}}{\mathrm{s} \mathrm{Mpc}}$, and the constant
-$H_{100} = 100 \, \frac{\mathrm{km}}{\mathrm{s} \mathrm{Mpc}}$ can be used to
+km s$^{-1}$ Mpc$^{-1}$, and the constant
+$H_{100} = 100$ km s$^{-1}$ Mpc$^{-1}$ can be used to
 define the \textit{dimensionless Hubble parameter} $h = \frac{H_0}{H_{100}}$.
 
 %\textcolor{red}{Why do we bother with $H_{100}$ at all? Why didn't we just
@@ -271,116 +271,37 @@ The analog for curvature is defined separately as
 \omega_{K} \equiv -\frac{K}{H_{100}^2}
 \end{equation}
 
-The dimensionless physical density parameters are traditionally bypassed in
-favor of the \textit{fractional density parameters} $\Omega_i$:
+Then
+
+\begin{equation}
+h^2 = \sum_i \omega_i + \omega_K
+\end{equation}
+
+More focus has traditionally been placed on
+the \textit{fractional density parameters} $\Omega_i$:
 
 \begin{equation}
 \Omega_i \equiv \frac{\omega_i}{h^2}
 \end{equation} % = \frac{\rho_{i, 0}}{\rho_c}
 
-which has the conceptual advantage of summing to unity when the Universe is
-flat. However, the inclusion of $h^2$ in the definitions of the density
-parameters can lead to misconceptions which are relevant to the content of
-this work but are beyond its scope. The simplest argument against the use of 
-$\Omega_i$ for the purposes of
-this treatment is that $\Omega_i$ combines two unknowns, $h$ and $\rho_i$
-together, which complicates parameter inference.\footnote{This situation is 
-made more drastic due to the Hubble tension, which leaves the value of $h$ 
-fairly unclear compared to other parameters.} Therefore, for this work we
-will use $\omega_i$ instead.
+such that 
+
+\begin{equation}
+1 = \sum_i \Omega_i + \Omega_K
+\end{equation}
 
 %s Distinguish baryons from CDM
 
 While baryons and cold dark matter (CDM) are both pressureless\footnote{This 
 is of
 course an approximation, but it is a very good one. While a hot baryonic gas 
-certainly exerts a pressure, this pressure is negligible in comparison to the energy density of the gas. \textcolor{red}{Where are we getting a unitless
-pressure term such that we can compare it in this way to energy density?
-Otherwise, terms of different units cannot be compared. I understand that we
-can get a unitless energy density by making it relative. Is there a similar
-procedure for pressure terms?}}, CDM appears to interact only gravitationally
+certainly exerts a pressure, this pressure is negligible in comparison to the 
+energy density of the gas.}, CDM appears to interact only gravitationally
 with other matter. This lack of collisional and radiative self-interaction
 prevents CDM clouds from collapsing in the same way that, for example,
 baryons can collapse to form stars and planets. Because of the significantly
 different behaviors of these two species of matter, we treat them separately
 even in cosmological contexts.
-
-%s sigma12 versus sigma8. This should come last as it is by far the most
-%s challenging of the parameters to explain.
-
-To conclude this section, we will briefly introduce the parameter
-$\sigma_{12}$, which will be fleshed out in
-section~\ref{sec: boltzmann_intro}. 
-$\sigma_{12}$ is defined as the linear-theory RMS mass variance in spheres
-of radius 12 Mpc:
-
-\begin{equation}
-\label{eq: sigma12}
-\sigma_{12}
-=
-\sqrt{\left\langle \left(
-	\frac{\delta M}{M} (12 \, \mathrm{Mpc})
-\right)^2 \right\rangle}
-\end{equation}
-
-As with the $\omega_i$ parameters, there is a more conventional parameter
-which again relies on the dimensionless Hubble parameter. $\sigma_8$ is
-defined as
-
-\begin{equation}
-\sigma_8
-=
-\sqrt{\left\langle \left(
-	\frac{\delta M}{M} (8 \, \mathrm{Mpc} \, h^{-1})
-\right)^2 \right\rangle}
-\end{equation}
-
-Notice that this is \textit{not} the same as replacing 12 with 8 in
-equation~\ref{eq: sigma12}! The subscript in $\sigma_8$ is misleading:
-$\sigma_8$ is the linear-theory RMS mass variance in spheres of radius
-$8 / h$ Mpc, not 8 Mpc. Recall that $h$ is not a well-known constant but its 
-own  cosmological parameter whose value is subject to further observations.
-
-$h$ units (which will appear again in section~\ref{sec: Pk_intro}) became
-conventional with the first galaxy redshift surveys (GRSs). The conversion of
-redshifts into comoving distances $\chi(z)$ requires the assumption of a set 
-of
-cosmological parameters called a \textit{fiducial cosmology}. However, the
-earliest surveys probed a limited range of small redshifts, where the
-comoving distance may be estimated as follows:
-
-\begin{equation}
-\label{eq: comov_dist_approx}
-\chi(z) \approx \frac{c}{H_0} \, z
-\end{equation}
-
-Therefore, use of $h^{-1}$ Mpc units allowed analyses of these early GRSs
-to quote results without assuming a fiducial cosmology. This
-approximation loses its validity for later GRSs because they covered larger
-redshift ranges. Without this approximation then, the analyses of these later
-surveys had to assume a full fiducial cosmology anyway. This means that
-$h^{-1}$ Mpc units lack their original justification, although out of
-convention they continue to be used (\cbib{San20}).
-
-This convention is not without serious drawbacks.
-For example, our incomplete understanding of $h$
-becomes problematic when comparing the results of different papers;
-if the quoted $h$ values differ even slightly between two works, the same
-symbol $\sigma_8$ will refer to different concepts--that is, mass variances on
-different scales. Therefore $\sigma_8$ comparisons will typically lead to
-confusion, such as the $\sigma_8$ tension, which basically vanishes when using
-$\sigma_{12}$. For a fuller treatment of the advantages of $\sigma_{12}$, we
-refer the reader to \cbib{San20}.
-
-The issue with $\sigma_8$ most relevant to this work is that, like the
-fractional density parameters $\Omega_i$, $\sigma_8$ combines two uncertain
-cosmological quantities: the amplitude of the power spectrum, and the
-relative expansion rate of the Universe. Even more important is the evolution 
-mapping argument. We can greatly simplify the
-parameter space of emulators with the help of $\sigma_{12}$
-(see section~\ref{sec: ev_mapping_intro} for details), and $\sigma_8$
-is simply incapable of exploiting the parameter degeneracies in the same way.
-
 
 \section{The Matter Power Spectrum}
 \label{sec: Pk_intro}
@@ -653,6 +574,95 @@ in~\ref{sec: ev_mapping_intro}. Since $h$ only affects the amplitude of the
 power spectrum, we do not need to train our emulator over it at all. Absolute 
 units are not only clearer but allow us to confine all of the significance of
 the value of $h$ to its impact on the value of $\sigma_{12}$.
+
+%s sigma12 versus sigma8. This should come last as it is by far the most
+%s challenging of the parameters to explain.
+
+To conclude this section, we will briefly introduce the parameter
+$\sigma_{12}$, which will be fleshed out in
+section~\ref{sec: boltzmann_intro}. 
+$\sigma_{12}$ is defined as the linear-theory RMS mass variance in spheres
+of radius 12 Mpc:
+
+\begin{equation}
+\label{eq: sigma12}
+\sigma_{12}
+=
+\sqrt{\left\langle \left(
+	\frac{\delta M}{M} (12 \, \mathrm{Mpc})
+\right)^2 \right\rangle}
+\end{equation}
+
+As with the $\omega_i$ parameters, there is a more conventional parameter
+which again relies on the dimensionless Hubble parameter. $\sigma_8$ is
+defined as
+
+\begin{equation}
+\sigma_8
+=
+\sqrt{\left\langle \left(
+	\frac{\delta M}{M} (8 \, \mathrm{Mpc} \, h^{-1})
+\right)^2 \right\rangle}
+\end{equation}
+
+Notice that this is \textit{not} the same as replacing 12 with 8 in
+equation~\ref{eq: sigma12}! The subscript in $\sigma_8$ is misleading:
+$\sigma_8$ is the linear-theory RMS mass variance in spheres of radius
+$8 / h$ Mpc, not 8 Mpc. Recall that $h$ is not a well-known constant but its 
+own  cosmological parameter whose value is subject to further observations.
+
+$h$ units (which will appear again in section~\ref{sec: Pk_intro}) became
+conventional with the first galaxy redshift surveys (GRSs). The conversion of
+redshifts into comoving distances $\chi(z)$ requires the assumption of a set 
+of
+cosmological parameters called a \textit{fiducial cosmology}. However, the
+earliest surveys probed a limited range of small redshifts, where the
+comoving distance may be estimated as follows:
+
+\begin{equation}
+\label{eq: comov_dist_approx}
+\chi(z) \approx \frac{c}{H_0} \, z
+\end{equation}
+
+Therefore, use of $h^{-1}$ Mpc units allowed analyses of these early GRSs
+to quote results without assuming a fiducial cosmology. This
+approximation loses its validity for later GRSs because they covered larger
+redshift ranges. Without this approximation then, the analyses of these later
+surveys had to assume a full fiducial cosmology anyway. This means that
+$h^{-1}$ Mpc units lack their original justification, although out of
+convention they continue to be used (\cbib{San20}).
+
+This convention is not without serious drawbacks.
+For example, our incomplete understanding of $h$
+becomes problematic when comparing the results of different papers;
+if the quoted $h$ values differ even slightly between two works, the same
+symbol $\sigma_8$ will refer to different concepts--that is, mass variances on
+different scales. Therefore $\sigma_8$ comparisons will typically lead to
+confusion, such as the $\sigma_8$ tension, which basically vanishes when using
+$\sigma_{12}$. For a fuller treatment of the advantages of $\sigma_{12}$, we
+refer the reader to \cbib{San20}.
+
+The issue with $\sigma_8$ most relevant to this work is that, like the
+fractional density parameters $\Omega_i$, $\sigma_8$ combines two uncertain
+cosmological quantities: the amplitude of the power spectrum, and the
+relative expansion rate of the Universe. Even more important is the evolution 
+mapping argument. We can greatly simplify the
+parameter space of emulators with the help of $\sigma_{12}$
+(see section~\ref{sec: ev_mapping_intro} for details), and $\sigma_8$
+is simply incapable of exploiting the parameter degeneracies in the same way.
+
+%s What is the problem with parameters that involve $h$?
+
+The inclusion of $h^2$ in the definitions of the density
+parameters can lead to misconceptions which are relevant to the content of
+this work but are beyond its scope. The simplest argument against the use of 
+$\Omega_i$ for the purposes of
+this treatment is that $\Omega_i$ combines two unknowns
+with different impacts on the power spectrum, $h$ and $\rho_i$
+together, which complicates parameter inference.\footnote{This situation is 
+made more drastic due to the Hubble tension, which leaves the value of $h$ 
+fairly unclear compared to other parameters.} Therefore, for this work we
+will use $\omega_i$ instead.
 
 \section{Boltzmann Solvers and CAMB}
 \label{sec: boltzmann_intro}
