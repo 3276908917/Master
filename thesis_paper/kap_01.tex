@@ -331,22 +331,6 @@ even in cosmological contexts.
 % Say this in 1.2
 Each energy species impacts the evolution of the Universe in different ways.
 
-This needs to go somewhere in this section: like, introduce the equation of
-primordial fluctuations which depends simultaneously on $n_s$ and $A_s$
-
-%s n_s, a parameter relating to a non-homogeneous background
-
-The parameter $n_s$ is called the \textit{spectral index} and describes the 
-power laws
-to which the power spectrum may be fit. We will delay its explanation to
-section~\ref{sec: Pk_intro}, where we introduce the power spectrum.
-
-%s A_s, a parameter relating to a non-homogeneous background
-
-The parameter $A_s$ is called the \textit{scalar mode amplitude} and describes
-the amplitude of the primordial power spectrum. We will explore the subtlety of this parameter's impact in
-chapter~\ref{chap: A_s}.
-
 -------------
 
 Although the cosmological principle appears to hold well on large scales,
@@ -402,7 +386,7 @@ defines the \textit{power spectrum}:
 \begin{equation}
 \langle \delta (\bm{k}) \delta (\bm{k}')^* \rangle
 =
-(2 \pi)^3 \delta_D (\mathbm{k} - \mathbm{k}') P(k)
+(2 \pi)^3 \delta_D (\bm{k} - \bm{k}') P(k)
 \end{equation}
 
 where $\delta_D$ is the three-dimensional Dirac delta function.
@@ -416,30 +400,50 @@ P(k) = \int d^3 r \, \xi(r) \exp [i \bm{r} \cdot \bm{k}]
 %s Why isn't this project obsolete, what with nonlinear emulators?
 
 The power spectrum describes the variance of the amplitudes of the Fourier
-modes. Actually, the power spectra we are discussing in this thesis are 
-\textit{linear-theory} power spectra $P_\text{L}(k)$. This means that we
-are including only linear terms in a perturbative expansion of $\delta (x)$.
-This entails that we neglect all but the dominant energy species' impact on
+modes. In this thesis we focus on the \textit{linear-theory} power spectrum 
+$P_\text{L}(k)$, which is obtained when $delta \ll 1$ and only linear terms in 
+the perturbative expansion of $\delta(\bm{x})$ are taken into account. 
+\textcolor{red}{Consequently, we neglect all but the dominant energy species' 
+impact on
 the growth of density fluctuations in any given period of the Universe's
-history.
+history.}
 
-Matter density fluctuations grow at different rates depending on 
-the dominant energy species in the Universe, and so far the Universe has
-undergone two major periods of domination (only relatively
-recently have we entered a third period, dominated by dark energy): first by 
-radiation, then by matter. The power spectrum captures this history. The
-smaller Fourier modes, which entered the \textit{comoving particle horizon} 
-(maximum
-separation of two particles in causal contact) $\chi_h$ first, were strongly
-suppressed by radiation, with
+To arrive at the power spectrum today, we evolve the primordial power
+spectrum from the time of inflation:
 
 \begin{equation}
-\chi_h = \int_0^{t_0} \, \frac{dt}{a(t)}
+P(k) = A_s \, \left( \frac{k}{k_0} \right)^{n_s}
 \end{equation}
 
-By contrast, the larger Fourier modes, which
-entered the horizon during matter domination, more easily grew in structure
-(\cbib{Dodelson}). The power spectrum can be fit by a piecewise function of 
+where $k_0$ is some pivot scale, taken arbitrarily to be 0.05 Mpc$^{-1}$;
+$A_s$ is the \textit{scalar mode amplitude}; and $n_s$ is the
+\textit{spectral index}.
+
+The shape of the power spectrum is affected by the rate of structure growth, 
+which varies depending on the dominant energy species of the Universe.
+The high pressure of radiation suppresses structure growth in the early
+Universe, whereas structure grows quickly when matter becomes dominant.
+The power spectrum captures this history: smaller Fourier modes enter the
+horizon first and were strongly suppressed by radiation, while larger modes 
+enter the horizon later and grew during the matter-dominated era
+\cbib{Dodelson}. The 
+\textit{horizon} represents the largest separation of two points in causal 
+contact with each other, and is given by the \textit{comoving Hubble length}:
+
+\begin{equation}
+\label{eq: horizon}
+\mathcal{H}
+=
+\frac{\partial a}{\partial \tau} \, \frac{1}{a}
+\end{equation}
+
+where the conformal time $\tau$ is given by
+
+\begin{equation}
+dt = a(\tau) d \tau
+\end{equation}
+
+The power spectrum can be fit by a piecewise function of 
 two parts, depending on when a Fourier mode enters the horizon.
 During the matter-dominated era, 
 
@@ -452,28 +456,25 @@ P(k) \propto
     \end{cases}\,.
 \end{equation}
 
-Where $n_s$ is the spectral index mentioned in
-section~\ref{sec: param_glossary} and
+Where is the turn-over scale given by \citet{FECS} as:
 
 \begin{equation}
 \label{eq: turnover}
 k_\text{eq} = 0.073 \, \omega_m \, \mathrm{Mpc}^{-1}
 \end{equation}
 
-is called the turn-over scale \cbib{FECS}.
-
 %s Why do we care about the power spectrum?
 
-So, already from these two equations, we can
+Already from these two equations, we can
 appreciate that the power spectrum helps us to constrain two key cosmological
 parameters: $n_s$ and $\omega_m$. It turns out that the precise shape and
-amplitude of the power spectrum can tell us about all of the six primary
-parameters that we introduced in section~\ref{sec: param_glossary}:
+amplitude of the power spectrum can tell us about all of the six
+parameters of primary interest to this thesis:
 $\omega_b$, $\omega_c$, $n_s$, $\sigma_{12}$, $A_s$, and $\omega_\nu$. 
-Specifically, the power spectrum is useful for parameter inference because of
+In particular, the power spectrum is useful for parameter inference because of
 its \textit{unique} dependence on each of these parameters. In 
 section~\ref{sec: boltzmann_intro}, we will include several figures 
-illustrating more clearly what these different dependencies look like.
+illustrating these different dependencies.
 
 %s Now show a picture
 
@@ -509,16 +510,18 @@ $A_s$ & $2.1272 \cdot 10^{-9}$ \\ \hline
  \label{tab: Aletheia_m0}
 \end{table}
 
-A standard Planck $\Lambda$CDM model is shown in
+The power spectrum for a standard Planck $\Lambda$CDM model is shown in
 figure~\ref{fig: first_power_spectrum}. The turnover scale $k_\text{eq}$
 (eq~\ref{eq: turnover}) marks
 the transition between the radiation- and matter-dominated epochs, as
-$k_\text{eq}$ is the first (and therefore) smallest Fourier mode to enter the 
-comoving particle horizon $\chi_h$ during the era of matter domination, where
+this mode enters the horizon (equation~\ref{eq: horizon}) at the time of
+matter-radiation equality $t_\text{eq}$, such that:
 
 \begin{equation}
-\chi_h = \int_0^{t_0} \, \frac{dt}{a(t)}
-\end{equation}
+\frac{\rho_\gamma}{a(t_\text{eq})^4}
+=
+\frac{\rho_m}{a(t_\text{eq})^3}
+\end{equation} 
 
 Figure~\ref{fig: first_power_spectrum} also shows the baryon acoustic
 oscillation (BAO) as a set of shallow wiggles on inverse scales of roughly
