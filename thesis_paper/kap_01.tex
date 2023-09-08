@@ -32,7 +32,7 @@ matter clustering depends on physical separation.
 The CMB and galaxy clustering probes have been crucial to the establishment
 of the $\Lambda$CDM model as the standard model of cosmology. Under this
 model, the Universe is dominated by a dark energy component in the form of a
-cosmological constant $\Lambda$, which behaves like a vacuum energy constant
+cosmological constant $\Lambda$, which behaves like a vacuum energy, constant
 in density across space and time. This model also posits a dark matter
 component which is ``cold'' (meaning a negligible velocity dispersion and
 therefore a negligible pressure) and constitutes the vast majority of matter
@@ -45,19 +45,20 @@ against several extensions of the $\Lambda$CDM model, such as a nonzero
 curvature component or a time-dependent dark energy equation of state. 
 
 Statistical analyses to answer these questions rely on great numbers of
-evaluations of cosmological theory in order to build probability 
-distributions, from which we obtain estimates for parameters and their
-uncertainties. These evaluations of cosmological theory entail the solutions
-of computationally-expensive equations (see
-section~\ref{sec: boltzmann_intro}). The time spent on these evaluations
+evaluations of power spectra based on cosmological theory in order to build 
+probability 
+distributions. From these distributions we obtain estimates for parameters and 
+their
+uncertainties. Theoretical power spectra are computationally expensive 
+(see section~\ref{sec: boltzmann_intro}); the time spent on these evaluations
 represents a bottleneck of the analysis which can be alleviated by the
 use of an emulator, a kind of multi-dimensional interpolator.
 
-After training an emulator over many theory evaluations, we can use the
-emulator instead of continuing to solve the equations. Furthermore, in
+After training an emulator over many theory evaluations, we can interpolate
+power spectra instead of continuing to solve the equations. Furthermore, in
 a technique known as \textit{evolution mapping}
 (section~\ref{sec: ev_mapping_intro}), we can exploit a degeneracy between 
-several parameters and dramatically reduce the number of parameters over which
+several parameters and dramatically reduce the number over which
 we need to train. 
 
 In summary, the goal of this work is to extend the applicability of
@@ -67,44 +68,18 @@ including a parameter otherwise behaving as a degenerate parameter.
 \section{Brief Glossary of Our Cosmological Parameters}
 \label{sec: param_glossary}
 
-We will get more specific about terms like ``cosmological observations''
-and ``what we would expect to see'' in the next section (\ref{sec: Pk_intro}, 
-on the matter power spectrum). First, we will briefly introduce concrete
+\textcolor{blue}{Ariel wants us to restrict this section to the homogeneous
+Universe. We'll need to tell the reader that we're doing this.}
+
+First, we will briefly introduce concrete
 examples of cosmological parameters in which we are interested.
-
-In this work, we will concentrate on different parameters to different 
-extents. 
-% The six parameters over which our emulator is trained are
-% $\omega_b$, $\omega_c$, $n_s$, $\sigma_{12}$, $A_s$, and $\omega_\nu$.
-By the end of this thesis, we will have built and tested two main
-emulators, each of which is trained over a different parameter
-space.\footnote{Emulators will be described in greater detail in
-section~\ref{sec: emulation_intro}. For now, the extremely simple definition 
-from the summary will suffice.}
-Each emulator accepts as $\matr{X}$ arrays of tuples of values for 
-cosmological 
-parameters and predicts as $\hat{\matr{Y}}$ the power spectra to which these
-tuples correspond. 
-
-%s Introduce the parameter names, THEN talk about what they mean
-
-The primary emulator for this work has been trained over six parameters:
-$\omega_b$, $\omega_\text{CDM}$, $n_s$, $\sigma_{12}$, $A_s$ and $\omega_\nu$.
-A secondary, ``support'' emulator has been trained over just the first four of
-these. The terms $h$ and $z$ are not subject to emulation but will be 
-important to the generation of training data for the emulator (see 
-section~\ref{sec: train_emu}. Cosmological terms beyond these (such as
-$\Omega_k$, $\omega_\text{DE}$, $w_0$, $w_a$) make only minor appearances in 
-this work.
 
 %s First: introduce equations until we can explain h and omega_i
 
-Our first goal will be to define the various $\omega_i$ terms, although along
-the way it will be convenient to point out other terms. To arrive at
-definitions for $\omega_i$, we will begin with the concept of the Universe's 
-energy density $\rho_i$
-in some energy species associated with the label $i$. We list the various
-energy species and their corresponding labels in
+As mentioned earlier, the evolution of the Universe depends on its contents.
+We can quantify its contents according to their density. Let us denote with
+$\rho_i$ the Universe's energy density in some energy species. We list the 
+various energy species and their corresponding labels in
 table~\ref{tab: species_symbols}.
 We note that $\gamma$ does not play a role in this thesis;
 while radiation is critically important in the early stages of the
@@ -139,10 +114,7 @@ $K$, $k$, or $\kappa$ & Curvature \\ \hline
 % can discuss the different specific species of energy and the subscripts that
 % we use to denote them.
 
-These densities $\rho_i$ are frequently rewritten with the help of various 
-constants and cosmological parameters. We rewrite the $\rho_i$ terms are based 
-on their appearance
-in the equations that govern the evolution of the Universe. This discussion
+This discussion
 will very closely follow section 2.2 from \cbib{FECS}. The reader is
 encouraged to engage this source in the event of confusion, as our discussion 
 here will be brief and therefore assume a great deal of cosmological 
@@ -154,18 +126,23 @@ One way of writing the first Friedmann equation is:
 
 \begin{equation}
 \label{eq: Friedmann1}
-\left( \frac{\dot{a}}{a} \right)^2 = \frac{8 \pi G}{3} \, \rho - \frac{K}{a^2}
+\left( \frac{\dot{a}}{a} \right)^2
+=
+\frac{8 \pi G}{3} \, \sum_i \rho_i - \frac{K}{a^2}
 \end{equation}
 
-Where the dimensionless scale factor $a$ is a way of describing the size of
-the Universe (which, by convention, is set to unity at the present day). As 
+Where the dimensionless scale factor $a(t)$ describes the
+separation between two points due to the cumulative evolution of the metric of 
+the Universe by time $t$. In other words,
+the separation between two objects without relative velocity will evolve
+with $\dot{a}(t)$. By convention, $a$ is set to unity at the present day,
+$t_0$.
+
+As 
 the universe expands, the wavelength of traveling light is stretched out, and
 photons lose energy. As far as we understand cosmology today, the Universe has
-always been expanding (although the expansion rate has evolved).
-Therefore,\footnote{\textcolor{red}{Actually, equation~\ref{eq: a_to_z}}
-should hold regardless of that fact, right? So this ``therefore'' is wrong,
-right?} we
-can use cosmological redshift $z$ as a proxy for the age of the Universe at 
+always been expanding, although the expansion rate has evolved. We can use
+cosmological redshift $z$ as a proxy for the scale factor at 
 which any photon, which we receive, was emitted from the source we are 
 observing.\footnote{Photons can of course be redshifted also according to the
 Doppler shift (the motion of bodies along the line-of-sight of the 
@@ -173,7 +150,7 @@ observation). On the scale of cosmological observations, cosmological redshift
 certainly dominates, but distortions due to Doppler-shifted light,
 called redshift space distortions, can cause problems for cosmological 
 analyses. These problems lie outside the scope of this work. For a detailed
-treatment on RSD, see chapter 8 of \cbib{FECS}}. Specifically, the redshift of
+treatment on RSD, see chapter 8 of \cbib{FECS}.} Specifically, the redshift of
 incoming light can
 be related to the scale factor at the time of its emission as:
 
@@ -182,25 +159,21 @@ be related to the scale factor at the time of its emission as:
 a = \frac{1}{1 + z}
 \end{equation}
 
-\textcolor{red}{Is it really important that I produce some sketch to show the
-effect of cosmological expansion on light wavelenghth, for example? I don't
-want to waste time learning InkScape.}
-
 $K$ characterizes the Universe's curvature as
 
 \begin{equation}
-^{(3)}R = \frac{6K}{a^2}
+R = \frac{6K}{a^2}
 \end{equation}
 
-\textcolor{red}{where $R$ is the scalar of curvature. How are we indexing
-into a scalar??.}
+where $R$ is the scalar of curvature.
 
 All the energy species that make up the Universe can be approximated as
 barotropic fluids with a constant of proportionality $w$ between the
 pressure $p$ and the density $\rho$ of the fluid, i.e. $p = w \rho$. $w$ is
 referred to as the equation of state parameter and in most cases is a
-well-known constant (for example, $w_\gamma = 1/3$ and $w_m = 0$). However, in
-the case of dark energy, the constancy cannot be taken for granted and we
+well-known constant; for radiation, $w_\gamma = 1/3$, while for matter,
+$w_m = 0$. In
+the case of dark energy, constancy cannot be taken for granted and we
 adopt a more general form called the Chevallier-Polarski-Linder (CPL) 
 parameterization \cbib{Scherrer}:
 
@@ -210,7 +183,27 @@ w_\text{DE} = w_0 + w_a (1 - a)
 
 These $w_0$ and $w_a$ are cosmological parameters which also appear in our
 statistical analyses, although our observations so far appear to support
-a cosmological constant solution: $w_0 = -1$ and $w_a$ = 0.
+a cosmological constant solution: $w_0 = -1$ and $w_a$ = 0. In the first
+Friedmann equation, this form of dark energy would appear as an added
+constant:
+
+\begin{equation}
+\label{eq: cosmo_constant}
+\left( \frac{\dot{a}}{a} \right)^2
+=
+\frac{8 \pi G}{3} \, \sum_{i \neq \Lambda} \rho_i
+-
+\frac{K}{a^2}
++
+\frac{\Lambda}{3}
+\end{equation}
+
+The density of dark energy in the form of a cosmological constant would
+therefore not depend on the scale
+factor at all. That is, regardless of any expansions or contractions of the
+Universe, its density in dark energy would remain the same. This behavior is
+indistinguishable from a vacuum energy solution, and the two terms are
+sometimes used interchangeably \cbib{FECS}. 
 
 We can combine the equations of state for the barotropic fluids with energy 
 conservation (\textcolor{orange}{Look up a derivation}) to find that
@@ -239,9 +232,8 @@ We can combine this with \ref{eq: Friedmann1} to write:
 
 %s Introduce h
 
-At this point, we have tied in all of the physics that will be necessary to
-explain the $\omega$ and $h$ parameters--now it is just a matter of rewriting 
-terms. First, we define the \textit{Hubble parameter}
+We can simplify our notation with several parameter definitions.
+We introduce the \textit{Hubble parameter}
 $H \equiv \frac{\dot{a}}{a}$ and evaluate \ref{eq: Friedmann1_sum}
 for the present:
 
@@ -312,33 +304,6 @@ prevents CDM clouds from collapsing in the same way that, for example,
 baryons can collapse to form stars and planets. Because of the significantly
 different behaviors of these two species of matter, we treat them separately
 even in cosmological contexts.
-
-%s omega_k
-
-\textcolor{red}{According to Andrea P., $\omega_K$ is an evolution parameter 
-only in a narrow 
-band around zero--specifically, over roughly the range [-0.05, 0.05].
-By how much does evolution mapping fail here? And, if 
-$\omega_K$ is truly a shape parameter, why does Ariel's FECS call $\omega_K$
-an evolution parameter?} We do not emulate over $\omega_K$ but assume take
-it to be zero for all cells. However, as we explain in
-section~\ref{sec: ev_mapping_intro}, this does not limit the applicability of
-our emulators. The use of nonzero $\omega_K$ values will simply entail a
-relabeling of the emulated power spectra. \textcolor{orange}{Then again, I'm
-holding $\sigma_{12}$ fixed, so does it change anything at all?}
-
-%s n_s
-
-The parameter $n_s$ is called the \textit{spectral index} and describes the 
-power laws
-to which the power spectrum may be fit. We will delay its explanation to
-section~\ref{sec: Pk_intro}, where we introduce the power spectrum.
-
-%s A_s
-
-The parameter $A_s$ is called the \textit{scalar mode amplitude} and describes
-the amplitude of the primordial power spectrum. We will explore the subtlety of this parameter's impact in
-chapter~\ref{chap: A_s}.
 
 %s sigma12 versus sigma8. This should come last as it is by far the most
 %s challenging of the parameters to explain.
@@ -419,6 +384,24 @@ is simply incapable of exploiting the parameter degeneracies in the same way.
 
 \section{The Matter Power Spectrum}
 \label{sec: Pk_intro}
+
+This needs to go somewhere in this section: like, introduce the equation of
+primordial fluctuations which depends simultaneously on $n_s$ and $A_s$
+
+%s n_s, a parameter relating to a non-homogeneous background
+
+The parameter $n_s$ is called the \textit{spectral index} and describes the 
+power laws
+to which the power spectrum may be fit. We will delay its explanation to
+section~\ref{sec: Pk_intro}, where we introduce the power spectrum.
+
+%s A_s, a parameter relating to a non-homogeneous background
+
+The parameter $A_s$ is called the \textit{scalar mode amplitude} and describes
+the amplitude of the primordial power spectrum. We will explore the subtlety of this parameter's impact in
+chapter~\ref{chap: A_s}.
+
+-------------
 
 Now that we have at least briefly introduced the various cosmological
 parameters of interest to us, we can define what we meant in the opening
@@ -935,6 +918,20 @@ $f \sigma_{12}(z)$ will be identical'' (\cbib{San21}).
 Now, for the hiccup, which segues into the next section: this scheme is broken by one parameter, the Universe's
 density in neutrinos. (In the next section: why this is so and what we can do
 about it.)
+
+%s omega_k: let's talk about this in evolution mapping
+
+\textcolor{red}{According to Andrea P., $\omega_K$ is an evolution parameter 
+only in a narrow 
+band around zero--specifically, over roughly the range [-0.05, 0.05].
+By how much does evolution mapping fail here? And, if 
+$\omega_K$ is truly a shape parameter, why does Ariel's FECS call $\omega_K$
+an evolution parameter?} We do not emulate over $\omega_K$ but assume take
+it to be zero for all cells. However, as we explain in
+section~\ref{sec: ev_mapping_intro}, this does not limit the applicability of
+our emulators. The use of nonzero $\omega_K$ values will simply entail a
+relabeling of the emulated power spectra. \textcolor{orange}{Then again, I'm
+holding $\sigma_{12}$ fixed, so does it change anything at all?}
 
 \section{Emulation: Basic Principles}
 \label{sec: emulation_intro}
