@@ -68,26 +68,14 @@ including a parameter otherwise behaving as a degenerate parameter.
 \section{Brief Glossary of Our Cosmological Parameters}
 \label{sec: param_glossary}
 
-\textcolor{blue}{Ariel wants us to restrict this section to the homogeneous
-Universe. We'll need to tell the reader that we're doing this.}
-
-First, we will briefly introduce concrete
-examples of cosmological parameters in which we are interested.
-
 %s First: introduce equations until we can explain h and omega_i
 
-As mentioned earlier, the evolution of the Universe depends on its contents.
-We can quantify its contents according to their density. Let us denote with
+First, we will briefly introduce concrete
+examples of cosmological parameters in which we are interested. As mentioned earlier, the evolution of the Universe depends on its contents.
+We can quantify these according to their densities. Let us denote with
 $\rho_i$ the Universe's energy density in some energy species. We list the 
 various energy species and their corresponding labels in
 table~\ref{tab: species_symbols}.
-We note that $\gamma$ does not play a role in this thesis;
-while radiation is critically important in the early stages of the
-Universe, it rapidly becomes inconsequential; after the Universe was a mere
-55,000 years old, the
-era of radiation domination gave way to the era of matter domination 
-(\cbib{CO}, page 1194)\footnote{For those who are
-curious, $\omega_\gamma$ ends up being a shape parameter \cbib{FECS}.}.
 
 %s What do the subscripts mean?
 
@@ -114,13 +102,21 @@ $K$, $k$, or $\kappa$ & Curvature \\ \hline
 % can discuss the different specific species of energy and the subscripts that
 % we use to denote them.
 
-This discussion
-will very closely follow section 2.2 from \cbib{FECS}. The reader is
+The following discussion
+will closely follow section 2.2 from \cbib{FECS}. The reader is
 encouraged to engage this source in the event of confusion, as our discussion 
 here will be brief and therefore assume a great deal of cosmological 
 background from the reader.
 
-One way of writing the first Friedmann equation is:
+The \textit{cosmological principle} states that on large
+enough scales ($r \gtrsim 100$ Mpc) \, the Universe looks statistically 
+homogeneous and isotropic \cbib{Ntelis}. That is, there are neither 
+preferred regions nor directions, but rather all parts of the Universe are
+indistinguishable.
+
+By combining the cosmological principle with general relativity, one can
+arrive at the \textit{first Friedmann equation}, which describes the relative
+rate of expansion of a hypothetical universe depending on its contents:
 
 %!s This whole next section is ripped from FECS. Should I be concerned?
 
@@ -133,10 +129,9 @@ One way of writing the first Friedmann equation is:
 
 Where the dimensionless scale factor $a(t)$ describes the
 separation between two points due to the cumulative evolution of the metric of 
-the Universe by time $t$. In other words,
-the separation between two objects without relative velocity will evolve
-with $\dot{a}(t)$. By convention, $a$ is set to unity at the present day,
-$t_0$.
+the universe by time $t$. In other words, the separation between two objects
+without any relative velocity will evolve according to $\dot{a}(t)$. By 
+convention, $a$ is set to unity at the present day, $t_0$.
 
 As 
 the universe expands, the wavelength of traveling light is stretched out, and
@@ -209,10 +204,37 @@ We can combine the equations of state for the barotropic fluids with energy
 conservation (\textcolor{orange}{Look up a derivation}) to find that
 
 \begin{equation}
+\label{eq: scale_factor_to_density}
 \rho_i \propto a^{-3 (1 + w_i)}
 \end{equation}
 
-As long as the different energy species do not interact, this relation will
+For matter and radiation, this relation yields intuitive results. Imagine
+stretching the contents of a cube equally so as to increase its volume. Since
+the amount of matter enclosed remains fixed, the energy density of matter
+should fall
+with the cube of the side length (represented by $a$). The energy density of
+enclosed radiation will fall for the same reasons, but with one additional
+factor of $a$ since stretching the wavelength of light will decrease its
+energy. This is why the energy density of radiation falls with
+$a^4$.
+
+This relation helps us to understand why the Universe passes through epochs
+marked by domination by different energy species. Early in the Universe's
+history, when $a$ was quite small, this $\rho_\gamma \propto a^{-4}$ scaling
+meant that radiation dominated the energy content of the Universe.
+As the scale factor grew, radiation quickly diluted and matter became the 
+dominant species.\footnote{This explains why $\gamma$ does not play a role as 
+one of our
+parameters of interest to this thesis; while radiation was critically 
+important in the early stages of the Universe, it rapidly became 
+inconsequential; after the Universe was a mere 55,000 years old, the
+era of radiation domination gave way to the era of matter domination. See page 
+1194 of \citet{CO} for more information.}
+Finally, as of relatively recently, matter too
+has become so dilute that dark energy now dominates. 
+
+As long as the different energy species do not interact,
+relation~\ref{eq: scale_factor_to_density} will
 apply to each species separately, and we can sum over all species to write:
 
 \begin{equation}
@@ -306,6 +328,9 @@ even in cosmological contexts.
 \section{The Matter Power Spectrum}
 \label{sec: Pk_intro}
 
+% Say this in 1.2
+Each energy species impacts the evolution of the Universe in different ways.
+
 This needs to go somewhere in this section: like, introduce the equation of
 primordial fluctuations which depends simultaneously on $n_s$ and $A_s$
 
@@ -359,11 +384,7 @@ function:
 \end{equation}
 
 This may be rewritten as $\xi(r)$ (i.e., the separation vector becomes a
-separation scalar) by application of the cosmological principle: on large
-enough scales ($r \gtrsim 100$ Mpc) \, the Universe looks statistically 
-homogeneous and isotropic (\cbib{Ntelis}). That is, there are neither 
-preferred regions nor directions, but rather all parts of the Universe are
-indistinguishable.
+separation scalar) by application of the cosmological principle.
 
 Unlike $\delta(\bm{x})$, $\xi(r)$ follows from our cosmological
 observations. Consider a basic GRS scenario: the
