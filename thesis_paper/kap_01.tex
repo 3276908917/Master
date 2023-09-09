@@ -886,7 +886,8 @@ We don't know what the true probability distribution of power spectra is. In ord
 As with our choice of $\sigma_{12}$ instead of $\sigma_8$, our choice of
 absolute units will facilitate the application of evolution mapping described
 in~\ref{sec: ev_mapping_intro}. Since $h$ only affects the amplitude of the
-power spectrum, we do not need to train our emulator over it at all. Absolute 
+power spectrum, we do not need to include it in the parameter space over 
+which we train our emulator. Absolute 
 units are not only clearer but allow us to confine all of the significance of
 the value of $h$ to its impact on the value of $\sigma_{12}$.
 
@@ -904,29 +905,40 @@ shape parameters $\Theta_s$ and evolution parameters $\Theta_e$.
 Shape parameters affect the shape of the power spectrum. Examples include
 $\omega_b$, $\omega_c$, and $n_s$.
 Evolution parameters affect only its amplitude. They are so called because
-the impact of evolution parameters on the linear-theory power spectrum is
+their impact on the linear-theory power spectrum is
 indistinguishable from an evolution, or translation in time, of the power 
 spectrum. This means that varying the redshift at which we evaluate the power
 spectrum will affect only its amplitude. $h$, $\omega_k$ and
 $\omega_\text{DE}$ are examples of evolution parameters. 
 
-We take, as the evolution mapping relation for the power spectrum, equation 13
-from \citet{San21}:
+We adapt equation 13 from \citet{San21} to write:
 
 \begin{equation}
 \label{eq: evMapping_pSpectrum}
-    \Delta^2_L (k | z, \Theta_s, \Theta_e)
+    P_L (k | z, \Theta_s, \Theta_e)
     =
-    \Delta_L^2 (k | \Theta_s, \sigma_{12} \left( z, \Theta_s, \Theta_e \right))
-\end{equation}\footnote{Varying $z$ has the same effect as varying an
-evolution parameter, which is why it appears on the RHS only as an argument to
-the $\sigma_{12}$ ``function.'' We write it separately from $\Theta_e$ to
+    P_L (k | \Theta_s, \sigma_{12} \left( z, \Theta_s, \Theta_e \right))
+\end{equation}
+
+which we call the \textit{evolution mapping relation} for the power
+spectrum.\footnote{As mentioned before, varying $z$ has the effect of varying 
+an evolution parameter, so it appears on the RHS only as an argument 
+to the $\sigma_{12}$ ``function.'' We write it separately from $\Theta_e$ to
 emphasize that $z$ does not describe a property of the Universe, but is
 simply used as a proxy here for \textcolor{red}{conformal?} time
 \textcolor{red}{elapsed since the Big Bang? (but we can only observe up to
 $z = 1100$...)}.}
 
-Why is this scheme important? Evolution mapping greatly simplifies the emulator
+%s In action: relabel some power spectra
+
+In practice, this means that any two cosmologies with identical shape
+parameters will yield identical power spectra as long we match the value of
+$\sigma_{12}$. This matching can be accomplished merely by varying redshift
+at which the power spectrum is evaluated.
+
+%s Now conclude with the significance
+
+Evolution mapping greatly simplifies the emulator
 implementation. Because we can
 funnel all of the evolution parameters through $\sigma_{12}$, we've effectively
 collapsed an entire category of parameters to just one parameter. Fewer
@@ -940,19 +952,10 @@ Now, for the hiccup, which segues into the next section: this scheme is broken b
 density in neutrinos. (In the next section: why this is so and what we can do
 about it.)
 
-%s omega_k: let's talk about this in evolution mapping
 
-\textcolor{red}{According to Andrea P., $\omega_K$ is an evolution parameter 
-only in a narrow 
-band around zero--specifically, over roughly the range [-0.05, 0.05].
-By how much does evolution mapping fail here? And, if 
-$\omega_K$ is truly a shape parameter, why does Ariel's FECS call $\omega_K$
-an evolution parameter?} We do not emulate over $\omega_K$ but assume take
-it to be zero for all cells. However, as we explain in
-section~\ref{sec: ev_mapping_intro}, this does not limit the applicability of
-our emulators. The use of nonzero $\omega_K$ values will simply entail a
-relabeling of the emulated power spectra. \textcolor{orange}{Then again, I'm
-holding $\sigma_{12}$ fixed, so does it change anything at all?}
+% To-do:
+
+% Make the plot where the different models overlap through sigma-matching
 
 \section{Emulation: Basic Principles}
 \label{sec: emulation_intro}

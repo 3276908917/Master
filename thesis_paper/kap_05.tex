@@ -209,6 +209,19 @@ fixed...}
 So, \verb|build_cosmology| makes a copy of the full Aletheia model 0 cosmology 
 and replaces four or six entries depending on the dimensionality of the LHC. 
 
+%s What kinds of assumptions does build_cosmology make
+
+Remember that Aletheia model 0 corresponds to the Planck best fit parameters
+this entails a flat Universe, $\omega_K = 0$.
+\textcolor{red}{According to Andrea P., extreme values of $\omega_K$
+affect the shape of $P(k)$. Doesn't that mean that $\omega_K$ is truly a
+shape parameter?} We do not emulate over $\omega_K$ but assume take
+it to be zero for all cells. However, as we explain in
+section~\ref{sec: ev_mapping_intro}, this does not limit the applicability of
+our emulators. The use of nonzero $\omega_K$ values will simply entail a
+relabeling of the emulated power spectra. \textcolor{orange}{Then again, I'm
+holding $\sigma_{12}$ fixed, so does it change anything at all?}
+
 %s Now talk about fill_hypercube, a central function of this script
 
 \verb|fill_hypercube| iterates through the rows $\bm{x}$ of the unit LHC
