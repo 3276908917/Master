@@ -566,10 +566,10 @@ redshifts, this distance may be approximated as:
 D_c(z) \approx \frac{c}{H_0} \, z
 \end{equation}
 
-consequently, the use of $h$ units allowed early GRSs to present results
+Consequently, the use of $h$ units allowed early GRSs to present results
 without committing to a fiducial cosmology. This
-approximation loses its validity for later GRSs because they covered larger
-redshift ranges. Consequently, analyses of later GRSs needed to assume full 
+approximation loses its validity for later GRSs because of the larger redshift
+values probed. Consequently, analyses of later GRSs needed to assume full 
 fiducial cosmologies anyway, and the use of $h^{-1}$ Mpc units is no longer
 advantageous. Nevertheless, they became convention and continue to be used 
 \cbib{San20}.
@@ -579,12 +579,62 @@ use of $h$ units: varying $h$ changes not only the power
 spectrum, but also the axes used to represent the power spectrum. Comparison 
 of power spectra from different 
 models is hindered because the $x$ and $y$ axes correspond to different ranges
-for each curve. If we use instead units of Mpc, then changes in $h$ change
+for each curve. If we use instead units of Mpc, then changes in $h$ affect
 only the power spectrum, and we can much more readily appreciate its true
 impact--that of an amplitude change.
 
-$\sigma_8$ discussions in section~\ref{sec: param_glossary}). As mentioned
-for $\sigma_8$, 
+%s Segue into the sigma parameters
+
+There are several parameters that affect only the amplitude of the power 
+spectrum. The physical density in curvature, $\omega_\nu$, is another example.
+We call these parameters \textit{evolution parameters} to distinguish them
+from \textit{shape parameters}, which affect the shape of the power
+spectrum. To describe the amplitude of the power spectrum, we will use just 
+one evolution parameter: $\sigma_{12}$ is defined as the linear-theory RMS 
+mass variance in spheres of radius 12 Mpc:
+
+\begin{equation}
+\label{eq: sigma12}
+\sigma_{12}
+=
+\sqrt{\left\langle \left(
+	\frac{\delta M}{M} (12 \, \mathrm{Mpc})
+\right)^2 \right\rangle}
+\end{equation}
+
+As with the $\omega_i$ parameters, there is a related parameter that
+typically receives more attention: $\sigma_8$ is defined as
+
+\begin{equation}
+\sigma_8
+=
+\sqrt{\left\langle \left(
+	\frac{\delta M}{M} (8 \, \mathrm{Mpc} \, h^{-1})
+\right)^2 \right\rangle}
+\end{equation}
+
+Notice that this is \textit{not} the same as replacing 12 with 8 in
+equation~\ref{eq: sigma12}! The subscript in $\sigma_8$ is misleading:
+$\sigma_8$ is the linear-theory RMS mass variance in spheres of radius
+$8 / h$ Mpc, not 8 Mpc. 
+
+Our incomplete understanding of $h$ complicates the comparison of results
+from different papers; if the quoted $h$ values differ even slightly, the same
+symbol $\sigma_8$ will refer to different concepts--that is, mass variances on
+different scales. Therefore, $\sigma_8$ comparisons will typically lead to
+confusion, such as the $\sigma_8$ tension, which may be resolved by using
+$\sigma_{12}$ instead.
+For a fuller treatment of the advantages of $\sigma_{12}$, we
+refer the reader to \citet{San20}.
+
+For this work, the most relevant issue with $\sigma_8$ and the $\Omega_i$ 
+parameters is their incompatibility with evolution mapping. The $\Omega_i$
+parameters combine shape parameters like $\omega_b$ and $\omega_c$ with the
+evolution parameter $h$, violating a distinction that we rely on in order
+to simplify the parameter space. Although $\sigma_8$ behaves as an evolution
+parameter for a fixed $h$, a varying $h$ will cause the meaning of $\sigma_8$
+to change, and so we cannot rely on it to characterize the amplitude of the
+power spectrum.
 
 % The following plots were generated with h_units_bad.ipynb
 \begin{figure}[htb]
@@ -609,91 +659,10 @@ for $\sigma_8$,
     		differ only in the units used. Observe that, in absolute units, we
     		can easily identify the impact of $h$ as a simple change in
     		amplitude. The use of $h$ units obscures this effect. This figure 
-    		is an imitation of figure 1 from \cbib{San20}.}
+    		is an imitation of figure 1 from \citet{San20}.}
     \label{fig: h_unit_Pk}
 \end{figure}
 
-%! Try to more carefully explain why it doesn't work: h is not a parameter
-% over which we emulate--sigma12 is. Therefore we cannot show h in the final
-% plots. This is a much subtler issue than the h complaints in the
-% previous section.
-
-
-
-As with our choice of $\sigma_{12}$ instead of $\sigma_8$, our choice of
-absolute units will facilitate the application of evolution mapping described
-in~\ref{sec: ev_mapping_intro}. Since $h$ only affects the amplitude of the
-power spectrum, we do not need to train our emulator over it at all. Absolute 
-units are not only clearer but allow us to confine all of the significance of
-the value of $h$ to its impact on the value of $\sigma_{12}$.
-
-%s sigma12 versus sigma8. This should come last as it is by far the most
-%s challenging of the parameters to explain.
-
-To conclude this section, we will briefly introduce the parameter
-$\sigma_{12}$, which will be fleshed out in
-section~\ref{sec: boltzmann_intro}. 
-$\sigma_{12}$ is defined as the linear-theory RMS mass variance in spheres
-of radius 12 Mpc:
-
-\begin{equation}
-\label{eq: sigma12}
-\sigma_{12}
-=
-\sqrt{\left\langle \left(
-	\frac{\delta M}{M} (12 \, \mathrm{Mpc})
-\right)^2 \right\rangle}
-\end{equation}
-
-As with the $\omega_i$ parameters, there is a more conventional parameter
-which again relies on the dimensionless Hubble parameter. $\sigma_8$ is
-defined as
-
-\begin{equation}
-\sigma_8
-=
-\sqrt{\left\langle \left(
-	\frac{\delta M}{M} (8 \, \mathrm{Mpc} \, h^{-1})
-\right)^2 \right\rangle}
-\end{equation}
-
-Notice that this is \textit{not} the same as replacing 12 with 8 in
-equation~\ref{eq: sigma12}! The subscript in $\sigma_8$ is misleading:
-$\sigma_8$ is the linear-theory RMS mass variance in spheres of radius
-$8 / h$ Mpc, not 8 Mpc. Recall that $h$ is not a well-known constant but its 
-own  cosmological parameter whose value is subject to further observations.
-
-This convention is not without serious drawbacks.
-For example, our incomplete understanding of $h$
-becomes problematic when comparing the results of different papers;
-if the quoted $h$ values differ even slightly between two works, the same
-symbol $\sigma_8$ will refer to different concepts--that is, mass variances on
-different scales. Therefore $\sigma_8$ comparisons will typically lead to
-confusion, such as the $\sigma_8$ tension, which basically vanishes when using
-$\sigma_{12}$. For a fuller treatment of the advantages of $\sigma_{12}$, we
-refer the reader to \cbib{San20}.
-
-The issue with $\sigma_8$ most relevant to this work is that, like the
-fractional density parameters $\Omega_i$, $\sigma_8$ combines two uncertain
-cosmological quantities: the amplitude of the power spectrum, and the
-relative expansion rate of the Universe. Even more important is the evolution 
-mapping argument. We can greatly simplify the
-parameter space of emulators with the help of $\sigma_{12}$
-(see section~\ref{sec: ev_mapping_intro} for details), and $\sigma_8$
-is simply incapable of exploiting the parameter degeneracies in the same way.
-
-%s What is the problem with parameters that involve $h$?
-
-The inclusion of $h^2$ in the definitions of the density
-parameters can lead to misconceptions which are relevant to the content of
-this work but are beyond its scope. The simplest argument against the use of 
-$\Omega_i$ for the purposes of
-this treatment is that $\Omega_i$ combines two unknowns
-with different impacts on the power spectrum, $h$ and $\rho_i$
-together, which complicates parameter inference.\footnote{This situation is 
-made more drastic due to the Hubble tension, which leaves the value of $h$ 
-fairly unclear compared to other parameters.} Therefore, for this work we
-will use $\omega_i$ instead.
 
 \section{Boltzmann Solvers and CAMB}
 \label{sec: boltzmann_intro}
@@ -705,9 +674,9 @@ approximations. However, the evolution equations are involved (running, for
 example, over many different cosmological parameters) and can be
 stiff, which calls for different approaches in different regimes. Furthermore,
 its solutions are highly oscillatory and therefore susceptible to numerical
-errors (\cbib{Seljak}). Full solutions consist of many different steps, whose
+errors \cbib{Seljak}. Full solutions consist of many different steps, whose
 descriptions fall outside of the scope of this work. We refer readers curious
-about these equations to the history in the introduction of \cbib{Seljak},
+about these equations to the history in the introduction of \citet{Seljak},
 which cites papers important to their development. 
 
 %s Equations are hard. Who can save us?
@@ -727,7 +696,8 @@ accepted values for these parameters and to consider the power
 spectrum for almost any combination of these parameters. Of course, there are 
 still limitations. For example, CAMB does not currently support negative 
 redshifts (which, we will later see, becomes a problem), and the minimum 
-allowed value of $H_0$ is 1 km / s / Mpc, although slightly higher values have 
+allowed value of $H_0$ is 1 km s$^{-1}$ Mpc$^{-1}$, although slightly higher 
+values have 
 been observed to cause runtime errors in the presence of other extreme 
 parameters.
 
@@ -913,6 +883,13 @@ We don't know what the true probability distribution of power spectra is. In ord
 \section{Evolution Mapping}
 \label{sec: ev_mapping_intro}
 
+As with our choice of $\sigma_{12}$ instead of $\sigma_8$, our choice of
+absolute units will facilitate the application of evolution mapping described
+in~\ref{sec: ev_mapping_intro}. Since $h$ only affects the amplitude of the
+power spectrum, we do not need to train our emulator over it at all. Absolute 
+units are not only clearer but allow us to confine all of the significance of
+the value of $h$ to its impact on the value of $\sigma_{12}$.
+
 \textcolor{blue}{I want to briefly summarize why we can funnel all of the 
 evolution parameters through $\sigma_{12}$ in this way. This objective may be
 too ambitious for this paper, because I would have to go through each
@@ -921,17 +898,20 @@ equations.} \textcolor{orange}{Maybe I can just do the same thing as Ariel
 recommended with the GPR kernel: ``we played around and found that this
 works.''}
 
-(\cbib{San21}) proposes to divide up the full set of cosmological
-parameters into two categories: \textit{evolution} parameters $\mathcal{O}_E$
-(such as $\omega_b$, $\omega_c$, and $\eta_s$)
-affect the amplitude of the power spectrum at a particular redshift, while
-\textit{shape} parameters $\mathcal{O}_S$
-(such as $\omega_K$, $\omega_\text{DE}$, w(a))
-affect the shape of the power
-spectrum.
+\citet{San21} proposes to divide up the full set of cosmological
+parameters into the two categories introduced in section~\ref{sec: Pk_intro}: 
+shape parameters $\Theta_s$ and evolution parameters $\Theta_e$.
+Shape parameters affect the shape of the power spectrum. Examples include
+$\omega_b$, $\omega_c$, and $n_s$.
+Evolution parameters affect only its amplitude. They are so called because
+the impact of evolution parameters on the linear-theory power spectrum is
+indistinguishable from an evolution, or translation in time, of the power 
+spectrum. This means that varying the redshift at which we evaluate the power
+spectrum will affect only its amplitude. $h$, $\omega_k$ and
+$\omega_\text{DE}$ are examples of evolution parameters. 
 
 We take, as the evolution mapping relation for the power spectrum, equation 13
-from \cbib{San21}:
+from \citet{San21}:
 
 \begin{equation}
 \label{eq: evMapping_pSpectrum}
