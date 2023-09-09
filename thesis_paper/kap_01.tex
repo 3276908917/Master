@@ -952,26 +952,16 @@ in evolution parameters.
 Evolution mapping is essential to this work because it greatly simplifies the 
 parameter space over which we train our emulator. We can express the impact of
 all evolution parameters through their impact on $\sigma_{12}$. Consequently, 
-in addition to the shape parameters, we need only train the emulator over a 
-single evolution parameter, $\sigma_{12}$.
+we need only train the emulator over the shape parameters and $\sigma_{12}$.
 Simplifying the parameter space will
 result in increased accuracy for our emulator because our training samples
 will be efficiently distributed throughout the parameter space. By contrast,
-if we explicitly trained over additional evolution parameters, the evolution
-mapping degeneracy would result in wasted samples.
+if we explicitly trained over additional evolution parameters, the same set of
+training samples would much less densely cover the parameter space.
 
-As with our choice of $\sigma_{12}$ instead of $\sigma_8$, our choice of
-absolute units will facilitate the application of evolution mapping described
-in~\ref{sec: ev_mapping_intro}. Since $h$ only affects the amplitude of the
-power spectrum, we do not need to include it in the parameter space over 
-which we train our emulator. Absolute 
-units are not only clearer but allow us to confine all of the significance of
-the value of $h$ to its impact on the value of $\sigma_{12}$.
-
-Now, for the hiccup, which segues into the next section: this scheme is broken by one parameter, the Universe's
-density in neutrinos. (In the next section: why this is so and what we can do
-about it.)
-
+\textcolor{red}{A segue into neutrinos would be possible here, but it
+wouldn't look too good since the neutrino section comes at the end. Should I
+put the neutrino section right after this one?}
 
 % To-do:
 
