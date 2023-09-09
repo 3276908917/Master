@@ -887,22 +887,6 @@ We don't know what the true probability distribution of power spectra is. In ord
 \section{Evolution Mapping}
 \label{sec: ev_mapping_intro}
 
-As with our choice of $\sigma_{12}$ instead of $\sigma_8$, our choice of
-absolute units will facilitate the application of evolution mapping described
-in~\ref{sec: ev_mapping_intro}. Since $h$ only affects the amplitude of the
-power spectrum, we do not need to include it in the parameter space over 
-which we train our emulator. Absolute 
-units are not only clearer but allow us to confine all of the significance of
-the value of $h$ to its impact on the value of $\sigma_{12}$.
-
-\textcolor{blue}{I want to briefly summarize why we can funnel all of the 
-evolution parameters through $\sigma_{12}$ in this way. This objective may be
-too ambitious for this paper, because I would have to go through each
-evolution parameter and derive its evolution nature in a few lines of 
-equations.} \textcolor{orange}{Maybe I can just do the same thing as Ariel
-recommended with the GPR kernel: ``we played around and found that this
-works.''}
-
 \citet{San21} proposes to divide up the full set of cosmological
 parameters into the two categories introduced in section~\ref{sec: Pk_intro}: 
 shape parameters $\Theta_s$ and evolution parameters $\Theta_e$.
@@ -931,19 +915,25 @@ to the $\sigma_{12}$ ``function.'' We write it separately from $\Theta_e$ to
 emphasize that $z$ does not describe a property of the Universe, but is
 simply used as a proxy here for \textcolor{red}{conformal?} time
 \textcolor{red}{elapsed since the Big Bang? (but we can only observe up to
-$z = 1100$...)}.}
+$z = 1100$...)}.} We stress that this relation does not hold when $P_L$ is
+expressed in $h$ units.
 
 %s In action: relabel some power spectra
 
-In practice, this means that any two cosmologies with identical shape
+The evolution mapping relation tells us that any two cosmologies with 
+identical shape
 parameters will yield identical power spectra as long we match the value of
-$\sigma_{12}$. This matching can be accomplished merely by varying redshift
-at which the power spectrum is evaluated.
+$\sigma_{12}$. This matching can be accomplished merely by varying the 
+redshift at which the power spectrum is evaluated.
+Figure~\ref{fig: ev_mapping_demo} shows the results of this technique applied
+to seven different cosmologies sharing shape parameters and differing only
+in evolution parameters.
 
 \begin{figure}[htb]
   \centering
   \includegraphics[scale=1.0]{intro/san21f2}
-  \cprotect\caption[Demonstration of evolution mapping]{For each value of
+  \cprotect\caption[Demonstration of evolution mapping]{Power spectra matched
+  	in $\sigma_{12}$ via evaluation at different redshifts. For each value of
   	$\sigma_{12}$
   	shown here, eight Aletheia models were plotted in different
   	colors. Each set of lines is tightly distributed and thereby demonstrates 
@@ -959,15 +949,24 @@ at which the power spectrum is evaluated.
 
 %s Now conclude with the significance
 
-Evolution mapping greatly simplifies the emulator
-implementation. Because we can
-funnel all of the evolution parameters through $\sigma_{12}$, we've effectively
-collapsed an entire category of parameters to just one parameter. Fewer
-parameters means that we get a more accurate emulator.
+Evolution mapping is essential to this work because it greatly simplifies the 
+parameter space over which we train our emulator. We can express the impact of
+all evolution parameters through their impact on $\sigma_{12}$. Consequently, 
+in addition to the shape parameters, we need only train the emulator over a 
+single evolution parameter, $\sigma_{12}$.
+Simplifying the parameter space will
+result in increased accuracy for our emulator because our training samples
+will be efficiently distributed throughout the parameter space. By contrast,
+if we explicitly trained over additional evolution parameters, the evolution
+mapping degeneracy would result in wasted samples.
 
-``At the linear level, all models characterized by identical shape parameters
-and the same values of the parameter combinations $b \sigma_{12}(z)$ and
-$f \sigma_{12}(z)$ will be identical'' (\cbib{San21}).
+As with our choice of $\sigma_{12}$ instead of $\sigma_8$, our choice of
+absolute units will facilitate the application of evolution mapping described
+in~\ref{sec: ev_mapping_intro}. Since $h$ only affects the amplitude of the
+power spectrum, we do not need to include it in the parameter space over 
+which we train our emulator. Absolute 
+units are not only clearer but allow us to confine all of the significance of
+the value of $h$ to its impact on the value of $\sigma_{12}$.
 
 Now, for the hiccup, which segues into the next section: this scheme is broken by one parameter, the Universe's
 density in neutrinos. (In the next section: why this is so and what we can do
