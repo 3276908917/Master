@@ -33,11 +33,12 @@ matter clustering depends on physical separation.
 The CMB and galaxy clustering probes have been crucial to the establishment
 of the $\Lambda$CDM model as the standard model of cosmology. Under this
 model, the Universe is dominated by a dark energy component in the form of a
-cosmological constant $\Lambda$, which behaves like a vacuum energy, constant
-in density across space and time. This model also posits a dark matter
-component which is ``cold'' (meaning a negligible velocity dispersion and
-therefore a negligible pressure) and constitutes the vast majority of matter
-in the Universe.
+cosmological constant $\Lambda$. This behaves like a vacuum energy, constant
+in density across space and time. The $\Lambda$CDM model also posits a 
+``cold'' dark
+matter component constituting the vast majority of matter in the Universe. 
+Cold dark matter has a negligible velocity dispersion and therefore a
+negligible pressure.
 
 There are several related mysteries about the Universe that we would like to
 explore, such as the nature of dark energy and the origin of primordial
@@ -64,7 +65,8 @@ we need to train.
 
 In summary, the goal of this work is to extend the applicability of
 evolution-mapping emulators to cosmologies with massive neutrinos by
-including a parameter otherwise behaving as a degenerate parameter. 
+including a parameter otherwise behaving as a degenerate parameter. In the
+following sections, we will define in greater detail the terms used here.
 
 \section{Brief Glossary of Our Cosmological Parameters}
 \label{sec: param_glossary}
@@ -330,7 +332,7 @@ even in cosmological contexts.
 \label{sec: Pk_intro}
 
 Although the cosmological principle appears to hold well on large scales,
-we know from our observations of structure in the Universe that it is not 
+we know from our observations of structure that the Universe is not perfectly
 homogeneous. To characterize these inhomogeneities, we can imagine quantifying 
 the energy density $\rho(\bm{x})$ of the Universe at any one point $\bm{x}$ in 
 three-dimensional space. From this we can define a similar quantity, a relative density fluctuation:
@@ -344,8 +346,9 @@ represents the average energy density of the entire Universe.
 $\delta(\bm{x})$ easier than $\rho(\bm{x})$ to work with since it
 is unitless and especially because it is normalized--the integral of the
 matter density contrast field, taken over the entire Universe, is zero.
-If the Universe is approximately homogeneous, we can hope to describe any
-deviations from homogeneity perturbatively.
+If the Universe is approximately homogeneous, then we expect
+$|\delta(\bm{x})_ \ll 1$, and we should be able to describe
+deviations from homogeneity using perturbation theory.
 
 $\delta(\bm{x})$ may in turn be used to define the two-point correlation 
 function:
@@ -404,8 +407,9 @@ impact on
 the growth of density fluctuations in any given period of the Universe's
 history.}
 
-To arrive at the power spectrum today, we evolve the primordial power
-spectrum from the time of inflation:
+Our current understanding of density fluctuations places their origin at the
+time inflation. To arrive at the power spectrum today, we time-evolve the 
+\textit{primordial} power spectrum from this period:
 
 \begin{equation}
 P(k) = A_s \, \left( \frac{k}{k_0} \right)^{n_s}
@@ -905,8 +909,8 @@ shape parameters $\Theta_s$ and evolution parameters $\Theta_e$.
 Shape parameters affect the shape of the power spectrum. Examples include
 $\omega_b$, $\omega_c$, and $n_s$.
 Evolution parameters affect only its amplitude. They are so called because
-their impact on the linear-theory power spectrum is
-indistinguishable from an evolution, or translation in time, of the power 
+their impact on the linear-theory power spectrum is 
+indistinguishable from a time evolution of the power 
 spectrum. This means that varying the redshift at which we evaluate the power
 spectrum will affect only its amplitude. $h$, $\omega_k$ and
 $\omega_\text{DE}$ are examples of evolution parameters. 
@@ -935,6 +939,23 @@ In practice, this means that any two cosmologies with identical shape
 parameters will yield identical power spectra as long we match the value of
 $\sigma_{12}$. This matching can be accomplished merely by varying redshift
 at which the power spectrum is evaluated.
+
+\begin{figure}[htb]
+  \centering
+  \includegraphics[scale=1.0]{intro/san21f2}
+  \cprotect\caption[Demonstration of evolution mapping]{For each value of
+  	$\sigma_{12}$
+  	shown here, eight Aletheia models were plotted in different
+  	colors. Each set of lines is tightly distributed and thereby demonstrates 
+  	the excellent agreement of power spectra from $\sigma_{12}$-matched
+  	cosmologies that agree in their shape parameters. This figure was
+  	inspired by figure 2 from \citet{San21}. Aletheia model 0 was related in
+  	table~\ref{tab: Aletheia_m0}. For details on the rest of the Aletheia
+  	models, please refer to the file
+  	\verb|cosmologies.dat|\footnote{\url{https://github.com/3276908917/Master/blob/main/cassL/cosmologies.dat}}
+  	in the Cassandra-Linear GitHub repository.}
+  \label{fig: ev_mapping_demo}
+\end{figure}
 
 %s Now conclude with the significance
 

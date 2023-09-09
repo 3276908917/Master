@@ -482,6 +482,8 @@ def boltzmann_battery(omnuh2_floats, skips_omega=[0, 2], skips_model=[8],
                 "k": np.ndarray of float64
                     k[i] is the inverse of the physical scale associated with
                     each P_nu[i] and P_no[i]
+                "s12_massless": the sigma12 of the massive-neutrino case
+                "s12_massive": the sigma12 of the massless-neutrino case
     """
     assert isinstance(omnuh2_floats, list) or \
         isinstance(omnuh2_floats, np.ndarray), "if you want only one" + \
