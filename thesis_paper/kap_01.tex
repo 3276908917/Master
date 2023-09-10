@@ -972,45 +972,79 @@ put the neutrino section right after this one?}
 
 Boltzmann codes typically take on the order of three seconds to evaluate the
 linear matter power spectrum for a given cosmological configuration. In a
-modern Monte Carlo Markov Chain analysis, tens of thousands of cosmological
-configurations will need to be evaluated. Therefore, evaluation of power
-spectra becomes a bottleneck of the analysis.
+modern Monte Carlo Markov Chain analysis, tens of thousands of such
+configurations will need to be evaluated. Therefore, power
+spectra evaluation becomes a bottleneck of the analysis.
 
-This motivates the use of emulation, which is \textcolor{red}{a kind of} 
-multi-dimensional interpolation. Power spectra emulation has been shown
-to achieve excellent accuracy (\textcolor{green}{on the order of}) while
-returning results several orders of magnitude more quickly.
+This motivates the use of emulators, which rely on multi-dimensional 
+interpolation instead of the equations of evolution. Power spectra emulation 
+has been shown to achieve excellent accuracy with computation times shorter
+by several orders of magnitude. Emulators apply different machine
+learning approaches in order to transform between cosmological
+configurations and power spectra. The two most common choices are neural 
+networks (NNs), which optimize the weights and biases on a set of connected 
+nodes, and Gaussian process regressions (GPRs), which apply Bayes' theorem to  
+iteratively tighten the variance of a distribution of random functions.
 
-Emulators interpolate across a high-dimensional parameter space. The primary
-limitation is that the emulator has to be built with every possible parameter
-in mind that an end-user could wish to vary. Yet there is a large number of
-different cosmological parameters discussed in the modern literature.
-``Currently available emulators only sample a few cosmological parameters,
-often with restrictive ranges, and are not applicable to more general
-parameter
-spaces'' (\cbib{San21}). ``Due to the high computational cost of the required
-simulations, [...] current emulators leave out parameters such as the
-curvature
-of the Universe or dynamic energy models beyond the standard CPL
-parametrization'' (\cbib{San21}).
+Emulators interpolate across a high-dimensional parameter space. This presents
+a fundamental limitation: emulators must be built with the same parameter
+space over which end users require for their analyses. If additional
+parameters or wider priors are needed, then new emulators need to be trained.
+Yet there is a large number of different cosmological parameters discussed in 
+the modern literature. Emulator flexibility and generality is desirable, but 
+comes at the price of a significantly more sample-expensive training phase in
+order to maintain accuracy levels.
 
-I'll talk a little about different emulators currently available, such as 
+However, due to the
+generality-accuracy tradeoff, currently available emulators tend to sample
+only sample a few cosmological parameters and over restrictive ranges
+\cbib{San21}. \textcolor{red}{This comment only applied to the emulators
+trained over N-body simulations, right? So it would probably be inappropriate
+to mention it in this paper, since we are emulating over Boltzmann solver
+spectra}.
+% Also part of this cut paragraph:
+\begin{comment}
+	``Due to the high computational cost of the required
+	simulations, [...] current emulators leave out parameters such as the
+	curvature of the Universe or dynamic energy models beyond the standard CPL
+	parametrization'' (\cbib{San21}).
+\end{comment}
+
+The effectiveness of emulation has given rise to considerable popularity, and
+several emulators of both linear and nonlinear power spectra have been put 
+forth in the literature.\footnote{Linear and nonlinear power spectra have 
+different
+applications. Linear power spectra can be used to predict $P_\text{NL}(k)$, 
+such as in perturbation theory approaches. Furthermore, most non-linear 
+emulators actually predict the ratio of the non-linear power spectrum to its 
+linear counterpart, so $P_\text{L}(k)$ is still necessary to evaluate
+$P_\text{NL}(k)$ (A. G. S\'{a}nchez, private communication, 2022).}
+\verb|baccoemu|
+includes both nonlinear and linear power spectrum emulators based on neural
+networks with quoted accuracies of 0.2\% for \cbib{Arico}.
+\verb|CosmoPower| also uses an NN. 
+\verb|COMET| uses GPR, although the development team
+has recently decided to switch to an NN.
+
+\textcolor{blue}{I'll talk a little about different emulators currently 
+available, such as 
 COMET. Some emulate non-linear power spectra, for example, and several even 
 include massive neutrinos. But this thesis will demonstrate that massive 
 neutrinos can be included into our evolution mapping approach, which will be 
-introduced in section~\ref{sec: ev_mapping_intro}.
+introduced in section~\ref{sec: ev_mapping_intro}.}
 
-Emulators of non-linear  power spectra $P_\text{NL}(k)$ are 
-already available, but linear-theory power spectra are still important.
-For example, they can be used to predict $P_\text{NL}(k)$, like in 
-perturbation theory approaches. Furthermore, most non-linear emulators
-actually predict the ratio of the non-linear power spectrum to its linear
-counterpart, so $P_\text{L}(k)$ is still necessary to evaluate
-$P_\text{NL}(k)$ (A. G. S\'{a}nchez, private communication, 2022).
+% Other things we could talk about: make more explicit that we are using a
+% large # Boltzmann / N-body power spectra in order to train the emulator in
+% the first place. This of course means that the accuracy will eventually be
+% limited by the accuracy of the input spectra...
 
+% This section really is short. Am I forgetting to talk about anything?
 
 \section{Gaussian Process Regression}
 \label{sec: gpr_intro}
+
+NNs represent the most
+common approach in the literature. GPR is a considerably simpler approach and are arguably more accessible to novices.
 
 % What is a Gaussian Process?
 
