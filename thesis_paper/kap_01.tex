@@ -1011,7 +1011,7 @@ spectra}.
 \end{comment}
 
 The effectiveness of emulation has given rise to considerable popularity, and
-several emulators of both linear and nonlinear power spectra have been put 
+several emulators of linear and nonlinear power spectra have been put 
 forth in the literature.\footnote{Linear and nonlinear power spectra have 
 different
 applications. Linear power spectra can be used to predict $P_\text{NL}(k)$, 
@@ -1019,12 +1019,26 @@ such as in perturbation theory approaches. Furthermore, most non-linear
 emulators actually predict the ratio of the non-linear power spectrum to its 
 linear counterpart, so $P_\text{L}(k)$ is still necessary to evaluate
 $P_\text{NL}(k)$ (A. G. S\'{a}nchez, private communication, 2022).}
-\verb|baccoemu|
-includes both nonlinear and linear power spectrum emulators based on neural
-networks with quoted accuracies of 0.2\% for \cbib{Arico}.
-\verb|CosmoPower| also uses an NN. 
-\verb|COMET| uses GPR, although the development team
-has recently decided to switch to an NN.
+\verb|baccoemu| includes both nonlinear and linear power spectrum emulators 
+based on NNs. The quoted accuracies in the linear case are
+0.2\% for redshifts $z \lesssim 3$ and
+0.5\% for redshifts $z \lesssim 9$. This emulator is trained over 216000
+\verb|CLASS|
+models in 600 $k$-bins $10^{-4} \leq k$ [$h$ Mpc$^{-1}$] $\leq 50$ and 
+includes massive neutrinos \cbib{Arico}. \verb|CosmoPower| also uses an NN
+to emulate both linear and nonlinear power spectra. It was trained over
+180,000 spectra in 420 $k$-bins over the ranges
+$10^{-5} \leq k $ Mpc$^{-1} \leq 10$ and 
+$0 \leq z \leq 5$. The authors have verified
+its accuracy on a full inference pipeline, demonstrating that the results
+are in excellent agreement regardless of the choice between \verb|CAMB| and
+\verb|CLASS| for the calculation of the training spectra. In the linear case,
+\citet{Mancini} quote errors of less than 0.1\%. 
+
+\verb|COMET| is of particular interest to this work because it has already
+successfully demonstrated the application of evolution mapping to the task of
+emulation. \verb|COMET| uses GPR, although the development team
+has recently decided to switch to an NN \cbib{Eggemeier}.
 
 \textcolor{blue}{I'll talk a little about different emulators currently 
 available, such as 
