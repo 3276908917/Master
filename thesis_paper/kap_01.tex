@@ -65,7 +65,10 @@ we need to train.
 
 In summary, the goal of this work is to extend the applicability of
 evolution-mapping emulators to cosmologies with massive neutrinos by
-including a parameter otherwise behaving as a degenerate parameter. In the
+including a parameter otherwise behaving as a degenerate parameter. We
+will describe in depth a new code, Cassandra-Linear, that we have developed
+in order to demonstrate this principle and to provide a user-friendly
+interface for power spectra emulation. In the
 following sections, we will define in greater detail the terms used here.
 
 \section{Brief Glossary of Our Cosmological Parameters}
@@ -986,6 +989,7 @@ by several orders of magnitude.\footnote{Of course, the accuracy of a
 well-constructed emulator will ultimately still be limited by the accuracy of 
 the input power spectra. Recall in the case of CAMB that this is 0.1\%
 \cbib{Seljak}.}
+
 Emulators apply different machine
 learning approaches in order to transform between cosmological
 configurations and power spectra. The two most common choices are neural 
@@ -1060,43 +1064,33 @@ COMET can operate.}
 \section{Gaussian Process Regression}
 \label{sec: gpr_intro}
 
-NNs represent the most
-common approach in the literature. GPR is a considerably simpler approach and are arguably more accessible to novices.
-
-% What is a Gaussian Process?
-
-Most emulators are based on a Gaussian Process (GP). A GP is a Gaussian
-distribution over functions\footnote
-{A GP is the limit of a one-hidden-layer neural network as the number of
-neurons approaches infinity.}, which can be interpreted
+In this work, we apply a GPR to emulate power spectra. A Gaussian Process 
+(GP) a Gaussian distribution over random functions,\footnote{The functions
+themselves are deterministic.} which can be interpreted
 as the infinite-dimensional generalization of the multivariate normal
 distribution. The inference of continuous values with a GP prior
-is known as Gaussian process regression, or Kriging. GP regression is a
-powerful non-linear multivariate interpolation tool. The computational
-complexity of inference and likelihood evaluation within GP regression is cubic
-in the number of points. This makes GP regression an excellent companion to
-Latin hypercube sampling (LHS), which makes highly efficient use of a limited 
-number of samples and whose basic idea will be explained in section~\ref{sec:
-lhc_theory}.
+is known as Gaussian process regression, or Kriging. GPR is a
+powerful non-linear multivariate interpolation tool. 
 
-Neural networks (NNs) generally need much larger sample sizes to reach
-comparable levels of
-accuracy. Due to various alterations in the Cassandra-Linear code over its
-development, several regenerations of the various emulator data sets were
-necessary. This practical constraint motivated the use of a GP for our
-emulator. Furthermore, NNs invariably require much more complicated setup and
-tuning--for example, in the precise architecture of the network (e.g. nodes
-per layer, layer types) as well as the hyperparameters (e.g. learning rate).
+NNs represent the most common approach in the literature. We elect to use a
+GPR for this work for several reasons. Most importantly, we find it to be
+a considerably simpler approach, more accessible to novices.
+NNs invariably require much more complicated setup and tuning in the precise 
+architecture and hyperparameter values (nodes per layer, learning rate, etc.) 
 By contrast, as we explain in section~\ref{sec: train_emu}, a Gaussian
-process regression is highly straightforward to set up and modify. Therefore,
-for a demonstration project such as Cassandra-Linear, we elected to base our
-emulator on a GP. Please refer to the section~\ref{sec: future_work} for a
-continuation of this discussion.
+process regression is highly straightforward to set up and modify.
 
-Are there other prediction approaches besides GPs and NNs? IF so, I need to
-further justify WHY we’re using GPs.
-GPs work best when there are few samples and a lot of parameters, right?
-But why is that so? What is the math behind that?
+Furthermore, NNs generally need much larger sample sizes to reach comparable 
+levels of accuracy. Due to various alterations in the Cassandra-Linear code 
+over its development, several regenerations of the various emulator data sets 
+were necessary. This practical constraint motivated the use of a GP for our
+emulator. Please refer to the section~\ref{sec: future_work} for a
+continuation of the comparison between NNs and GPRs for emulation tasks.
+
+\textcolor{orange}{Are there other prediction approaches besides GPs and NNs? 
+IF so, I need to further justify WHY we’re using GPs.
+GPs work best when there are few samples and a lot of 
+parameters, right? But why is that so? What is the math behind that?}
 
 
 \section{Sampling Approach: Latin Hypercube}
@@ -1108,6 +1102,12 @@ What is the theoretical best LHC that we could make?
 
 Besides, can we explain this equation?
 
+The computational
+complexity of inference and likelihood evaluation within GPR is cubic
+in the number of points. This makes GP regression an excellent companion to
+Latin hypercube sampling (LHS), which makes highly efficient use of a limited 
+number of samples and whose basic idea will be explained in section~\ref{sec:
+lhc_theory}.
 
 \section{Neutrinos and Their Cosmological Impact}
 \label{sec: neutrino_problem}
