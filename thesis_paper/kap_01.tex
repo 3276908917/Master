@@ -1103,10 +1103,10 @@ parameters, right? But why is that so? What is the math behind that?}
 \section{Sampling Approach: Latin Hypercube}
 \label{sec: lhc_theory}
 
-I imagine this is going to be an extremely short section. We should motivate
+\textcolor{blue}{I should motivate
 why we're using this style of sampling.
-
 What is the theoretical best LHC that we could make?
+Besides, can we explain this equation?}
 
 % The following plots were generated with h_units_bad.ipynb
 \begin{figure}[htb]
@@ -1130,12 +1130,13 @@ What is the theoretical best LHC that we could make?
  		\label{fig: better_lhs}
     \end{subfigure}
     \centering
-    \caption[Impact]{Impact.}
-    \label{fig: this}
+    \caption[Comparison of random and LH sampling.]{Comparison of an example
+    	random sample with two examples of LHSs. Unlike random sampling,
+    	LHS guarantees that every subinterval will be sampled. However, if
+    	the minimum separation is low enough, there will still be large
+    	undersampled regions.}
+    \label{fig: sample_comparison}
 \end{figure}
-
-
-Besides, can we explain this equation?
 
 The computational
 complexity of inference and likelihood evaluation within GPR is cubic
@@ -1147,8 +1148,15 @@ A unit LHS is primarily characterized by its dimension $d$ and number of
 samples $N_s$. $d$ separate intervals, all running from zero to unity, are
 split into $N_s$ subintervals. Then, each subinterval is sampled just once.
 
+Contrast this with random sampling, figure~\ref{fig: sample_comparison}.
 
-\textcolor{red}{Would you like me to include a diagram here?}
+\begin{equation}
+\label{eq: best_lhs_sep}
+s = \left( \frac{1}{N_s} \right)^{1 / d}
+\end{equation}
+
+For example, for a six-parameter emulator trained over 5000 samples, the best
+possible LHS would have a minimum separation of $s \approx 0.2418$.
 
 \section{Neutrinos and Their Cosmological Impact}
 \label{sec: neutrino_problem}
