@@ -1065,12 +1065,19 @@ COMET can operate.}
 \label{sec: gpr_intro}
 
 In this work, we apply a GPR to emulate power spectra. A Gaussian Process 
-(GP) a Gaussian distribution over random functions,\footnote{The functions
+(GP) is a Gaussian distribution over random functions,\footnote{The functions
 themselves are deterministic.} which can be interpreted
 as the infinite-dimensional generalization of the multivariate normal
 distribution. The inference of continuous values with a GP prior
 is known as Gaussian process regression, or Kriging. GPR is a
-powerful non-linear multivariate interpolation tool. 
+powerful non-linear multivariate interpolation tool because in addition to
+allowing conventional predictions, GPR can also give us an uncertainty on the
+prediction, which is not typically obtained when training an NN.
+
+\textcolor{red}{Should I put some equations here, to outline the basics?
+For example, I could refer to
+\url{https://gaussianprocess.org/gpml/chapters/RW.pdf} as the COMET paper
+does.}
 
 NNs represent the most common approach in the literature. We elect to use a
 GPR for this work for several reasons. Most importantly, we find it to be
