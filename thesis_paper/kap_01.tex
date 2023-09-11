@@ -1095,7 +1095,7 @@ emulator. Please refer to the section~\ref{sec: future_work} for a
 continuation of the comparison between NNs and GPRs for emulation tasks.
 
 \textcolor{orange}{Are there other prediction approaches besides GPs and NNs? 
-IF so, I need to further justify WHY we’re using GPs.
+If so, I need to further justify WHY we’re using GPs.
 GPs work best when there are few samples and a lot of 
 parameters, right? But why is that so? What is the math behind that?}
 
@@ -1103,9 +1103,37 @@ parameters, right? But why is that so? What is the math behind that?}
 \section{Sampling Approach: Latin Hypercube}
 \label{sec: lhc_theory}
 
-I imagine this is going to be an extremely short section. We should motivate why we're using this style of sampling.
+I imagine this is going to be an extremely short section. We should motivate
+why we're using this style of sampling.
 
 What is the theoretical best LHC that we could make?
+
+% The following plots were generated with h_units_bad.ipynb
+\begin{figure}[htb]
+    \begin{subfigure}{0.32 \textwidth}
+    \centering
+ 		\includesvg[width=\textwidth]{intro/lhs/random}
+ 		\caption{A random sample. Some subintervals are sampled repeatedly.}
+ 		\label{fig: random_sample}
+    \end{subfigure}
+    \begin{subfigure}{0.32 \textwidth}
+    \centering
+ 		\includesvg[width=\textwidth]{intro/lhs/bad_lhs}
+ 		\caption{An LHS with a low minimum separation between points.}
+ 		\label{fig: poor_lhs}
+    \end{subfigure}
+    \begin{subfigure}{0.32 \textwidth}
+    \centering
+ 		\includesvg[width=\textwidth]{intro/lhs/better_lhs}
+ 		\caption{A different LHS with a higher minimum separation between
+ 			points.}
+ 		\label{fig: better_lhs}
+    \end{subfigure}
+    \centering
+    \caption[Impact]{Impact.}
+    \label{fig: this}
+\end{figure}
+
 
 Besides, can we explain this equation?
 
@@ -1113,8 +1141,14 @@ The computational
 complexity of inference and likelihood evaluation within GPR is cubic
 in the number of points. This makes GP regression an excellent companion to
 Latin hypercube sampling (LHS), which makes highly efficient use of a limited 
-number of samples and whose basic idea will be explained in section~\ref{sec:
-lhc_theory}.
+number of samples.
+
+A unit LHS is primarily characterized by its dimension $d$ and number of 
+samples $N_s$. $d$ separate intervals, all running from zero to unity, are
+split into $N_s$ subintervals. Then, each subinterval is sampled just once.
+
+
+\textcolor{red}{Would you like me to include a diagram here?}
 
 \section{Neutrinos and Their Cosmological Impact}
 \label{sec: neutrino_problem}
