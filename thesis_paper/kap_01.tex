@@ -703,7 +703,8 @@ redshifts (which, we will later see, becomes a problem), and the minimum
 allowed value of $H_0$ is 1 km s$^{-1}$ Mpc$^{-1}$, although slightly higher 
 values have 
 been observed to cause runtime errors in the presence of other extreme 
-parameters.
+parameters. CLASS and CAMB claim to be accurate at the 0.1\% level
+\cbib{Lesgourges}.
 
 %s Pics? Not so fast. Let's pick one.
 
@@ -977,9 +978,15 @@ configurations will need to be evaluated. Therefore, power
 spectra evaluation becomes a bottleneck of the analysis.
 
 This motivates the use of emulators, which rely on multi-dimensional 
-interpolation instead of the equations of evolution. Power spectra emulation 
+interpolation instead of the equations of evolution. Emulators are trained 
+over large numbers of power spectra either computed
+by a Boltzmann solver or from an N-body simulation. Power spectra emulation 
 has been shown to achieve excellent accuracy with computation times shorter
-by several orders of magnitude. Emulators apply different machine
+by several orders of magnitude.\footnote{Of course, the accuracy of a
+well-constructed emulator will ultimately still be limited by the accuracy of 
+the input power spectra. Recall in the case of CAMB that this is 0.1\%
+\cbib{Seljak}.}
+Emulators apply different machine
 learning approaches in order to transform between cosmological
 configurations and power spectra. The two most common choices are neural 
 networks (NNs), which optimize the weights and biases on a set of connected 
@@ -1039,6 +1046,9 @@ are in excellent agreement regardless of the choice between \verb|CAMB| and
 successfully demonstrated the application of evolution mapping to the task of
 linear power spectrum emulation. \verb|COMET| uses GPR, although the development team
 has recently decided to switch to an NN \cbib{Eggemeier}.
+
+\textcolor{orange}{I need material on the accuracy and ranges over which
+COMET can operate.}
 
 % Other things we could talk about: make more explicit that we are using a
 % large # Boltzmann / N-body power spectra in order to train the emulator in
