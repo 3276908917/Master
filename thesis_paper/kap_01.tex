@@ -1048,7 +1048,8 @@ are in excellent agreement regardless of the choice between \verb|CAMB| and
 
 \verb|COMET| is of particular interest to this work because it has already
 successfully demonstrated the application of evolution mapping to the task of
-linear power spectrum emulation. \verb|COMET| uses GPR, although the development team
+linear power spectrum emulation. \verb|COMET| uses GPR, although the 
+development team
 has recently decided to switch to an NN \cbib{Eggemeier}.
 
 \textcolor{orange}{I need material on the accuracy and ranges over which
@@ -1108,6 +1109,22 @@ why we're using this style of sampling.
 What is the theoretical best LHC that we could make?
 Besides, can we explain this equation?}
 
+The computational
+complexity of inference and likelihood evaluation within GPR is cubic
+in the number of points \textcolor{green}{citation?}.
+This makes GP regression an excellent companion to
+Latin hypercube sampling (LHS), which makes highly efficient use of a limited 
+number of samples.
+
+A unit LHS is primarily characterized by its dimension $d$ and number of 
+samples $N_s$. $d$ separate intervals, all running from zero to unity, are
+each split into $N_s$ subintervals. Then, each subinterval is sampled
+exactly once. By contrast, simple random sampling (SRS) may sample any 
+particular subinterval any number of times, including not at all. SRS
+can require vast numbers of samples before all regions of the space are
+represented. For a pictorial representation of SRS versus LHS, see
+figure~\ref{fig: sample_comparison}.
+
 % The following plots were generated with h_units_bad.ipynb
 \begin{figure}[htb]
     \begin{subfigure}{0.32 \textwidth}
@@ -1138,25 +1155,26 @@ Besides, can we explain this equation?}
     \label{fig: sample_comparison}
 \end{figure}
 
-The computational
-complexity of inference and likelihood evaluation within GPR is cubic
-in the number of points. This makes GP regression an excellent companion to
-Latin hypercube sampling (LHS), which makes highly efficient use of a limited 
-number of samples.
+LHS does not always improve significantly over SRS. It is convenient to
+assess the quality of an LHS according to the minimum separation $s^*$ between 
+any two sample points in the LHS. A high $s^*$ indicates that the sample
+space is evenly covered. To visually appreciate the difference between
+LHSs of different $s^*$ values, see again figure~\ref{fig: sample_comparison}.
 
-A unit LHS is primarily characterized by its dimension $d$ and number of 
-samples $N_s$. $d$ separate intervals, all running from zero to unity, are
-split into $N_s$ subintervals. Then, each subinterval is sampled just once.
-
-Contrast this with random sampling, figure~\ref{fig: sample_comparison}.
+For each value of $d$ and $N_s$, there is a theoretical maximum value of
+$s^*$:
 
 \begin{equation}
 \label{eq: best_lhs_sep}
-s = \left( \frac{1}{N_s} \right)^{1 / d}
+s^*_\text{best} = \left( \frac{1}{N_s} \right)^{1 / d}
 \end{equation}
 
 For example, for a six-parameter emulator trained over 5000 samples, the best
-possible LHS would have a minimum separation of $s \approx 0.2418$.
+possible LHS would have $s^* \approx 0.2418$.
+\textcolor{orange}{Talk about how you got this equation?}
+
+% Add a sentence or two about converting a unit LHS into a set of cosmological
+% parameters (rescaling) and even non-linear sampling!
 
 \section{Neutrinos and Their Cosmological Impact}
 \label{sec: neutrino_problem}
@@ -1193,13 +1211,17 @@ evolution-mapping scheme.
 Why do they behave in this way? All neutrinos start off as
 relativistic particles in the early Universe, acting as a type of radiation.
 But as the Universe continues to expand and cool, the neutrinos behave
-increasingly like dark matter.
-In this way, the physical density in neutrinos impacts both the shape and the
-evolution.
+increasingly like dark matter. In this way, the physical density in neutrinos 
+impacts both the shape and the evolution.
 
-``The popular heuristic formula for the linear theory suppression of the matter
-fluctuations by free-streaming $\nu$, $\Delta P(k) / P(k) \approx -8 f_\nu$, is
-valid only on very small scales $k > 0.8 h$ / Mpc, However, it is not of
+``The popular heuristic formula for the linear theory suppression of the 
+matter fluctuations by free-streaming $\nu$:
+
+\begin{equation}
+\Delta P(k) / P(k) \approx -8 f_\nu
+\end{equation}
+
+is valid only on very small scales $k > 0.8 h$ / Mpc, However, it is not of
 practical use as this is in the strongly nonlinear regime of matter
 clustering'' (\cbib{Kiakotou}).
 
@@ -1209,21 +1231,28 @@ $\omega_\nu = 0$. This of course limits the applicability of our emulator to
 cosmologies with very small $\omega_\nu$, but this constraint agrees with
 current observations (\textcolor{orange}{which?}).
 
-I want to end this section with a vague plan of action: we want to play around with CAMB power spectra to see if there are any simple ways around this limitation in our approach.
-
 %%% New stuff
 
 % what is a MEMNeC?
 
-We already have an approximation for the power spectrum of a massive-neutrino cosmology within the evolution mapping scheme. The $\sigma_{12}$ value that we described earlier is actually the $\sigma_{12}$ value of the model's MEMNeC. can already be approximated within evolution-mapping by slightly altering scheme. \textcolor{red}{Is it fair to say we are adjusting, or was this actually the same scheme as it always was?} We take a MEMNeC and the desired cosmology. The sigma 12 is actually the sigma 12 of the MEMNeC. Then we treat the physical density in neutrinos as a shape parameter along with $A_s$.
+We already have an approximation for the power spectrum of a massive-neutrino 
+cosmology within the evolution mapping scheme. The $\sigma_{12}$ value that we 
+described earlier is actually the $\sigma_{12}$ value of the model's MEMNeC. 
+can already be approximated within evolution-mapping by slightly altering 
+scheme. \textcolor{red}{Is it fair to say we are adjusting, or was this 
+actually the same scheme as it always was?} We take a MEMNeC and the desired 
+cosmology. The sigma 12 is actually the sigma 12 of the MEMNeC. Then we treat 
+the physical density in neutrinos as a shape parameter along with $A_s$.
 
 We are not just concentrating on linear-theory power spectra, but also power
-spectra of 
-\textit{non-neutrino} 
-matter.\footnote{\textcolor{red}{Andrea added the following comment: ``We 
-should 
+spectra of \textit{non-neutrino} matter.\footnote{\textcolor{red}{Andrea added 
+the following comment: ``We should 
 justify this assumption. It is standard practice to assume that the galaxy 
 density field is determined only by the underlying cdm+b density field, 
 without taking into consideration the cold neutrino component (which also 
 behaves as matter).'' Do you have recommendations for sources I can consult in
 order to add this information to this paragraph?}}
+
+\textcolor{blue}{I want to end this section with a vague plan of action: we 
+want to play around with CAMB power spectra to see if there are any simple 
+ways around this limitation in our approach.}
