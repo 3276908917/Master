@@ -918,11 +918,13 @@ We adapt equation 13 from \citet{San21} to write:
 which we call the \textit{evolution mapping relation} for the power
 spectrum.\footnote{As mentioned before, varying $z$ has the effect of varying 
 an evolution parameter, so it appears on the RHS only as an argument 
-to the $\sigma_{12}$ ``function.'' We write it separately from $\Theta_e$ to
+to the $\sigma_{12}$ ``function.'' We write it separately from
+$\Theta_e$ to
 emphasize that $z$ does not describe a property of the Universe, but is
 simply used as a proxy here for \textcolor{red}{conformal?} time
 \textcolor{red}{elapsed since the Big Bang? (but we can only observe up to
-$z = 1100$...)}.} We stress that this relation does not hold when $P_L$ is
+$z = 1100$...)}.} 
+We stress that the evolution mapping relation does not hold when $P_L$ is
 expressed in $h$ units.
 
 %s In action: relabel some power spectra
@@ -1197,18 +1199,22 @@ the interpretation stage (section~\ref{sec: lhc_flow_chart}).
 \section{Neutrinos and Their Cosmological Impact}
 \label{sec: neutrino_problem}
 
-\textcolor{blue}{I'll talk a little about different emulators currently 
-available, such as 
-COMET. Some emulate non-linear power spectra, for example, and several even 
-include massive neutrinos. But this thesis will demonstrate that massive 
-neutrinos can be included into our evolution mapping approach, which will be 
-introduced in section~\ref{sec: ev_mapping_intro}.}
-
 As mentioned in section~\ref{sec: emulation_intro}, COMET has already 
 successfully demonstrated the application of evolution mapping to emulation. 
 The focus of this work is to extend evolution mapping (EvM) to account for 
 massive neutrinos. Due to uncertainty about how to handle $\omega_\nu$ within 
 the evolution mapping framework, COMET fixes this parameter at zero.
+
+At this point, we add that we are focusing on the power
+spectrum of \textit{non-neutrino} matter.\footnote{\textcolor{red}{Andrea 
+added the following comment: ``We should 
+justify this assumption. It is standard practice to assume that the galaxy 
+density field is determined only by the underlying cdm+b density field, 
+without taking into consideration the cold neutrino component (which also 
+behaves as matter).'' Do you have recommendations for sources I can consult in
+order to add this information to this paragraph?}} Several currently-available 
+emulators, such as \verb|baccoemu| and \verb|CosmoPower|, are able to handle 
+massive neutrinos because they do not use evolution mapping.
 
 Evolution mapping relies on a clear separability in parameters which massive 
 neutrinos do not cleanly follow. Specifically, unlike other shape parameters, 
@@ -1218,7 +1224,8 @@ Due to the extremely low mass per particle, and the lack of charge, neutrinos
 interact only extremely weakly with baryonic matter. Neutrinos behave like a 
 relativistic species in the extremely hot and energetic early Universe.
 During this period, neutrinos suppress structure growth on small scales by
-free-streaming out of overdensities \cbib{Kiakotou}. As the Universe expands and cools down, neutrinos gradually behave like increasingly cold dark matter,
+free-streaming out of overdensities \cbib{Kiakotou}. As the Universe expands 
+and cools down, neutrinos gradually behave like increasingly cold dark matter,
 which promotes structure growth.
 
 \begin{figure}[h!]
@@ -1240,34 +1247,31 @@ linear-theory suppression of matter fluctuations:
 \end{equation}
 
 which is unfortunately valid only on very small scales $k > 0.8 h$ / Mpc.
+
 It has also been proposed to treat the neutrinos as a small correction factor
 to the results from an analogous cosmology with the same $\omega_m$ but with
 $\omega_\nu = 0$. This limits the applicability of our emulator to
 cosmologies with very small $\omega_\nu$, where we can treat the effect of
-neutrinos as a perturbation on our massless-neutrino spectra.
+massive neutrinos as a perturbation on our massless-neutrino spectra. We adapt 
+the evolution mapping relation as follows:
 
-%%% New stuff
+\begin{equation}
+\label{eq: evMapping_modded}
+    P_L (k | z, \Theta_s, \Theta_e)
+    =
+    P_L (k | \Theta_s,
+    		\tilde{\sigma}_{12} \left( z, \Theta_s, \Theta_e \right))
+\end{equation}
 
-% what is a MEMNeC?
+%s what is a MEMNeC?
 
-We already have an approximation for the power spectrum of a massive-neutrino 
-cosmology within the evolution mapping scheme. The $\sigma_{12}$ value that we 
-described earlier is actually the $\sigma_{12}$ value of the model's MEMNeC. 
-can already be approximated within evolution-mapping by slightly altering 
-scheme. \textcolor{red}{Is it fair to say we are adjusting, or was this 
-actually the same scheme as it always was?} We take a MEMNeC and the desired 
-cosmology. The sigma 12 is actually the sigma 12 of the MEMNeC. Then we treat 
-the physical density in neutrinos as a shape parameter along with $A_s$.
+and then treat the physical density in neutrinos as a shape parameter.
+We define $\tilde{\sigma}_{12}$ as the $\sigma_{12}$ of the corresponding 
+matter-equivalent massless-neutrino cosmology (MEMNeC). The MEMNeC is
+defined such that $\tilde{\omega}_c = \omega_c + \omega_\nu$ and
+$\tilde{\omega}_\nu = 0$.
 
-We are not just concentrating on linear-theory power spectra, but also power
-spectra of \textit{non-neutrino} matter.\footnote{\textcolor{red}{Andrea added 
-the following comment: ``We should 
-justify this assumption. It is standard practice to assume that the galaxy 
-density field is determined only by the underlying cdm+b density field, 
-without taking into consideration the cold neutrino component (which also 
-behaves as matter).'' Do you have recommendations for sources I can consult in
-order to add this information to this paragraph?}}
-
-\textcolor{blue}{I want to end this section with a vague plan of action: we 
-want to play around with CAMB power spectra to see if there are any simple 
-ways around this limitation in our approach.}
+The goal of this work is to improve on this solution after exploring the 
+impact 
+of massive neutrinos in greater depth. In the next chapter, we will carefully 
+explain our CAMB setup, which will allow us to test ideas for improvements.
