@@ -1204,6 +1204,23 @@ include massive neutrinos. But this thesis will demonstrate that massive
 neutrinos can be included into our evolution mapping approach, which will be 
 introduced in section~\ref{sec: ev_mapping_intro}.}
 
+As mentioned in section~\ref{sec: emulation_intro}, COMET has already 
+successfully demonstrated the application of evolution mapping to emulation. 
+The focus of this work is to extend evolution mapping (EvM) to account for 
+massive neutrinos. Due to uncertainty about how to handle $\omega_\nu$ within 
+the evolution mapping framework, COMET fixes this parameter at zero.
+
+Evolution mapping relies on a clear separability in parameters which massive 
+neutrinos do not cleanly follow. Specifically, unlike other shape parameters, 
+the impact of $\omega_\nu$ on the power spectrum is not constant in redshift
+(see figure~\ref{fig: neutrinos_and_redshift}.
+Due to the extremely low mass per particle, and the lack of charge, neutrinos
+interact only extremely weakly with baryonic matter. Neutrinos behave like a 
+relativistic species in the extremely hot and energetic early Universe.
+During this period, neutrinos suppress structure growth on small scales by
+free-streaming out of overdensities \cbib{Kiakotou}. As the Universe expands and cools down, neutrinos gradually behave like increasingly cold dark matter,
+which promotes structure growth.
+
 \begin{figure}[htb]
   \centering
   \includegraphics[scale=0.5]{intro/redshift_dependence_problem}
@@ -1212,42 +1229,22 @@ introduced in section~\ref{sec: ev_mapping_intro}.}
   \label{fig: neutrinos_and_redshift}
 \end{figure}
 
-(\cbib{Kiakotou}): ``Neutrinos with masses on the eV scale or below will be a
-hot component of the dark matter and will free-stream out of overdensities and
-thus wipe out small-scale structures.''
-
-``In general, a larger density of relativistic species leads to a smaller
-growth of matter fluctuations'' (\cbib{Zennaro}).
-
-The point of this section is: why is $\omega_\nu$ bad for the
-evolution mapping scheme? Because neutrinos exhibit redshift-dependent
-damping of the power-spectrum, and therefore affect both the shape and the
-amplitude of the power spectrum. Whenever massive neutrinos are present,
-the growth factor becomes scale-dependent, which disrupts the
-evolution-mapping scheme.
-
-Why do they behave in this way? All neutrinos start off as
-relativistic particles in the early Universe, acting as a type of radiation.
-But as the Universe continues to expand and cool, the neutrinos behave
-increasingly like dark matter. In this way, the physical density in neutrinos 
-impacts both the shape and the evolution.
-
-``The popular heuristic formula for the linear theory suppression of the 
-matter fluctuations by free-streaming $\nu$:
+Whenever massive neutrinos are present, the growth factor becomes scale-
+dependent, which disrupts the application of evolution mapping. There have
+been several proposals for isolating and approximating the impact of 
+neutrinos. For example, \citet{Kiakotou} includes a popular formula for
+linear-theory suppression of matter fluctuations:
 
 \begin{equation}
 \Delta P(k) / P(k) \approx -8 f_\nu
 \end{equation}
 
-is valid only on very small scales $k > 0.8 h$ / Mpc, However, it is not of
-practical use as this is in the strongly nonlinear regime of matter
-clustering'' (\cbib{Kiakotou}).
-
-One proposed solution is to treat the neutrinos as a small correction factor
-to the results from an anologous cosmology with the same $\omega_m$ but with
-$\omega_\nu = 0$. This of course limits the applicability of our emulator to
-cosmologies with very small $\omega_\nu$, but this constraint agrees with
-current observations (\textcolor{orange}{which?}).
+which is unfortunately valid only on very small scales $k > 0.8 h$ / Mpc.
+It has also been proposed to treat the neutrinos as a small correction factor
+to the results from an analogous cosmology with the same $\omega_m$ but with
+$\omega_\nu = 0$. This limits the applicability of our emulator to
+cosmologies with very small $\omega_\nu$, where we can treat the effect of
+neutrinos as a perturbation on our massless-neutrino spectra.
 
 %%% New stuff
 
