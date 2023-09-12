@@ -23,7 +23,8 @@ Galaxy clustering is another important probe, with similarly ambitious
 improvements over the years. The original Sloan Digital Sky Surveys (SDSS) I
 and II covered about one million galaxies in a redshift range of $0.07 < 0.2$
 and were completed over the periods 2000-2005 and 2005-2008, respectively.
-The Dark Energy Spectroscopic Instrument, which had its first light in 2019, is expected to complete its mission of 30 million targets in 2026
+The Dark Energy Spectroscopic Instrument, which had its first light in 2019, 
+is expected to complete its mission of 30 million targets in 2026
 \cbib{Finkbeiner}. \textcolor{orange}{Redshift range?}
 These probes allow us to describe the matter power spectrum
 with greater precision. The power spectrum is the amplitude of density
@@ -77,7 +78,8 @@ following sections, we will define in greater detail the terms used here.
 %s First: introduce equations until we can explain h and omega_i
 
 First, we will briefly introduce concrete
-examples of cosmological parameters in which we are interested. As mentioned earlier, the evolution of the Universe depends on its contents.
+examples of cosmological parameters in which we are interested. As mentioned 
+earlier, the evolution of the Universe depends on its contents.
 We can quantify these according to their densities. Let us denote with
 $\rho_i$ the Universe's energy density in some energy species. We list the 
 various energy species and their corresponding labels in
@@ -338,7 +340,8 @@ Although the cosmological principle appears to hold well on large scales,
 we know from our observations of structure that the Universe is not perfectly
 homogeneous. To characterize these inhomogeneities, we can imagine quantifying 
 the energy density $\rho(\bm{x})$ of the Universe at any one point $\bm{x}$ in 
-three-dimensional space. From this we can define a similar quantity, a relative density fluctuation:
+three-dimensional space. From this we can define a similar quantity, a 
+relative density fluctuation:
 
 \begin{equation}
 \delta(\bm{x}) = \frac{\rho(\bm{x}) - \bar{\rho}}{\bar{\rho}}
@@ -1104,26 +1107,32 @@ parameters, right? But why is that so? What is the math behind that?}
 \section{Sampling Approach: Latin Hypercube}
 \label{sec: lhc_theory}
 
-\textcolor{blue}{I should motivate
-why we're using this style of sampling.
-What is the theoretical best LHC that we could make?
-Besides, can we explain this equation?}
-
-The computational
-complexity of inference and likelihood evaluation within GPR is cubic
-in the number of points \textcolor{green}{citation?}.
+%%% It's just not relevant, we're only predicting later, and we've already
+%%% demonstrated that GPR is faster than Boltzmann.
+\begin{comment}
+The computational complexity of inference and likelihood evaluation within GPR 
+is cubic in the number of points \cbib{Barber}.
 This makes GP regression an excellent companion to
 Latin hypercube sampling (LHS), which makes highly efficient use of a limited 
 number of samples.
+\end{comment}
+%%%
 
-A unit LHS is primarily characterized by its dimension $d$ and number of 
+We will need to build several data sets in order to train and test our
+emulator. Now that we have decided on the parameters whose effects we would
+like to emulate, we need to sample these parameters in order to build
+individual cosmologies. We will use Latin hypercube sampling to sample 
+the space of cosmological configurations.
+
+A unit Latin hypercube sample (LHS) is primarily characterized by its 
+dimension $d$ and number of 
 samples $N_s$. $d$ separate intervals, all running from zero to unity, are
 each split into $N_s$ subintervals. Then, each subinterval is sampled
 exactly once. By contrast, simple random sampling (SRS) may sample any 
 particular subinterval any number of times, including not at all. SRS
 can require vast numbers of samples before all regions of the space are
-represented. For a pictorial representation of SRS versus LHS, see
-figure~\ref{fig: sample_comparison}.
+represented. For a pictorial representation of SRS versus Latin hypercube
+sampling, see figure~\ref{fig: sample_comparison}.
 
 % The following plots were generated with h_units_bad.ipynb
 \begin{figure}[htb]
@@ -1147,19 +1156,23 @@ figure~\ref{fig: sample_comparison}.
  		\label{fig: better_lhs}
     \end{subfigure}
     \centering
-    \caption[Comparison of random and LH sampling.]{Comparison of an example
+    \caption[Comparison of SRS and Latin hypercube sampling.]{Comparison of an 
+    example
     	random sample with two examples of LHSs. Unlike random sampling,
-    	LHS guarantees that every subinterval will be sampled. However, if
+    	Latin hypercube sampling guarantees that every subinterval will be 
+    	sampled. However, if
     	the minimum separation is low enough, there will still be large
     	undersampled regions.}
     \label{fig: sample_comparison}
 \end{figure}
 
-LHS does not always improve significantly over SRS. It is convenient to
-assess the quality of an LHS according to the minimum separation $s^*$ between 
-any two sample points in the LHS. A high $s^*$ indicates that the sample
-space is evenly covered. To visually appreciate the difference between
-LHSs of different $s^*$ values, see again figure~\ref{fig: sample_comparison}.
+Latin hypercube sampling does not always improve significantly over SRS. It is 
+convenient to
+assess the quality of an LHS according to the minimum separation $s^*$ 
+between any two sample points in the LHS. A high $s^*$ indicates that 
+the sample space is evenly covered. To visually appreciate the difference 
+between LHSs of different $s^*$ values, see again
+figure~\ref{fig: sample_comparison}.
 
 For each value of $d$ and $N_s$, there is a theoretical maximum value of
 $s^*$:
@@ -1170,11 +1183,16 @@ s^*_\text{best} = \left( \frac{1}{N_s} \right)^{1 / d}
 \end{equation}
 
 For example, for a six-parameter emulator trained over 5000 samples, the best
-possible LHS would have $s^* \approx 0.2418$.
+possible LHS sample would have $s^* \approx 0.2418$.
 \textcolor{orange}{Talk about how you got this equation?}
 
-% Add a sentence or two about converting a unit LHS into a set of cosmological
-% parameters (rescaling) and even non-linear sampling!
+Once we have a unit LHS, we can rescale each coordinate according to a 
+different parameter's prior to map the LHS into our parameter space. The
+choice of priors will be discussed in the conceptual outline of our
+emulator (see section~\ref{sec: default_priors}). Similarly,
+although the unit LHS entails linear sampling of the [0, 1] interval, it is 
+straightforward to transform these samples into a different distribution
+the interpretation stage (section~\ref{sec: lhc_flow_chart}).
 
 \section{Neutrinos and Their Cosmological Impact}
 \label{sec: neutrino_problem}
