@@ -484,7 +484,7 @@ illustrating these different dependencies.
 
 %s Now show a picture
 
-\begin{figure}[htb]
+\begin{figure}[h!]
   \centering
   \includegraphics[scale=1.0]{intro/m0_Pk}
   \caption[Aletheia Model 0 Power Spectrum]{This is power spectrum was
@@ -584,6 +584,33 @@ fiducial cosmologies anyway, and the use of $h^{-1}$ Mpc units is no longer
 advantageous. Nevertheless, they became convention and continue to be used 
 \cbib{San20}.
 
+% The following plots were generated with h_units_bad.ipynb
+\begin{figure}[h!]
+    \begin{subfigure}{0.45 \textwidth}
+    \centering
+ 		\includegraphics[width=\textwidth]{intro/h_impact_h_units}
+ 		\caption{Using $h$ units.}
+ 		\label{fig: h_units}
+    \end{subfigure}
+    \begin{subfigure}{0.45 \textwidth}
+    \centering
+ 		\includegraphics[width=\textwidth]{intro/h_impact_absolute_units}
+ 		\caption{Using absolute units.}
+ 		\label{fig: without_h_units}
+    \end{subfigure}
+        \centering
+    \caption[Impact of $h$ on $P(k)$]
+    		{Non-neutrino matter power spectra at $z=0$ for three different
+    		models based on model zero (refer to table~\ref{tab: Aletheia_m0} 
+    		for details) and varying only in the value of $h$. These two
+    		panels
+    		differ only in the units used. Observe that, in absolute units, we
+    		can easily identify the impact of $h$ as a simple change in
+    		amplitude. The use of $h$ units obscures this effect. This figure 
+    		is an imitation of figure 1 from \citet{San20}.}
+    \label{fig: h_unit_Pk}
+\end{figure}
+
 We illustrate in figure~\ref{fig: h_unit_Pk} one significant problem with the
 use of $h$ units: varying $h$ changes not only the power 
 spectrum, but also the axes used to represent the power spectrum. Comparison 
@@ -645,33 +672,6 @@ to simplify the parameter space. Although $\sigma_8$ behaves as an evolution
 parameter for a fixed $h$, a varying $h$ will cause the meaning of $\sigma_8$
 to change, and so we cannot rely on it to characterize the amplitude of the
 power spectrum.
-
-% The following plots were generated with h_units_bad.ipynb
-\begin{figure}[htb]
-    \begin{subfigure}{0.45 \textwidth}
-    \centering
- 		\includegraphics[width=\textwidth]{intro/h_impact_h_units}
- 		\caption{Using $h$ units.}
- 		\label{fig: h_units}
-    \end{subfigure}
-    \begin{subfigure}{0.45 \textwidth}
-    \centering
- 		\includegraphics[width=\textwidth]{intro/h_impact_absolute_units}
- 		\caption{Using absolute units.}
- 		\label{fig: without_h_units}
-    \end{subfigure}
-        \centering
-    \caption[Impact of $h$ on $P(k)$]
-    		{Non-neutrino matter power spectra at $z=0$ for three different
-    		models based on model zero (refer to table~\ref{tab: Aletheia_m0} 
-    		for details) and varying only in the value of $h$. These two
-    		panels
-    		differ only in the units used. Observe that, in absolute units, we
-    		can easily identify the impact of $h$ as a simple change in
-    		amplitude. The use of $h$ units obscures this effect. This figure 
-    		is an imitation of figure 1 from \citet{San20}.}
-    \label{fig: h_unit_Pk}
-\end{figure}
 
 
 \section{Boltzmann Solvers and CAMB}
@@ -781,7 +781,7 @@ amplitude shift associated with various $A_s$ values in figure~\ref{fig:
 A_s_dependence} and stress that the same plot only needs to be relabeled in 
 order to illustrate the impact of $\sigma_{12}$, $z$, $h$, etc. 
 
-\begin{figure}[htb]
+\begin{figure}[h!]
   \centering
   \includegraphics[scale=1.0]{intro/parameter_demos/ombh2_impact_on_Pk}
   \caption[Impact of $\omega_b$ on $P(k)$]{Impact of $\omega_b$. Increased
@@ -797,7 +797,7 @@ order to illustrate the impact of $\sigma_{12}$, $z$, $h$, etc.
   \label{fig: omega_b_dependence}
 \end{figure}
 
-\begin{figure}[htb]
+\begin{figure}[h!]
   \centering
   \includegraphics[scale=1.0]{intro/parameter_demos/omch2_impact_on_Pk}
   \caption[Impact of $\omega_c$ on $P(k)$]{Impact of $\omega_c$. Increased
@@ -819,7 +819,7 @@ order to illustrate the impact of $\sigma_{12}$, $z$, $h$, etc.
 % If the gravitational collapse story were really true, why wouldn't that
 % also apply to baryons? Maybe it's because b is so outnumbered by c
 
-\begin{figure}[htb]
+\begin{figure}[h!]
   \centering
   \includegraphics[scale=1.0]{intro/parameter_demos/n_s_impact_on_Pk}
   \caption[Impact of $n_s$ on $P(k)$]{Impact of $n_s$. The $n_s$ can be
@@ -829,7 +829,7 @@ order to illustrate the impact of $\sigma_{12}$, $z$, $h$, etc.
   \label{fig: n_s_dependence}
 \end{figure}
 
-\begin{figure}[htb]
+\begin{figure}[h!]
   \centering
   \includegraphics[scale=1.0]{intro/parameter_demos/A_s_impact_on_Pk}
   \caption[Impact of $A_s$ on $P(k)$]{Impact of $A_s$. Differences produce
@@ -843,7 +843,7 @@ order to illustrate the impact of $\sigma_{12}$, $z$, $h$, etc.
   \label{fig: A_s_dependence}
 \end{figure}
 
-\begin{figure}[htb]
+\begin{figure}[h!]
   \centering
   \includegraphics[scale=1.0]{intro/parameter_demos/omnuh2_impact_on_Pk}
   \caption[Impact of $\omega_\nu$ on $P(k)$]{Impact of $\omega_\nu$ for the
@@ -936,7 +936,7 @@ Figure~\ref{fig: ev_mapping_demo} shows the results of this technique applied
 to seven different cosmologies sharing shape parameters and differing only
 in evolution parameters.
 
-\begin{figure}[htb]
+\begin{figure}[h!]
   \centering
   \includegraphics[scale=1.0]{intro/san21f2}
   \cprotect\caption[Demonstration of evolution mapping]{Power spectra matched
@@ -1135,7 +1135,7 @@ represented. For a pictorial representation of SRS versus Latin hypercube
 sampling, see figure~\ref{fig: sample_comparison}.
 
 % The following plots were generated with h_units_bad.ipynb
-\begin{figure}[htb]
+\begin{figure}[h!]
     \begin{subfigure}{0.32 \textwidth}
     \centering
  		\includesvg[width=\textwidth]{intro/lhs/random}
@@ -1144,13 +1144,13 @@ sampling, see figure~\ref{fig: sample_comparison}.
     \end{subfigure}
     \begin{subfigure}{0.32 \textwidth}
     \centering
- 		\includesvg[width=\textwidth]{intro/lhs/bad_lhs}
+ 		\includesvg[width=\textwidth]{intro/lhs/bad_LHS}
  		\caption{An LHS with a low minimum separation between points.}
  		\label{fig: poor_lhs}
     \end{subfigure}
     \begin{subfigure}{0.32 \textwidth}
     \centering
- 		\includesvg[width=\textwidth]{intro/lhs/better_lhs}
+ 		\includesvg[width=\textwidth]{intro/lhs/better_LHS}
  		\caption{A different LHS with a higher minimum separation between
  			points.}
  		\label{fig: better_lhs}
@@ -1221,7 +1221,7 @@ During this period, neutrinos suppress structure growth on small scales by
 free-streaming out of overdensities \cbib{Kiakotou}. As the Universe expands and cools down, neutrinos gradually behave like increasingly cold dark matter,
 which promotes structure growth.
 
-\begin{figure}[htb]
+\begin{figure}[h!]
   \centering
   \includegraphics[scale=0.5]{intro/redshift_dependence_problem}
   \caption[Redshift Dependence of Neutrino Impact]{Blue is also not flat,
