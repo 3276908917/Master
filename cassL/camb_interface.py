@@ -13,6 +13,8 @@ import copy as cp
 import os
 data_prefix = os.path.dirname(os.path.abspath(__file__)) + "/"
 
+from cassL import utils
+
 try:
     # Keep in mind that 'cosmologies.dat' is NOT the same file as the original
     # 'cosmology_Aletheia.dat' that Ariel provided. In order to facilitate the
@@ -916,7 +918,7 @@ def model_ratios(snap_index, sims, canvas, massive=True, skips=[],
             this_p = correct_sims[i][snap_index][P_accessor]
 
         truncated_k, truncated_p, aligned_p = \
-            truncator(baseline_k, baseline_p, this_k,
+            utils.truncator(baseline_k, baseline_p, this_k,
                       this_p, interpolation=True)
 
         label_in = "model " + str(i)
@@ -1013,17 +1015,17 @@ def compare_wrappers(k_list, p_list, correct_sims, snap_index, canvas, massive,
             this_p_for = correct_sims[i][snap_index][P_accessor]
 
         truncated_k_py, truncated_p_py, aligned_p_py = \
-            truncator(baseline_k_py, baseline_p_py, this_k_py,
+            utils.truncator(baseline_k_py, baseline_p_py, this_k_py,
                       this_p_py, interpolation=this_h != baseline_h)
         y_py = aligned_p_py / truncated_p_py
 
         truncated_k_for, truncated_p_for, aligned_p_for = \
-            truncator(baseline_k_for, baseline_p_for, this_k_for,
+            utils.truncator(baseline_k_for, baseline_p_for, this_k_for,
                       this_p_for, interpolation=this_h != baseline_h)
         y_for = aligned_p_for / truncated_p_for
 
         truncated_k, truncated_y_py, aligned_p_for = \
-            truncator_neutral(truncated_k_py, y_py, truncated_k_for, y_for)
+            utils.truncator_neutral(truncated_k_py, y_py, truncated_k_for, y_for)
 
         label_in = "model " + str(i)
         plot_area.plot(truncated_k, truncated_y_py / aligned_p_for,
@@ -1048,37 +1050,3 @@ def compare_wrappers(k_list, p_list, correct_sims, snap_index, canvas, massive,
     plot_area.set_title(title)
     plot_area.legend()
 
-
-def truncator(base_x, base_y, obj_x, obj_y):
-    # This doesn't make the same assumptions as truncator
-    # But of course it's terrible form to leave both of these functions here.
-    """
-    Throw out base_x values until
-        min(base_x) >= min(obj_x) and max(base_x) <= max(obj_x)
-    then interpolate the object arrays over the truncated base_x domain.
-
-    Returns
-    -------
-        trunc_base_x: np.ndarray
-            truncated base_x array, which is now common to both y arrays
-        trunc_y: truncated base_y array
-        aligned_y: interpolation of obj_y over trunc_x
-    """
-    # What is the most conservative lower bound?
-    lcd_min = max(min(obj_x), min(base_x))
-    # What is the most conservative upper bound?
-    lcd_max = min(max(obj_x), max(base_x))
-
-    # Eliminate points outside the conservative bounds
-    mask_base = np.all([[base_x <= lcd_max], [base_x >= lcd_min]], axis=0)[0]
-    trunc_base_x = base_x[mask_base]
-    trunc_base_y = base_y[mask_base]
-
-    mask_obj = np.all([[obj_x <= lcd_max], [obj_x >= lcd_min]], axis=0)[0]
-    trunc_obj_x = obj_x[mask_obj]
-    trunc_obj_y = obj_y[mask_obj]
-
-    interpolator = interp1d(obj_x, obj_y, kind="cubic")
-    aligned_y = interpolator(trunc_base_x)
-
-    return trunc_base_x, trunc_base_y, aligned_y

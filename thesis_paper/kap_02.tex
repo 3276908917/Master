@@ -26,7 +26,7 @@ setting produce this undesired pattern?}
 \textcolor{blue}{You might think that this is sort of an inappropriate 
 section
 for a master's thesis (especially since I have in mind that this be a lengthy 
-section), but I would like to include it unless you feel very strongly. After 
+section), but I would like to include it unless you feel very strongly. After
 all, I spent several months of the project debugging at least ten different 
 ways that slight and major errors in the various settings led to 
 irreconcilable results.}
@@ -36,39 +36,38 @@ irreconcilable results.}
 just talking about the correct lines, don't talk about what happens when
 they're wrong.}
 
-%For example, one parameter that tripped me up for a while:
-The impact of some parameters can be quite subtle, especially (we imagine)
-for users unfamiliar with the nuances of neutrino physics.
-
-Consider the neutrino mass 
-hierarchy: the options are degenerate, normal, and inverted. The CAMB 
-documentation annotates this parameter as ``(1 or 2 eigenstate 
-approximation),'' but this is somewhat unclear. Is the degenerate hierarchy 
-the single mass eigenstate approximation? Do both normal and inverted 
-hierarchies involve two eigenstates? Besides, even if this description were
-literally accurate, why does use of the normal mass hierarchy lead to
-incorrect results?
-
-% C'mon, Ariel's GOT to let me have this plot. It's a big open question!
-
-%In figure \ref{fig: spectrum_type}, we can see that requesting of the wrong
-%power spectrum type can in some low-$\omega_\nu$ cases yields errors so low
-%that we might accidentally overlook them. This error pattern is easily
-%recognizable and is a consequence of the definition of the power spectrum: the
-%Fourier transform  of the two-point correlation function. ...Okay, I'm still thinking about this. I don't understand %yet, but I'll be sure to ask you if I'm still struggling about it.
-
-Another paragraph I want to have in this section: stress the part of the evolution mapping introduction, that the $\sigma_{12}$ value we're using to describe the model is actually the $\sigma_{12}$ value of the model's MEMNeC! This is so important and confusing that maybe I'll even recapitulate again later in the section on the generate\_emu\_data.script.
+%%% C'mon, Ariel's GOT to let me have this plot. It's a big open question!
+\begin{comment}
+In figure \ref{fig: spectrum_type}, we can see that requesting of the wrong
+power spectrum type can in some low-$\omega_\nu$ cases yields errors so low
+that we might accidentally overlook them. This error pattern is easily
+recognizable and is a consequence of the definition of the power spectrum: the
+Fourier transform  of the two-point correlation function. ...Okay, I'm still 
+thinking about this. I don't understand %yet, but I'll be sure to ask you if I
+%I'm still struggling about it.
+\end{comment}
+%%%
 
 %s Now discuss individual settings
 
-In principle, the accuracy boost should increase the variance in our models but should not affect the bias. The line is
+In the following lines, \verb|pars| describes a CAMB parameters object whose
+settings we modify until we have completely described the power spectrum that
+we want CAMB to calculate.
 
-\verb|pars.Accuracy.AccuracyBoost = 3|
+First of all, although CAMB also offers CMB spectra, we are interested in the
+matter power spectrum. Therefore, we disable CMB calculations with the 
+following lines:
 
-\textcolor{orange}{But what does it do? The CLASS citation may have some
-useful information!}
+\verb|pars.Want_CMB = False| (temperature and polarization spectra)
+
+\verb|pars.DoLensing = False| (calculates lensing of the CMB)
+
+Next, we need to specify that we want the \textit{linear} matter power 
+spectrum with:
 
 \verb|pars.NonLinear = camb.model.NonLinear_none|
+
+
 
 % Why is CAMB set up this way anyway? Why do I have to put in a model object 
 % instead of simply flipping a Boolean? {probably not a relevant question for
@@ -87,28 +86,39 @@ detective work.}
 talk about what they are, then say ``we are not interested in these, let's 
 save time by skipping the computation.''
 
-\verb|pars.Want_CMB = False|
 
-``Calculate the temperature and polarization power spectra.'' We're not 
-interested in these quantities; in order to apply computational resources more 
-efficiently, we should avoid these calculations and therefore set this to 
-\verb|False|.
-
-\verb|pars.DoLensing = False|
-
-``Include CMB lensing'' but \textcolor{red}{why don't we care about this? Does
-this not affect the power spectrum results in any way that we can appreciate
-within the confines of the MCMC experiment that we're testing here?}
 
 \verb|pars.YHe = 0.24|
+
+In principle, the accuracy boost should increase the variance in our models but should not affect the bias. The line is
+
+\verb|pars.Accuracy.AccuracyBoost = 3|
+
+\textcolor{orange}{But what does it do? The CLASS citation may have some
+useful information!}
 
 \verb|pars.Accuracy.lAccuracyBoost = 3|
 
 \verb|pars.Accuracy.AccuratePolarization = False|
 
-%s Small things
+%s Neutrino peculiarities
+
+%For example, one parameter that tripped me up for a while:
+The impact of some parameters can be quite subtle, especially (we imagine)
+for users unfamiliar with the nuances of neutrino physics.
+
+Consider the neutrino mass 
+hierarchy: the options are degenerate, normal, and inverted. The CAMB 
+documentation annotates this parameter as ``(1 or 2 eigenstate 
+approximation),'' but this is somewhat unclear. Is the degenerate hierarchy 
+the single mass eigenstate approximation? Do both normal and inverted 
+hierarchies involve two eigenstates? Besides, even if this description were
+literally accurate, why does use of the normal mass hierarchy lead to
+incorrect results?
 
 Beware the neutrino settings. The effective number of massive neutrinos is about 3.027
+
+%s k range
 
 \textcolor{orange}{We'll also want to justify why we're using k ranges out to
 such tiny scales. It's true that our surveys can't probe these scales, but
