@@ -165,11 +165,18 @@ $\tau$ describes the optical depth to the CMB.
 
 %s k range
 
-\verb|pars.Transfer.kmax = 10.0 if hubble_units else 10.0 / h| \quad the smallest scale at which we evaluate the transfer function.
+\verb|pars.Transfer.kmax = 10.0 if hubble_units else 10.0 / h| \quad the smallest scale at which we evaluate the power spectrum.
+\footnote{Technically, this is the smallest scale at which we evaluate the
+\textit{transfer} function, but for our purposes the distinction is
+unimportant. For an introduction to the transfer function, see \citet{FECS}.} 
 
-\textcolor{orange}{I haven't defined the transfer function yet...} CAMB
-expects \verb|kmax| in Hubble units, so we divide out the factor $h$ if the
-user wishes to use the recommended absolute units. \textcolor{orange}{We'll also want to justify why we're using k ranges out to
+CAMB expects \verb|kmax| in Hubble units, so we divide out the factor $h$ if 
+the user wishes to use the recommended absolute units.
+We note that our limit is extremely small. The smallest scale probed by
+currently available cosmological data is $k \approx 3$ Mpc$^{-1}$
+\cbib{Aghanim}.
+
+\textcolor{orange}{We'll also want to justify why we're using k ranges out to
 such tiny scales. It's true that our surveys can't probe these scales, but
 this work is purely computational. In its application, the high k values can
 always be disregarded.}
