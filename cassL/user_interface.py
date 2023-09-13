@@ -13,6 +13,16 @@ A_MEGA_MAX = np.exp(5) / 10 ** 10
 A_CLASSIC_MIN = np.exp(2.35) / 10 ** 10
 A_CLASSIC_MAX = np.exp(3.91) / 10 ** 10
 
+# These values help with the following function.
+# However, neither of these belongs here, we should find a different home.
+disregard_keys = ["OmB", "OmC", "OmM", "z(4)", "z(3)", "z(2)", "z(1)", "z(0)",
+    "Lbox", "sigma8", "Name", "nnu_massive", "EOmDE"]
+
+def print_cosmology(cosmology):
+    for key in cosmology.keys():
+        if key not in disregard_keys:
+            print(key, cosmology[key])
+
 def prior_file_to_dict(prior_name="COMET_with_nu"):
     """
     !

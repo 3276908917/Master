@@ -15,17 +15,6 @@ model0 = ci.cosm.loc[0]
 
 A_S_DEFAULT = 2.12723788013E-09
 
-# These values help with the following function.
-# However, neither of these belongs here, we should find a different home.
-disregard_keys = ["OmB", "OmC", "OmM", "z(4)", "z(3)", "z(2)", "z(1)", "z(0)",
-    "Lbox", "sigma8", "Name", "nnu_massive", "EOmDE"]
-
-def print_cosmology(cosmology):
-    for key in cosmology.keys():
-        if key not in disregard_keys:
-            print(key, cosmology[key])
-
-
 def build_cosmology(om_b_in, om_c_in, ns_in, sigma12_in, As_in, om_nu_in,
     param_ranges=None):
     # We should replace this function with a function that assumes, e.g.

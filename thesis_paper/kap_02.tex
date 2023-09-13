@@ -111,7 +111,10 @@ the \verb|CAMBparams| object \verb|pars|. The cosmology dictionary is
 intended to store cosmological parameters in a more user-friendly format.
 All cosmology dictionaries should follow the same structure in order to be 
 correctly interpreted by the various functions in Cassandra-Linear. The required keys are described in table~\ref{tab: cosmology_dictionary}; all
-values should be floating point numbers.
+values should be floating point numbers. The user is advised to print out
+cosmology dictionaries with the \verb|print_cosmology| function in the
+\verb|user_interface.py| script, which will automatically ignore unused keys
+and resolve extreme roundoff cases.
 
 % Address unused (OmL) and sometimes used (OmK) parameters
 % Remind the user that, to "leave values at default for cassL," he can
@@ -149,25 +152,28 @@ spectrum returned by \verb|evaluate_cosmology|. Instead, this field is used
 by the \verb|direct_eval_cell| and \verb|interpolate_cell| functions
 (section~\ref{sec: generate_emu_data}).}
 
+The \verb|input_cosmology| function implements the following additional
+settings universal to all of our power spectra:
+
  not and optical depths $\tau$ to the CMB 
 are not parameters of interest to us, and we keep these values fixed:
 \textcolor{orange}{What kinds of parameters are these in evolution mapping?
 Do they affect the power spectrum at all?}
 
-While \verb|tau=0.0952| is specified in the call to \verb|pars.set_cosmology|.
-
-Next: 
-
-\verb|pars.Transfer.kmax = 10.0 if hubble_units else 10.0 / h|
+\verb|tau=0.0952| \quad specified in the call to \verb|pars.set_cosmology|.
+$\tau$ describes the optical depth to the CMB.
 
 %s k range
 
-\textcolor{orange}{We'll also want to justify why we're using k ranges out to
+\verb|pars.Transfer.kmax = 10.0 if hubble_units else 10.0 / h| \quad the smallest scale at which we evaluate the transfer function.
+
+\textcolor{orange}{I haven't defined the transfer function yet...} CAMB
+expects \verb|kmax| in Hubble units, so we divide out the factor $h$ if the
+user wishes to use the recommended absolute units. \textcolor{orange}{We'll also want to justify why we're using k ranges out to
 such tiny scales. It's true that our surveys can't probe these scales, but
 this work is purely computational. In its application, the high k values can
 always be disregarded.}
 
-\
 
 \section{Dark Energy Settings}
 
