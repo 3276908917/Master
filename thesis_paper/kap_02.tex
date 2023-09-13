@@ -5,9 +5,6 @@ power spectra calculated by the Boltzmann solver CAMB. Although CAMB was
 written in Fortran-90, we will be exclusively accessing CAMB through its
 Python wrappers, as Cassandra-Linear is a Python package. In this chapter, we will explain our setup and introduce the reader to various CAMB settings.
 
-\section{Configuring CAMB for this Project}
-\label{sec: camb_config}
-
 \begin{comment}
 \textcolor{blue}{
 I hope to, in painstaking detail, cover many of the lines of the code that I
@@ -46,22 +43,26 @@ thinking about this. I don't understand %yet, but I'll be sure to ask you if I
 %s Now discuss individual settings
 
 To set up a power spectrum calculation, CAMB requires a
-\verb|CAMBparams| object which stores all of the settings from accuracy levels
-to cosmological parameter values. In the following lines, \verb|pars| 
-describes the \verb|CAMBparams| object that our code uses. First, we will
-include lines that are universal across runs, which is contained in the
-helper function \verb|apply_universal_output_settings| in the Cassandra-Linear
-script, \verb|camb_interface.py|.
+\verb|CAMBparams| object which stores all the settings from accuracy levels
+to cosmological parameter values. In the following sections, \verb|pars| 
+refers to the \verb|CAMBparams| object within our code.
 
-\
+\section{Universal Settings}
 
-First of all, although CAMB also offers CMB spectra, we are interested in the
-matter power spectrum. Therefore, we disable CMB calculations with the 
-following lines:
+First, we will motivate settings that are universal across runs. These are 
+mostly 
+contained in the helper function \verb|apply_universal_output_settings| in the 
+Cassandra-Linear script, \verb|camb_interface.py|.
+
+Although CAMB also offers CMB spectra, we are interested in the
+matter power spectrum. Therefore, \verb|apply_universal_output_settings|  
+first disables CMB calculations:
 
 \verb|pars.WantCls = False| \quad CMB transfer function
 
 \verb|pars.Want_CMB = False| \quad temperature and polarization spectra
+
+\verb|pars.Accuracy.AccuratePolarization = False|
 
 \verb|pars.DoLensing = False| \quad calculates lensing of the CMB
 
@@ -81,16 +82,32 @@ spectrum:
 
 \
 
-The helium mass fraction $Y_\text{He}$ and optical depths $\tau$ to the CMB 
-are not parameters of interest to us, and we keep these values fixed:
-\textcolor{orange}{What kinds of parameters are these in evolution mapping?
-Do they affect the power spectrum at all?}
+The helium mass fraction $Y_\text{He}$ is not a focus of this work and is left
+at the standard value:
 
-\verb|pars.YHe = 0.24|
-
-While \verb|tau=0.0952| is specified in the call to \verb|pars.set_cosmology|.
+\verb|pars.YHe = 0.24| \quad \cbib{Cooke}
 
 \
+
+Lastly, we set the accuracy with which CAMB should calculate power spectra.
+In principle, the accuracy boost should increase the variance in our models but not affect the bias. The line is
+
+\verb|pars.Accuracy.AccuracyBoost = 3| \quad requests more multipoles in the Boltzmann hierarchy. \textcolor{orange}{Whatever that is}
+
+\verb|pars.Accuracy.lAccuracyBoost = 3|
+
+The second line is explained in the CAMB documentation only as a ``general 
+accuracy setting effecting [\textit{sic}] everything related to step sizes 
+etc''. \textcolor{orange}{But what does it do? The CLASS citation may have 
+some useful information!}
+
+\
+
+Another helper function: specify neutrino mass
+
+Another helper function: input dark energy
+
+Next: 
 
 \verb|pars.Transfer.kmax = 10.0 if hubble_units else 10.0 / h|
 
@@ -102,6 +119,12 @@ this work is purely computational. In its application, the high k values can
 always be disregarded.}
 
 \
+
+\section{Dark Energy Settings}
+
+The \verb|input_dark_energy| function.
+
+\section{Neutrino Settings}
 
 %s Neutrino peculiarities
 
@@ -118,26 +141,39 @@ hierarchies involve two eigenstates? Besides, even if this description were
 literally accurate, why does use of the normal mass hierarchy lead to
 incorrect results?
 
+I think the weirdness is because we're always
+insisting that \verb|nnu_massive_in=1|. Therefore,
+if the hierarchy is not denerate, there will still
+be a mass distribution, which means that the 
+massive neutrino won't have all of the mass!
+
 Beware the neutrino settings. The effective number of massive neutrinos is about 3.027
-
-\
-
-In principle, the accuracy boost should increase the variance in our models but should not affect the bias. The line is
-
-\verb|pars.Accuracy.AccuracyBoost = 3|
-
-\textcolor{orange}{But what does it do? The CLASS citation may have some
-useful information!}
-
-\verb|pars.Accuracy.lAccuracyBoost = 3|
-
-\verb|pars.Accuracy.AccuratePolarization = False|
 
 \
 
 Other parameters not explicitly addressed here--including, of course, the
 cosmological parameters of primary interest to this paper--may be assumed to 
 have been left at default CAMB values.
+
+\
+
+ not and optical depths $\tau$ to the CMB 
+are not parameters of interest to us, and we keep these values fixed:
+\textcolor{orange}{What kinds of parameters are these in evolution mapping?
+Do they affect the power spectrum at all?}
+
+While \verb|tau=0.0952| is specified in the call to \verb|pars.set_cosmology|.
+
+%s MEMNeC manipulation functions
+
+The \verb|omnuh2_to_mnu| function. Similarly, the \verb|mnu_to_omnuh2|
+function. The \verb|balance_neutrinos_with_CDM| function.
+
+%s other important nu stuff
+
+The \verb|specify_neutrino_mass| function is \textit{not} a helper function!
+It is important that the user call this on the target cosmology before passing
+it to \verb|evaluate_cosmology|.
 
 \section{Convenience Functions}
 
@@ -161,21 +197,9 @@ particular model in the order which CAMB would prefer
 evolution mapping comparisons. % Maybe this should go in the previous
 % minisection
 	
-%s MEMNeC manipulation functions
 
-The \verb|omnuh2_to_mnu| function. Similarly, the \verb|mnu_to_omnuh2|
-function. The \verb|balance_neutrinos_with_CDM| function.
 
 %s Pipeline functions
-
-The \verb|apply_universal_output_settings| function modifies the \verb|pars|
-object according to the settings described in section~\ref{sec: camb_config}.
-
-The \verb|input_dark_energy| function.
-
-The \verb|specify_neutrino_mass| function is \textit{not} a helper function!
-It is important that the user call this on the target cosmology before passing
-it to \verb|evaluate_cosmology|.
 
 The \verb|get_CAMB_interpolator| function.
 

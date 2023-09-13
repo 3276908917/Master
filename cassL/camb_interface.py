@@ -586,16 +586,18 @@ def apply_universal_output_settings(pars):
 
     # The following lines are desperation settings
     # If we ever have extra time, we can more closely study what each line does
-    pars.NonLinear = camb.model.NonLinear_none
     pars.WantCls = False
-    pars.WantScalars = False
     pars.Want_CMB = False
-    pars.DoLensing = False
-    pars.YHe = 0.24
-    pars.Accuracy.AccuracyBoost = 3
-    pars.Accuracy.lAccuracyBoost = 3
     pars.Accuracy.AccuratePolarization = False
-
+    pars.DoLensing = False
+    pars.WantScalars = False
+    
+    pars.NonLinear = camb.model.NonLinear_none
+    
+    pars.YHe = 0.24
+    
+    pars.Accuracy.lAccuracyBoost = 3
+    pars.Accuracy.AccuracyBoost = 3
 
 def input_dark_energy(pars, w0, wa):
     """
