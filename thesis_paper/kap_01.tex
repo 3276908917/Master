@@ -375,13 +375,14 @@ the application of some fiducial model) between the observer and the galaxy.
 By combining this distance with the sky position (the two angles $\theta$ and
 $\phi$), we can locate each galaxy in three-dimensional space. Then, $\xi(r)$ 
 may be estimated via analysis of every pair of galaxies in our data. Simply
-put, within such a survey, $\xi(r)$\footnote{Technically, this is a statement
+put, within such a survey, $\xi(r)$ can be thought
+of as the excess probability, with respect to a homogeneous distribution, that 
+some galaxy will be located at a distance $r$ from any other
+galaxy.\footnote{Technically, this is a statement
 about $\xi_g(r)$, the two-point correlation function of galaxies. Although we
 are using galaxies to approximate the distribution of all matter, there will
 be some bias in our approach because galaxies (as extraordinarily dense 
-structures) represent peaks in the $\delta$ field.} can be thought
-of as the excess probability, with respect to a homogeneous distribution, that 
-some galaxy will be located at a distance $r$ from any other galaxy.
+structures) represent peaks in the $\delta$ field.}
 
 When dealing with density fluctuations, it is convenient to work in Fourier
 space. The two-point correlation
@@ -952,10 +953,12 @@ in evolution parameters.
   	inspired by figure 2 from \citet{San21}. Aletheia model 0 was related in
   	table~\ref{tab: Aletheia_m0}. For details on the rest of the Aletheia
   	models, please refer to the file
-  	\verb|cosmologies.dat|\footnote{\url{https://github.com/3276908917/Master/blob/main/cassL/cosmologies.dat}}
-  	in the Cassandra-Linear GitHub repository.}
+  	\verb|cosmologies.dat|\footnotemark
+  	\, in the Cassandra-Linear GitHub repository.}
   \label{fig: ev_mapping_demo}
 \end{figure}
+
+\footnotetext{\url{https://github.com/3276908917/Master/blob/main/cassL/cosmologies.dat}}
 
 %s Now conclude with the significance
 
