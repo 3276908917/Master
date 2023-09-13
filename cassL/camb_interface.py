@@ -47,6 +47,8 @@ styles = ["solid"] * 200
 # This regex expression powers the parse_redshifts function.
 redshift_column = re.compile("z.+")
 
+def default_cosmology():
+    return cp.deepcopy(cosm.iloc[0])
 
 def parse_redshifts(model_num):
     r"""
