@@ -34,7 +34,14 @@ def closest_index(array, target_value):
     
     error_list = abs(array - target_value)
     return error_list.index(min(error_list))
-    
+
+def normalize(array):
+    min_ = np.min(array)
+    max_ = np.max(array)
+    range_ = max_ - min_
+    shifted = array - min_
+    return shifted / range_
+
 def truncator(base_x, base_y, obj_x, obj_y):
     """
     Throw out base_x values until

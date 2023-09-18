@@ -8,6 +8,7 @@ import pickle
 from cassL import camb_interface as ci
 from cassL import generate_emu_data as ged
 from cassL import user_interface as ui
+from cassL import utils
 
 constructor_complaint = "emu objects require either two NumPy arrays " + \
     "(the data sets) or an emu file handle."
@@ -266,7 +267,7 @@ class Emulator_Trainer:
               sum(sum(self.sq_errors)))
 
     def set_scales(self, scales):
-        if len(scales) != len(self.Y_test[0]):
+        if len(scales) != self.emu.ydim:
             raise ValueError("The dimension of the given set of scales " + \
                 "does not match the dimension of the spectra!")
         
@@ -310,14 +311,16 @@ class Emulator_Trainer:
                 "represent the x coordinate.")
 
         k_index = None
-        # Issue a warning if we weren't able to find the exact k value.
-        if fixed_k not in self._scales:
-            k_index = ui.closest_index(self._scales, fixed_k)
-            raise UserWarning("No exact match was found for the given " + \
-                "fixed k (" + str(fixed_k) + "). Approximating to " + \
-                str(self._scales[k_index]))
-        else:
-            k_index = self._scales.index(fixed_k)
+
+        if fixed_k:
+            # Issue a warning if we weren't able to find the exact k value.
+            if fixed_k not in self._scales:
+                k_index = utils.closest_index(self._scales, fixed_k)
+                raise UserWarning("No exact match was found for the given " + \
+                    "fixed k (" + str(fixed_k) + "). Approximating to " + \
+                    str(self._scales[k_index]))
+            else:
+                k_index = self._scales.index(fixed_k)
 
         valid_indices = list(range(len(self.X_test[:, param_index])))
         if param_range is not None:
@@ -325,10 +328,10 @@ class Emulator_Trainer:
                 self.X_test[:, param_index] < param_range[1],
                 self.X_test[:, param_index] > param_range[0]))[0]
         valid_vals = self.X_test[:, param_index][valid_indices]
-        normalized_vals = normalize(valid_vals)
+        normalized_vals = utils.normalize(valid_vals)
 
         colors = plt.cm.plasma(normalized_vals)
-        
+ 
         valid_errors = self.deltas[valid_indices] if deltas \
             else self.rel_errors[valid_indices]
 
@@ -341,19 +344,28 @@ class Emulator_Trainer:
                     # loop is complete.
                     plt.scatter(self.valid_vals[i], valid_errors[i][k_index])
                 else:
-                    plt.plot(self._scales, valid_errors[i],
-                        color=colors[i], alpha=0.05)
+                    if param_index:
+                        plt.plot(self._scales, valid_errors[i],
+                            color=colors[i], alpha=0.05)
+                    else:
+                        plt.plot(self._scales, valid_errors[i], alpha=0.05)
                     plt.xscale('log')
 
-        plt.title(r"Emulator " + emu_vlabel + ", " + str(len(valid_errors)) + \
-                 r" Random Massive-$\nu$ Models" + "\ncolored by " + \
-                 param_label + " value")
+        title = "Emulator " + self.emu.name + ", " + \
+            str(len(valid_errors)) + r" Random Massive-$\nu$ Models"
+
+        if param_index:
+            title += "\ncolored by " + param_label + " value"
+
+        plt.title(title)
         plt.ylabel("% error between CAMB and CassL")
         plt.xlabel("scale $k$ [1 / Mpc]")
-        
-        norm = mpl.colors.Normalize(vmin=min(valid_vals), vmax=max(valid_vals))
-        plt.colorbar(mpl.cm.ScalarMappable(cmap=plt.cm.plasma, norm=norm))
-        
+
+        if param_index:
+            norm = mpl.colors.Normalize(vmin=min(valid_vals),
+                                        vmax=max(valid_vals))
+            plt.colorbar(mpl.cm.ScalarMappable(cmap=plt.cm.plasma, norm=norm))
+
         if save_label is not None:
             plt.savefig("../plots/emulator/performance/" + save_label + ".png")
 
