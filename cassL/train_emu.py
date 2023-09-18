@@ -278,7 +278,20 @@ class Emulator_Trainer:
             raise AttributeError("Errors have not been computed yet! Use " + \
                 " the function 'test'")
 
-    def error_curves(self, deltas=False, plot_every=1, param_index=None,
+    def get_errors(self, metric):
+        if metric == "deltas":
+            return self.deltas
+        elif metric == "relative":
+            return self.rel_errors
+        elif metric == "percent":
+            return 100 * self.rel_errors
+        elif metric == "sqerr":
+            return self.sq_errors
+
+        raise ValueError("Unknown error metric specified. Available " + \
+            "options are 'deltas', 'relative', 'percent', and 'sqerr'.")
+
+    def error_curves(self, metric="relative", plot_every=1, param_index=None,
         param_label=None, param_range=None, fixed_k=None, save_label=None):
         """
         If param_index is None, all error curves are plotted together and in
@@ -331,9 +344,10 @@ class Emulator_Trainer:
         normalized_vals = utils.normalize(valid_vals)
 
         colors = plt.cm.plasma(normalized_vals)
- 
-        valid_errors = self.deltas[valid_indices] if deltas \
-            else self.rel_errors[valid_indices]
+
+        errors = self.get_errors(metric)
+
+        valid_errors = errors[valid_indices]
 
         for i in range(len(valid_errors)):
             if i % plot_every == 0:
@@ -358,7 +372,8 @@ class Emulator_Trainer:
             title += "\ncolored by " + param_label + " value"
 
         plt.title(title)
-        plt.ylabel("% error between CAMB and CassL")
+
+        plt.ylabel(metric + " error between CAMB and CassL")
         plt.xlabel("scale $k$ [1 / Mpc]")
 
         if param_index:
@@ -371,7 +386,7 @@ class Emulator_Trainer:
 
         plt.show()
 
-    def error_statistics(self, deltas=False, error_aggregator=np.median):
+    def error_statistics(self, metric="relative", error_aggregator=np.median):
         """
         Maybe this function, like error_curve, should include a parameter range
         constraint parameter.
@@ -389,17 +404,17 @@ class Emulator_Trainer:
         """
         self.enforce_error_calculation()
         
-        errors = self.deltas if deltas else self.rel_errors
+        errors = self.get_errors(metric)
         error_array = error_aggregator(errors, axis=1)
         
-        print("The chosen error statistic...")
-        print("ranges from", np.min(meds), "to", np.max(meds))
+        print("The " + metric + " errors...")
+        print("range from", np.min(meds), "to", np.max(meds))
         print("median is", np.median(meds))
         print("mean is", np.mean(meds))
         print("st.dev. is", np.std(meds))
 
-    def error_hist(self, deltas=False, error_aggregator=np.median,
-                   title="Histogram of Median Relative Errors", bins=None):
+    def error_hist(self, metric="relative", error_aggregator=np.median,
+                   aggregator_description="Median", bins=None):
         """
         Maybe this function, like error_curve, should include a parameter range
         constraint parameter.
@@ -408,20 +423,19 @@ class Emulator_Trainer:
         """
         self.enforce_error_calculation()
         
-        errors = self.deltas if deltas else self.rel_errors
+        errors = self.get_errors(metric)
         error_array = error_aggregator(errors, axis=1)
 
         if bins == None:
             bins="sturges"
 
         plt.hist(error_array, bins=bins)
-        plt.title(title)
+        plt.title("Emulator " + self.emu.name + ": histogram of " + \
+                  aggregator_description + " " + metric + " errors")
         plt.ylabel("Frequency [counts]")
 
-        if deltas:
-            plt.xlabel("Delta between CAMB and Cassandra-L Power-spectrum")
-        else:
-            plt.xlabel("Relative error between CAMB and Cass-L P-spectrum")
+        plt.xlabel(aggregator_description + " " + metric + \
+                   " error between CAMB and Cassandra-L")
 
         plt.savefig("plots/err_hist_" + self.emu.name + ".png")
 
