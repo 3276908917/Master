@@ -164,13 +164,9 @@ by the \verb|direct_eval_cell| and \verb|interpolate_cell| functions
 The \verb|input_cosmology| function implements the following additional
 settings universal to all of our power spectra:
 
- not and optical depths $\tau$ to the CMB 
-are not parameters of interest to us, and we keep these values fixed:
-\textcolor{orange}{What kinds of parameters are these in evolution mapping?
-Do they affect the power spectrum at all?}
-
 \verb|tau=0.0952| \quad specified in the call to \verb|pars.set_cosmology|.
-$\tau$ describes the optical depth to the CMB.
+$\tau$ describes the optical depth to the CMB. \textcolor{orange}{What kinds of parameters are $Y_\text{He}$ and $\tau$ in evolution mapping?
+Do they affect the power spectrum at all?}
 
 %s k range
 
@@ -232,7 +228,26 @@ where $x_\nu$ is \textcolor{orange}{the mysterious ``neutrino mass fac''} and
 $N_\nu$ is the effective number of massive neutrino species. According to the
 Planck best fit, \textcolor{green}{this is 3.044}.
 
-To make this process easier, we have included the function
+%s Neutrino peculiarities
+The standard particle model specifies three flavors of neutrino. The neutrino
+\textit{mass hierarchy} describes the distribution of mass across these three
+flavors. CAMB supports three different mass hierarchies: ``degenerate''
+assigns the same mass to every flavor. ``Normal'' and ``inverted'' describe:
+\textcolor{green}{Use the hardcore neutrinos papers to continue this
+discussion}.
+
+For this demonstration project, we will use the simple setup of a single
+massive neutrino flavor. Consequently, the choice of hierarchy is important
+only in scaling the mass value we assign this flavor. For example, if we use
+the normal hierarchy with the same value of $\sum_i m_{\nu, i}$, then the
+power spectrum will look as though we had used the degenerate hierarchy with
+a smaller value of $\sum_i m_{\nu, i}$. In other words, it appears that the
+most massive neutrino flavor dominates the impact of massive neutrinos on the
+power spectrum.
+
+Recall from section~\ref{sec: neutrino_problem} that we will need to keep
+track of a MEMNeC for every massive-neutrino cosmology for which we wish to
+compute a power spectrum. To make this easier, we have included the function
 \verb|balance_neutrinos_with_CDM| which takes as parameters a cosmology
 dictionary and a value for $\omega_\nu$, \verb|new_omnuh2|. If
 \verb|new_omnuh2| is zero, the function returns the cosmology's MEMNeC.
@@ -245,7 +260,9 @@ It takes a cosmology dictionary, an $\omega_\nu$ value, and the number of
 massive neutrinos--not the effective number $N_\nu^\text{eff}$, but a simple 
 integer. It records these, as well as the corresponding
 $\sum_i m_{\nu, i}$ value, in a copy of the cosmology
-dictionary.
+dictionary. \verb|specify_neutrino_mass| is not a helper function 
+automatically called by others, but needs to be called whenever computing
+power spectra with CL.
 
 \textcolor{orange}{How can I justify using $N_\nu^\text{eff} = 3.046$ for the
 ``mnu'' conversion while I use $N_\nu^\text{massive} = 1$ for the call to
@@ -257,48 +274,6 @@ code in section~\ref{sec: CAMB_validation} are the Aletheia models,
 which do not specify a neutrino configuration. Furthermore, since we use 
 Aletheia model 0 as a set of default values for emulator training later on,
 this function will remain important.
-
-%s Neutrino peculiarities
-
-%For example, one parameter that tripped me up for a while:
-The impact of some parameters can be quite subtle, especially (we imagine)
-for users unfamiliar with the nuances of neutrino physics.
-
-Consider the neutrino mass 
-hierarchy: the options are degenerate, normal, and inverted. The CAMB 
-documentation annotates this parameter as ``(1 or 2 eigenstate 
-approximation),'' but this is somewhat unclear. Is the degenerate hierarchy 
-the single mass eigenstate approximation? Do both normal and inverted 
-hierarchies involve two eigenstates? Besides, even if this description were
-literally accurate, why does use of the normal mass hierarchy lead to
-incorrect results?
-
-I think the weirdness is because we're always
-insisting that \verb|nnu_massive_in=1|. Therefore,
-if the hierarchy is not denerate, there will still
-be a mass distribution, which means that the 
-massive neutrino won't have all of the mass!
-
-Beware the neutrino settings. The effective number of massive neutrinos is about 3.027
-
-\
-
-Other parameters not explicitly addressed here--including, of course, the
-cosmological parameters of primary interest to this paper--may be assumed to 
-have been left at default CAMB values.
-
-\
-
-%s MEMNeC manipulation functions
-
-The \verb|omnuh2_to_mnu| function. Similarly, the \verb|mnu_to_omnuh2|
-function. The \verb|balance_neutrinos_with_CDM| function.
-
-%s other important nu stuff
-
-The \verb|specify_neutrino_mass| function is \textit{not} a helper function!
-It is important that the user call this on the target cosmology before passing
-it to \verb|evaluate_cosmology|.
 
 \section{Convenience Functions}
 
