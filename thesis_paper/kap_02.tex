@@ -201,6 +201,63 @@ given by best fit values?}
 
 \section{Neutrino Settings}
 
+%s Setting omega_nu
+
+As mentioned in section~\ref{sec: param_glossary}, we are interested in the
+parameter $\omega_\nu$ and will need to vary it. CAMB does not seem to accept
+$\omega_\nu$ values directly, in what may be a bug. For example, setting
+\verb|pars.omnuh2| does not affect the return values of
+
+\verb|camb.get_results(pars).get_matter_power_spectrum|.
+
+However, it may simply be the case that the \verb|omnuh2| attribute is
+intended only as an output field. The \verb|pars.set_cosmology| function
+accepts \verb|mnu| (the sum of the masses of the different neutrino flavors,
+$\sum_i m_{\nu, i}$ \textcolor{orange}{in eV? Or what are the units??}),
+which then updates the value of \verb|pars.omnuh2|.
+In order to transform between the two, we have included in
+\verb|camb_interface.py| the two convenience functions
+\verb|omnuh2_to_mnu| and \verb|mnu_to_omnuh2|, which merely present the 
+internal logic of CAMB in an isolated and user-accessible way.
+
+\textcolor{orange}{Explain the equation being used here:}
+
+\begin{equation}
+\sum_i m_{\nu, i}
+=
+\omega_\nu \, x_\nu \, \left( \frac{3}{N_\nu^\text{eff}} \right)^{3/4}
+\end{equation},
+
+where $x_\nu$ is \textcolor{orange}{the mysterious ``neutrino mass fac''} and
+$N_\nu$ is the effective number of massive neutrino species. According to the
+Planck best fit, \textcolor{green}{this is 3.044}.
+
+To make this process easier, we have included the function
+\verb|balance_neutrinos_with_CDM| which takes as parameters a cosmology
+dictionary and a value for $\omega_\nu$, \verb|new_omnuh2|. If
+\verb|new_omnuh2| is zero, the function returns the cosmology's MEMNeC.
+If \verb|new_omnuh2| is nonzero and the cosmology has $\omega_\nu = 0$, 
+the function returns the MEMNeC's massive-neutrino counterpart.
+
+Lastly, we use the function \verb|specify_neutrino_mass| to add entries to
+a cosmology dictionary before requesting power spectra.
+It takes a cosmology dictionary, an $\omega_\nu$ value, and the number of
+massive neutrinos--not the effective number $N_\nu^\text{eff}$, but a simple 
+integer. It records these, as well as the corresponding
+$\sum_i m_{\nu, i}$ value, in a copy of the cosmology
+dictionary.
+
+\textcolor{orange}{How can I justify using $N_\nu^\text{eff} = 3.046$ for the
+``mnu'' conversion while I use $N_\nu^\text{massive} = 1$ for the call to
+``set\_cosmology''? The truth is that it doesn't really matter, right? since
+CAMB uses these as the default values anyway. But why do they do that?}
+
+This function is important because the cosmologies that we use to test our
+code in section~\ref{sec: CAMB_validation} are the Aletheia models,
+which do not specify a neutrino configuration. Furthermore, since we use 
+Aletheia model 0 as a set of default values for emulator training later on,
+this function will remain important.
+
 %s Neutrino peculiarities
 
 %For example, one parameter that tripped me up for a while:
@@ -278,6 +335,7 @@ The \verb|evaluate_cosmology| function.
 The \verb|cosmology_to_PK_interpolator| function.
 
 \section{Verifying Our Settings}
+\label{sec: CAMB_validation}
 
 %s Even more code
 

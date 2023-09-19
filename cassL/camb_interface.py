@@ -613,14 +613,14 @@ def input_dark_energy(pars, w0, wa):
         pars.set_dark_energy(w=w0, wa=wa, dark_energy_model='ppf')
 
 
-def specify_neutrino_mass(mlc, omnuh2_in, nnu_massive_in=1):
+def specify_neutrino_mass(cosmology, omnuh2_in, nnu_massive_in=1):
     """
     Helper function for input_cosmology.
     This returns modified copy (and therefore does not mutate the original) of
     the input dictionary object, which corresponds to a cosmology with massive
     neutrinos.
     """
-    full_cosmology = cp.deepcopy(mlc)
+    full_cosmology = cp.deepcopy(cosmology)
 
     full_cosmology["omnuh2"] = omnuh2_in
 
