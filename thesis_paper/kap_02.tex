@@ -188,7 +188,16 @@ currently available cosmological data is $k \approx 3$ Mpc$^{-1}$
 
 \section{Dark Energy Settings}
 
-The \verb|input_dark_energy| function.
+The \verb|input_dark_energy| function modifies the input \verb|pars| object
+according to the input DE EoS parameters, $w_a$ and $w_0$. For the standard
+Planck best-fit cosmology, $w_0 = -1$ and $w_a = 0$. For this special case,
+referred to as cosmological constant $\Lambda$, we use the two-
+fluid approximation. Wherever the EoS departs from this, we use instead the
+more flexible parametrized post-Friedmann (PPF) model.
+
+\textcolor{orange}{What is the difference between the ``fluid'' and ``PPF''
+models?? Can you show that these two models agree when $w_a$ and $W-0$ are
+given by best fit values?}
 
 \section{Neutrino Settings}
 
