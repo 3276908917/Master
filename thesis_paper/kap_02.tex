@@ -1,10 +1,14 @@
 \chapter{CAMB, Initial Setup}
 
-As mentioned in section~\ref{sec: boltzmann_intro}, this work will rely on
-power spectra calculated by the Boltzmann solver CAMB. Although CAMB was
+To reiterate, our first research goal is to investigate the impact of massive
+neutrinos on the power spectrum more closely. This will help us to understand
+how to incorporate $\omega_\nu$ into the evolution mapping framework.
+In this chapter, we will familiarize ourselves with our chosen Boltzmann 
+solver, CAMB, and introduce various important settings. Although CAMB was
 written in Fortran-90, we will be exclusively accessing CAMB through its
-Python wrappers, as Cassandra-Linear is a Python package. In this chapter, we will explain our setup and introduce the reader to various CAMB settings.
+Python wrappers, as Cassandra-Linear is a Python package. 
 
+%%%
 \begin{comment}
 \textcolor{blue}{
 I hope to, in painstaking detail, cover many of the lines of the code that I
@@ -23,6 +27,7 @@ all, I spent several months of the project debugging at least ten different
 ways that slight and major errors in the various settings led to 
 irreconcilable results.}
 \end{comment}
+%%%
 
 \textcolor{orange}{Ariel recommends
 just talking about the correct lines, don't talk about what happens when
@@ -101,7 +106,11 @@ accurate and equally fast.
 
 The second line is explained in the CAMB documentation only as a ``general 
 accuracy setting effecting [\textit{sic}] everything related to step sizes 
-etc.'' \citet{Lesgourges} compares CLASS and CAMB a \textcolor{orange}{But what, more specifically, does it do?}
+etc.'' \citet{Lesgourges} compares CLASS and CAMB at various values for this
+attribute and find that at 3, the code precision already reaches the 0.1\% 
+level. \textcolor{orange}{But what, more specifically, does it do? And it may
+be a good idea to test the emulator with a much better precision: the value of
+12 is the largest meaningful value in the Lesgourges paper.}
 
 \
 
