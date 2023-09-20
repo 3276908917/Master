@@ -223,7 +223,7 @@ internal logic of CAMB in an isolated and user-accessible way.
 \sum_i m_{\nu, i}
 =
 \omega_\nu \, x_\nu \, \left( \frac{3}{N_\nu^\text{eff}} \right)^{3/4}
-\end{equation},
+,\end{equation}
 
 where $x_\nu$ is \textcolor{orange}{the mysterious ``neutrino mass fac''} and
 $N_\nu$ is the effective number of massive neutrino species. According to the
@@ -349,11 +349,47 @@ spectrum of cold matter with itself.
 \section{Verifying Our Settings}
 \label{sec: CAMB_validation}
 
+In order to confirm that our power spectra are viable for emulator training,
+we need to ensure they are at least accurate at the level of error on CAMB
+itself. We test the various \verb|camb_interface.py| functions described in
+this chapter against two other CAMB implementations: one from Andrea Pezzotta,
+using a different interpolator setup, and the other from Ariel G. S\'{a}nchez,
+accessing the native Fortran without any wrapper. The CL function
+\verb|load_benchmark| function exists only to store S\'{a}nchez's results in
+memory.
+
+We compare the power spectra produced by our CAMB calls for the four
+approximate
+$\omega_\nu$ values $6.356 \cdot 10^{-4}$, $2.149 \cdot 10^{-3}$,
+$6.356 \cdot 10^{-3}$, and $1 \cdot 10^{-2}$.\footnote{These values are
+accessible through the CL global array \verb|OMNUH2_FLOATS|. 
+For each $\omega_nu$, we test each of the first seven Aletheia cosmologies for 
+a total of 28 models.
+
 %s Even more code
 
-The \verb|load_benchmark| function.
+To call CAMB on Aletheia models in a convenient and structured way, we have
+introduced two additional \verb|camb_interface.py| functions:
+\verb|parse_redshifts| function returns the array of redshift values $z_i$
+associated with each Aletheia model, where $i$ is the column of the file
+\verb|cosmologies.dat| (included with CL). These $z_i$ are defined such that
 
-The \verb|parse_redshifts| function returns the redshifts associated with a
+\begin{equation}
+\sigma_{12}(\text{model a}, z_{i, \text{model a}})
+=
+\sigma_{12}(\text{model b}, z_{i, \text{model b}})
+,\end{equation}
+
+Since the Aletheia models share values for the shape parameters, the
+evolution mapping relation gives:
+
+\begin{equation}
+P_L(k, \text{model a}, z_{i, \, \text{model a}})
+=
+P_L(k, \text{model b}, z_{i, \, \text{model b}})
+,\end{equation}
+
+ athe redshifts associated with a
 particular model in the order which CAMB would prefer
 
 * CAMB prefers newest last
@@ -361,18 +397,17 @@ particular model in the order which CAMB would prefer
 evolution mapping comparisons. % Maybe this should go in the previous
 % minisection
 
-The \verb|boltzmann_battery| function.
+The errors are miniscule and recorded in figure XXY. 
 
-%! This is weird, and perhaps inappropriate for a thesis document.
-
-To test this setup, we compare our results with those of Ariel S\'{a}nchez 
-(within the native Fortran framework of CAMB) and Andrea Pezzotta for the
-first seven Aletheia cosmologies and four $\omega_\nu$ physical densities in
-neutrinos (\textcolor{green}{approximately} 0, 0.0006, 0.002, 0.006.), for a 
-total of 28
-models. The errors are miniscule and recorded in figure XXY. After verifying
+After verifying
 the accuracy of our code in this way, we proceed to experiment with the power
 spectra in order to explore solutions to the evolution mapping problem.
 
-% Aletheia Model 8 has not been integrated into our code suite yet. We can’t handle its DE weirdness. Instead of bringing up and then discarding model 8, we shouldn’t mention it at all.
+The \verb|boltzmann_battery| function.
+
+
+
+% Aletheia Model 8 has not been integrated into our code suite yet. We can’t 
+% handle its DE weirdness. Instead of bringing up and then discarding model 8, 
+% we shouldn’t mention it at all.
 
