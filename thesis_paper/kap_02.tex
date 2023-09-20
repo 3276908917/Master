@@ -404,9 +404,12 @@ some time, the user is encouraged to skip any uninteresting indices--
 \verb|skips_omega| for $\omega_\nu$ values, \verb|skips_model| for
 Aletheia models, and \verb|skips_snapshots| for snapshots. The snapshot index
 is equivalent to a backwards-running redshift index, so the last snapshot
-corresponds to a redshift of zero.
+corresponds to a redshift of zero. The \verb|skips_model| array should always
+include 8, as that model cannot be processed in the latest (as of October 2,
+2023) version of CL.
 
-The errors are miniscule and recorded in figure XXY. 
+Since S\'{a}nchez's power spectra were evaluated at 1000 points, we call
+\verb|boltzmann_battery| with \verb|k_points=1000|. The errors are miniscule and recorded in figure XXY. 
 
 Now that we have verified the accuracy of our code, we are ready to
 experiment with the power spectra in order to explore ways to integrate
@@ -415,4 +418,7 @@ massive neutrinos into our evolution mapping framework.
 % Aletheia Model 8 has not been integrated into our code suite yet. We can’t 
 % handle its DE weirdness. Instead of bringing up and then discarding model 8, 
 % we shouldn’t mention it at all.
+
+% The plot should consist of an error swarm, one against Ariel, one against
+% Andrea.
 

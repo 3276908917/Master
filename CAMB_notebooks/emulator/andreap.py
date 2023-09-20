@@ -19,7 +19,7 @@ def cassL_to_andrea_cosmology(cosm, hybrid=False, foreign=None):
         "interpolator_CAMB_agreement" notebook) vanishes.
     """
     from cassL import generate_emu_data as ged
-    ged.print_cosmology(cosm)
+    # ui.print_cosmology(cosm)
     
     ombh2 = cosm['ombh2']
     omch2 = cosm['omch2']
