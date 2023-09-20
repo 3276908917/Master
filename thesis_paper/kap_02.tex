@@ -359,14 +359,12 @@ accessing the native Fortran without any wrapper. The CL function
 memory.
 
 We compare the power spectra produced by our CAMB calls for the four
-approximate
-$\omega_\nu$ values $6.356 \cdot 10^{-4}$, $2.149 \cdot 10^{-3}$,
-$6.356 \cdot 10^{-3}$, and $1 \cdot 10^{-2}$.\footnote{These values are
-accessible through the CL global array \verb|OMNUH2_FLOATS|. 
-For each $\omega_nu$, we test each of the first seven Aletheia cosmologies for 
+approximate $\omega_\nu$ values\footnote{These values are
+accessible through the CL global array \verb|OMNUH2_FLOATS|.}
+$6.356 \cdot 10^{-4}$, $2.149 \cdot 10^{-3}$,
+$6.356 \cdot 10^{-3}$, and $1 \cdot 10^{-2}$. For each
+$\omega_\nu$, we test each of the first seven Aletheia cosmologies for 
 a total of 28 models.
-
-%s Even more code
 
 To call CAMB on Aletheia models in a convenient and structured way, we have
 introduced two additional \verb|camb_interface.py| functions:
@@ -389,23 +387,30 @@ P_L(k, \text{model a}, z_{i, \, \text{model a}})
 P_L(k, \text{model b}, z_{i, \, \text{model b}})
 ,\end{equation}
 
- athe redshifts associated with a
-particular model in the order which CAMB would prefer
+Therefore, a first sanity check for any code accessing CAMB is to reproduce
+figure~\ref{fig: ev_mapping_demo} using the $z_i$ to control for $\sigma_{12}$
+across the different Aletheia models. The function \verb|parse_redshifts|
+returns the $z_i$ for a particular model in descending order--i.e. oldest
+to newest. This is not only the order within \verb|cosmologies.dat|--CAMB
+will automatically sort input redshift arrays to this order, so to avoid
+confusion we keep redshift arrays in this order from the start.
 
-* CAMB prefers newest last
-* The \verb|cosmologies.dat| file has some $z$ columns which allow for easy
-evolution mapping comparisons. % Maybe this should go in the previous
-% minisection
+CL's \verb|boltzmann_battery| function creates a battery of CAMB power
+spectra according to the same
+format\footnote{Refer to the docstring for a detailed breakdown of this
+format.} in which S\'{a}nchez's results are
+returned by \verb|load_benchmark|. Since the evaluation of 28 models can take
+some time, the user is encouraged to skip any uninteresting indices--
+\verb|skips_omega| for $\omega_\nu$ values, \verb|skips_model| for
+Aletheia models, and \verb|skips_snapshots| for snapshots. The snapshot index
+is equivalent to a backwards-running redshift index, so the last snapshot
+corresponds to a redshift of zero.
 
 The errors are miniscule and recorded in figure XXY. 
 
-After verifying
-the accuracy of our code in this way, we proceed to experiment with the power
-spectra in order to explore solutions to the evolution mapping problem.
-
-The \verb|boltzmann_battery| function.
-
-
+Now that we have verified the accuracy of our code, we are ready to
+experiment with the power spectra in order to explore ways to integrate
+massive neutrinos into our evolution mapping framework.
 
 % Aletheia Model 8 has not been integrated into our code suite yet. We can’t 
 % handle its DE weirdness. Instead of bringing up and then discarding model 8, 
