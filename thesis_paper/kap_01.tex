@@ -67,7 +67,8 @@ we need to train.
 In summary, the goal of this work is to extend the applicability of
 evolution-mapping emulators to cosmologies with massive neutrinos by
 including a parameter otherwise behaving as a degenerate parameter. We
-will describe in depth a new code, Cassandra-Linear, that we have developed
+will describe in depth a new code, Cassandra-Linear (CL), that we have 
+developed
 in order to demonstrate this principle and to provide a user-friendly
 interface for power spectra emulation. In the
 following sections, we will define in greater detail the terms used here.
@@ -729,7 +730,7 @@ speedup tricks) and user interfaces and customization options
 
 As the researchers in our group have much more experience with CAMB, we 
 elected to use CAMB as a starting point for our Python package
-Cassandra-Linear. In principal, to maximize the generality of 
+CL. In principal, to maximize the generality of 
 the results introduced in this 
 work, we would demonstrate their compatibility with at least CLASS as well. In 
 practice, since these codes agree so well, we prioritize other lines of 
@@ -954,7 +955,7 @@ in evolution parameters.
   	table~\ref{tab: Aletheia_m0}. For details on the rest of the Aletheia
   	models, please refer to the file
   	\verb|cosmologies.dat|\footnotemark
-  	\, in the Cassandra-Linear GitHub repository.}
+  	\, in the CL GitHub repository.}
   \label{fig: ev_mapping_demo}
 \end{figure}
 
@@ -1098,7 +1099,7 @@ By contrast, as we explain in section~\ref{sec: train_emu}, a Gaussian
 process regression is highly straightforward to set up and modify.
 
 Furthermore, NNs generally need much larger sample sizes to reach comparable 
-levels of accuracy. Due to various alterations in the Cassandra-Linear code 
+levels of accuracy. Due to various alterations in the CL code 
 over its development, several regenerations of the various emulator data sets 
 were necessary. This practical constraint motivated the use of a GP for our
 emulator. Please refer to the section~\ref{sec: future_work} for a

@@ -6,7 +6,7 @@ how to incorporate $\omega_\nu$ into the evolution mapping framework.
 In this chapter, we will familiarize ourselves with our chosen Boltzmann 
 solver, CAMB, and introduce various important settings. Although CAMB was
 written in Fortran-90, we will be exclusively accessing CAMB through its
-Python wrappers, as Cassandra-Linear is a Python package. 
+Python wrappers, as CL is a Python package. 
 
 %%%
 \begin{comment}
@@ -57,7 +57,7 @@ refers to the \verb|CAMBparams| object within our code.
 First, we will motivate settings that are universal across runs. These are 
 mostly 
 contained in the helper function \verb|apply_universal_output_settings| in the 
-Cassandra-Linear script, \verb|camb_interface.py|.
+CL script \verb|camb_interface.py|.
 
 Although CAMB also offers CMB spectra, we are interested in the
 matter power spectrum. Therefore, \verb|apply_universal_output_settings|  
@@ -119,7 +119,7 @@ A few additional universal settings are handled in the function
 the \verb|CAMBparams| object \verb|pars|. The cosmology dictionary is
 intended to store cosmological parameters in a more user-friendly format.
 All cosmology dictionaries should follow the same structure in order to be 
-correctly interpreted by the various functions in Cassandra-Linear. The required keys are described in table~\ref{tab: cosmology_dictionary}; all
+correctly interpreted by the various functions in CL. The required keys are described in table~\ref{tab: cosmology_dictionary}; all
 values should be floating point numbers. The user is advised to print out
 cosmology dictionaries with the \verb|print_cosmology| function in the
 \verb|user_interface.py| script, which will automatically ignore unused keys
@@ -279,33 +279,40 @@ this function will remain important.
 
 % camb\_interface.py
 
-\textcolor{blue}{The purpose of this section is to anticipate the Python
-package Cassandra-Linear. The settings we describe in the previous section
-still technically correspond to lines of code of course, but here we tie these
-individually-treated lines into bigger functions that users can quickly use to
-get results from CAMB!}
+The helper functions of the previous chapters, as well as some additional
+manipulations of \verb|pars|, are bundled together in several larger
+functions which are designed to be used in the emulator pipeline. These
+functions return power spectra given an input cosmology dictionary and
+therefore represent a great starting point for beginners experimenting with
+the CL code.
 
-%s Explain cosmologies.dat file
+CL offers two basic approaches to evaluating a power spectrum given an input
+cosmology dictionary. The \textit{direct evaluation} approach uses CAMB's 
+\verb|get_matter_power_spectrum| function, which evaluates a cosmology only
+for an array of explicit $z$ values. This approach is used by the top-level
+function \verb|evaluate_cosmology| function, which takes as inputs a 
+cosmology dictionary, an array of redshifts, the desired resolution of the
+power spectrum, and whether the spectrum should be returned in Hubble
+units.\footnote{The user is encouraged to disregard the
+\verb|fancy_neutrinos| flag, as it relates
+to an investigation into CAMB's handling of various neutrino properties.}
+Remember that the use of Hubble units affects both the $x$- and
+$y$-axes (compare again figures~\ref{fig: h_units}
+and~\ref{fig: without_h_units}.). The resolution is specified according to
+\verb|k_points|, the number of points at which to evaluate
+the power spectrum. CAMB applies this value by sampling the scale range at
+\verb|k_points| logarithmically spaced points.
 
-%s Explain our accessing of it
+%s The crown jewel
 
-The \verb|parse_redshifts| function returns the redshifts associated with a
-particular model in the order which CAMB would prefer
+\verb|get_CAMB_pspectrum|
+\verb|input_cosmology|
 
-* CAMB prefers newest last
-* The \verb|cosmologies.dat| file has some $z$ columns which allow for easy
-evolution mapping comparisons. % Maybe this should go in the previous
-% minisection
-	
+
 %s Pipeline functions
 
 The \verb|get_CAMB_interpolator| function.
 
-%s The crown jewels
-
-The \verb|boltzmann_battery| function.
-
-The \verb|evaluate_cosmology| function.
 
 The \verb|cosmology_to_PK_interpolator| function.
 
@@ -315,6 +322,16 @@ The \verb|cosmology_to_PK_interpolator| function.
 %s Even more code
 
 The \verb|load_benchmark| function.
+
+The \verb|parse_redshifts| function returns the redshifts associated with a
+particular model in the order which CAMB would prefer
+
+* CAMB prefers newest last
+* The \verb|cosmologies.dat| file has some $z$ columns which allow for easy
+evolution mapping comparisons. % Maybe this should go in the previous
+% minisection
+
+The \verb|boltzmann_battery| function.
 
 %! This is weird, and perhaps inappropriate for a thesis document.
 
