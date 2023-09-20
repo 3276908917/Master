@@ -600,6 +600,9 @@ def apply_universal_output_settings(pars):
     
     pars.Accuracy.lAccuracyBoost = 3
     pars.Accuracy.AccuracyBoost = 3
+    
+    # Transfer.kmax describes an absolute k
+    pars.Transfer.kmax = 10.0
 
 def input_dark_energy(pars, w0, wa):
     """
@@ -683,8 +686,6 @@ def input_cosmology(cosmology, hubble_units=False):
     #print(cosmology["A_s"], cosmology["mnu"])
 
     input_dark_energy(pars, cosmology["w0"], float(cosmology["wa"]))
-
-    pars.Transfer.kmax = 10.0 if hubble_units else 10.0 / h
 
     return pars
 
@@ -777,6 +778,11 @@ def get_CAMB_interpolator(pars, redshifts=[0], kmax=1, hubble_units=False):
     """
     Helper function for cosmology_to_PK_interpolator.
     Given a fully set-up pars function, return a CAMB PK interpolator object.
+    
+    The input array @redshifts describes the space over which to build the
+    interpolator. For more accuracy, more redshifts should be used. Keep in
+    mind that CAMB only allows nz_step as large as 150, so the @redshifts
+    array should not exceed 150 in length!
     """
     # To change the the extent of the k-axis, change the following line as well
     # as the "get_matter_power_spectrum" call.
@@ -798,6 +804,11 @@ def cosmology_to_PK_interpolator(cosmology, redshifts=[0],
     fancy_neutrinos=False, kmax=1, hubble_units=False):
     """
     This is a really rough function, I'm just trying to test out an idea.
+    
+    The input array @redshifts describes the space over which to build the
+    interpolator. For more accuracy, more redshifts should be used. Keep in
+    mind that CAMB only allows nz_step as large as 150, so the @redshifts
+    array should not exceed 150 in length!
     """
     assert isinstance(redshifts, list) or isinstance(redshifts, np.ndarray), \
         "If you want to use a single redshift, you must still nest it in" + \

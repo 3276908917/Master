@@ -94,6 +94,20 @@ at the standard value:
 
 \
 
+%s k range
+
+\verb|pars.Transfer.kmax = 10.0| \quad in absolute units,
+the smallest scale at which we evaluate the power spectrum.
+\footnote{Technically, this is the smallest scale at which we evaluate the
+\textit{transfer} function, but for our purposes the distinction is
+unimportant. For an introduction to the transfer function, see \citet{FECS}.} 
+
+We note that our limit is extremely small. The smallest scale probed by
+currently available cosmological data is $k \approx 3$ Mpc$^{-1}$
+\cbib{Aghanim}. We use this limit with potential future surveys in mind.
+
+\
+
 Last, we set the accuracy with which CAMB should calculate power spectra.
 Although higher accuracies should require greater computation time, we only
 need to generate one training set in order to produce an emulator. Therefore,
@@ -114,7 +128,7 @@ be a good idea to test the emulator with a much better precision: the value of
 
 \
 
-A few additional universal settings are handled in the function
+One additional universal setting is handled in the function
 \verb|input_cosmology|, which translates a cosmology dictionary into 
 the \verb|CAMBparams| object \verb|pars|. The cosmology dictionary is
 intended to store cosmological parameters in a more user-friendly format.
@@ -167,19 +181,6 @@ settings universal to all of our power spectra:
 \verb|tau=0.0952| \quad specified in the call to \verb|pars.set_cosmology|.
 $\tau$ describes the optical depth to the CMB. \textcolor{orange}{What kinds of parameters are $Y_\text{He}$ and $\tau$ in evolution mapping?
 Do they affect the power spectrum at all?}
-
-%s k range
-
-\verb|pars.Transfer.kmax = 10.0 if hubble_units else 10.0 / h| \quad the smallest scale at which we evaluate the power spectrum.
-\footnote{Technically, this is the smallest scale at which we evaluate the
-\textit{transfer} function, but for our purposes the distinction is
-unimportant. For an introduction to the transfer function, see \citet{FECS}.} 
-
-CAMB expects \verb|kmax| in Hubble units, so we divide out the factor $h$ if 
-the user wishes to use the recommended absolute units.
-We note that our limit is extremely small. The smallest scale probed by
-currently available cosmological data is $k \approx 3$ Mpc$^{-1}$
-\cbib{Aghanim}. We use this limit with potential future surveys in mind.
 
 
 \section{Dark Energy Settings}
@@ -286,15 +287,15 @@ functions return power spectra given an input cosmology dictionary and
 therefore represent a great starting point for beginners experimenting with
 the CL code.
 
-CL offers two basic approaches to evaluating a power spectrum given an input
+CL offers two main approaches to evaluating a power spectrum given an input
 cosmology dictionary. The \textit{direct evaluation} approach uses CAMB's 
-\verb|get_matter_power_spectrum| function, which evaluates a cosmology only
-for an array of explicit $z$ values. This approach is used by the top-level
-function \verb|evaluate_cosmology| function, which takes as inputs a 
+\verb|get_matter_power_spectrum| function, which evaluates a cosmology over
+an array of explicit $z$ values. This approach is used by the top-level
+function \verb|evaluate_cosmology|, which takes as inputs a 
 cosmology dictionary, an array of redshifts, the desired resolution of the
-power spectrum, and whether the spectrum should be returned in Hubble
+power spectrum, and whether to use Hubble
 units.\footnote{The user is encouraged to disregard the
-\verb|fancy_neutrinos| flag, as it relates
+\verb|fancy_neutrinos| flag for this function, as it relates
 to an investigation into CAMB's handling of various neutrino properties.}
 Remember that the use of Hubble units affects both the $x$- and
 $y$-axes (compare again figures~\ref{fig: h_units}
@@ -303,18 +304,47 @@ and~\ref{fig: without_h_units}.). The resolution is specified according to
 the power spectrum. CAMB applies this value by sampling the scale range at
 \verb|k_points| logarithmically spaced points.
 
-%s The crown jewel
+The \verb|get_CAMB_pspectrum| 
+function is a helper for this approach and is not likely to be otherwise 
+needed by a typical user. For users interested in
+developing their own interfaces with CAMB, we mention two further
+settings in the call to \verb|get_matter_power_spectrum| which are not
+modifiable through CL functions:
 
-\verb|get_CAMB_pspectrum|
-\verb|input_cosmology|
+\verb|minkh=1e-4 / pars.h| and \verb|maxkh=10.0 / pars.h|
+\quad sets the desired
+range of inverse scales to $10^{-4} \leq k$ Mpc $\leq 10$. These values were
+selected to fully encompass the various probes of the power spectrum without
+extending the range too far into unexplored regions \cbib{Aghanim}. 
 
+\verb|var1='delta_nonu'| and \verb|var2='delta_nonu'| requests the power
+spectrum of cold matter with itself.
 
-%s Pipeline functions
+The second main approach is to use a 2D spline interpolation object returned
+by CAMB's \verb|get_matter_power_interpolator|. The user gives a
+range of $z$ and $k$ values over which to interpolate and then may request
+the power spectrum at any $(z, k)$ location within this space from the
+interpolator. This approach is handled by the CL function
+\verb|cosmology_to_PK_interpolator|, which accepts a cosmology dictionary,
+a set of redshifts, a maximum $k$ value, and whether to use Hubble units.
+The function accepts redshifts stored in an array in order to maximize
+compatibility with \verb|evaluate_cosmology|, although the meaning is slightly
+different here: since the number of $z$ values in the array determines the
+resolution of the interpolator, the user desiring maximum accuracy is
+encouraged to input 150 redshift values, which is the maximum allowed by CAMB.
 
-The \verb|get_CAMB_interpolator| function.
+\verb|get_CAMB_interpolator| function is a helper for this approach and is not 
+likely to be otherwise needed by a typical user. For users interested in
+developing their own interfaces with CAMB, we mention two further
+settings in the call to \verb|get_matter_power_interpolator| which are not
+modifiable through CL functions:
 
+\verb|nonlinear=False| (\textcolor{orange}{Why are we specifying the linear
+power spectrum in two cases?)} \quad requests linear power spectrum.
 
-The \verb|cosmology_to_PK_interpolator| function.
+\verb|var1='delta_nonu'| and \verb|var2='delta_nonu'| requests the power
+spectrum of cold matter with itself.
+
 
 \section{Verifying Our Settings}
 \label{sec: CAMB_validation}
