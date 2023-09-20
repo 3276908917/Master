@@ -230,15 +230,18 @@ $N_\nu$ is the effective number of massive neutrino species. The standard
 particle model predicts this to be 3.046 \cbib{Archidiacono}.
 
 %s Neutrino peculiarities
-The standard particle model specifies three flavors of neutrino. The neutrino
-\textit{mass hierarchy} describes the distribution of mass across these three
-flavors. CAMB supports three different mass hierarchies: ``degenerate''
-assigns the same mass to every flavor. ``Normal'' and ``inverted'' describe:
-\textcolor{green}{Use the hardcore neutrinos papers to continue this
-discussion} \cbib{Qian}.
+The standard particle model specifies three flavors of neutrino which are
+coherent superpositions of three mass eigenstates. It is not well understood
+whether the mass associated with the $\nu_3$ eigenstate is greater or less
+than that of the $\nu_1$ and $\nu_3$ eigenstates. The ``normal'' neutrino
+\textit{mass hierarchy} places the greatest mass in the $\nu_3$
+eigenstate; the ``inverted'' mass hierarchy places the smallest mass there. 
+CAMB supports both of these hierarchies as well as a third: ``degenerate''
+assigns the same mass to every eigenstate.\cbib{Qian}.
 
 For this demonstration project, we will use the simple setup of a single
-massive neutrino flavor. Consequently, the choice of hierarchy is important
+massive neutrino eigenstate. Consequently, the choice of hierarchy is 
+important
 only in scaling the mass value we assign this flavor. For example, if we use
 the normal hierarchy with the same value of $\sum_i m_{\nu, i}$, then the
 power spectrum will look as though we had used the degenerate hierarchy with
