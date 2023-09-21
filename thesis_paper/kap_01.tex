@@ -1258,12 +1258,30 @@ linear-theory suppression of matter fluctuations:
 
 which is unfortunately valid only on very small scales $k > 0.8 h$ / Mpc.
 
-It has also been proposed to treat the neutrinos as a small correction factor
-to the results from an analogous cosmology with the same $\omega_m$ but with
-$\omega_\nu = 0$. This limits the applicability of our emulator to
-cosmologies with very small $\omega_\nu$, where we can treat the effect of
-massive neutrinos as a perturbation on our massless-neutrino spectra. We adapt 
-the evolution mapping relation as follows:
+It has also been proposed to treat the neutrinos as a small correction factor.
+
+Consider the trivial exact relation
+
+\begin{equation}
+P_\nu(k) = \de(k) \, P_0 (k)
+,\end{equation}
+
+where $\de(k) \equiv P_\nu (k) / P_0 (k)$, $P_\nu (k)$ is the power spectrum 
+of the massive-neutrino cosmology in which we are interested, and $P_0(k)$ is 
+the power spectrum of the corresponding matter-equivalent massless-neutrino
+cosmology (MEMNeC). The MEMNeC is defined such that $\tilde{\omega}_c = 
+\omega_c + \omega_\nu$ and $\tilde{\omega}_\nu = 0$. All other parameters are
+the same between a cosmology and its MEMNeC.
+
+We can approximate $\de(k)$ by fixing it to some $\de^*(k)$ that we calculate
+once for each set of shape parameters. This limits the applicability of our 
+emulator to cosmologies with small $\omega_\nu$, where we can treat the
+interaction between massive neutrinos and evolution parameters as a 
+perturbation on a baseline model.
+
+%s what is a MEMNeC?
+
+Keep in mind that we must now adapt the evolution mapping relation as follows:
 
 \begin{equation}
 \label{eq: evMapping_modded}
@@ -1271,15 +1289,10 @@ the evolution mapping relation as follows:
     =
     P_L (k | \Theta_s,
     		\tilde{\sigma}_{12} \left( z, \Theta_s, \Theta_e \right))
-\end{equation}
+.\end{equation}
 
-%s what is a MEMNeC?
-
-and then treat the physical density in neutrinos as a shape parameter.
-We define $\tilde{\sigma}_{12}$ as the $\sigma_{12}$ of the corresponding 
-matter-equivalent massless-neutrino cosmology (MEMNeC). The MEMNeC is
-defined such that $\tilde{\omega}_c = \omega_c + \omega_\nu$ and
-$\tilde{\omega}_\nu = 0$.
+In other words, $\sigma_{12}$ is now replaced by $\tilde{\sigma}_{12}$, the
+$\sigma_{12}$ value associated with the cosmology's MEMNeC.
 
 The goal of this work is to improve on this solution after exploring the 
 impact 

@@ -28,55 +28,47 @@ asymptotes means that $A_s$ will capture most of the unruly behavior of
 neutrinos. What theory motivates such a judgment? Or are we only guessing?}
 
 We begin with the second proposal from section~\ref{sec: neutrino_problem}:
-to approximate the power spectrum of a massive-neutrino cosmology, we use the
-power spectrum of its MEMNeC. This can be represented symbolically as
+to approximate the power spectrum of a massive-neutrino cosmology, we
+combine the
+power spectrum of its MEMNeC with an approximation of the ratio
+between the two:
 
 \begin{equation}
 \label{eq: MEMNeC_approx}
-P_\nu(k) \approx P_0 (k)
+P_\nu(k) \approx \de^* (k) P_0 (k)
 ,\end{equation}
-
-Where $P_\nu (k)$ is the power spectrum of the massive-neutrino cosmology in
-which we are interested and $P_0(k)$ is the power spectrum of its MEMNeC.
-
-Consider that the exact relation is trivially
-
-\begin{equation}
-P_\nu(k) = \de(k) \, P_0 (k)
-,\end{equation}
-
-where $\de(k) \equiv P_\nu (k) / P_0 (k)$.
 
 The essence of this chapter is to increase the accuracy in our $P_\nu(k)$
-predictions by estimating $\de(k)$.
+predictions by estimating the true $\de(k)$. Specifically, we are interested
+in how the true $\de(k)$ deviates from $\de^*(k)$. Therefore, we pay special
+attention to the quantity:
 
-To visualize the problem, we have plotted $P_\nu (k) / P_0(k)$
-in figure~\ref{fig: ratio_plots} for model 0 at two redshifts.
+\begin{equation}
+\label{eq: ee}
+\ee (k) \equiv \frac{\de(k)}{\de^*(k)}
+\end{equation}
 
-Since approximation~\ref{eq: MEMNeC_approx} worked reasonably
-well, we know that
+To simplify the discussion, we will concentrate on the small-scale limit of 
+this ratio $\el$
+
+\begin{equation}
+\el \equiv \lim_{k \rightarrow \infty} \ee(k)
+\end{equation}
 
 If we can estimate $\el$ accurately, then in principle our task 
 is complete, because the slope toward smaller $k$ values is
 even and analytically predictable. \textcolor{green}{Can I refer the reader to
  a paper on this?}
 
-The differences are a little large, so we study a subtler
-quantity $\ee_i (k)$:
+\section{Proposed Fitting Functions}
+ 
+In order to explore this limit concretely, we will use the Aletheia models as
+our test cases. This means that we can rewrite definition~\ref{eq: ee} as:
 
 \begin{equation}
+\label{eq: ee}
 \ee_i (k) \equiv \frac{\de_\text{model i}(k)}{\de_\text{model 0}(k)}
 \end{equation}
-
-To simplify our demonstrations, we will concentrate on the
-small-scale limit of this ratio $\el_i$
-
-\begin{equation}
-\el_i \equiv \lim_{k \rightarrow \infty} \ee_i(k)
-\end{equation}
-
-
-\section{Proposed Fitting Functions}
 
 \textcolor{orange}{This section, like the ``Convenience Functions'' section
 from chapter 2, should anticipate CL: we should talk about the

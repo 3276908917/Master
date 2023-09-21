@@ -955,7 +955,9 @@ def model_ratios(snap_index, sims, canvas, massive=True, skips=[],
     if 'y' in active_labels:
         plot_area.set_ylabel(ylabel)
 
-    plot_area.set_title(title + r": $\omega_\nu$ = " + omnuh2_str +
+    if title is not None and title[len(title) - 1] != ":":
+        title += ": "
+    plot_area.set_title(title + r"$\omega_\nu$ = " + omnuh2_str +
                         "; Snapshot " + str(snap_index))
     if not suppress_legend:
         plot_area.legend()
