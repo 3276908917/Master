@@ -1,17 +1,15 @@
 \chapter{Expansion of the Parameter Space}
 \label{chap: A_s}
 
-% Section on messing around
-
-\textcolor{blue}{Here, I will talk about the playing-around that we did, to 
-discover that
-$A_s$ assisted in the prediction of the suppression due to massive neutrinos.}
-
-Expansion of the parameter space represents the single most important novel
-step in this work.
-
-% I need to think of an introduction for this section. Let's write on the
-% train.
+Now that we have a comprehensive set of convenience functions with which to
+configure CAMB, we can easily obtain the theoretical power spectra we need in
+order to demonstrate our solution to the neutrino difficulties introduced in
+section~\ref{sec: neutrino_problem}. This chapter will motivate the inclusion 
+of the additional parameter $A_s$ in the evolution mapping framework.
+Because the focus of this thesis is regression rather than theory,
+we will merely show that $A_s$ contains information relevant to the impact of
+massive neutrinos. Then, the GPR should, in principle, be able to optimize its
+use to predict power spectra.
 
 % Maybe it would make more sense to have the large cass-L chapter focus on the
 % creation of a massless-neutrino emulator and THEN a smaller chapter focusing
@@ -29,15 +27,54 @@ step in this work.
 asymptotes means that $A_s$ will capture most of the unruly behavior of 
 neutrinos. What theory motivates such a judgment? Or are we only guessing?}
 
-Recall from section~\ref{sec: neutrino_problem} the second
-proposal for accounting for neutrinos within evolution mapping: an
-approximation using the MEMNeC. In this chapter, we seek to extend this approximation with a correction factor.
-
-In brief, we wish to solve the following equation for the ratio:
+We begin with the second proposal from section~\ref{sec: neutrino_problem}:
+to approximate the power spectrum of a massive-neutrino cosmology, we use the
+power spectrum of its MEMNeC. This can be represented symbolically as
 
 \begin{equation}
-P_\nu = \left( \frac{P_\nu}{P_0} \right) P_0
+\label{eq: MEMNeC_approx}
+P_\nu(k) \approx P_0 (k)
+,\end{equation}
+
+Where $P_\nu (k)$ is the power spectrum of the massive-neutrino cosmology in
+which we are interested and $P_0(k)$ is the power spectrum of its MEMNeC.
+
+Consider that the exact relation is trivially
+
+\begin{equation}
+P_\nu(k) = \de(k) \, P_0 (k)
+,\end{equation}
+
+where $\de(k) \equiv P_\nu (k) / P_0 (k)$.
+
+The essence of this chapter is to increase the accuracy in our $P_\nu(k)$
+predictions by estimating $\de(k)$.
+
+To visualize the problem, we have plotted $P_\nu (k) / P_0(k)$
+in figure~\ref{fig: ratio_plots} for model 0 at two redshifts.
+
+Since approximation~\ref{eq: MEMNeC_approx} worked reasonably
+well, we know that
+
+If we can estimate $\el$ accurately, then in principle our task 
+is complete, because the slope toward smaller $k$ values is
+even and analytically predictable. \textcolor{green}{Can I refer the reader to
+ a paper on this?}
+
+The differences are a little large, so we study a subtler
+quantity $\ee_i (k)$:
+
+\begin{equation}
+\ee_i (k) \equiv \frac{\de_\text{model i}(k)}{\de_\text{model 0}(k)}
 \end{equation}
+
+To simplify our demonstrations, we will concentrate on the
+small-scale limit of this ratio $\el_i$
+
+\begin{equation}
+\el_i \equiv \lim_{k \rightarrow \infty} \ee_i(k)
+\end{equation}
+
 
 \section{Proposed Fitting Functions}
 
@@ -45,6 +82,7 @@ P_\nu = \left( \frac{P_\nu}{P_0} \right) P_0
 from chapter 2, should anticipate CL: we should talk about the
 code that we have written in order to explore these ratios, which one can find
 in} \verb|camb_interface.py|.
+
 
 The \verb|model_ratios| function.
 
@@ -84,11 +122,14 @@ significantly detract from the performance of the emulator.
 So, our massive-neutrino emulator will be trained over six cosmological
 parameters: $\omega_b$, $\omega_c$, $n_s$, $\sigma_{12}$, $A_s$, and
 $\omega_\nu$. In other words, to predict a power
-spectrum $\hat{y}$, the emulator will accept as an input $x$ these six
-parameters.
+spectrum $\hat{\vec{y}}$, the emulator will accept as an input $\vec{x}$
+these six parameters.
 
 %s Now segue into the next chapter
 
 We just need to add $A_s$ to the set of cosmological parameters
 over which we train our GPR and then we can treat $\omega_\nu$ like a shape
-parameter.
+parameter. Expansion of the parameter space represents the single most 
+important novel step in this work. The remaining chapters will
+focus on the integration of this new approach into a beginner-friendly
+emulation code.

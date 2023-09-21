@@ -527,8 +527,8 @@ def boltzmann_battery(omnuh2_floats, skips_omega=[0, 2], skips_model=[8],
                 inner_dict = {}
                 z = z_input[snap_index]
 
-                massless_nu_cosmology = \
-                    balance_neutrinos_with_CDM(row, 0)
+                massless_nu_cosmology = specify_neutrino_mass(
+                    row, 0, nnu_massive_in=0)
                 massless_tuple = \
                     evaluate_cosmology(massless_nu_cosmology, redshifts=[z],
                                        fancy_neutrinos=fancy_neutrinos,
@@ -540,6 +540,10 @@ def boltzmann_battery(omnuh2_floats, skips_omega=[0, 2], skips_model=[8],
 
                 massive_nu_cosmology = specify_neutrino_mass(
                     row, this_omnuh2_float, nnu_massive_in=1)
+
+                # Adjust CDM density so that we have the same total matter
+                # density as before:
+                massive_nu_cosmology["omch2"] -= this_omnuh2_float
 
                 massive_tuple = \
                     evaluate_cosmology(massive_nu_cosmology, redshifts=[z],
@@ -883,7 +887,6 @@ def model_ratios(snap_index, sims, canvas, massive=True, skips=[],
                  title="Ground truth", omnuh2_str="0.002", models=cosm,
                  suppress_legend=False):
     """
-    Why is this a different function from above?
     There are a couple of annoying formatting differences with the power nu
     dictionary which add up to an unpleasant time trying to squeeze it into the
     existing function...
@@ -899,7 +902,7 @@ def model_ratios(snap_index, sims, canvas, massive=True, skips=[],
         P_accessor = "P_no"
 
     baseline_h = models.loc[0]["h"]
-    baseline_k = correct_sims[0][snap_index]["k"]
+    baseline_k = sims[0][snap_index]["k"]
 
     baseline_p = sims[0][snap_index]["P_nu"] / \
         sims[0][snap_index]["P_no"]
@@ -917,20 +920,19 @@ def model_ratios(snap_index, sims, canvas, massive=True, skips=[],
 
     k_list = []
     rat_list = []
-    for i in range(1, len(correct_sims)):
+    for i in range(1, len(sims)):
         if i in skips:
             continue  # Don't know what's going on with model 8
         this_h = models.loc[i]["h"]
-        this_k = correct_sims[i][snap_index]["k"]
+        this_k = sims[i][snap_index]["k"]
 
-        this_p = correct_sims[i][snap_index]["P_nu"] / \
-            correct_sims[i][snap_index]["P_no"]
+        this_p = sims[i][snap_index]["P_nu"] / \
+            sims[i][snap_index]["P_no"]
         if P_accessor is not None:
-            this_p = correct_sims[i][snap_index][P_accessor]
+            this_p = sims[i][snap_index][P_accessor]
 
         truncated_k, truncated_p, aligned_p = \
-            utils.truncator(baseline_k, baseline_p, this_k,
-                      this_p, interpolation=True)
+            utils.truncator(baseline_k, baseline_p, this_k, this_p)
 
         label_in = "model " + str(i)
         plot_area.plot(truncated_k, aligned_p / truncated_p,
@@ -961,7 +963,7 @@ def model_ratios(snap_index, sims, canvas, massive=True, skips=[],
     return k_list, rat_list
 
 
-def compare_wrappers(k_list, p_list, correct_sims, snap_index, canvas, massive,
+def compare_wrappers(k_list, p_list, sims, snap_index, canvas, massive,
                      subscript, title, skips=[], subplot_indices=None,
                      active_labels=['x', 'y']):
     """
@@ -990,12 +992,12 @@ def compare_wrappers(k_list, p_list, correct_sims, snap_index, canvas, massive,
     else:
         baseline_p_py = p_list[0][z_index] / baseline_h ** 3
 
-    baseline_k_for = correct_sims[0][snap_index]["k"]
+    baseline_k_for = sims[0][snap_index]["k"]
 
-    baseline_p_for = correct_sims[0][snap_index]["P_nu"] / \
-        correct_sims[0][snap_index]["P_no"]
+    baseline_p_for = sims[0][snap_index]["P_nu"] / \
+        sims[0][snap_index]["P_no"]
     if P_accessor is not None:
-        baseline_p_for = correct_sims[0][snap_index][P_accessor]
+        baseline_p_for = sims[0][snap_index][P_accessor]
 
     plot_area = None
     if subplot_indices is None:
@@ -1018,12 +1020,12 @@ def compare_wrappers(k_list, p_list, correct_sims, snap_index, canvas, massive,
         else:
             this_p_py = p_list[i][z_index]
 
-        this_k_for = correct_sims[i][snap_index]["k"]
+        this_k_for = sims[i][snap_index]["k"]
 
-        this_p_for = correct_sims[i][snap_index]["P_nu"] / \
-            correct_sims[i][snap_index]["P_no"]
+        this_p_for = sims[i][snap_index]["P_nu"] / \
+            sims[i][snap_index]["P_no"]
         if P_accessor is not None:
-            this_p_for = correct_sims[i][snap_index][P_accessor]
+            this_p_for = sims[i][snap_index][P_accessor]
 
         truncated_k_py, truncated_p_py, aligned_p_py = \
             utils.truncator(baseline_k_py, baseline_p_py, this_k_py,

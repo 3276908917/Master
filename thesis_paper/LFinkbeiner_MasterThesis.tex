@@ -24,13 +24,17 @@
 \usepackage{a4wide}
 \usepackage{fancyhdr}
 \usepackage{graphicx}
-%\usepackage{english}
+
+\usepackage[T2A]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage[russian, english]{babel}
 \usepackage[bookmarks]{hyperref}
 
 % Additional packages just for Lukas' thesis
 \usepackage{xcolor, bbold, graphics}
 \usepackage{amsmath, verbatim, bm, amssymb}
 \usepackage{ulem, fancyvrb}
+
 
 \usepackage{svg}
 \usepackage{caption, subcaption}
@@ -54,6 +58,11 @@
 % StackExchange
 
 \newcommand*{\lang}{en-GB}
+
+\newcommand{\el}{\mbox{\usefont{T2A}{\rmdefault}{m}{n}\cyrl}}
+\newcommand{\de}{\mbox{\usefont{T2A}{\rmdefault}{m}{n}\cyrd}}
+\newcommand{\ee}{\mbox{\usefont{T2A}{\rmdefault}{m}{n}\cyri}}
+
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% Definition der Kopfzeile %%

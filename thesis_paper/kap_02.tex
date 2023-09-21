@@ -205,6 +205,9 @@ parameter $\omega_\nu$ and will need to vary it. CAMB does not seem to accept
 $\omega_\nu$ values directly, in what may be a bug. For example, setting
 \verb|pars.omnuh2| does not affect the return values of
 
+\textcolor{red}{This is wrong. Andrea was able to use camb.set\_params to get
+the desired omnuh2!!}
+
 \verb|camb.get_results(pars).get_matter_power_spectrum|.
 
 However, it may simply be the case that the \verb|omnuh2| attribute is
@@ -320,7 +323,7 @@ range of inverse scales to $10^{-4} \leq k$ Mpc $\leq 10$. These values were
 selected to fully encompass the various probes of the power spectrum without
 extending the range too far into unexplored regions \cbib{Aghanim}. 
 
-\verb|var1='delta_nonu'| and \verb|var2='delta_nonu'| requests the power
+\verb|var1=`delta_nonu'| and \verb|var2=`delta_nonu'| requests the power
 spectrum of cold matter with itself.
 
 The second main approach is to use a 2D spline interpolation object returned
@@ -345,7 +348,7 @@ modifiable through CL functions:
 \verb|nonlinear=False| (\textcolor{orange}{Why are we specifying the linear
 power spectrum in two cases?)} \quad requests linear power spectrum.
 
-\verb|var1='delta_nonu'| and \verb|var2='delta_nonu'| requests the power
+\verb|var1=`delta_nonu'| and \verb|var2=`delta_nonu'| requests the power
 spectrum of cold matter with itself.
 
 
@@ -412,11 +415,11 @@ include 8, as that model cannot be processed in the latest (as of October 2,
 2023) version of CL.
 
 Since S\'{a}nchez's power spectra were evaluated at 1000 points, we call
-\verb|boltzmann_battery| with \verb|k_points=1000|. The errors are miniscule and recorded in figure XXY. 
+\verb|boltzmann_battery| with \verb|k_points=1000|. The errors are miniscule 
+and recorded in figure XXY. 
 
-Now that we have verified the accuracy of our code, we are ready to
-experiment with the power spectra in order to explore ways to integrate
-massive neutrinos into our evolution mapping framework.
+The code described in this chapter lays the foundation for the rest of the
+work. All of the power spectra that we use will be computed via CL.
 
 % Aletheia Model 8 has not been integrated into our code suite yet. We can’t 
 % handle its DE weirdness. Instead of bringing up and then discarding model 8, 
