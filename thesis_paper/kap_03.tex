@@ -75,15 +75,33 @@ from chapter 2, should anticipate CL: we should talk about the
 code that we have written in order to explore these ratios, which one can find
 in} \verb|camb_interface.py|.
 
+To study the behavior of $\ee_i$, we developed the \verb|camb_interface.py|
+function \verb|model_ratios|. This function accepts a single snap
+index\footnote{remember that there are four snaps for each model, and snap 
+four always corresponds to $z = 0$} and a set of power spectra nearly in the
+format returned by \verb|boltzmann_battery|, but without the $\omega_\nu$ 
+layer.\footnote{for explanations of the
+remaining function parameters, we refer the reader to the docstring} it
+computes and plots all of the $\ee_i$ spectra in the input set. We show an
+example of its output in figure~\ref{fig: model_ratios_demo}. This function
+is recommended for any users seeking to improve the characterization of
+$\ee_i$.
 
-The \verb|model_ratios| function.
+\textcolor{orange}{The above paragraph only describes the function in the
+case ``massive=`x'''}
 
-The \verb|model_ratios| function goes in the section where we conclude that 
-$A_s$ and $\omega_\nu$ suffice to capture the growth factor suppression of 
-massive neutrinos.
+We fit the asymptotes with a log. An example of its effect is visualized in
+figure~\ref{fig: ee_prediction_demo}.
 
 
 \section{Testing Functions}
+
+Now we need to make sure that our prediction works well in other cases, not
+just for the canonical Aletheia models.
+
+We produce two sets of test cases, one for random cosmologies, one for
+random cosmologies with $A_s$ fixed. Specifically, we only randomize
+evolution parameters.
 
 The \verb|get_As_matched_cosmology| function.
 The \verb|get_random_cosmology| function.
