@@ -3,6 +3,7 @@ from scipy.integrate import quad
 import numpy as np
 from camb import initialpower, model
 
+from cassL import generate_emu_data as ged
 from cassL import camb_interface as ci
 import copy as cp
 
@@ -17,8 +18,7 @@ def cassL_to_andrea_cosmology(cosm, hybrid=False, foreign=None):
         ("cosmology_to_PK_interpolator") and Andrea's ("get_PK") closer and
         closer together until this strange discrepancy (as chronicled on the
         "interpolator_CAMB_agreement" notebook) vanishes.
-    """
-    from cassL import generate_emu_data as ged
+    """ 
     # ui.print_cosmology(cosm)
     
     ombh2 = cosm['ombh2']
@@ -191,11 +191,11 @@ def get_PK(ombh2, omch2, ns, omnuh2, H0, As, w0=-1.0, wa=0.0, omk=0.0,
         precise source of discrepancies currently recorded by our Jupyter
         notebooks.
     """
-
+    omk = 0
     #pars = camb.CAMBparams()
     #pars.set_cosmology(H0=H0, ombh2=ombh2, omch2=omch2, mnu=mnu, omk=omk)
     pars = camb.set_params(H0=H0, ombh2=ombh2, omch2=omch2, omnuh2=omnuh2, omk=omk)
-    pars.num_nu_massive = 1
+    pars.num_nu_massive = 1 if omnuh2 != 0 else 0
     #omnuh2 = np.copy(pars.omnuh2)
     #print (omnuh2)
     pars.InitPower.set_params(ns=ns, As=As)
