@@ -527,8 +527,8 @@ def boltzmann_battery(omnuh2_floats, skips_omega=[0, 2], skips_model=[8],
                 inner_dict = {}
                 z = z_input[snap_index]
 
-                massless_nu_cosmology = specify_neutrino_mass(
-                    row, 0, nnu_massive_in=0)
+                massless_nu_cosmology = \
+                    balance_neutrinos_with_CDM(row, 0)
                 massless_tuple = \
                     evaluate_cosmology(massless_nu_cosmology, redshifts=[z],
                                        fancy_neutrinos=fancy_neutrinos,
@@ -540,10 +540,6 @@ def boltzmann_battery(omnuh2_floats, skips_omega=[0, 2], skips_model=[8],
 
                 massive_nu_cosmology = specify_neutrino_mass(
                     row, this_omnuh2_float, nnu_massive_in=1)
-
-                # Adjust CDM density so that we have the same total matter
-                # density as before:
-                massive_nu_cosmology["omch2"] -= this_omnuh2_float
 
                 massive_tuple = \
                     evaluate_cosmology(massive_nu_cosmology, redshifts=[z],

@@ -195,7 +195,7 @@ def get_PK(ombh2, omch2, ns, omnuh2, H0, As, w0=-1.0, wa=0.0, omk=0.0,
     #pars = camb.CAMBparams()
     #pars.set_cosmology(H0=H0, ombh2=ombh2, omch2=omch2, mnu=mnu, omk=omk)
     pars = camb.set_params(H0=H0, ombh2=ombh2, omch2=omch2, omnuh2=omnuh2, omk=omk)
-    pars.num_nu_massive = 1 if omnuh2 != 0 else 0
+    pars.num_nu_massive = 1
     #omnuh2 = np.copy(pars.omnuh2)
     #print (omnuh2)
     pars.InitPower.set_params(ns=ns, As=As)
