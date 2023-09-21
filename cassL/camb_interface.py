@@ -945,7 +945,7 @@ def model_ratios(snap_index, sims, canvas, massive=True, skips=[],
     if 'x' in active_labels:
         plot_area.set_xlabel(r"k [1 / Mpc]")
 
-    ylabel = r"$x_i / x_0$"
+    ylabel = r"и$_i$ / и$_0$"
     if P_accessor is not None:
         if massive is True:
             ylabel = r"$P_\mathrm{massive} / P_\mathrm{massive, model \, 0}$"
