@@ -83,45 +83,47 @@ def homogenize_k_axes(samples):
     and samples[i][0] is the set of k values to which this power spectrum
     corresponds.
     
-    Then it takes the first row as the baseline
-    such that all other P(k) are interpolated as though they had the same
-    k axis as the first row.
+    Then it takes the most narrow row of k values as the baseline
+    such that all other P(k) are interpolated to share k axes.
     """
 
     # First, let's find the rows with the smallest k_max and largest k_min:
-    max_min = np.min(samples[0][0])
-    max_min_i = 0   
-    min_max = np.max(samples[0][0])
-    min_max_i = 0
+    max_mink = np.min(samples[0][0])
+    max_mink_i = 0   
+    min_maxk = np.max(samples[0][0])
+    min_maxk_i = 0
 
     for i in range(1, len(samples)):
         min_ = np.min(samples[i][0])
         max_ = np.max(samples[i][0])
-        if min_ > max_min:
-            max_min = min_
-            max_min_i = i
-        if max_ < min_max:
-            min_max = max_
-            min_max_i = i
+        if min_ > max_mink:
+            max_mink = min_
+            max_mink_i = i
+        if max_ < min_maxk:
+            min_maxk = max_
+            min_maxk_i = i
 
-    base_k = samples[max_min_i][0]
-    base_P = samples[max_min_i][1]
+    base_k = samples[max_mink_i][0]
+    base_P = samples[max_mink_i][1]
     interpd_spectra = np.zeros((len(samples), len(base_k)))
 
-    if max_min_i != min_max_i:
+    if max_mink_i != min_maxk_i:
         # There is no single k array whose bounds fall within everyone else's.
         # Therefore, we use the k array with the smallest k_max to pare down
         # (via the truncator function) the k array with the largest k_min
-        obj_k = samples[min_max_i][0]
-        obj_P = samples[max_min_i][1]
+        obj_k = samples[min_maxk_i][0]
+        obj_P = samples[min_maxk_i][1]
 
         base_k, base_P, aligned_P = truncator(base_k, base_P, obj_k, obj_P) 
 
         interpd_spectra = np.zeros((len(samples), len(base_k)))
-        interpd_spectra[min_max_i] = aligned_P
+        interpd_spectra[min_maxk_i] = aligned_P
+        interpd_spectra[max_mink_i] = base_P
+    else:
+        interpd_spectra[max_mink_i] = base_P
 
     for i in range(len(samples)):
-        if i != max_min_i and i != min_max_i:
+        if i != max_mink_i and i != min_maxk_i:
             _, _, interpd_spectra[i] = \
                 truncator(base_k, base_P, samples[i][0], samples[i][1])
      
