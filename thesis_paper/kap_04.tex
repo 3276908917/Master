@@ -62,20 +62,78 @@ in~\ref{sec: generate_emu_data}.
 % One reason this goes here: priors show up in almost every script,
 % so there isn't a great cass-L section in which to put this.
 
-As we will explain in section~\ref{sec: build_lhc}, our code generates unit 
-Latin hypercube samples so that a single hypercube can be used to build 
-several different emulators simply by using a different set of priors to 
-rescale the cube.
+Our code generates unit Latin hypercube samples which can be reused for many
+different emulator setups. To use any given Latin hypercube in a different
+emulator, one need only rescale the axes of the hypercube according to the
+proper priors. CL accomplishes this through the use of prior files.
 
-CL is packaged with three pairs of prior files. Depending on which priors the 
-user selects, the emulator will automatically become a massive-neutrino or 
-massless-neutrino emulator. \textcolor{orange}{This needs to be linked to the 
-convenience section, on how to add scenario files and what not. But this 
-feature is not finished yet! We may have to punt it to “future work.”}
+CL is packaged with three pairs of prior files.
+Depending on which priors the 
+user selects, the emulator will be a massive-neutrino or 
+massless-neutrino emulator.
+
+The $\omega_\nu$ prior is always $[0, 0.01]$ and the $\sigma_{12}$ prior is
+always $[0.2, 1]$.
 
 \textcolor{orange}{Table goes here.}
 % Caption for one table: The ``classic'' priors represent a middle ground 
 % between those of ``COMET'' and ``MEGA''.
+
+\begin{table}[ht!]
+\centering
+\begin{tabular}{l|l|l}
+\hline
+Parameter & Minimum Value & Maximum Value \\ \hline
+$\omega_b$ & 0.005 & 0.28 \\
+$\omega_c$ & 0.001 & 0.99 \\
+$n_s$ & 0.7 & 1.3 \\
+$A_s$\footnotemark & $5.003 \cdot 10^{-10}$ & $1.484 \cdot 10^{-8}$  \\
+\end{tabular}
+ \cprotect\caption[``MEGA'' priors]{``MEGA'' priors. The range of allowed
+ 	values is significantly larger than the modern $3\sigma$ intervals
+ 	for these parameters. It was created from the most extreme values used
+ 	in table 1 of \citet{Mancini} and table 1 of \citet{Arico}, even including
+ 	CMB emulators. 
+ 	\textcolor{red}{Maybe since we didn't end up using this prior file, I
+ 	should scrap it from the discussion?}}
+ \label{tab: MEGA_priors}
+\end{table}
+
+\begin{table}[ht!]
+\centering
+\begin{tabular}{l|l|l}
+\hline
+Parameter & Minimum Value & Maximum Value \\ \hline
+$\omega_b$ & 0.01875 & 0.02625 \\
+$\omega_c$ & 0.05 & 0.255 \\
+$n_s$ & 0.84 & 1.1 \\
+$A_s$\footnotemark & $1.049 \cdot 10^{-9}$ & $4.990 \cdot 10^{-9}$  \\
+\end{tabular}
+	\cprotect\caption[``CLASSIC'' priors]{``CLASSIC'' priors. Despite
+ 	significantly smaller ranges than table~\ref{tab: MEGA_priors}, this
+ 	parameter space is still easily large enough to accommodate modern
+ 	statistical analyses. \textcolor{green}{citation.}}
+ \label{tab: CLASSIC_priors}
+\end{table}
+
+\begin{table}[ht!]
+\centering
+\begin{tabular}{l|l|l}
+\hline
+Parameter & Minimum Value & Maximum Value \\ \hline
+$\omega_b$ & 0.0205 & 0.02415 \\
+$\omega_c$ & 0.085 & 0.155 \\
+$n_s$ & 0.92 & 1.01 \\
+$A_s$\footnotemark & $1.049 \cdot 10^{-9}$ & $4.990 \cdot 10^{-9}$  \\
+\end{tabular}
+	\cprotect\caption[``COMET'' priors]{``COMET'' priors.
+	These values are significantly more restrictive than in
+	tables~\ref{tab: MEGA_priors} and~\ref{tab: CLASSIC_priors},
+	but the parameter space should still be large enough to accommodate
+	most modern statistical analyses. \textcolor{green}{citation.}
+	These priors were taken from table 2 of \citet{Eggemeier}.}
+ \label{tab: COMET_priors}
+\end{table}
 
 In tables XXX-XXZ, we provide the specific upper and lower bounds for each of
 the six cosmological parameters over which our massive-neutrino emulator is 
@@ -95,9 +153,9 @@ application of evolution mapping principles within the CL code.
 \textcolor{orange}{Talk a little more about the prior ranges, what are their
 values in words??}
 
-The default priors that we use correspond to those currently used by COMET. \textcolor{orange}{Two
-justifications for this choice: unsolvable cells, but more than that, simplicity and accuracy
-for the ``demo'' run.}
+The default priors that we use correspond to those currently used by COMET. 
+\textcolor{orange}{Two justifications for this choice: unsolvable cells, but 
+more than that, simplicity and accuracy for the ``demo'' run.}
 
 \section{Creation of Separate Emulators}
 \label{sec: 2emu_intro}
@@ -161,7 +219,8 @@ these two parameters may not be sufficient to fully characterize the
 suppression of the power spectrum by massive neutrinos. Of course, we would 
 like to reiterate that, though we have applied a symbolic regression approach 
 in order to independently justify our analytical expression from
-chapter~\ref{chap: A_s}, this by no means guarantees that we have found the optimal analytical expression.
+chapter~\ref{chap: A_s}, this by no means guarantees that we have found the 
+optimal analytical expression.
 
 To simplify the user experience, this two-emulator solution lives ``under the
 hood'' and by default \textcolor{orange}{will be} hidden behind an interface
@@ -169,9 +228,12 @@ which automatically queries the correct emulator given some user-input
 cosmology.
 
 To justify our decision and to quantify the improvement from this approach, we
-have prepared \textcolor{orange}{some} plots in section~\ref{sec: 2emu_improvement}.
+have prepared \textcolor{orange}{some} plots in
+section~\ref{sec: 2emu_improvement}.
 
-\textcolor{orange}{Conclude this section by saying that this integration of multiple emulators into one user-facing script can be further exploited with, for example, different emulators for different neutrino mass hierarchies.}
+\textcolor{orange}{Conclude this section by saying that this integration of 
+multiple emulators into one user-facing script can be further exploited with, 
+for example, different emulators for different neutrino mass hierarchies.}
 
 Besides its relevance to the neutrino suppression of the small-scale power
 spectrum, $A_s$ appears to be an evolution parameter. Therefore, when the
