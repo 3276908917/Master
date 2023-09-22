@@ -79,7 +79,8 @@ To study the behavior of $\ee_i$, we developed the \verb|camb_interface.py|
 function \verb|model_ratios|. This function accepts a single snap
 index\footnote{Remember that there are four snaps for each model, and snap 
 four always corresponds to $z = 0$} and a set of power spectra nearly in the
-format returned by \verb|boltzmann_battery|, but without the $\omega_\nu$ 
+format returned by \\
+\verb|boltzmann_battery|, but without the $\omega_\nu$ 
 layer.\footnote{For explanations of the
 remaining function parameters, we refer the reader to the docstring} Tt
 computes and plots all of the $\ee_i$ spectra in the input set. We show an
@@ -118,6 +119,7 @@ After experimenting with different functions and parameters, we find the
 following fitting function:
 
 \begin{equation}
+\label{eq: fit}
 \hat{\ee}_i = C \, \omega_\nu \, \ln \left( \frac{A_{s, i}}{A_{s, 0}} \right)
 .\end{equation}
 
