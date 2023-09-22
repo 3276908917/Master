@@ -144,7 +144,7 @@ All of the shape parameters are still consistent with Aletheia model 0.
 \begin{tabular}{l|l|l}
 \hline
 Parameter & Minimum Value & Maximum Value \\ \hline
-$\omega_\text{DE}$\footnotemark & -0.153 & 0.807 \\
+$\omega_\text{DE}$\footnotemark & 0.1 & 0.5 \\
 $\omega_K$ & -0.05 & 0.05 \\
 $w_0$ & -2.0 & -0.5 \\
 $w_a$ & -0.5 & 0.5 \\
@@ -203,17 +203,19 @@ significantly detract from the performance of the emulator.
 % I'm not sure if this section will survive, we'll see how big the conclusion
 % here ends up being.
 
-So, our massive-neutrino emulator will be trained over six cosmological
-parameters: $\omega_b$, $\omega_c$, $n_s$, $\sigma_{12}$, $A_s$, and
+In this chapter, we have illustrated how the scalar mode amplitude $A_s$
+contains information of great relevance to the application of evolution
+mapping to the emulation of massive-neutrino power spectra. As a result of 
+these demonstrations, we know to construct 
+our massive-neutrino emulator emulator over the six cosmological
+parameters $\omega_b$, $\omega_c$, $n_s$, $\sigma_{12}$, $A_s$, and
 $\omega_\nu$. In other words, to predict a power
-spectrum $\hat{\vec{y}}$, the emulator will accept as an input $\vec{x}$
-these six parameters.
+spectrum, our emulator will accept as an input a vector describing
+these six parameters. Conceptually, adding $A_s$ to the set of
+emulation parameters allows us to treat $\omega_\nu$ like a shape
+parameter.
 
-%s Now segue into the next chapter
-
-We just need to add $A_s$ to the set of cosmological parameters
-over which we train our GPR and then we can treat $\omega_\nu$ like a shape
-parameter. Expansion of the parameter space represents the single most 
+Expansion of the parameter space represents the single most 
 important novel step in this work. The remaining chapters will
-focus on the integration of this new approach into a beginner-friendly
-emulation code.
+focus on the integration of this modified evolution mapping framework
+into a beginner-friendly emulation code.
