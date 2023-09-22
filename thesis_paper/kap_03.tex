@@ -144,7 +144,7 @@ All of the shape parameters are still consistent with Aletheia model 0.
 \begin{tabular}{l|l|l}
 \hline
 Parameter & Minimum Value & Maximum Value \\ \hline
-$h$ & 0.2 & 1 \\
+$\omega_\text{DE}$\footnotemark & -0.153 & 0.807 \\
 $\omega_K$ & -0.05 & 0.05 \\
 $w_0$ & -2.0 & -0.5 \\
 $w_a$ & -0.5 & 0.5 \\
@@ -154,31 +154,47 @@ $A_s$\footnotemark & $5.003 \cdot 10^{-10}$ & $1.484 \cdot 10^{-8}$  \\
  	Cosmologies]{Parameters which we vary for the purpose of testing the
  	generality of fit~\ref{eq: fit}, and their domains.
  	\textcolor{red}{Is it poor form to have a footnote that looks like an
- 	exponent? How should I do it differently?}
+ 	exponent? How should I do it differently?}}
  \label{tab: fit_test_params}
 \end{table}
+
+\addtocounter{footnote}{-1}
+
+\footnotetext{Unfortunately, $\omega_\text{DE}$ is not accepted as an
+input by CAMB's \verb|set_cosmology|. To vary $\omega_\text{DE}$ in this way,
+we fix $\omega_b$ and $\omega_c$ and select a value for $\omega_K$. Then, we
+vary $h$--according to equation~\ref{eq: h_to_omega}, this should only
+affect $\omega_\text{DE}$.}
 
 \footnotetext{These values were rounded to three significant figures. Refer
 to the code for greater precision.}
 
-The \verb|get_As_matched_cosmology| function.
+These cosmologies cover a wide range of $\el$ values, as shown in
+figure~\ref{fig: random_battery}. The errors for the fits are shown in
+figure~\ref{fig: random_battery_errs}.
 
+To further test our solution, we also created the function
+\verb|get_As_matched_cosmology|, which randomizes the cosmologies in the same
+way except for fixing $A_s$ at the value for model 0.
+figure~\ref{fig: degenerate_battery}. The errors for the fits are shown in
+figure~\ref{fig: degenerate_battery_errs}.
 
-In producing asymptote plots, we find that our predictions line up quite well,
-but not perfectly. This may indicate that our parametrization is insufficient.
-In other words, we may need additional cosmological parameters besides the
-$A_s$ and $\omega_\nu$ and in order to fully characterize the impact of
-massive neutrinos on the power spectrum.
+This third test demonstrates that the imperfections in our fit cannot be
+attributed solely to the form of equation~\ref{eq: fit};  
+since all of the cosmologies share $\omega_\nu$ and $A_s$ values, and since
+the asymptotes were nevertheless not all identical, the
+asymptote must have some dependence also on one of the other parameters that
+we varied.  
 
-However, the imperfect performance of our predictions may also simply
-indicate that the final form of our asymptote predictions (equation XXY) is
-only an approximation of some true (or at least more accurate) relationship
+However, the larger errors that we see in
+figure~\ref{fig: random_battery_errs} suggests that our fit may only
+approximately describe the relationship
 between $A_s$, $\omega_\nu$, and the small-scale suppression of the power
 spectrum. A symbolic regression investigation could prove highly effective at
 resolving this ambiguity by efficiently searching out improved formulas. 
 However, we do not consider this a promising avenue
 for the continuation of this work (see section~\ref{sec: future_work} for our
-recommendations), because the error on our predictions is so low. The error
+recommendations); the error
 is so low here that we do not believe the imperfect predictions to
 significantly detract from the performance of the emulator.
 
