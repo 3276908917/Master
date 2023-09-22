@@ -374,8 +374,9 @@ def get_As_matched_cosmology(omega_nu, A_s=2.12723788013000E-09):
     # row['OmC'] = row['omch2'] / row['h'] ** 2
     # row['OmM'] = row['OmB'] + row['OmC']
 
-    row['OmK'] = np.random.uniform(-0.05, 0)
-    
+    OmK_low_bound = -0.05 / row['h'] ** 2
+    row['OmK'] = np.random.uniform(OmK_low_bound, -OmK_low_bound)
+        
     # This field is not used anywhere
     #row['OmL'] = 1 - row['OmM'] - row['OmK']
 
@@ -404,7 +405,7 @@ def get_random_cosmology(omega_nu):
     Return a cosmological configuration based on model0 but uniformly
     randomized in:
         h: [0.2, 1]
-        OmegaK: [-.05, 0]
+        OmegaK: [-0.05, 0.05]
         A_s: about [5.0028e-10, 1.4841e-8]
         w0: [-2, -.5]
         wa: [-.5, .5]
@@ -418,31 +419,11 @@ def get_random_cosmology(omega_nu):
     ! Unfortunately, all of these bounds are hard-coded. Maybe we can read in a
     table for this?
     """
-    row = cp.deepcopy(cosm.iloc[0])
-
-    row['h'] = np.random.uniform(0.2, 1)
-
-    # These fields are not used anywhere
-    # Given h, the following are now fixed:
-    # row['OmB'] = row['ombh2'] / row['h'] ** 2
-    # row['OmC'] = row['omch2'] / row['h'] ** 2
-    # row['OmM'] = row['OmB'] + row['OmC']
-
-    row['OmK'] = np.random.uniform(-0.05, 0)
-    
-    # This field is not used anywhere
-    # row['OmL'] = 1 - row['OmM'] - row['OmK']
-
-    # ~ Do we have any constraints on h besides Aletheia?
-    # I ask because this seems like a pretty small window.
-    # ditto
-    row['w0'] = np.random.uniform(-2., -.5)
-    # ditto
-    row['wa'] = np.random.uniform(-0.5, 0.5)
+    row = get_As_matched_cosmology(omega_nu)
     
     row['A_s'] = np.random.uniform(A_min, A_max)
 
-    return specify_neutrino_mass(row, omega_nu)
+    return row
     
 
 #! It's confusing to the user to have both omnuh2_floats and skips_omega as

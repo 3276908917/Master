@@ -77,13 +77,13 @@ in} \verb|camb_interface.py|.
 
 To study the behavior of $\ee_i$, we developed the \verb|camb_interface.py|
 function \verb|model_ratios|. This function accepts a single snap
-index\footnote{remember that there are four snaps for each model, and snap 
+index\footnote{Remember that there are four snaps for each model, and snap 
 four always corresponds to $z = 0$} and a set of power spectra nearly in the
 format returned by \verb|boltzmann_battery|, but without the $\omega_\nu$ 
-layer.\footnote{for explanations of the
-remaining function parameters, we refer the reader to the docstring} it
+layer.\footnote{For explanations of the
+remaining function parameters, we refer the reader to the docstring} Tt
 computes and plots all of the $\ee_i$ spectra in the input set. We show an
-example of its output in figure~\ref{fig: model_ratios_demo}. This function
+example output in figure~\ref{fig: model_ratios_demo}. This function
 is recommended for any users seeking to improve the characterization of
 $\ee_i$.
 
@@ -112,21 +112,57 @@ $\ee_i$.
 \textcolor{orange}{The above paragraph only describes the function in the
 case ``massive=`x'''}
 
-We fit the asymptotes with a log. An example of its effect is visualized in
-figure~\ref{fig: ee_prediction_demo}.
+\textcolor{green}{Both plot titles need to be redone.}
 
+After experimenting with different functions and parameters, we find the
+following fitting function:
+
+\begin{equation}
+\hat{\ee}_i = C \, \omega_\nu \, \ln \left( \frac{A_{s, i}}{A_{s, 0}} \right)
+.\end{equation}
+
+We demonstrate its predictions in figure~\ref{fig: ee_prediction_demo}.
+
+We also show the errors for the Aletheia models in
+figure~\ref{fit_errors_Aletheia}.
 
 \section{Testing Functions}
 
-Now we need to make sure that our prediction works well in other cases, not
-just for the canonical Aletheia models.
+To verify that our approach has general applicability, we now test the
+asymptotic fit on a much broader selection of models.
 
-We produce two sets of test cases, one for random cosmologies, one for
-random cosmologies with $A_s$ fixed. Specifically, we only randomize
-evolution parameters.
+\textcolor{orange}{What if we tested this fitting function on an independent
+set of models with a consistent but different set of shape parameters?}
+
+First, we created the function \verb|get_random_cosmology| function, which
+accepts an $\omega_\nu$ value and returns a cosmology with randomized
+evolution parameters over the following ranges:~\ref{tab: fit_test_params}.
+All of the shape parameters are still consistent with Aletheia model 0.
+
+\begin{table}[ht!]
+\centering
+\begin{tabular}{l|l|l}
+\hline
+Parameter & Minimum Value & Maximum Value \\ \hline
+$h$ & 0.2 & 1 \\
+$\omega_K$ & -0.05 & 0.05 \\
+$w_0$ & -2.0 & -0.5 \\
+$w_a$ & -0.5 & 0.5 \\
+$A_s$\footnotemark & $5.003 \cdot 10^{-10}$ & $1.484 \cdot 10^{-8}$  \\
+\end{tabular}
+ \cprotect\caption[Parameter Ranges for Random Test
+ 	Cosmologies]{Parameters which we vary for the purpose of testing the
+ 	generality of fit~\ref{eq: fit}, and their domains.
+ 	\textcolor{red}{Is it poor form to have a footnote that looks like an
+ 	exponent? How should I do it differently?}
+ \label{tab: fit_test_params}
+\end{table}
+
+\footnotetext{These values were rounded to three significant figures. Refer
+to the code for greater precision.}
 
 The \verb|get_As_matched_cosmology| function.
-The \verb|get_random_cosmology| function.
+
 
 In producing asymptote plots, we find that our predictions line up quite well,
 but not perfectly. This may indicate that our parametrization is insufficient.
