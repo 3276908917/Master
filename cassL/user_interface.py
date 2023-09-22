@@ -156,16 +156,18 @@ def build_train_and_test_sets(scenario_name):
     #X Step 4: build test LHC 
     
     # Step 5: fill-in test LHC
+    
+    if scenario["same_test_set"] is None:
 
-    lhc_test = np.load("data_sets/" + scenario["LHC_train"] + \
-                        "/lhc_test_initial.npy")
-    
-    samples_test, rescalers_test = \
-        ged.fill_hypercube(lhc_train, standard_k, param_ranges=priors,
-            save_label=scenario_name + "_test")
-    
-    np.save(save_path + "/samples_test.npy", samples_test)
-    np.save(save_path + "/rescalers_test.npy", rescalers_test)
+        lhc_test = np.load("data_sets/" + scenario["LHC_train"] + \
+                            "/lhc_test_initial.npy")
+        
+        samples_test, rescalers_test = \
+            ged.fill_hypercube(lhc_train, standard_k, param_ranges=priors,
+                save_label=scenario_name + "_test")
+        
+        np.save(save_path + "/samples_test.npy", samples_test)
+        np.save(save_path + "/rescalers_test.npy", rescalers_test)
     
     #X Step 6: call build_and_test_emulator
 

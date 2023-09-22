@@ -1,0 +1,12 @@
+# What is the point of this emulator?
+
+$priors
+COMET_with_nu
+$paired_with
+None
+$num_spectra_points
+300
+$same_test_set
+Hnu2direct
+$LHC_train
+Hnu2_4000samples
