@@ -1,6 +1,8 @@
 import numpy as np
 from cassL import lhc
+from cassL import generate_emu_data as ged
 from cassL import train_emu as te
+import os
 
 # In keeping with the format of values typically quoted in the literature for
 # the scalar mode amplitude (see, for example, Spurio Mancini et al, 2021 ),
@@ -105,7 +107,7 @@ def build_train_and_test_sets(scenario_name):
     # Keep track of the scenario folder, so that we can save things there...
     
     scenario = {}
-    file_handle = "scenarios/" + scenario_name + "/" + scenario_name + ".txt"
+    file_handle = "scenarios/" + scenario_name + ".txt"
     
     with open(file_handle, 'r') as file:
         lines = file.readlines()
@@ -114,41 +116,59 @@ def build_train_and_test_sets(scenario_name):
             if line[0] == "$":
                 key = line[1:].strip()
             else:
-                val = line
+                val = line.strip()
                 if line == "None":
                     val = None
                 elif line.isnumeric():
                     val = float(line)
                 scenario[key] = val
     
-    # Step 2: build train LHC
+    #X Step 2: build train LHC
     
-    priors = prior_file_to_dict(scenario["prior_name"])
+    priors = prior_file_to_dict(scenario["priors"])
     
+    '''
     train_lhc = lhc.multithread_unit_LHC_builder(dim=len(priors),
         n_samples=scenario["num_test_samples"],
         label=scenario_name,
         num_workers=12, previous_record=0)
+    '''
     
     # Step 3: fill-in train LHC
     
-    # Step 4: build test LHC
+    standard_k = np.load("data_sets/k/" + scenario["num_spectra_points"] + \
+                         "k.npy", allow_pickle=True)
+    
+    lhc_train = np.load("data_sets/" + scenario["LHC_train"] + \
+                        "/lhc_train_initial.npy")
+    
+    save_path = "data_sets/" + scenario_name
+    if not os.path.exists(save_path):
+        os.makedirs(save_path)
+    
+    samples_train, rescalers_train = \
+        ged.fill_hypercube(lhc_train, standard_k, param_ranges=priors,
+            save_label=scenario_name + "_train")
+    
+    np.save(save_path + "/samples_train.npy", samples_test)
+    np.save(save_path + "/rescalers_train.npy", rescalers_test)
+    
+    #X Step 4: build test LHC 
     
     # Step 5: fill-in test LHC
+
+    lhc_test = np.load("data_sets/" + scenario["LHC_train"] + \
+                        "/lhc_test_initial.npy")
     
-    # Step 6: call build_and_test_emulator
+    samples_test, rescalers_test = \
+        ged.fill_hypercube(lhc_train, standard_k, param_ranges=priors,
+            save_label=scenario_name + "_test")
+    
+    np.save(save_path + "/samples_test.npy", samples_test)
+    np.save(save_path + "/rescalers_test.npy", rescalers_test)
+    
+    #X Step 6: call build_and_test_emulator
 
-
-
-    # The function needs to auto-detect how much progress we've already made
-    # on each particular scenario.
-
-    # The function needs to store results in carefully organized directories
-
-    # The function needs to automatically delete backups that are no longer
-    # needed.
-
-    return 23
 
 def get_data_dict(emu_name, prior_name="COMET", test_name=None):
     #! WATCH OUT! THIS FUNCTION ASSUMES MASSIVE NEUTRINOS ALWAYS

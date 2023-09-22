@@ -4,7 +4,7 @@ $priors
 COMET
 $paired_with
 None
-$num_sectra_points
+$num_spectra_points
 300
 $num_train_samples
 5000
@@ -14,3 +14,7 @@ $test_scenario
 None
 $num_test_samples
 5000
+$same_test_set
+None
+$LHC_file
+?
