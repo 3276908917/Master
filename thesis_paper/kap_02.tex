@@ -55,8 +55,8 @@ refers to the \verb|CAMBparams| object within our code.
 \section{Universal Settings}
 
 First, we will motivate settings that are universal across runs. These are 
-mostly 
-contained in the helper function \verb|apply_universal_output_settings| in the 
+mostly contained in the helper function \\
+\verb|apply_universal_output_settings| in the
 CL script \verb|camb_interface.py|.
 
 Although CAMB also offers CMB spectra, we are interested in the
@@ -114,7 +114,8 @@ need to generate one training set in order to produce an emulator. Therefore,
 computation time invested now will result in an emulator which is more
 accurate and equally fast.
 
-\verb|pars.Accuracy.lAccuracyBoost = 3| \quad requests more multipoles in the Boltzmann hierarchy. \textcolor{orange}{Whatever that is}
+\verb|pars.Accuracy.lAccuracyBoost = 3| \quad requests more multipoles in the 
+Boltzmann hierarchy. \textcolor{orange}{Whatever that is}
 
 \verb|pars.Accuracy.AccuracyBoost = 3| 
 
@@ -133,7 +134,8 @@ One additional universal setting is handled in the function
 the \verb|CAMBparams| object \verb|pars|. The cosmology dictionary is
 intended to store cosmological parameters in a more user-friendly format.
 All cosmology dictionaries should follow the same structure in order to be 
-correctly interpreted by the various functions in CL. The required keys are described in table~\ref{tab: cosmology_dictionary}; all
+correctly interpreted by the various functions in CL. The required keys are 
+described in table~\ref{tab: cosmology_dictionary}; all
 values should be floating point numbers. The user is advised to print out
 cosmology dictionaries with the \verb|print_cosmology| function in the
 \verb|user_interface.py| script, which will automatically ignore unused keys
@@ -179,7 +181,8 @@ The \verb|input_cosmology| function implements the following additional
 settings universal to all of our power spectra:
 
 \verb|tau=0.0952| \quad specified in the call to \verb|pars.set_cosmology|.
-$\tau$ describes the optical depth to the CMB. \textcolor{orange}{What kinds of parameters are $Y_\text{He}$ and $\tau$ in evolution mapping?
+$\tau$ describes the optical depth to the CMB. \textcolor{orange}{What kinds 
+of parameters are $Y_\text{He}$ and $\tau$ in evolution mapping?
 Do they affect the power spectrum at all?}
 
 
@@ -339,10 +342,12 @@ different here: since the number of $z$ values in the array determines the
 resolution of the interpolator, the user desiring maximum accuracy is
 encouraged to input 150 redshift values, which is the maximum allowed by CAMB.
 
-\verb|get_CAMB_interpolator| function is a helper for this approach and is not 
+The \verb|get_CAMB_interpolator| function is a helper for this approach and is 
+not 
 likely to be otherwise needed by a typical user. For users interested in
 developing their own interfaces with CAMB, we mention two further
-settings in the call to \verb|get_matter_power_interpolator| which are not
+settings in the call to \\
+\verb|get_matter_power_interpolator| which are not
 modifiable through CL functions:
 
 \verb|nonlinear=False| (\textcolor{orange}{Why are we specifying the linear
@@ -415,12 +420,13 @@ include 8, as that model cannot be processed in the latest (as of October 2,
 2023) version of CL.
 
 Since S\'{a}nchez's power spectra were evaluated at 1000 points, we call
+\\
 \verb|boltzmann_battery| with \verb|k_points=1000|. The errors are miniscule 
 and recorded in figure XXY. 
 
 \begin{figure}[ht!]
   \centering
-  \includegraphics[scale=1.0]{err_on_CL/Ariel}
+  \includegraphics[width=\textwidth]{err_on_CL/Ariel}
   \caption[CL Consistency]{35 error curves, spanning
   	7 Aletheia models and 5 $\omega_\nu$ values.}
   \label{fig: Ariel_errs}

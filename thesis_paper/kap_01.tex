@@ -489,7 +489,7 @@ illustrating these different dependencies.
 
 \begin{figure}[ht!]
   \centering
-  \includegraphics[scale=1.0]{intro/m0_Pk}
+  \includegraphics[width=\textwidth]{intro/m0_Pk}
   \caption[Aletheia Model 0 Power Spectrum]{This is power spectrum was
   computed by CAMB for Aletheia model 0 without massive neutrinos.
   Table~\ref{tab: Aletheia_m0} defines this model in terms
@@ -788,7 +788,7 @@ order to illustrate the impact of $\sigma_{12}$, $z$, $h$, etc.
 
 \begin{figure}[ht!]
   \centering
-  \includegraphics[scale=1.0]{intro/parameter_demos/ombh2_impact_on_Pk}
+  \includegraphics[width=\textwidth]{intro/parameter_demos/ombh2_impact_on_Pk}
   \caption[Impact of $\omega_b$ on $P(k)$]{Impact of $\omega_b$. Increased
   	density in baryons corresponds to an increase in power on all scales.
   	However, this is not equivalent to a simple change in overall amplitude.
@@ -804,7 +804,7 @@ order to illustrate the impact of $\sigma_{12}$, $z$, $h$, etc.
 
 \begin{figure}[ht!]
   \centering
-  \includegraphics[scale=1.0]{intro/parameter_demos/omch2_impact_on_Pk}
+  \includegraphics[width=\textwidth]{intro/parameter_demos/omch2_impact_on_Pk}
   \caption[Impact of $\omega_c$ on $P(k)$]{Impact of $\omega_c$. Increased
   	density in CDM smooths out the BAO, similarly to the baryon case
   	(see figure~\ref{fig: omega_b_dependence}). More visibly, higher
@@ -826,7 +826,7 @@ order to illustrate the impact of $\sigma_{12}$, $z$, $h$, etc.
 
 \begin{figure}[ht!]
   \centering
-  \includegraphics[scale=1.0]{intro/parameter_demos/n_s_impact_on_Pk}
+  \includegraphics[width=\textwidth]{intro/parameter_demos/n_s_impact_on_Pk}
   \caption[Impact of $n_s$ on $P(k)$]{Impact of $n_s$. The $n_s$ can be
   thought of as a kind of rotation of the power spectrum, although this
   is only coarse description. The differences shown here are
@@ -836,7 +836,7 @@ order to illustrate the impact of $\sigma_{12}$, $z$, $h$, etc.
 
 \begin{figure}[ht!]
   \centering
-  \includegraphics[scale=1.0]{intro/parameter_demos/A_s_impact_on_Pk}
+  \includegraphics[width=\textwidth]{intro/parameter_demos/A_s_impact_on_Pk}
   \caption[Impact of $A_s$ on $P(k)$]{Impact of $A_s$. Differences produce
   	only a change in the overall amplitude of the power spectrum. We stress
   	that this simple description applies only in the case of massless
@@ -850,7 +850,7 @@ order to illustrate the impact of $\sigma_{12}$, $z$, $h$, etc.
 
 \begin{figure}[ht!]
   \centering
-  \includegraphics[scale=1.0]{intro/parameter_demos/omnuh2_impact_on_Pk}
+  \includegraphics[width=\textwidth]{intro/parameter_demos/omnuh2_impact_on_Pk}
   \caption[Impact of $\omega_\nu$ on $P(k)$]{Impact of $\omega_\nu$ for the
   	fixed redshift $z=0$. Massive neutrinos suppress structure formation in
   	a manner highly reminiscent of radiation. This similarity arises from the
@@ -870,8 +870,10 @@ Since many of these parameters have fairly unique impacts on the power
 spectrum, we can imagine building a collection of power spectra labeled by
 their parameter configurations and then comparing our real-world observations 
 to them. We can ask to which of these theoretical power spectra our 
-observations most closely agree. This question is quantitatively answered by 
-parameter inference in the form of a Monte Carlo Markov Chain (MCMC) analysis, whose basic idea will be discussed in the next section.
+observations most closely agree.
+In the next section, we will categorize parameters according to the
+kind of impact that they have on the power spectrum, which allows us to
+exploit a degeneracy and make our emulator more efficient. 
 
 %%% We're sinking this section! It's not relevant enough and I don't know 
 %%% enough.
@@ -887,11 +889,18 @@ parameter inference in the form of a Monte Carlo Markov Chain (MCMC) analysis, w
 
 %We can assign a probability $P(\bm{\pi} | d$
 
-This can be a very brief section, but I want to discuss a little bit of how most modern parameter inference works because it motivates the need for extremely fast power spectrum computation. It provides a sort of conceptual bridge between our ``pure'' goal (quantifying the cosmos) and the nitty-gritty bulk of the paper (optimizing emulator performance).
+This can be a very brief section, but I want to discuss a little bit of how 
+most modern parameter inference works because it motivates the need for 
+extremely fast power spectrum computation. It provides a sort of conceptual 
+bridge between our ``pure'' goal (quantifying the cosmos) and the nitty-gritty 
+bulk of the paper (optimizing emulator performance).
 
 Metropolis-Hastings algorithm.
 
-We don't know what the true probability distribution of power spectra is. In order to build this distribution with simulation results, we simply draw from the distribution. \textcolor{orange}{Refer to ``Data to Insights'' lecture notes in order to tighten this description.}
+We don't know what the true probability distribution of power spectra is. In 
+order to build this distribution with simulation results, we simply draw from 
+the distribution. \textcolor{orange}{Refer to ``Data to Insights'' lecture 
+notes in order to tighten this description.}
 
 \end{comment}
 %%%
@@ -945,7 +954,7 @@ in evolution parameters.
 
 \begin{figure}[ht!]
   \centering
-  \includegraphics[scale=1.0]{intro/san21f2}
+  \includegraphics[width=\textwidth]{intro/san21f2}
   \cprotect\caption[Demonstration of evolution mapping]{Power spectra matched
   	in $\sigma_{12}$ via evaluation at different redshifts. For each value of
   	$\sigma_{12}$
@@ -1148,26 +1157,30 @@ sampling, see figure~\ref{fig: sample_comparison}.
     \begin{subfigure}{0.32 \textwidth}
     \centering
  		\includesvg[width=\textwidth]{intro/lhs/random}
- 		\caption{A random sample. Some subintervals are sampled repeatedly.}
+ 		\caption{}
  		\label{fig: random_sample}
     \end{subfigure}
     \begin{subfigure}{0.32 \textwidth}
     \centering
  		\includesvg[width=\textwidth]{intro/lhs/bad_LHS}
- 		\caption{An LHS with a low minimum separation between points.}
+ 		\caption{}
  		\label{fig: poor_lhs}
     \end{subfigure}
     \begin{subfigure}{0.32 \textwidth}
     \centering
  		\includesvg[width=\textwidth]{intro/lhs/better_LHS}
- 		\caption{A different LHS with a higher minimum separation between
- 			points.}
+ 		\caption{}
  		\label{fig: better_lhs}
     \end{subfigure}
     \centering
     \caption[Comparison of SRS and Latin hypercube sampling.]{Comparison of an 
     example
-    	random sample with two examples of LHSs. Unlike random sampling,
+    	random sample with two examples of LHSs.
+    	\ref{fig: random_sample} a random sample.
+    	Some subintervals are sampled repeatedly.
+	\ref{fig: poor_lhs} An LHS with a low $s^*$.    	
+    	\ref{fig: better_lhs} A different LHS with a higher $s^*$.
+    	Unlike random sampling,
     	Latin hypercube sampling guarantees that every subinterval will be 
     	sampled. However, if
     	the minimum separation is low enough, there will still be large
