@@ -365,8 +365,11 @@ def get_As_matched_cosmology(omega_nu, A_s=2.12723788013000E-09):
     table for this?
     """
     row = cp.deepcopy(cosm.iloc[0])
+    
+    omdeh2 = np.random.uniform(0.1, 0.5)
+    omKh2 = np.random.uniform(-0.05, 0.05)
 
-    row['h'] = np.random.uniform(0.2, 1)
+    row['h'] = np.sqrt(row["ombh2"] + row["omch2"] + omdeh2 + omKh2)
     
     # These fields are not used anywhere
     # Given h, the following are now fixed:
@@ -374,8 +377,7 @@ def get_As_matched_cosmology(omega_nu, A_s=2.12723788013000E-09):
     # row['OmC'] = row['omch2'] / row['h'] ** 2
     # row['OmM'] = row['OmB'] + row['OmC']
 
-    OmK_low_bound = -0.05 / row['h'] ** 2
-    row['OmK'] = np.random.uniform(OmK_low_bound, -OmK_low_bound)
+    row['OmK'] = omKh2 / row['h'] ** 2
         
     # This field is not used anywhere
     #row['OmL'] = 1 - row['OmM'] - row['OmK']

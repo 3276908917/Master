@@ -150,7 +150,7 @@ def build_train_and_test_sets(scenario_name):
 
     return 23
 
-def get_data_dict(emu_name, prior_name="COMET"):
+def get_data_dict(emu_name, prior_name="COMET", test_name=None):
     #! WATCH OUT! THIS FUNCTION ASSUMES MASSIVE NEUTRINOS ALWAYS
 
     # This will return a dictionary which the new iteration of
@@ -169,6 +169,9 @@ def get_data_dict(emu_name, prior_name="COMET"):
 
     Y_train = np.load(directory + "samples_train.npy", allow_pickle=False)
     data_dict["Y_train"] = Y_train
+
+    if test_name is not None:
+        directory = "data_sets/" + test_name + "/"
 
     X_test = np.load(directory + "lhc_test_final.npy", allow_pickle=False)
     data_dict["X_test"] = X_test
