@@ -73,7 +73,8 @@ emulator performance trained on hyper cubes of various minimum distances.
 
 \section{Resolution of the k Axis}
 
-This might go better in the CassL section, but I think I ought to motivate the decision to use length-300 arrays.
+This might go better in the CassL section, but I think I ought to motivate the 
+decision to use length-300 arrays.
 
 \section{Number of Training Samples}
 \label{sec: num_samples}
@@ -81,9 +82,13 @@ This might go better in the CassL section, but I think I ought to motivate the d
 \textcolor{blue}{Justify choice of 5000 samples for each: maybe we can make a
 trend plot showing diminishing returns in test error?}
 
-% This might go better in the CassL section, but I think I ought to motivate the decision to use 5000 training arrays.
+% This might go better in the CassL section, but I think I ought to motivate 
+% the decision to use 5000 training arrays.
 
-\textcolor{orange}{I'll have to concede that the results of this section are not entirely comprehensive; we didn't train any emulators over the uncertainties of analogous validation hypercubes. All comparisons here use the simpler pipeline of just two data sets, training and testing.}
+\textcolor{orange}{I'll have to concede that the results of this section are 
+not entirely comprehensive; we didn't train any emulators over the 
+uncertainties of analogous validation hypercubes. All comparisons here use the 
+simpler pipeline of just two data sets, training and testing.}
 
 
 \section{Linear Sampling in Different Parameters}
@@ -101,12 +106,46 @@ strategy will more efficiently reduce the deltas that we see in our emulator.
 
 \section{Summary of the Paper}
 
-What was the main objective of this thesis? What were the key results of this work? Why are they important? How do these results compare with results from papers on similar subjects?
+What was the main objective of this thesis? What were the key results of this 
+work? Why are they important? How do these results compare with results from 
+papers on similar subjects?
+
+\section{Emulation over Uncertainties}
+
+\textcolor{blue}{This content should be subsumed into future work, since we
+didn't manage to complete this feature in time.}
+
+For a further step of accuracy, we can add a third data set to our pipeline
+and introduce a second layer of emulation.
+
+Up to this point, our pipeline has included a training set and a testing set.
+If we add a validation set, then we can train a second emulator over the
+errors associated with the first emulator's performance on this validation
+set.
+
+Within the current (as of \textcolor{orange}{24.08.2023}) setup of
+Cassandra-Linear, we typically generate two Latin hypercubes for each
+emulator. The first represents our training set and an emulator cannot be
+produced without it. The second one represents our validation set.
+
+\textcolor{orange}{In a future
+release of Cassandra-Linear, this set will be used to train an ``uncertainty''
+emulator, which will train over the errors from the main emulator in order to
+provide the user with an uncertainty estimate for any cosmology located within
+the space of priors over which the main emulator was trained.} 
+
+\textcolor{orange}{However, this functionality has not yet been implemented. 
+Currently, we are 
+using the validation hypercube more as a test hypercube: we compute the 
+uncertainties at discrete points and examine these uncertainties (e.g. with
+scatterplots and histograms) to assess the performance of the emulator.}
+
 
 \section{Future Work}
 \label{sec: future_work}
 
-Here I will talk about what kinds of questions we estimate will be most fruitful for further inquiries about this topic and this code.
+Here I will talk about what kinds of questions we estimate will be most 
+fruitful for further inquiries about this topic and this code.
 
 Is there a theoretically perfect LHC generator?
 
@@ -129,7 +168,8 @@ papers for investigations into this question.
 
 GP's allow natural propagation of
 uncertainty in predictions to the final posterior distribution; neural
-networks lack this feature. At the same time, NNs provide larger speedups \textcolor{green}{CITATIONS}.
+networks lack this feature. At the same time, NNs provide larger speedups 
+\textcolor{green}{CITATIONS}.
 
 The code should be expanded with documentation and unit tests. Also, the
 user interface script is still in progress.
