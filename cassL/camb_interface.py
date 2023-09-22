@@ -289,9 +289,9 @@ def match_sigma12(target, tolerance, cosmology,
 
     # First, let's probe the half-way point.
     # We're assuming a maximum allowed redshift of $z=2$ for now.
-
+#!
     # print(_z)
-    _, _, _, list_s12 = evaluate_cosmology(cosmology, 0, nu_massive=False,
+    _, _, _, list_s12 = evaluate_cosmology(cosmology, _redshifts, nu_massive=False,
                                            redshifts=_redshifts)
 
     import matplotlib.pyplot as plt
@@ -740,16 +740,16 @@ def evaluate_cosmology(cosmology, redshifts=[0], fancy_neutrinos=False,
     -----------
     cosmology: dict
         a dictionary of value for CAMBparams fields
-    redshifts: array of redshift values at which to evaluate the model
+    redshifts: list or np.ndarray
+        collection of redshift values at which to evaluate the model
         If you would like to fix the sigma12 value, specify this in the mlc
         dictionary and set this parameter to None. If you would not like to
         fix the sigma12 value, make sure that the mlc dictionary does not
         contain a non-None sigma12 entry.
-
-    @param omnuh2_in : neutrino physical mass density
-    @fancy_neutrinos: flag sets whether we attempt to impose a neutrino
-        scheme on CAMB after we've already set the physical density. The
-        results seem to be inconsistent with observation.
+    fancy_neutrinos: Boolean
+        Whether we attempt to impose a neutrino scheme on CAMB after we've
+        already set the physical density. The results seem to be inconsistent
+        with observation, but we need more
     """
     ''' Retire this code block until we figure out z dominance
     if redshifts is None:
