@@ -38,6 +38,8 @@ OMNUH2_FLOATS = np.array([0.0006356, 0.002148659574468, 0.006356, 0.01])
 # access the power spectra save files provided to us by Ariel.
 OMNUH2_STRS = np.array(["0.0006", "0.002", "0.006", "0.01"])
 
+ALETHEIA_SNAPS = np.array([0, 1, 2, 3, 4])
+
 # ! Just some standard colors and styles for when I plot several models
 # together. We should figure out a way to get rid of this.
 colors = ["green", "blue", "brown", "red", "black", "orange", "purple",
@@ -291,8 +293,8 @@ def match_sigma12(target, tolerance, cosmology,
     # We're assuming a maximum allowed redshift of $z=2$ for now.
 #!
     # print(_z)
-    _, _, _, list_s12 = evaluate_cosmology(cosmology, _redshifts, nu_massive=False,
-                                           redshifts=_redshifts)
+    _, _, _, list_s12 = evaluate_cosmology(cosmology, _redshifts,
+                                           k_points=1000)
 
     import matplotlib.pyplot as plt
     # print(list_s12)
@@ -321,8 +323,8 @@ def match_sigma12(target, tolerance, cosmology,
         print("No solution.")
         return None
 
-    _, _, _, s12_out = evaluate_cosmology(cosmology, 0, nu_massive=False,
-                                          redshifts=[z_best])
+    _, _, _, s12_out = evaluate_cosmology(cosmology, redshifts=[z_best],
+                                          k_points=1000)
     discrepancy = (s12_out[0] - target) / target
     if abs(discrepancy) <= tolerance:
         return z_best
@@ -331,11 +333,11 @@ def match_sigma12(target, tolerance, cosmology,
         new_floor = max(0, z_best - z_step)
         new_ceil = min(1100, z_best + z_step)
         new_redshifts = np.flip(np.linspace(new_floor, new_ceil, 150))
-        return match_s12(target, tolerance, cosmology,
+        return match_sigma12(target, tolerance, cosmology,
                          _redshifts=new_redshifts)
 
 
-def get_As_matched_cosmology(A_s=2.12723788013000E-09):
+def get_As_matched_cosmology(omega_nu, A_s=2.12723788013000E-09):
     """
     !
     Return a cosmological configuration based on model0 but uniformly
@@ -362,22 +364,20 @@ def get_As_matched_cosmology(A_s=2.12723788013000E-09):
     ! Unfortunately, all of these bounds are hard-coded. Maybe we can read in a
     table for this?
     """
-    row = {}
-
-    # Shape pars: CONSTANT ACROSS MODELS
-    row['ombh2'] = 0.022445
-    row['omch2'] = 0.120567
-    row['n_s'] = 0.96
+    row = cp.deepcopy(cosm.iloc[0])
 
     row['h'] = np.random.uniform(0.2, 1)
-
+    
+    # These fields are not used anywhere
     # Given h, the following are now fixed:
-    row['OmB'] = row['ombh2'] / row['h'] ** 2
-    row['OmC'] = row['omch2'] / row['h'] ** 2
-    row['OmM'] = row['OmB'] + row['OmC']
+    # row['OmB'] = row['ombh2'] / row['h'] ** 2
+    # row['OmC'] = row['omch2'] / row['h'] ** 2
+    # row['OmM'] = row['OmB'] + row['OmC']
 
-    row['OmK'] = 0
-    row['OmL'] = 1 - row['OmM'] - row['OmK']
+    row['OmK'] = np.random.uniform(-0.05, 0)
+    
+    # This field is not used anywhere
+    #row['OmL'] = 1 - row['OmM'] - row['OmK']
 
     # ~ Do we have any constraints on h besides Aletheia?
     # I ask because this seems like a pretty small window.
@@ -387,11 +387,18 @@ def get_As_matched_cosmology(A_s=2.12723788013000E-09):
     row['wa'] = np.random.uniform(-0.5, 0.5)
 
     row['A_s'] = A_s
+    
+    nnu_massive = 1 if omega_nu != 0 else 0
 
-    return row
+    return specify_neutrino_mass(row, omega_nu)
 
 
-def get_random_cosmology():
+#! This is really an awful approach, but it should make the code marginally
+# faster.
+A_min = np.exp(1.61) / 10 ** 10
+A_max = np.exp(5) / 10 ** 10
+
+def get_random_cosmology(omega_nu):
     r"""
     !
     Return a cosmological configuration based on model0 but uniformly
@@ -411,22 +418,20 @@ def get_random_cosmology():
     ! Unfortunately, all of these bounds are hard-coded. Maybe we can read in a
     table for this?
     """
-    row = {}
-
-    # Shape pars: CONSTANT ACROSS MODELS
-    row['ombh2'] = 0.022445
-    row['omch2'] = 0.120567
-    row['n_s'] = 0.96
+    row = cp.deepcopy(cosm.iloc[0])
 
     row['h'] = np.random.uniform(0.2, 1)
 
+    # These fields are not used anywhere
     # Given h, the following are now fixed:
-    row['OmB'] = row['ombh2'] / row['h'] ** 2
-    row['OmC'] = row['omch2'] / row['h'] ** 2
-    row['OmM'] = row['OmB'] + row['OmC']
+    # row['OmB'] = row['ombh2'] / row['h'] ** 2
+    # row['OmC'] = row['omch2'] / row['h'] ** 2
+    # row['OmM'] = row['OmB'] + row['OmC']
 
     row['OmK'] = np.random.uniform(-0.05, 0)
-    row['OmL'] = 1 - row['OmM'] - row['OmK']
+    
+    # This field is not used anywhere
+    # row['OmL'] = 1 - row['OmM'] - row['OmK']
 
     # ~ Do we have any constraints on h besides Aletheia?
     # I ask because this seems like a pretty small window.
@@ -434,19 +439,15 @@ def get_random_cosmology():
     row['w0'] = np.random.uniform(-2., -.5)
     # ditto
     row['wa'] = np.random.uniform(-0.5, 0.5)
-
-    A_min = np.exp(1.61) / 10 ** 10
-    A_max = np.exp(5) / 10 ** 10
+    
     row['A_s'] = np.random.uniform(A_min, A_max)
 
-    # ~ Should we compute omnuh2 here, or leave that separate?
+    return specify_neutrino_mass(row, omega_nu)
+    
 
-    # ~ Should we also specify pars not specified by the Aletheia data
-    # table, for example tau or the CMB temperature?
-
-    return row
-
-
+#! It's confusing to the user to have both omnuh2_floats and skips_omega as
+# parameters. Let's just assume that omnuh2_floats already skips the
+# uninteresting values!
 def boltzmann_battery(omnuh2_floats, skips_omega=[0, 2], skips_model=[8],
                       skips_snapshot=[1, 2, 3], hubble_units=False,
                       models=cosm, fancy_neutrinos=False, k_points=100000):
@@ -616,13 +617,18 @@ def input_dark_energy(pars, w0, wa):
         pars.set_dark_energy(w=w0, wa=wa, dark_energy_model='ppf')
 
 
-def specify_neutrino_mass(cosmology, omnuh2_in, nnu_massive_in=1):
+def specify_neutrino_mass(cosmology, omnuh2_in, nnu_massive_in=None):
     """
     Helper function for input_cosmology.
     This returns modified copy (and therefore does not mutate the original) of
     the input dictionary object, which corresponds to a cosmology with massive
     neutrinos.
     """
+    # Default behavior: if no nnu_massive_in specified, take it to be 1 in the
+    # massive-neutrino case, 0 otherwise
+    if nnu_massive_in is None:
+        nnu_massive_in = 0 if omnuh2_in == 0 else 1
+    
     full_cosmology = cp.deepcopy(cosmology)
 
     full_cosmology["omnuh2"] = omnuh2_in
