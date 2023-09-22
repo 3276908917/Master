@@ -10,6 +10,7 @@ import camb
 from camb import model, initialpower, get_matter_power_interpolator
 
 from cassL import camb_interface as ci
+from cassL import user_interface as ui
 
 model0 = ci.cosm.loc[0]
 
@@ -101,9 +102,9 @@ def direct_eval_cell(input_cosmology, standard_k_axis, debug=False):
 
     if debug:
         print("\nMEMNeC:")
-        print_cosmology(MEMNeC)
+        ui.print_cosmology(MEMNeC)
         print("\nOriginal cosmology:")
-        print_cosmology(input_cosmology)
+        ui.print_cosmology(input_cosmology)
         print("\n")
 
     _, _, _, list_sigma12 = ci.evaluate_cosmology(MEMNeC, _redshifts,
@@ -135,7 +136,7 @@ def direct_eval_cell(input_cosmology, standard_k_axis, debug=False):
         if input_cosmology['h'] <= 0.1:
             print("\nThis cell cannot be solved with a nonnegative redshift.")
             print("This is the failed cosmology:\n")
-            print_cosmology(input_cosmology)
+            ui.print_cosmology(input_cosmology)
             print("\nThe closest feasible sigma_12 value is off by:",
                 abs(list_sigma12[len(list_sigma12) - 1] / \
                 input_cosmology["sigma12"]) * 100, "%\n")
@@ -220,7 +221,7 @@ def interpolate_cell(input_cosmology, standard_k_axis):
         if input_cosmology['h'] <= 0.1:
             print("\nThis cell cannot be solved with a nonnegative redshift.")
             print("This is the failed cosmology:\n")
-            print_cosmology(input_cosmology)
+            ui.print_cosmology(input_cosmology)
             print("\nThe closest feasible sigma_12 value is off by:",
                 abs(list_sigma12[len(list_sigma12) - 1] / \
                 input_cosmology["sigma12"]) * 100, "%\n")
