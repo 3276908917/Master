@@ -16,6 +16,7 @@ the emulation.
 % one, because the writing should constantly refer back to it.
 
 \section{Pipeline and Design Choices}
+\label{sec: flow_chart}
 
 % Disgusting hack to get verbatim functionality in tabel
 
@@ -76,7 +77,7 @@ Script & Abbreviation & purpose \\ \hline
 
 The \verb|pyDOE2| function that we will use to generate our LHSs
 returns a result with entries that range from zero to unity. In continuity
-with the language of section~\ref{sec: lhc_intro}, we will refer
+with the language of section~\ref{sec: lhc_theory}, we will refer
 to such LHSs as \textit{unit} LHSs.\footnote{We will later denote LHSs with 
 the matrix notation $\matr{X}$ and collections of CAMB power spectra as
 $\matr{Y}$ to
@@ -168,10 +169,10 @@ All intervals are sampled uniformly, \textcolor{orange}{although some
 experimental code exists to interpret the same hypercube as a uniform sampling
 in root or square space, for example}. At first, we used the highly ambitious 
 (relative to modern uncertainty bars) ``MEGA'' set of priors
-(table~\ref{tab: priors}),
+(table~\ref{tab: MEGA_priors}),
 whose values we decided based on the recent emulator papers from
-\textcolor{green}{Spurio Mancini et al 2021. and the other paper, I can't
-remember the name.} However, during the process of generating training data, 
+\citet{Mancini} and \citet{Arico}.
+However, during the process of generating training data, 
 we found that CAMB was not able to match all of the necessary $\sigma_{12}$ 
 values. We refer to such a situation as an unsolvable cell, and will explain
 why it happens in section~\ref{sec: generate_emu_data}, which covers the
@@ -215,8 +216,8 @@ extrapolation} from our training data, which is dangerous for accuracy.
 To 
 address this unique problem among our parameter ranges, CL can automatically 
 access one of two emulators depending on the user’s input. The primary 
-emulator is trained over the aforementioned prior range in $\omega_\nu$
-(table~\ref{tab: neutrino_priors}). In addition to this, we’ve trained a 
+emulator is trained over the aforementioned prior range,
+$\omega_\nu \in [0, 0.01]$. In addition to this, we’ve trained a 
 separate emulator specifically to handle the massless neutrino case. In 
 practice, this entails the same prior ranges for the parameters $\omega_b$, 
 $\omega_c$, $n_s$, and $\sigma_{12}$. However, here we no longer need $A_s$;

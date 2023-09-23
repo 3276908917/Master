@@ -35,7 +35,7 @@ In this section, we will discuss the building of LHSs, which within the
 Cassandra-linear is handled by the \verb|lhs.py| script.
 By ``LHSs,'' we are here referring exclusively to the
 sample of cosmologies for which we want to compute power spectra.
-However, as mentioned in section~\ref{sec: lhc_flow_chart}, at this stage we 
+However, as mentioned in section~\ref{sec: lhc_outline}, at this stage we 
 are not yet committing to a particular set of priors. Instead, each axis is 
 sampled from the uniform distribution $\mathcal{U} (0, 1)$.
 
@@ -323,8 +323,8 @@ This need goes beyond numerical instabilities. For example, if a parameter's
 prior range falls within the relatively reasonable [0.0001, 0.0006] interval, 
 its emulation will still be improved by normalizing it to a [0, 1] interval. 
 Nonetheless, the improvement will be more dramatic the further away a prior is 
-from this [0, 1] interval. The prior in $A_s$, as given in
-table~\ref{tab: neutrino_priors}, covers extremely small values. Consequently, 
+from this [0, 1] interval. The prior in $A_s$, regardless of the choice
+between the three default priors files, covers extremely small values. Consequently, 
 without the appropriate normalization, the trained GPR will be nearly 
 insensitive to the impact of $A_s$ and \textcolor{green}{almost behave like a 
 massless-neutrino emulator}; the lack of neutrino dependence would dominate 
@@ -408,7 +408,7 @@ predicting power spectra using the results of this thesis.}
 
 %s Now talk about the use of prior files
 
-In section~\ref{sec: default_priors}, we introduced different priors 
+In section~\ref{sec: lhc_outline}, we introduced different priors 
 included with CL, as well as their file names. These file names come into play 
 when calling the function \verb|prior_file_to_dict|, which reads a prior file
 into a Python dictionary. The reader is encouraged to add additional prior
