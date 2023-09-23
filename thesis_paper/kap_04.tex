@@ -8,10 +8,7 @@ spectra, 300 points for each spectrum) WITHOUT justifying any of them--later,
 in chapter~\ref{chap: disc_and_conc}, we'll justify these decisions and
 talk about the consequences of alternate settings.}
 
-In order to simplify the process of testing different emulator setups, and to 
-make power spectra more accessible to beginners in the field, we have 
-developed a Python package, which we call Cassandra-Linear (CL)1. CL 
-represents a full emulation pipeline from the generation of training and 
+CL represents a full emulation pipeline from the generation of training and 
 testing data to the plotting of error statistics associated with
 the emulation.
 
@@ -24,7 +21,9 @@ the emulation.
 \begin{figure}[ht!]
     \centering
  	\includesvg[width=\textwidth]{chap4/flow_chart}
- 	\caption{What do the different colors and shapes mean?}
+ 	\caption[CL Flow Chart]{Flow chart describing the broad structure of the
+ 		code as it pertains to construction of an emulator. Dotted lines
+ 		indicate connections still in development as of 2 October 2023.}
  	\label{fig: flow_chart}
 \end{figure}
 
