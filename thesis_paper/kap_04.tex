@@ -17,21 +17,58 @@ the emulation.
 
 \section{Pipeline and Design Choices}
 
+% Disgusting hack to get verbatim functionality in tabel
+
+
+
+\begin{comment}
+
+\SaveVerb{lhs}|lhs.py|
+\SaveVerb{ged}|generate_emu_data.py|
+\SaveVerb{ci}|camb_interface.py|
+\SaveVerb{te}|train_emu.py|
+\SaveVerb{ui}|user_interface.py|
+\SaveVerb{utils}|utils.py|
+\end{comment}
+
 % The following plots were generated with h_units_bad.ipynb
 \begin{figure}[ht!]
     \centering
  	\includesvg[width=\textwidth]{chap4/flow_chart}
  	\caption[CL Flow Chart]{Flow chart describing the broad structure of the
- 		code as it pertains to construction of an emulator. Dotted lines
- 		indicate connections still in development as of 2 October 2023.}
+ 		code as it pertains to constructing an emulator. Dotted lines
+ 		indicate connections still in development as of 2 October 2023.
+ 		\Verb|utils.py| contains code which is frequently used throughout
+ 		the entire pipeline, but due to its miscellaneous nature its
+ 		inclusion in this flow chart would lead to unnecessary clutter.}
  	\label{fig: flow_chart}
 \end{figure}
+
+\begin{comment}
+\UseVerb{utils}
+\end{comment}
 
 By default, each Latin hypercube consists of $N_s = 5000$ entries. For 
 justification of this quantity, please refer to
 section~\ref{sec: num_samples}.
 
 $N_k = 300$.
+
+\begin{table}[ht!]
+\centering
+\begin{tabular}{l|c|l}
+\hline
+Script & Abbreviation & purpose \\ \hline
+\Verb|lhs.py| & lhs & Creates unit LHSs. \\
+\Verb|generate_emu_data.py| & ged & Fill in hypercube with spectra. \\
+\Verb|camb_interface.py| & ci & Computes an individual spectrum. \\
+\Verb|train_emu.py| & te & Trains and tests emulator. \\
+\Verb|user_interface.py| & ui & Bridges lhs, ged, and te scripts. \\
+\end{tabular}
+ \cprotect\caption[Summary of CL Scripts]{Maybe we should axe the last
+ 	column.}
+ \label{tab: script_summary}
+\end{table}
 
 
 \section{LHCs}
