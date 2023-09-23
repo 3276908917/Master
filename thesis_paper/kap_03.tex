@@ -19,13 +19,9 @@ use to predict power spectra.
 % going to proceed under the current scheme and MAYBE allow ourselves to redo
 % it shortly before submission.
 
-\section{Equation to be Solved}
+\section{Formal Statement of the Solution}
 
-% Redo section title
-
-\textcolor{orange}{Remember to explain \textit{why} the prediction of these 
-asymptotes means that $A_s$ will capture most of the unruly behavior of 
-neutrinos. What theory motivates such a judgment? Or are we only guessing?}
+% Redo section title?
 
 We begin with the second proposal from section~\ref{sec: neutrino_problem}:
 to approximate the power spectrum of a massive-neutrino cosmology, we
@@ -57,10 +53,11 @@ this ratio $\el$
 
 If we can estimate $\el$ accurately, then in principle our task 
 is complete, because the slope toward smaller $k$ values is
-even and analytically predictable. \textcolor{green}{Can I refer the reader to
- a paper on this?}
+even and analytically predictable. \textcolor{red}{Do you know of a relevant
+paper to which I could refer the viewer? Or perhaps you would say that all of
+the necessary information is already contained in FECS?}
 
-\section{Proposed Fitting Functions}
+\section{Proposed Fitting Function}
  
 In order to explore this limit concretely, we will use the Aletheia models as
 our test cases. This means that we can rewrite definition~\ref{eq: ee} as:
@@ -76,10 +73,10 @@ code that we have written in order to explore these ratios, which one can find
 in} \verb|camb_interface.py|.
 
 To study the behavior of $\ee_i$, we developed the \verb|camb_interface.py|
-function \verb|model_ratios|. This function accepts a single snap
+function \\ \verb|model_ratios|. This function accepts a single snap
 index\footnote{Remember that there are four snaps for each model, and snap 
 four always corresponds to $z = 0$} and a set of power spectra nearly in the
-format returned by \\
+format returned by
 \verb|boltzmann_battery|, but without the $\omega_\nu$ 
 layer.\footnote{For explanations of the
 remaining function parameters, we refer the reader to the docstring} Tt
@@ -113,8 +110,6 @@ $\ee_i$.
 \textcolor{orange}{The above paragraph only describes the function in the
 case ``massive=`x'''}
 
-\textcolor{green}{Both plot titles need to be redone.}
-
 After experimenting with different functions and parameters, we find the
 following fitting function:
 
@@ -128,7 +123,7 @@ We demonstrate its predictions in figure~\ref{fig: ee_prediction_demo}.
 We also show the errors for the Aletheia models in
 figure~\ref{fit_errors_Aletheia}.
 
-\section{Testing Functions}
+\section{Testing the Fit}
 
 To verify that our approach has general applicability, we now test the
 asymptotic fit on a much broader selection of models.
@@ -146,8 +141,8 @@ All of the shape parameters are still consistent with Aletheia model 0.
 \begin{tabular}{l|l|l}
 \hline
 Parameter & Minimum Value & Maximum Value \\ \hline
-$\omega_\text{DE}$\footnotemark & 0.1 & 0.5 \\
 $\omega_K$ & -0.05 & 0.05 \\
+$\omega_\text{DE}$\footnotemark & 0.1 & 0.5 \\
 $w_0$ & -2.0 & -0.5 \\
 $w_a$ & -0.5 & 0.5 \\
 $A_s$\footnotemark & $5.003 \cdot 10^{-10}$ & $1.484 \cdot 10^{-8}$  \\
@@ -168,6 +163,30 @@ we fix $\omega_b$ and $\omega_c$ and select a value for $\omega_K$. Then, we
 vary $h$--according to equation~\ref{eq: h_to_omega}, this should only
 affect $\omega_\text{DE}$.}
 
+% The following plots were generated with divergence_asymptotes.ipynb
+\begin{figure}[ht!]
+    \begin{subfigure}{0.45 \textwidth}
+    \centering
+ 		\includegraphics[width=\textwidth]{chap3/exotic_asymptotes}
+ 		\cprotect\caption{One hundred random $\ee$ curves generated through
+ 			the function \verb|get_random_cosmology|.}
+ 		\label{fig: random_battery}
+    \end{subfigure}
+    \begin{subfigure}{0.45 \textwidth}
+    \centering
+ 		\includegraphics[width=\textwidth]{chap3/exotic_histogram}
+ 		\caption{The errors associated with applying equation~\ref{eq: fit}
+ 			to predict the asymptotes.}
+ 		\label{fig: random_battery_errs}
+    \end{subfigure}
+        \centering
+    \caption[Random-cosmology Experiment]
+    		{Model ratios
+    		\textcolor{red}{Would it have been better if I just included the
+    		right plot and no left plot?}}
+    \label{fig: random_cosmology_experiment}
+\end{figure}
+
 \footnotetext{These values were rounded to three significant figures. Refer
 to the code for greater precision.}
 
@@ -175,11 +194,36 @@ These cosmologies cover a wide range of $\el$ values, as shown in
 figure~\ref{fig: random_battery}. The errors for the fits are shown in
 figure~\ref{fig: random_battery_errs}.
 
-To further test our solution, we also created the function
-\verb|get_As_matched_cosmology|, which randomizes the cosmologies in the same
+To further test our solution, we also created the function \\
+\verb|get_As_matched_random_cosmology|,
+which randomizes the cosmologies in the same
 way except for fixing $A_s$ at the value for model 0.
 figure~\ref{fig: degenerate_battery}. The errors for the fits are shown in
 figure~\ref{fig: degenerate_battery_errs}.
+
+% The following plots were generated with divergence_asymptotes.ipynb
+\begin{figure}[ht!]
+    \begin{subfigure}{0.45 \textwidth}
+    \centering
+ 		\includegraphics[width=\textwidth]{chap3/degenerate_asymptotes}
+ 		\cprotect\caption{One hundred random $\ee$ curves generated through
+ 			the function \verb|get_As_matched_random_cosmology|.}
+ 		\label{fig: degenerate_battery}
+    \end{subfigure}
+    \begin{subfigure}{0.45 \textwidth}
+    \centering
+ 		\includegraphics[width=\textwidth]{chap3/degenerate_histogram}
+ 		\caption{The errors associated with applying equation~\ref{eq: fit}
+ 			to predict the asymptotes.}
+ 		\label{fig: degenerate_battery_errs}
+    \end{subfigure}
+        \centering
+    \caption[$\ee$]
+    		{Model ratios
+    		\textcolor{red}{Would it have been better if I just included the
+    		right plot and no left plot?}}
+    \label{fig: degenerate_cosmology_experiment}
+\end{figure}
 
 This third test demonstrates that the imperfections in our fit cannot be
 attributed solely to the form of equation~\ref{eq: fit};  
@@ -222,6 +266,5 @@ important novel step in this work. The remaining chapters will
 focus on the integration of this modified evolution mapping framework
 into a beginner-friendly emulation code.
 
-\textcolor{blue}{Plot to do: add errors for original Aletheia set; add two
-plots for random cosmology experiment; add two plots for fixed
-A\_s experiment. Add $\chi^2$ values for all two of the three experiments.}
+\textcolor{blue}{Plot to do: add errors for original Aletheia set;
+Add $\chi^2$ values for all three experiments.}

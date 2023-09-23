@@ -337,7 +337,7 @@ def match_sigma12(target, tolerance, cosmology,
                          _redshifts=new_redshifts)
 
 
-def get_As_matched_cosmology(omega_nu, A_s=2.12723788013000E-09):
+def get_As_matched_random_cosmology(omega_nu, A_s=2.12723788013000E-09):
     """
     !
     Return a cosmological configuration based on model0 but uniformly
@@ -421,7 +421,7 @@ def get_random_cosmology(omega_nu):
     ! Unfortunately, all of these bounds are hard-coded. Maybe we can read in a
     table for this?
     """
-    row = get_As_matched_cosmology(omega_nu)
+    row = get_As_matched_random_cosmology(omega_nu)
     
     row['A_s'] = np.random.uniform(A_min, A_max)
 
