@@ -64,7 +64,7 @@ our test cases. This means that we can rewrite definition~\ref{eq: ee} as:
 
 \begin{equation}
 \label{eq: eei}
-\ee_i (k) \equiv \frac{\de_\text{model i}(k)}{\de_\text{model 0}(k)}
+\el_i (k) \equiv \frac{\de_\text{model i}(k)}{\de_\text{model 0}(k)}
 \end{equation}
 
 \textcolor{orange}{This section, like the ``Convenience Functions'' section
@@ -122,6 +122,27 @@ We demonstrate its predictions in figure~\ref{fig: ee_prediction_demo}.
 
 We also show the errors for the Aletheia models in
 figure~\ref{fit_errors_Aletheia}.
+
+\begin{table}[ht!]
+\centering
+\begin{tabular}{l|l}
+\hline
+Model Index & {Percent Error} \\ \hline
+1 & $-4.983 \cdot 10^{-3}$ \\
+2 & $+2.503 \cdot 10^{-3}$ \\
+3 & $-2.267 \cdot 10^{-3}$ \\
+4 & $+2.238 \cdot 10^{-3}$ \\
+5 & $+1.577 \cdot 10^{-3}$ \\
+6 & $-3.137 \cdot 10^{-3}$ \\
+6 & $-1.170 \cdot 10^{-2}$ \\
+\end{tabular}
+ \cprotect\caption[Fit Performance on Aletheia Models]{Errors, rounded to
+ four significant figures, when predicting
+ the $\el_i$ for various Aletheia models. As mentioned before, we skip model
+ 8, since the code is not setup to handle that exotic dark energy scenario.
+ The reduced $\chi^2$ value across these models is $2.714 \cdot 10^{-9}$.}
+ \label{tab: fit_errors_Aletheia}
+\end{table}
 
 \section{Testing the Fit}
 
@@ -266,5 +287,5 @@ important novel step in this work. The remaining chapters will
 focus on the integration of this modified evolution mapping framework
 into a beginner-friendly emulation code.
 
-\textcolor{blue}{Plot to do: add errors for original Aletheia set;
-Add $\chi^2$ values for all three experiments.}
+\textcolor{blue}{Plot to do: add $\chi^2$ values for all three experiments;
+	figure out caption length causing the plots to misalign!}
