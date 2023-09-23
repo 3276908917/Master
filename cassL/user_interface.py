@@ -150,8 +150,8 @@ def build_train_and_test_sets(scenario_name):
         ged.fill_hypercube(lhc_train, standard_k, param_ranges=priors,
             save_label=scenario_name + "_train")
     
-    np.save(save_path + "/samples_train.npy", samples_test)
-    np.save(save_path + "/rescalers_train.npy", rescalers_test)
+    np.save(save_path + "/samples_train.npy", samples_train)
+    np.save(save_path + "/rescalers_train.npy", rescalers_train)
     
     #X Step 4: build test LHC 
     
