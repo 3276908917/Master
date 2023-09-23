@@ -497,7 +497,7 @@ def boltzmann_battery(omnuh2_floats, skips_omega=[0, 2], skips_model=[8],
 
             z_input = parse_redshifts(mindex)
             if None in z_input:
-                spectra[this_omnuh2_float][m_index] = None
+                spectra[this_omnuh2_float][mindex] = None
                 continue
 
             for snap_index in range(len(z_input)):
@@ -934,7 +934,7 @@ def model_ratios(snap_index, sims, canvas, massive=True, skips=[],
     if 'x' in active_labels:
         plot_area.set_xlabel(r"k [1 / Mpc]")
 
-    ylabel = r"и$_i$ / и$_0$"
+    ylabel = r"и($k$)"
     if P_accessor is not None:
         if massive is True:
             ylabel = r"$P_\mathrm{massive} / P_\mathrm{massive, model \, 0}$"
