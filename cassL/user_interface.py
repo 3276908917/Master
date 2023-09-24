@@ -113,17 +113,25 @@ def build_train_and_test_sets(scenario_name):
         lines = file.readlines()
         key = None
         for line in lines:
+            print("Line is:", line, line.strip() == "")
+            if line[0] == "#":
+                continue
+            if line.strip() == "":
+                continue
+
             if line[0] == "$":
                 key = line[1:].strip()
             else:
                 val = line.strip()
-                if line == "None":
+                if val == "None":
                     val = None
-                elif line.isnumeric():
-                    val = float(line)
+                elif val.isnumeric() and key != "num_spectra_points":
+                    val = float(val)
                 scenario[key] = val
     
     #X Step 2: build train LHC
+    
+    print("Scenario is\n", scenario)
     
     priors = prior_file_to_dict(scenario["priors"])
     
@@ -152,6 +160,7 @@ def build_train_and_test_sets(scenario_name):
     
     np.save(save_path + "/samples_train.npy", samples_train)
     np.save(save_path + "/rescalers_train.npy", rescalers_train)
+    np.save(save_path + "/lhc_train_final.npy", lhc_train)
     
     #X Step 4: build test LHC 
     
@@ -163,11 +172,12 @@ def build_train_and_test_sets(scenario_name):
                             "/lhc_test_initial.npy")
         
         samples_test, rescalers_test = \
-            ged.fill_hypercube(lhc_train, standard_k, param_ranges=priors,
+            ged.fill_hypercube(lhc_test, standard_k, param_ranges=priors,
                 save_label=scenario_name + "_test")
         
         np.save(save_path + "/samples_test.npy", samples_test)
         np.save(save_path + "/rescalers_test.npy", rescalers_test)
+        np.save(save_path + "/lhc_test_final.npy", lhc_test)
     
     #X Step 6: call build_and_test_emulator
 
