@@ -31,40 +31,29 @@ procured in practice, and what our ``solution'' (inelegant though it may be)
 is to obtaining a sample with a decent minimum separation between the points
 (remember to briefly repeat why this is important).}
 
-The \verb|pyDOE2| function that we will use to generate our LHSs
-returns a result with entries that range from zero to unity. 
+In this section, we will discuss the building of LHSs, which within CL is 
+handled by \verb|lhs|. As mentioned in section~\ref{sec: lhc_outline},
+we first create a unit LHS and then later rescale it according to a set of
+priors.
 
-In this section, we will discuss the building of LHSs, which within the
-Cassandra-linear is handled by the \verb|lhs.py| script.
-By ``LHSs,'' we are here referring exclusively to the
-sample of cosmologies for which we want to compute power spectra.
-However, as mentioned in section~\ref{sec: lhc_outline}, at this stage we 
-are not yet committing to a particular set of priors. Instead, each axis is 
-sampled from the uniform distribution $\mathcal{U} (0, 1)$.
-
-% We'll also describe the switch from a rescaled Latin hypercube to a unit
-% Latin hypercube that we later interpret differently according to the
-% specified priors.
-
-Each entry $\bm{x}$ in our LHS $\matr{X}$ will be either a four- or six-dimensional vector, 
+Each entry $\bm{x}$ in our LHS $\matr{X}$ will be either a four- or six-
+dimensional vector, 
 depending on the emulator's support for massive neutrinos. When building a
-massless-neutrino emulator, a single LHS entry will describe the $\omega_b$,
-$\omega_\text{CDM}$, $n_s$, and $\sigma_{12}$ values for that cosmology in 
-this order. When building a massive-neutrino emulator, a single LHS entry will 
-additionally describe the $A_s$ and $\omega_\nu$ values for that cosmology, 
+massless-neutrino emulator, each $\bm{x}$ will describe the $\omega_b$,
+$\omega_c$, $n_s$, and $\sigma_{12}$ values for a different cosmology in 
+this order. When building a massive-neutrino emulator, each $\bm{x}$ will 
+additionally specify the $A_s$ and $\omega_\nu$ values for that cosmology, 
 again in this order.
 
 To get started generating LHSs, we integrated demonstration code written by 
-Daniel Farrow \text{red}{(and who else?) add these people to the Danksagung} 
-during the CAKE 2021 workshop. We begin by invoking the \verb|lhs| function of
+Daniel Farrow \text{orange}{(and who else?) add these people to the 
+Danksagung}. We begin by invoking the \verb|lhs| function of
 \verb|pyDOE2| a number of times. Each time we get a random new unit LHC, whose
 spacing we analyze with the \verb|cdist| function from
 \verb|scipy.spatial.distance|.  Recall from section~\ref{sec: lhc_theory} that
-our sample more evenly covers the sample space if the minimum separation 
-between the sample points increases. \textcolor{green}{Uneven separations will
-result in excess error depending on the location of the cosmology in parameter
-space}. Therefore, from among the numerous calls of \verb|lhs| we select the
-hypercube sample with the largest minimum separation.
+our sample more evenly covers the sample space if the minimum separation
+$s^*$ increases. Therefore, from among the numerous calls of \verb|lhs| we 
+select the hypercube sample with the largest minimum separation.
 
 In order to maximize the number of random hypercubes generated per unit of
 wall time, we have written a multithreaded function called
@@ -99,7 +88,8 @@ should be set to the \verb|cdist| value of the exis}
 % intend to write. If the user is sure, we take the cdist of that existing
 % file and use it as the previous record!
 
-% we multithreaded the Python script to spawn 12 workers on an 11th gen Intel i7-11700 @ 2.50 GHz. IF YOU ARE USING THE WORK DESKTOP
+% we multithreaded the Python script to spawn 12 workers on an 11th gen Intel 
+% i7-11700 @ 2.50 GHz. IF YOU ARE USING THE WORK DESKTOP
 
 As of the current (as of \textcolor{orange}{24.08.2023}) version of the
 Cassandra-Linear code, this brute-force approach is the method used to build
@@ -120,7 +110,8 @@ best minimum separation.
 
 Remember from section~\ref{sec: lhc_theory} that we have an equation for the
 best possible minimum separation that we can achieve with a Latin hypercube
-of some given dimension and total number of samples. Let us consider a massless-neutrino emulator (a total of four dimensions per cosmology vector)
+of some given dimension and total number of samples. Let us consider a 
+massless-neutrino emulator (a total of four dimensions per cosmology vector)
 trained over five-thousand CAMB spectra. If we plug in $d = 4$ and $N=5000$,
 we get XXY. Similarly, for our massive-neutrino emulator (a total of six 
 dimensions per cosmology) trained over the same number of spectra, we find a 

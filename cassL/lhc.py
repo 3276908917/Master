@@ -10,6 +10,7 @@ from pyDOE2 import lhs
 from six import iteritems
 from scipy.spatial.distance import cdist
 from collections import OrderedDict
+import time
 
 def generate_samples(ranges, n_samples, n_trials=0, validation=False):
     r"""
@@ -257,7 +258,8 @@ def multithread_LHC_builder(param_ranges, n_samples, label="unlabeled",
         '''
 
 def multithread_unit_LHC_builder(dim, n_samples, label="unlabeled",
-    num_workers=12, previous_record=0, comparator=np.greater):
+    num_workers=12, previous_record=0, comparator=np.greater,
+    track_performance=False):
     """
     Use more CPU to compute more random LHCs, periodically saving the one with
     the greatest minimum separation. In other words, our LHC generation
@@ -280,6 +282,12 @@ def multithread_unit_LHC_builder(dim, n_samples, label="unlabeled",
         The two obvious options are np.greater and np.less. np.greater is the
         default and should be used if you are unsure.
     """
+    total_calls = 0
+    start_time = time.time()
+    
+    function_calls = np.array([])
+    bests = np.array([])
+    wall_times = np.array([])
 
     overall_min_dist = previous_record
     overall_best_lhc = None
@@ -291,7 +299,9 @@ def multithread_unit_LHC_builder(dim, n_samples, label="unlabeled",
         min_dists = []
         lhcs = []
 
+        # Now collapse everything
         for future in futures:
+            function_calls += 50
             this_lhc, this_min_dist = future.result()
             if comparator(this_min_dist, overall_min_dist):
                 overall_min_dist = this_min_dist
@@ -302,6 +312,16 @@ def multithread_unit_LHC_builder(dim, n_samples, label="unlabeled",
 
                 print("New best (" + str(overall_min_dist) + \
                       ") found! Saving...")
+                
+                if track_performance:
+                    function_calls = np.append(function_calls, total_calls)
+                    bests = np.append(bests, overall_min_dist)
+                    wall_times = np.append(wall_times,
+                                           time.time() - start_time)
+                    
+                    np.save("fn_calls.npy", function_calls)
+                    np.save("bests.npy", bests)
+                    np.save("wall_times.npy", wall_times)
 
 
 def nearness_comparator(target):
