@@ -113,7 +113,6 @@ def build_train_and_test_sets(scenario_name):
         lines = file.readlines()
         key = None
         for line in lines:
-            print("Line is:", line, line.strip() == "")
             if line[0] == "#":
                 continue
             if line.strip() == "":
@@ -130,8 +129,6 @@ def build_train_and_test_sets(scenario_name):
                 scenario[key] = val
     
     #X Step 2: build train LHC
-    
-    print("Scenario is\n", scenario)
     
     priors = prior_file_to_dict(scenario["priors"])
     
