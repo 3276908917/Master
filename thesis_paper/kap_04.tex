@@ -17,6 +17,7 @@ description of the pipeline, with motivations behind several key components.
 For a more detailed and technical breakdown of the implementation of the steps
 mentioned here, refer to chapter~\ref{chap: implementation}.
 
+
 \section{LHSs}
 \label{sec: lhc_outline}
 
@@ -25,27 +26,6 @@ thought of as the $\matr{X}$ in our regression problem, while the
 corresponding CAMB power spectra may be thought of as the $\matr{Y}$. Each
 row $\bm{x}$ in $\matr{X}$ will describe a different cosmology, and each
 row $\bm{y}$ in $\matr{Y}$ will be the power spectrum for that cosmology.
-
-% Intro sentence?
-
-We will generate our LHSs so that their values range from zero to unity.
-In continuity with the language of section~\ref{sec: lhc_theory}, we will 
-refer to such LHSs as \textit{unit} LHSs. These unit LHSs are saved as
-\texttt|npy| files and later rescaled according to specify the training
-domain in each parameter. This two-step process, first of generating a unit
-LHC and then rescaling it, allows us to build many different emulators from a 
-single LHS file. That is, rescaling the same LHS in different ways allows us
-to cut down on the number of LHSs that we need to generate.
-
-% One reason this goes here: priors show up in almost every script,
-% so there isn't a great cass-L section in which to put this.
-
-CL accomplishes this rescaling through the use of prior files.
-CL is packaged with three pairs of prior files. The parameter domains for each
-pair are
-described in tables~\ref{tab: MEGA_priors},~\ref{tab: CLASSIC_priors},
-and~\ref{tab: COMET_priors}. The $\omega_\nu$ prior is always $[0, 0.01]$ and 
-the $\sigma_{12}$ prior is always $[0.2, 1]$.
 
 %%% I just don't think anyone is really going to be confused by this...
 \begin{comment}
@@ -56,17 +36,29 @@ the reader should keep in mind that a unit $\matr{X}_u$ therefore does not
 indicate an identity matrix.}
 \end{comment}
 
-(For example, $\sigma_{12}^2$ sampling--although we did not
-get it to work, the infrastructure is still there for whomever comes along in
-the future.)
+% Intro sentence?
 
-These prior files come in pairs so that the user may choose between a
-massless- and a massive-neutrino emulator: the prior name need only be
-coupled with the ending \verb|_no_nu| or \verb|_with_nu|, respectively.
+We will generate our LHSs so that their values range from zero to unity.
+In continuity with the language of section~\ref{sec: lhc_theory}, we will 
+refer to such LHSs as \textit{unit} LHSs. These unit LHSs are saved as
+\texttt|npy| files and later rescaled according to priors in order to
+specify the training
+domain in each parameter. This two-step process, first of generating a unit
+LHC and then rescaling it, allows us to build many different emulators from a 
+single LHS file. That is, rescaling the same LHS in different ways allows us
+to cut down on the number of LHSs that we need to generate.
 
-To create a new prior file, the user can simply copy one of the
-existing files as a template. The format is very simple, but must be
-followed carefully for the file to be read correctly.
+% One reason this goes here: priors show up in almost every script,
+% so there isn't a great cass-L section in which to put this.
+
+CL accomplishes this rescaling through the use of priors files.
+CL is packaged with three pairs of priors files (the pairing will be explained
+in section~\ref{sec: 2emu_intro}). The parameter domains for each pair are
+described in tables~\ref{tab: MEGA_priors},~\ref{tab: CLASSIC_priors},
+and~\ref{tab: COMET_priors}. The three pairs of files share the same priors in
+$\omega_\nu$ ([0, 0.01]) and $\sigma_{12}$ ([0.2, 1]) and so these are
+omitted. \textcolor{red}{Is it okay for me to omit like that or should I just
+repeat the information?}
 
 \begin{table}[ht!]
 \centering
@@ -124,6 +116,9 @@ $A_s$\footnotemark & $1.049 \cdot 10^{-9}$ & $4.990 \cdot 10^{-9}$  \\
  \label{tab: COMET_priors}
 \end{table}
 
+\textcolor{orange}{Talk a little more about the prior ranges, what are their
+values in words?}
+
 All intervals are sampled uniformly, \textcolor{orange}{although some
 experimental code exists to interpret the same hypercube as a uniform sampling
 in root or square space, for example}. At first, we used the highly ambitious 
@@ -137,14 +132,16 @@ values. We refer to such a situation as an unsolvable cell, and will explain
 why it happens in section~\ref{sec: generate_emu_data}, which covers the
 application of evolution mapping principles within the CL code.
 
-\textcolor{orange}{Talk a little more about the prior ranges, what are their
-values in words?}
-
 The default priors that we use correspond to those currently used by COMET. 
 \textcolor{orange}{Two justifications for this choice: unsolvable cells, but 
 more than that, simplicity and accuracy for the ``demo'' run.}
 
-\section{Pipeline and Design Choices}
+To create a new prior file, the user can simply copy one of the
+existing files as a template. The format is very simple, but must be
+followed carefully for the file to be read correctly.
+
+
+\section{Pipeline}
 \label{sec: flow_chart}
 
 % Disgusting hack to get verbatim functionality in tabel
@@ -166,7 +163,7 @@ LHSs stored?
 \texttt{ui} processes the scenario file and loads the LHSs and priors into
 memory, packaging them into a data dictionary. Before submitting this
 dictionary to \texttt{te}, \texttt{ui} requests the power spectra from
-\textt{ged}. Recall that LHSs 
+\texttt{ged}. Recall that LHSs 
 
 \begin{comment}
 
@@ -219,9 +216,19 @@ Script & Abbreviation & purpose \\ \hline
  \label{tab: script_summary}
 \end{table}
 
-
 \section{Creation of Separate Emulators}
 \label{sec: 2emu_intro}
+
+\begin{comment}
+\textcolor{orange}{One consequence of this section for this chapter: our
+priors files come in pairs!}
+
+\textcolor{orange}{These prior files come in pairs so that the user may choose 
+between a
+massless- and a massive-neutrino emulator: the prior name need only be
+coupled with the ending} \verb|_no_nu| or \verb|_with_nu|, respectively.
+
+\end{comment}
 
 One potential weakness of \textcolor{orange}{this} emulator outline emerges 
 from the prior range for the physical density in neutrinos. The lower bound 
