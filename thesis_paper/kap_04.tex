@@ -1,13 +1,5 @@
 \chapter{Conceptual Outline of Our Emulator Code and Pipeline}
 
-\textcolor{blue}{The point of this section is to introduce the reader to the
-basic structure of the emulator pipeline. Most of the discussion will follow
-from a flow chart showing the various conceptual pieces of the emulator. Also
-in this section, I will introduce various choices made (e.g. 5000 training
-spectra, 300 points for each spectrum) WITHOUT justifying any of them--later,
-in chapter~\ref{chap: disc_and_conc}, we'll justify these decisions and
-talk about the consequences of alternate settings.}
-
 Now that we have a solution which allows integration of massive neutrinos
 into the evolution mapping framework, we are ready to plan and build the
 machinery which leads to an emulator. CL represents a full emulation pipeline from the generation of training and 
@@ -206,7 +198,7 @@ would be a really easy way to expand the code in a meaningful way.}
 \centering
 \begin{tabular}{l|c|l}
 \hline
-Script & Abbreviation & purpose \\ \hline
+Script & Abbreviation & Purpose \\ \hline
 \Verb|lhs.py| & \texttt{lhs} & Creates unit LHSs. \\
 \Verb|generate_emu_data.py| & \texttt{ged} & Computes spectra for an LHS.\\
 \Verb|camb_interface.py| & \texttt{ci} & Computes an individual spectrum. \\
@@ -215,7 +207,11 @@ Script & Abbreviation & purpose \\ \hline
 	\texttt{lhs}, \texttt{ged}, and \texttt{te} scripts. \\
 \Verb|utils.py| & \texttt{utils} & Miscellaneous utility functions. 
 \end{tabular}
- \cprotect\caption[Summary of CL Scripts]{\textcolor{red}{Should I axe
+ \cprotect\caption[Summary of CL Scripts]{The scripts that make up CL.
+ 	The second column indicates the abbreviations we will use throughout this 
+ 	chapter and chapter~\ref{chap: implementation}. The third column is just
+ 	for quick reference: all scripts (except for \texttt{utils}) will be
+ 	addressed in detail in these two chapters. \textcolor{red}{Should I axe
  	the last column or could it be appropriate for this thesis?}}
  \label{tab: script_summary}
 \end{table}
@@ -237,14 +233,6 @@ Script & Abbreviation & purpose \\ \hline
 
 \section{Creation of Separate Emulators}
 \label{sec: 2emu_intro}
-
-\textcolor{orange}{One consequence of this section for this chapter: our
-priors files come in pairs!}
-
-\textcolor{orange}{These prior files come in pairs so that the user may choose 
-between a
-massless- and a massive-neutrino emulator: the prior name need only be
-coupled with the ending} \verb|_no_nu| or \verb|_with_nu|, respectively.
 
 One potential weakness of \textcolor{orange}{this} emulator outline emerges 
 from the prior range for the physical density in neutrinos. The lower bound 
@@ -277,7 +265,7 @@ samples on the ``left'' side of $\omega_\nu = 0$.}}
 To address this unique problem among our parameter ranges, we train two
 independent CL emulators. The primary 
 emulator is trained over the aforementioned prior range,
-$\omega_\nu \in [0, 0.01]$, and $A_s$ depending on the prior file used
+$\omega_\nu \in [0, 0.01]$, with $A_s$ depending on the priors file used
 (see tables~\ref{tab: MEGA_priors},~\ref{tab: CLASSIC_priors},
 and~\ref{tab: COMET_priors}). The secondary emulator is specifically trained
 to handle the massless neutrino case. In 
@@ -291,7 +279,13 @@ dimension of our LHS decreases from six to four.
 
 To train this massless-neutrino emulator, we use the same pipeline introduced
 in section~\ref{sec: flow_chart} and the same code as described in 
-chapter~\ref{chap: implementation}. Since the
+chapter~\ref{chap: implementation}. However, when specifying the priors, we
+take care to exclude the now irrelevant parameters. This explains why our
+priors files come in pairs. For example, to build a massless-neutrino emulator
+with the COMET priors, one would modify the line after \verb|$priors| in the 
+scenario file from \verb|COMET_with_nu| to \verb|COMET_no_nu|. 
+
+Since the
 massless-neutrino emulator is trained over just four parameters, and since we 
 nevertheless continue to train over 5000 samples, we expect the
 massless-neutrino emulator to be universally more accurate when compared
