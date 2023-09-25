@@ -41,7 +41,7 @@ indicate an identity matrix.}
 We will generate our LHSs so that their values range from zero to unity.
 In continuity with the language of section~\ref{sec: lhc_theory}, we will 
 refer to such LHSs as \textit{unit} LHSs. These unit LHSs are saved as
-\texttt|npy| files and later rescaled according to priors in order to
+\texttt{npy} files and later rescaled according to priors in order to
 specify the training
 domain in each parameter. This two-step process, first of generating a unit
 LHC and then rescaling it, allows us to build many different emulators from a 
@@ -56,7 +56,7 @@ CL is packaged with three pairs of priors files (the pairing will be explained
 in section~\ref{sec: 2emu_intro}). The parameter domains for each pair are
 described in tables~\ref{tab: MEGA_priors},~\ref{tab: CLASSIC_priors},
 and~\ref{tab: COMET_priors}. The three pairs of files share the same priors in
-$\omega_\nu$ ([0, 0.01]) and $\sigma_{12}$ ([0.2, 1]) and so these are
+$\omega_\nu$, [0, 0.01], and $\sigma_{12}$, [0.2, 1], and so these are
 omitted. \textcolor{red}{Is it okay for me to omit like that or should I just
 repeat the information?}
 
@@ -119,26 +119,42 @@ $A_s$\footnotemark & $1.049 \cdot 10^{-9}$ & $4.990 \cdot 10^{-9}$  \\
 \textcolor{orange}{Talk a little more about the prior ranges, what are their
 values in words?}
 
-All intervals are sampled uniformly, \textcolor{orange}{although some
-experimental code exists to interpret the same hypercube as a uniform sampling
-in root or square space, for example}. At first, we used the highly ambitious 
-(relative to modern uncertainty bars) ``MEGA'' set of priors
-(table~\ref{tab: MEGA_priors}),
-whose values we decided based on the recent emulator papers from
-\citet{Mancini} and \citet{Arico}.
+At first, we used the highly ambitious ``MEGA'' set of priors
+(table~\ref{tab: MEGA_priors}), whose values we decided based on the recent 
+emulator papers from \citet{Mancini} and \citet{Arico}.
 However, during the process of generating training data, 
-we found that CAMB was not able to match all of the necessary $\sigma_{12}$ 
-values. We refer to such a situation as an unsolvable cell, and will explain
-why it happens in section~\ref{sec: generate_emu_data}, which covers the
-application of evolution mapping principles within the CL code.
+we found that CAMB was frequently unable to compute the power spectrum for
+all the
+resulting cosmologies (this issue will be explained in
+section~\ref{sec: generate_emu_data}). We do not recommend the use of this
+file because the priors are not representative of the ranges appearing in the
+training set.
 
-The default priors that we use correspond to those currently used by COMET. 
-\textcolor{orange}{Two justifications for this choice: unsolvable cells, but 
-more than that, simplicity and accuracy for the ``demo'' run.}
+The ``CLASSIC'' priors (table~\ref{tab: CLASSIC_priors}) are mostly solvable, 
+but only the ``COMET'' priors (table~\ref{tab: COMET_priors}) are consistently
+entirely solvable. For this reason and for the cheaper (by number of samples) 
+accuracy that comes with tighter priors, the COMET priors are the defaults for 
+CL.
 
-To create a new prior file, the user can simply copy one of the
-existing files as a template. The format is very simple, but must be
-followed carefully for the file to be read correctly.
+The user is welcome to write sets of priors suitable to their applications.
+To do so, one need only create a new prior file. The format is very simple, 
+but must be followed carefully for the file to be read correctly. We
+recommend copying one of the existing priors files as a template. 
+
+As one final note on the general implementation of LHSs in CL, we note that
+all axes of our \textit{unit} LHSs run \textit{uniformly} over the interval
+[0, 1]. However, the rescaled 
+parameter domains can be more flexible. For example, the fourth axis
+of an LHS
+describes $\sigma_{12}$ in the default implementation of the code. We can also
+interpret the axis as a set of $\sigma_{12}^2$ values instead,
+in case we wish to
+increase our sampling in larger values of $\sigma_{12}$ over the same
+interval. Unfortunately, this non-uniform sampling does not seem to be
+correctly implemented
+in the current (as of 2 October 2023) version of the code. Nonetheless, as we
+will repeat in section~\ref{sec: future_work},
+the feature is in principle simple to implement.
 
 
 \section{Pipeline}
