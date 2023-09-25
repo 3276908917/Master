@@ -51,26 +51,28 @@ Danksagung}. We begin by invoking the \verb|lhs| function of
 \verb|pyDOE2| a number of times. Each time we get a random new unit LHC, whose
 spacing we analyze with the \verb|cdist| function from
 \verb|scipy.spatial.distance|.  Recall from section~\ref{sec: lhc_theory} that
-our sample more evenly covers the sample space if the minimum separation
+our samples more evenly cover the sample space if the minimum separation
 $s^*$ increases. Therefore, from among the numerous calls of \verb|lhs| we 
-select the hypercube sample with the largest minimum separation.
+select the LHS with the largest minimum separation.
 
 In order to maximize the number of random hypercubes generated per unit of
 wall time, we have written a multithreaded function called
 \verb|multithread_unit_LHC_builder| \textcolor{orange}{Keep your eye on this
 one, I'm thinking about condensing lhc.py to just a couple of functions.}
 Through the function parameter \verb|num_workers| the user is free to assign
-any number of CPU threads to the task, so in principle the computer can be
-wholly dedicated to the optimization of the LHS. This function represents an
-unending query for LHSs. The user will be notified via command
-line printout whenever an LHS has been generated whose minimum separation is
-higher than the previous record value. Whenever such a superior LHS is
+any number of CPU threads to the task; in principle, a CPU can be
+wholly dedicated to the optimization of the LHS.
+\verb|multithread_unit_LHC_builder| does not contain a return statement but
+instead triggers an unending query for LHSs. The user is notified via command
+line printout whenever an LHS has been generated whose $s^*$ exceeds
+the previous record. Whenever such a superior LHS is
 encountered, the function writes the LHS to a file and continues. Therefore,
 the user may run this script in the background and terminate whenever. The
 function always writes LHSs to the same file, so each new record-setting LHS
 overwrites the old one. When the user terminates the function, whatever output
 file remains represents the best LHS seen since the function was first called.
 
+%%% It's just too much detail for a master's thesis, no one will care
 \begin{comment}
 The \verb|cdist| function can be re-used to compare LHSs loaded from 
 different
@@ -82,6 +84,7 @@ simply continue overwriting the same file. Therefore, the function
 stop the function and then resume it later. In such a case, the parameter
 should be set to the \verb|cdist| value of the exis}
 \end{comment}
+%%%
 
 % I've got a better idea: the function should automatically ask the user if
 % he's sure, in the case that we find a file under the name under which we
@@ -91,11 +94,10 @@ should be set to the \verb|cdist| value of the exis}
 % we multithreaded the Python script to spawn 12 workers on an 11th gen Intel 
 % i7-11700 @ 2.50 GHz. IF YOU ARE USING THE WORK DESKTOP
 
-As of the current (as of \textcolor{orange}{24.08.2023}) version of the
-Cassandra-Linear code, this brute-force approach is the method used to build
-the Latin hypercube samples eventually used to train the emulators. To 
-understand the computational and wall-time costs associated with our
-brute-force solution, we include plots XXY and XXY.
+As of 2 October 2023, CL relies on this brute-force approach to build the
+LHSs that are eventually used to train the emulators. To understand the 
+computational and wall-time costs associated with this solution, we include 
+plots~\ref{fig: function_calls} and~\ref{fig: wall_time}.
 
 \begin{comment} % The following paragraph says this stuff better
 we left the system to run for three consecutive days. In this time, the 
@@ -108,19 +110,20 @@ this brute force solution, we fail to obtain an LHC of even a third of the
 best minimum separation.
 \end{comment} 
 
-Remember from section~\ref{sec: lhc_theory} that we have an equation for the
-best possible minimum separation that we can achieve with a Latin hypercube
-of some given dimension and total number of samples. Let us consider a 
+Remember from section~\ref{sec: lhc_theory} equation~\ref{eq: best_lhs_sep},
+which tells us the best possible $s^*$
+given dimension $d$ and total number of samples $N_s$. Let us consider a 
 massless-neutrino emulator (a total of four dimensions per cosmology vector)
 trained over five-thousand CAMB spectra. If we plug in $d = 4$ and $N=5000$,
 we get XXY. Similarly, for our massive-neutrino emulator (a total of six 
 dimensions per cosmology) trained over the same number of spectra, we find a 
-theoretical best minimum-separation of XXY. 
+theoretical best minimum-separation of $s^*_\text{best} \approx 0.1189$.
 
-It is based on figures XXY and XXY that we may claim that our approach is
+Based on figures~\ref{fig: function_calls} and~\ref{fig: wall_time}, we
+claim that our approach is
 inefficient and not well-suited to the approach of finding LHCs with large
-minimum separations. As mentioned in section~\ref{sec: lhc_theory},
-we value a high minimum separation because it means we are sampling the
+$s^*$. As mentioned in section~\ref{sec: lhc_theory},
+we value a high $s^*$ because it means we are sampling the
 space of cosmologies evenly rather than oversampling particular regions.
 Therefore, we expect the consequence of a low minimum separation in the LHC to
 be a higher error variance as well as a slightly higher average bias.
