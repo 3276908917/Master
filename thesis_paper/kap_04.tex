@@ -8,100 +8,57 @@ spectra, 300 points for each spectrum) WITHOUT justifying any of them--later,
 in chapter~\ref{chap: disc_and_conc}, we'll justify these decisions and
 talk about the consequences of alternate settings.}
 
-CL represents a full emulation pipeline from the generation of training and 
+Now that we have a solution which allows integration of massive neutrinos
+into the evolution mapping framework, we are ready to plan and build the
+machinery which leads to an emulator. CL represents a full emulation pipeline from the generation of training and 
 testing data to the plotting of error statistics associated with
-the emulation.
+the emulation. This chapter will concentrate on a high-level and accessible 
+description of the pipeline, with motivations behind several key components.
+For a more detailed and technical breakdown of the implementation of the steps
+mentioned here, refer to chapter~\ref{chap: implementation}.
 
-% We're gonna need a flow chart for this puppy. That should be priority number
-% one, because the writing should constantly refer back to it.
-
-\section{Pipeline and Design Choices}
-\label{sec: flow_chart}
-
-% Disgusting hack to get verbatim functionality in tabel
-
-
-
-\begin{comment}
-
-\SaveVerb{lhs}|lhs.py|
-\SaveVerb{ged}|generate_emu_data.py|
-\SaveVerb{ci}|camb_interface.py|
-\SaveVerb{te}|train_emu.py|
-\SaveVerb{ui}|user_interface.py|
-
-\end{comment}
-
-% The following plots were generated with h_units_bad.ipynb
-\begin{figure}[ht!]
-    \centering
- 	\includesvg[width=\textwidth]{chap4/flow_chart}
- 	\caption[CL Flow Chart]{Flow chart describing the broad structure of the
- 		code as it pertains to constructing an emulator. Dotted lines
- 		indicate connections still in development as of 2 October 2023.
- 		Double lines indicate references of one file in another.
- 		\Verb|utils| contains code which is frequently used throughout
- 		the entire pipeline. However, due to its miscellaneous nature, its
- 		inclusion in this flow chart would lead to unnecessary clutter.}
- 	\label{fig: flow_chart}
-\end{figure}
-
-\begin{comment}
-\UseVerb{utils}
-\end{comment}
-
-By default, each Latin hypercube consists of $N_s = 5000$ entries. For 
-justification of this quantity, please refer to
-section~\ref{sec: num_samples}.
-
-$N_k = 300$.
-
-\begin{table}[ht!]
-\centering
-\begin{tabular}{l|c|l}
-\hline
-Script & Abbreviation & purpose \\ \hline
-\Verb|lhs.py| & lhs & Creates unit LHSs. \\
-\Verb|generate_emu_data.py| & ged & Fill in hypercube with spectra. \\
-\Verb|camb_interface.py| & ci & Computes an individual spectrum. \\
-\Verb|train_emu.py| & te & Trains and tests emulator. \\
-\Verb|user_interface.py| & ui & Bridges lhs, ged, and te scripts. \\
-\Verb|utils.py| & utils & Miscellaneous utility functions. 
-\end{tabular}
- \cprotect\caption[Summary of CL Scripts]{Maybe we should axe the last
- 	column.}
- \label{tab: script_summary}
-\end{table}
-
-
-\section{LHCs}
+\section{LHSs}
 \label{sec: lhc_outline}
 
-The \verb|pyDOE2| function that we will use to generate our LHSs
-returns a result with entries that range from zero to unity. In continuity
-with the language of section~\ref{sec: lhc_theory}, we will refer
-to such LHSs as \textit{unit} LHSs.\footnote{We will later denote LHSs with 
-the matrix notation $\matr{X}$ and collections of CAMB power spectra as
-$\matr{Y}$ to
-emphasize the roles of these data in the training and testing of the emulator. 
-However, we will continue to use the term ``unit'' as introduced here, and 
-the reader should keep in mind that a unit $\matr{X}_u$ therefore does not
-indicate an identity matrix.} These unit LHSs are saved as \verb|npy| files
-and later rescaled according to the desired parameter ranges. This allows us
-to build many different emulators from a single LHS file.
+The LHSs give the values of the cosmological parameters and therefore may be 
+thought of as the $\matr{X}$ in our regression problem, while the 
+corresponding CAMB power spectra may be thought of as the $\matr{Y}$. Each
+row $\bm{x}$ in $\matr{X}$ will describe a different cosmology, and each
+row $\bm{y}$ in $\matr{Y}$ will be the power spectrum for that cosmology.
 
-(For example, $\sigma_{12}^2$ sampling--although we did not
-get it to work, the infrastructure is still there for whomever comes along in
-the future.)
+% Intro sentence?
+
+We will generate our LHSs so that their values range from zero to unity.
+In continuity with the language of section~\ref{sec: lhc_theory}, we will 
+refer to such LHSs as \textit{unit} LHSs. These unit LHSs are saved as
+\texttt|npy| files and later rescaled according to specify the training
+domain in each parameter. This two-step process, first of generating a unit
+LHC and then rescaling it, allows us to build many different emulators from a 
+single LHS file. That is, rescaling the same LHS in different ways allows us
+to cut down on the number of LHSs that we need to generate.
 
 % One reason this goes here: priors show up in almost every script,
 % so there isn't a great cass-L section in which to put this.
 
 CL accomplishes this rescaling through the use of prior files.
-CL is packaged with three pairs of prior files. The parameter domains are
+CL is packaged with three pairs of prior files. The parameter domains for each
+pair are
 described in tables~\ref{tab: MEGA_priors},~\ref{tab: CLASSIC_priors},
 and~\ref{tab: COMET_priors}. The $\omega_\nu$ prior is always $[0, 0.01]$ and 
 the $\sigma_{12}$ prior is always $[0.2, 1]$.
+
+%%% I just don't think anyone is really going to be confused by this...
+\begin{comment}
+to
+emphasize the roles of these data in the training and testing of the emulator. 
+However, we will continue to use the term ``unit'' as introduced here, and 
+the reader should keep in mind that a unit $\matr{X}_u$ therefore does not
+indicate an identity matrix.}
+\end{comment}
+
+(For example, $\sigma_{12}^2$ sampling--although we did not
+get it to work, the infrastructure is still there for whomever comes along in
+the future.)
 
 These prior files come in pairs so that the user may choose between a
 massless- and a massive-neutrino emulator: the prior name need only be
@@ -186,6 +143,82 @@ values in words?}
 The default priors that we use correspond to those currently used by COMET. 
 \textcolor{orange}{Two justifications for this choice: unsolvable cells, but 
 more than that, simplicity and accuracy for the ``demo'' run.}
+
+\section{Pipeline and Design Choices}
+\label{sec: flow_chart}
+
+% Disgusting hack to get verbatim functionality in tabel
+
+To digestibly visualize the overall structure of emulation with CL, we
+include figure~\ref{fig: flow_chart}.
+This section will explain the main steps in the emulation pipeline by
+elaborating on this flow chart with the aid of the abbreviations listed in
+table~\ref{tab: script_summary}.
+
+First, the user needs to decide on the desired properties and domain of the
+emulator. Most of these properties are currently set within a ``scenario
+file.'' Over what range in each parameter should the emulator be trained?
+The user should specify these with a priors file (see section~\ref{sec: 
+lhc_outline}) and reference it in the scenario file. At how many points in
+$k$ should CL predict the power spectrum? Where are the training and testing 
+LHSs stored?
+
+\texttt{ui} processes the scenario file and loads the LHSs and priors into
+memory, packaging them into a data dictionary. Before submitting this
+dictionary to \texttt{te}, \texttt{ui} requests the power spectra from
+\textt{ged}. Recall that LHSs 
+
+\begin{comment}
+
+\SaveVerb{lhs}|lhs.py|
+\SaveVerb{ged}|generate_emu_data.py|
+\SaveVerb{ci}|camb_interface.py|
+\SaveVerb{te}|train_emu.py|
+\SaveVerb{ui}|user_interface.py|
+
+\end{comment}
+
+% The following plots were generated with h_units_bad.ipynb
+\begin{figure}[ht!]
+    \centering
+ 	\includesvg[width=\textwidth]{chap4/flow_chart}
+ 	\caption[CL Flow Chart]{Flow chart describing the broad structure of the
+ 		code as it pertains to constructing an emulator. Dotted lines
+ 		indicate connections still in development as of 2 October 2023.
+ 		Double lines indicate references of one file in another.
+ 		\Verb|utils| contains code which is frequently used throughout
+ 		the entire pipeline. However, due to its miscellaneous nature, its
+ 		inclusion in this flow chart would lead to unnecessary clutter.}
+ 	\label{fig: flow_chart}
+\end{figure}
+
+\begin{comment}
+\UseVerb{utils}
+\end{comment}
+
+By default, each Latin hypercube consists of $N_s = 5000$ entries. For 
+justification of this quantity, please refer to
+section~\ref{sec: num_samples}.
+
+$N_k = 300$.
+
+\begin{table}[ht!]
+\centering
+\begin{tabular}{l|c|l}
+\hline
+Script & Abbreviation & purpose \\ \hline
+\Verb|lhs.py| & \texttt{lhs} & Creates unit LHSs. \\
+\Verb|generate_emu_data.py| & \texttt{ged} & Fill in hypercube with spectra.\\
+\Verb|camb_interface.py| & \texttt{ci} & Computes an individual spectrum. \\
+\Verb|train_emu.py| & \texttt{te} & Trains and tests emulator. \\
+\Verb|user_interface.py| & \texttt{ui} & Bridges lhs, ged, and te scripts. \\
+\Verb|utils.py| & \texttt{utils} & Miscellaneous utility functions. 
+\end{tabular}
+ \cprotect\caption[Summary of CL Scripts]{Maybe we should axe the last
+ 	column.}
+ \label{tab: script_summary}
+\end{table}
+
 
 \section{Creation of Separate Emulators}
 \label{sec: 2emu_intro}
