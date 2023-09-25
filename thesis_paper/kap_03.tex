@@ -101,7 +101,7 @@ $\ee_i$.
     \end{subfigure}
         \centering
     \caption[$\ee$]
-    		{Model ratios
+    		{Model ratios.
     		\textcolor{red}{Would it have been better if I just included the
     		right plot and no left plot?}}
     \label{fig: model_ratios}
@@ -190,20 +190,27 @@ affect $\omega_\text{DE}$.}
     \begin{subfigure}{0.45 \textwidth}
     \centering
  		\includegraphics[width=\textwidth]{chap3/exotic_asymptotes}
- 		\cprotect\caption{One hundred random $\ee$ curves generated through
- 			the function \verb|get_random_cosmology|.}
+ 		\cprotect\caption{$\ee$ curves of the random models.}
  		\label{fig: random_battery}
     \end{subfigure}
     \begin{subfigure}{0.45 \textwidth}
     \centering
  		\includegraphics[width=\textwidth]{chap3/exotic_histogram}
- 		\caption{The errors associated with applying equation~\ref{eq: fit}
- 			to predict the asymptotes.}
+ 		\caption{Errors associated with fit~\ref{eq: fit}.}
  		\label{fig: random_battery_errs}
     \end{subfigure}
         \centering
-    \caption[Random-cosmology Experiment]
-    		{Model ratios
+    \cprotect\caption[Random-cosmology Experiment]
+    		{Results from a run of 100 cosmologies uniformly
+    			random in the parameters listed in
+    			table~\ref{tab: fit_test_params}, using the function
+    			\verb|get_random_cosmology|. Since this test consists of
+    			only one hundred models, the histogram cannot be interpreted as
+    			comprehensive, but only as an example of typical errors in our
+    			fit. Indeed, reruns of this experiment can lead to
+    			significantly different spreads in the histogram.
+    			The reduced $\chi^2$ value for this particular run of the
+    			experiment is approximately $5.005 \cdot 10^{-7}$.
     		\textcolor{red}{Would it have been better if I just included the
     		right plot and no left plot?}}
     \label{fig: random_cosmology_experiment}
@@ -228,22 +235,30 @@ figure~\ref{fig: degenerate_battery_errs}.
     \begin{subfigure}{0.45 \textwidth}
     \centering
  		\includegraphics[width=\textwidth]{chap3/degenerate_asymptotes}
- 		\cprotect\caption{One hundred random $\ee$ curves generated through
- 			the function \verb|get_As_matched_random_cosmology|.}
+ 		\cprotect\caption{$\ee$ curves of the random models.}
  		\label{fig: degenerate_battery}
     \end{subfigure}
     \begin{subfigure}{0.45 \textwidth}
     \centering
  		\includegraphics[width=\textwidth]{chap3/degenerate_histogram}
- 		\caption{The errors associated with applying equation~\ref{eq: fit}
- 			to predict the asymptotes.}
+ 		\caption{Errors associated with fit~\ref{eq: fit}.}
  		\label{fig: degenerate_battery_errs}
     \end{subfigure}
         \centering
-    \caption[$\ee$]
-    		{Model ratios
-    		\textcolor{red}{Would it have been better if I just included the
-    		right plot and no left plot?}}
+    \cprotect\caption[$A_s$-degenerate Fit Test]
+    		{Results from a run of 100 cosmologies uniformly
+    			random in the first four parameters of
+    			table~\ref{tab: fit_test_params}, using the function
+    			\verb|get_random_As_matched_cosmology|. 
+    			Since this test consists of
+    			only one hundred models, the histogram cannot be interpreted as
+    			comprehensive, but only as an example of typical errors in our
+    			fit. Indeed, reruns of this experiment can lead to
+    			significantly different spreads in the histogram.
+    			The reduced $\chi^2$ value for this particular run of the
+    			experiment is approximately $2.514 \cdot 10^{-8}$.
+    			\textcolor{red}{Would it have been better if I just included the
+    			right plot and no left plot?}}
     \label{fig: degenerate_cosmology_experiment}
 \end{figure}
 
@@ -287,6 +302,3 @@ Expansion of the parameter space represents the single most
 important novel step in this work. The remaining chapters will
 focus on the integration of this modified evolution mapping framework
 into a beginner-friendly emulation code.
-
-\textcolor{blue}{Plot to do: add $\chi^2$ values for all three experiments;
-	figure out caption length causing the plots to misalign!}
