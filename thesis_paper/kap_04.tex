@@ -154,14 +154,11 @@ the feature is in principle simple to implement.
 
 % Disgusting hack to get verbatim functionality in tabel
 
-To digestibly visualize the overall structure of emulation with CL, we
-include figure~\ref{fig: flow_chart}.
-This section will explain the main steps in the emulation pipeline by
-elaborating on this flow chart with the aid of the abbreviations listed in
-table~\ref{tab: script_summary}.
+In this section we outline the general procedure for building and testing an
+emulator. For an explanation of the abbreviations used here, see table~\ref{tab: script_summary}. 
 
-\textcolor{red}{The following paragraph is not very easy to read, but I'm not
-sure how to better structure it.}
+\textcolor{red}{The following two paragraphs are not very easy to read, but 
+I'm not sure how to better structure them.}
 
 First, the user needs to decide on the desired properties and domain of the
 emulator. Most of these properties are currently set within a ``scenario
@@ -169,8 +166,12 @@ file.'' Over what range in each parameter should the emulator be trained?
 The user should specify these with a priors file (see section~\ref{sec: 
 lhc_outline}) and reference it in the scenario file. At how many points in
 $k$ should CL predict the power spectrum? By default, we pick $N_k = 300$. 
-Where are the training and testing 
-LHSs stored? When using \texttt{lhs} to generate the training and testing
+Where are the training and testing LHSs stored? Does this scenario share an
+already-computed test set with a different emulator? For example, one could
+re-use a test set built from an $N_s=3000$ LHS to test an emulator built from
+an $N_s=7000$ training LHS.
+
+When using \texttt{lhs} to generate the training and testing
 LHSs, remaining questions are answered: how even does the LHS need to be
 (e.g. threshold value for $s^*$)? How many samples should each data set have?
 By default, we pick $N_s = 5000$.
@@ -182,14 +183,18 @@ dictionary to \texttt{te}, \texttt{ui} requests the power spectra from
 produces the rescale parameters files which are not
 necessary for building the emulator but which contain useful diagnostic
 information when verifying the correctness of the code. To learn about rescale
-parameters, refer to section~\ref{sec: generate_emu_data}}
+parameters, refer to section~\ref{sec: generate_emu_data}}. \texttt{ged}
+applies the technique of evolution mapping in interacting with \texttt{ci}. 
 
 At this point, we have $\matr{X}_\text{train}$, $\matr{X}_\text{test}$, 
 $\matr{Y}_\text{train}$, and $\matr{Y}_\text{test}$. These elements are
 organized into a data dictionary and passed to \texttt{te}, which instantiates
 a new emulator trainer object. This trainer in turn instantiates an emulator 
-object and calculates some simple error metrics according to the provided
-test set.
+object and trains the Gaussian process it contains. Finally, the trainer 
+calculates some simple error metrics according to the provided test set.
+
+As a digestible visualization of the procedure as described here, we
+include figure~\ref{fig: flow_chart}.
 
 \textcolor{orange}{The emulator should also compute training errors!! This
 would be a really easy way to expand the code in a meaningful way.}
@@ -234,7 +239,7 @@ Script & Abbreviation & Purpose \\ \hline
 \section{Creation of Separate Emulators}
 \label{sec: 2emu_intro}
 
-One potential weakness of \textcolor{orange}{this} emulator outline emerges 
+One potential weakness of this emulator outline emerges 
 from the prior range for the physical density in neutrinos. The lower bound 
 ($\omega_\nu = 0$) of this range for the physical density in neutrinos is 
 highly firm; any negative value would be unphysical. However, this 
