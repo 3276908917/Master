@@ -168,34 +168,64 @@ This section will explain the main steps in the emulation pipeline by
 elaborating on this flow chart with the aid of the abbreviations listed in
 table~\ref{tab: script_summary}.
 
+\textcolor{red}{The following paragraph is not very easy to read, but I'm not
+sure how to better structure it.}
+
 First, the user needs to decide on the desired properties and domain of the
 emulator. Most of these properties are currently set within a ``scenario
 file.'' Over what range in each parameter should the emulator be trained?
 The user should specify these with a priors file (see section~\ref{sec: 
 lhc_outline}) and reference it in the scenario file. At how many points in
-$k$ should CL predict the power spectrum? Where are the training and testing 
-LHSs stored?
+$k$ should CL predict the power spectrum? By default, we pick $N_k = 300$. 
+Where are the training and testing 
+LHSs stored? When using \texttt{lhs} to generate the training and testing
+LHSs, remaining questions are answered: how even does the LHS need to be
+(e.g. threshold value for $s^*$)? How many samples should each data set have?
+By default, we pick $N_s = 5000$.
 
 \texttt{ui} processes the scenario file and loads the LHSs and priors into
 memory, packaging them into a data dictionary. Before submitting this
 dictionary to \texttt{te}, \texttt{ui} requests the power spectra from
-\texttt{ged}. Recall that LHSs 
+\texttt{ged}, which constitutes our $\matr{Y}$.\footnote{\texttt{ged} also 
+produces the rescale parameters files which are not
+necessary for building the emulator but which contain useful diagnostic
+information when verifying the correctness of the code. To learn about rescale
+parameters, refer to section~\ref{sec: generate_emu_data}}
 
-\begin{comment}
+At this point, we have $\matr{X}_\text{train}$, $\matr{X}_\text{test}$, 
+$\matr{Y}_\text{train}$, and $\matr{Y}_\text{test}$. These elements are
+organized into a data dictionary and passed to \texttt{te}, which instantiates
+a new emulator trainer object. This trainer in turn instantiates an emulator 
+object and calculates some simple error metrics according to the provided
+test set.
 
-\SaveVerb{lhs}|lhs.py|
-\SaveVerb{ged}|generate_emu_data.py|
-\SaveVerb{ci}|camb_interface.py|
-\SaveVerb{te}|train_emu.py|
-\SaveVerb{ui}|user_interface.py|
+\textcolor{orange}{The emulator should also compute training errors!! This
+would be a really easy way to expand the code in a meaningful way.}
 
-\end{comment}
+\begin{table}[ht!]
+\centering
+\begin{tabular}{l|c|l}
+\hline
+Script & Abbreviation & purpose \\ \hline
+\Verb|lhs.py| & \texttt{lhs} & Creates unit LHSs. \\
+\Verb|generate_emu_data.py| & \texttt{ged} & Computes spectra for an LHS.\\
+\Verb|camb_interface.py| & \texttt{ci} & Computes an individual spectrum. \\
+\Verb|train_emu.py| & \texttt{te} & Trains and tests emulator. \\
+\Verb|user_interface.py| & \texttt{ui} & Bridges
+	\texttt{lhs}, \texttt{ged}, and \texttt{te} scripts. \\
+\Verb|utils.py| & \texttt{utils} & Miscellaneous utility functions. 
+\end{tabular}
+ \cprotect\caption[Summary of CL Scripts]{\textcolor{red}{Should I axe
+ 	the last column or could it be appropriate for this thesis?}}
+ \label{tab: script_summary}
+\end{table}
 
 % The following plots were generated with h_units_bad.ipynb
 \begin{figure}[ht!]
     \centering
  	\includesvg[width=\textwidth]{chap4/flow_chart}
- 	\caption[CL Flow Chart]{Flow chart describing the broad structure of the
+ 	\caption[CL Flow Chart]{Flow chart broadly describing the structure
+ 		of the
  		code as it pertains to constructing an emulator. Dotted lines
  		indicate connections still in development as of 2 October 2023.
  		Double lines indicate references of one file in another.
@@ -205,37 +235,9 @@ dictionary to \texttt{te}, \texttt{ui} requests the power spectra from
  	\label{fig: flow_chart}
 \end{figure}
 
-\begin{comment}
-\UseVerb{utils}
-\end{comment}
-
-By default, each Latin hypercube consists of $N_s = 5000$ entries. For 
-justification of this quantity, please refer to
-section~\ref{sec: num_samples}.
-
-$N_k = 300$.
-
-\begin{table}[ht!]
-\centering
-\begin{tabular}{l|c|l}
-\hline
-Script & Abbreviation & purpose \\ \hline
-\Verb|lhs.py| & \texttt{lhs} & Creates unit LHSs. \\
-\Verb|generate_emu_data.py| & \texttt{ged} & Fill in hypercube with spectra.\\
-\Verb|camb_interface.py| & \texttt{ci} & Computes an individual spectrum. \\
-\Verb|train_emu.py| & \texttt{te} & Trains and tests emulator. \\
-\Verb|user_interface.py| & \texttt{ui} & Bridges lhs, ged, and te scripts. \\
-\Verb|utils.py| & \texttt{utils} & Miscellaneous utility functions. 
-\end{tabular}
- \cprotect\caption[Summary of CL Scripts]{Maybe we should axe the last
- 	column.}
- \label{tab: script_summary}
-\end{table}
-
 \section{Creation of Separate Emulators}
 \label{sec: 2emu_intro}
 
-\begin{comment}
 \textcolor{orange}{One consequence of this section for this chapter: our
 priors files come in pairs!}
 
@@ -243,8 +245,6 @@ priors files come in pairs!}
 between a
 massless- and a massive-neutrino emulator: the prior name need only be
 coupled with the ending} \verb|_no_nu| or \verb|_with_nu|, respectively.
-
-\end{comment}
 
 One potential weakness of \textcolor{orange}{this} emulator outline emerges 
 from the prior range for the physical density in neutrinos. The lower bound 
