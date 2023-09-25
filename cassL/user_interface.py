@@ -70,6 +70,23 @@ def prior_file_to_dict(prior_name="COMET_with_nu"):
 
     return param_ranges
 
+def check_existing_files(scenario_name):    
+    save_path = "data_sets/" + scenario_name
+    
+    train_complete = False
+    test_complete = False
+    
+    if os.path.exists(save_path + "/lhc_train_final.npy") and \
+        os.path.exists(save_path + "/samples_train.npy"):
+        train_complete = True
+        
+    if os.path.exists(save_path + "/lhc_test_final.npy") and \
+        os.path.exists(save_path + "/samples_test.npy"):
+        test_complete = True
+    
+    return train_complete, test_complete
+    
+
 def build_train_and_test_sets(scenario_name):
     """
     #! This situation's misconfigured. This function should only build the
@@ -138,32 +155,44 @@ def build_train_and_test_sets(scenario_name):
         label=scenario_name,
         num_workers=12, previous_record=0)
     '''
-    
-    # Step 3: fill-in train LHC
-    
+
     standard_k = np.load("data_sets/k/" + scenario["num_spectra_points"] + \
-                         "k.npy", allow_pickle=True)
-    
-    lhc_train = np.load("data_sets/" + scenario["LHC_train"] + \
-                        "/lhc_train_initial.npy")
+                     "k.npy", allow_pickle=True)
     
     save_path = "data_sets/" + scenario_name
     if not os.path.exists(save_path):
         os.makedirs(save_path)
+        
+    train_complete, test_complete = check_existing_files(scenario_name)
     
-    samples_train, rescalers_train = \
-        ged.fill_hypercube(lhc_train, standard_k, param_ranges=priors,
-            save_label=scenario_name + "_train")
+    # Step 3: fill-in train LHC
+    if train_complete:
+        print("The training spectra appear to have already been computed. " + \
+              "If this is incorrect, please delete the old files and try " + \
+              "again.")
+    else:
+        lhc_train = np.load("data_sets/" + scenario["LHC_train"] + \
+                            "/lhc_train_initial.npy")
+
+        samples_train, rescalers_train = \
+            ged.fill_hypercube(lhc_train, standard_k, param_ranges=priors,
+                save_label=scenario_name + "_train")
+        
+        np.save(save_path + "/samples_train.npy", samples_train)
+        np.save(save_path + "/rescalers_train.npy", rescalers_train)
+        np.save(save_path + "/lhc_train_final.npy", lhc_train)
     
-    np.save(save_path + "/samples_train.npy", samples_train)
-    np.save(save_path + "/rescalers_train.npy", rescalers_train)
-    np.save(save_path + "/lhc_train_final.npy", lhc_train)
+        print("\nThe training spectra have been computed! Checking for " + \
+              "testing spectra...\n")
     
     #X Step 4: build test LHC 
     
     # Step 5: fill-in test LHC
-    
-    if scenario["same_test_set"] is None:
+    if test_complete:
+        print("The testing spectra appear to have already been computed. " + \
+              "If this is incorrect, please delete the old files and try " + \
+              "again.")
+    elif scenario["same_test_set"] is None:
 
         lhc_test = np.load("data_sets/" + scenario["LHC_train"] + \
                             "/lhc_test_initial.npy")
