@@ -179,7 +179,7 @@ x' = x (b - a) + a
 
 After scaling the parameters, \verb|build_cosmology| finishes bridging the gap
 between the LHS and the CAMB \verb|pars| object (as introduced in
-chapter~\label{chap: CAMB_setup}) by using default values to fill in the
+chapter~\ref{chap: CAMB_setup}) by using default values to fill in the
 remaining values demanded by CAMB. For example, $H_0$, $w_a$ and $w_0$ are
 not parameters over
 which we train the emulator, but CAMB requires that they be specified before
@@ -259,20 +259,41 @@ time, we can quickly establish whether the cosmology is ``solvable'' by
 verifying that
 
 \begin{equation}
+\label{eq: solvability_cond}
 \tilde{\sigma}_{12}(z = 0) \geq \tilde{\sigma}_{12}(z_\text{target})
 .\end{equation}
 
-power spectrum today ($z = 0$) should always yield the maximum 
 
-We will now describe the process of rescaling a cosmology with the evolution 
-parameters z and h in order to match the desired $\sigma_{12}$ value.
+When this condition is not fulfilled, we can modify the value of $h$ to
+compensate. Recall from chapter~\ref{chap: A_s} that changing $h$ while
+holding $\omega_b$, $\omega_c$, and $\omega_K$ fixed amounts to varying
+$\omega_\text{DE}$, an evolution parameter. Since $h$ is an evolution
+parameter in this context, we are free to modify it in order to increase the
+range of solvable cosmologies. Although CAMB nominally accepts $h$ values as
+low as 0.01, in practice we find that values below around
+$h_\text{min} \approx 0.07$ sometimes lead to crashes.
 
-For the purposes of this treatment, we refer to any cell, for which this 
-approach does not work, as an unsolvable cell. In practice, this means that 
-even at the lowest h values supported by CAMB (\textcolor{orange}{what are 
-these, and why is it unsafe to just use 0.01, even though that is sometimes 
-allowed?}), we cannot match the desired sigma 12 value with a nonnegative 
-redshift. CAMB does not allow for negative redshifts, although it prove be 
+We call this process of tweaking the $h$ and $z$ values `rescaling' to
+succinctly distinguish it from the application of priors to scale a unit LHS.
+In chapter~\ref{chap: emu_outline}, we noted that \texttt{ged} outputs
+files containing rescale parameters. These files contain the $(h, z)$ pairs
+at which we evaluated each cosmology in the input LHS. Since we train our
+emulator over neither $h$ nor $z$, this information is inconsequential to the
+construction and testing of the emulator. Instead, these files are useful for
+independently verifying the accuracy of the pipeline.
+
+Unfortunately, even when setting the dimensionless Hubble parameter to its
+minimum safe value, some power spectra will still fail
+condition~\ref{eq: solvability_cond}.
+For the purposes of this treatment, we refer to such cosmologies as
+``unsolvable.'' The problem of unsolvable cosmologies led us to create the
+increasingly restrictive prior sets described in section~\ref{lhc_outline}.
+Of the three provided pairs of priors files, only the COMET priors
+(table~\ref{tab: COMET_priors}) are narrow enough to completely evade the 
+issue of unsolvable cosmologies. For this reason, the COMET priors are the
+defaults used by CL.
+
+CAMB does not allow for negative redshifts, although it prove be 
 interesting to try to resolve this issue with a code that does allow negative 
 redshifts, such as CLASS. \textcolor{orange}{Re-iterate the discussion from
 section~\ref{sec: boltzmann_intro}: why didn’t we use CLASS for this project?}
@@ -285,6 +306,9 @@ there,
 unsolvable cells do not immediately sink the entire data set. The remaining
 still be used to train an emulator as long as even one cell has been solved.
 \textcolor{orange}{This will be explained in section~\ref{sec: train_emu}}.
+
+We will now describe the process of rescaling a cosmology with the evolution 
+parameters z and h in order to match the desired $\sigma_{12}$ value.
 
 %s Bonus section that doesn't really fit anywhere specific: speed-up
 
