@@ -1,4 +1,5 @@
 \chapter{CAMB, Initial Setup}
+\label{chap: CAMB_setup}
 
 To reiterate, our first research goal is to investigate the impact of massive
 neutrinos on the power spectrum more closely. This will help us to understand
@@ -158,7 +159,7 @@ Key & Significance \\ \hline
 'h' & $h$ \\
 'w0' & $w_0$ in the CPL EoS for DE \\
 'wa' & $w_a$ in the CPL EoS for DE \\
-'sigma12' & $\sigma_{12}$\footnotemark \\
+'sigma12' & $\tilde{\sigma}_{12}$\footnotemark \\
 'omnuh2' & $\omega_\nu$ \\
 'mnu' & $\sum_i m_{\nu, i}$ \\
 'nnu\_massive' & Number of massive $\nu$ species \\ \hline
@@ -172,7 +173,8 @@ Key & Significance \\ \hline
  \label{tab: cosmology_dictionary}
 \end{table}
  	
-\footnotetext{Specifying a $\sigma_{12}$ value will not affect the power
+\footnotetext{Specifying a $\tilde{\sigma}_{12}$ value will not affect the 
+power
 spectrum returned by \verb|evaluate_cosmology|. Instead, this field is used
 by the \verb|direct_eval_cell| and \verb|interpolate_cell| functions
 (section~\ref{sec: generate_emu_data}).}
@@ -384,9 +386,9 @@ associated with each Aletheia model, where $i$ is the column of the file
 \verb|cosmologies.dat| (included with CL). These $z_i$ are defined such that
 
 \begin{equation}
-\sigma_{12}(\text{model a}, z_{i, \text{model a}})
+\tilde{\sigma}_{12}(\text{model a}, z_{i, \text{model a}})
 =
-\sigma_{12}(\text{model b}, z_{i, \text{model b}})
+\tilde{\sigma}_{12}(\text{model b}, z_{i, \text{model b}})
 ,\end{equation}
 
 Since the Aletheia models share values for the shape parameters, the

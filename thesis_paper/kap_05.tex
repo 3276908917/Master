@@ -25,34 +25,30 @@ describe how to install the package.}
 
 % lhc.py
 
-\textcolor{blue}{This section will briefly recapitulate some of the Latin hypercube sampling
-explanation from the introduction. Then we will talk about how this sample is
-procured in practice, and what our ``solution'' (inelegant though it may be)
-is to obtaining a sample with a decent minimum separation between the points
-(remember to briefly repeat why this is important).}
-
 In this section, we will discuss the building of LHSs, which within CL is 
-handled by \verb|lhs|. As mentioned in section~\ref{sec: lhc_outline},
+handled by \texttt|lhs|. As mentioned in section~\ref{sec: lhc_outline},
 we first create a unit LHS and then later rescale it according to a set of
 priors.
 
-Each entry $\bm{x}$ in our LHS $\matr{X}$ will be either a four- or six-
-dimensional vector, 
+Each entry $\bm{x}$ in our LHS $\matr{X}$ will be either a four- or
+six-dimensional vector, 
 depending on the emulator's support for massive neutrinos. When building a
 massless-neutrino emulator, each $\bm{x}$ will describe the $\omega_b$,
-$\omega_c$, $n_s$, and $\sigma_{12}$ values for a different cosmology in 
+$\omega_c$, $n_s$, and
+$\tilde{\sigma}_{12}$ values for a different cosmology in 
 this order. When building a massive-neutrino emulator, each $\bm{x}$ will 
 additionally specify the $A_s$ and $\omega_\nu$ values for that cosmology, 
 again in this order.
 
 To get started generating LHSs, we integrated demonstration code written by 
-Daniel Farrow \text{orange}{(and who else?) add these people to the 
-Danksagung}. We begin by invoking the \verb|lhs| function of
-\verb|pyDOE2| a number of times. Each time we get a random new unit LHC, whose
-spacing we analyze with the \verb|cdist| function from
-\verb|scipy.spatial.distance|.  Recall from section~\ref{sec: lhc_theory} that
+Daniel Farrow \textcolor{orange}{(and who else?) add these people to the 
+Danksagung}. We begin by invoking the \texttt{lhs} function of
+\texttt{pyDOE2} a number of times. Each time we get a random new unit LHC, 
+whose spacing we analyze with the \texttt{cdist} function from
+\texttt{scipy.spatial.distance}.
+Recall from section~\ref{sec: lhc_theory} that
 our samples more evenly cover the sample space if the minimum separation
-$s^*$ increases. Therefore, from among the numerous calls of \verb|lhs| we 
+$s^*$ increases. Therefore, from among the numerous calls of \texttt{lhs} we 
 select the LHS with the largest minimum separation.
 
 In order to maximize the number of random hypercubes generated per unit of
@@ -115,18 +111,18 @@ which tells us the best possible $s^*$
 given dimension $d$ and total number of samples $N_s$. Let us consider a 
 massless-neutrino emulator (a total of four dimensions per cosmology vector)
 trained over five-thousand CAMB spectra. If we plug in $d = 4$ and $N=5000$,
-we get XXY. Similarly, for our massive-neutrino emulator (a total of six 
-dimensions per cosmology) trained over the same number of spectra, we find a 
-theoretical best minimum-separation of $s^*_\text{best} \approx 0.1189$.
+we find $s^*_\text{best} \approx 0.1189$. Clearly, the brute force method
+achieves only a comparatively low $s^*$, even over the span of multiple days.
 
 Based on figures~\ref{fig: function_calls} and~\ref{fig: wall_time}, we
-claim that our approach is
-inefficient and not well-suited to the approach of finding LHCs with large
-$s^*$. As mentioned in section~\ref{sec: lhc_theory},
-we value a high $s^*$ because it means we are sampling the
-space of cosmologies evenly rather than oversampling particular regions.
-Therefore, we expect the consequence of a low minimum separation in the LHC to
-be a higher error variance as well as a slightly higher average bias.
+claim that our approach is inefficient and not well-suited to the approach of 
+maximizing $s^*$. Since suboptimal $s^*$ values imply unevenness in the
+coverage of the space of cosmologies, we expect low $s^*$ values to impact
+the emulator by increasing variance in the errors, because the worst errors
+will be significantly worse, while the best errors will be slightly better in
+oversampled regions. We also expect the average error to increase slightly,
+as the oversampled regions should benefit less than the undersampled regions
+suffer.
 
 % One could argue that the variance in oversampled regions will decrease to
 % compensate, right? I need to clarify that the decrease in variance in the
@@ -135,17 +131,65 @@ be a higher error variance as well as a slightly higher average bias.
 % continuous, so closely spaced points reveal less about the true function
 % than well spaced points.
 
-Later, we will test our expectations by comparing emulators with different
-minimum separations in their LHSs in section~\ref{sec: error_from_lhc}, to
-which we defer remaining concerns about our approach to LHC generation.
-Additionally, we will explore the question of superior methods in
-section~\ref{sec: future_work}.
+We will test these expectations in section~\ref{sec: error_from_lhc} by
+varying the $s^*$ of the LHS with which we train the emulator.
+\textcolor{orange}{We will explore the question of superior methods in
+section~\ref{sec: future_work}}.
 
-\section{Integrating Evolution Mapping}
-\label{sec: generate_emu_data}
+\section{Rescaling the LHS}
+\label{sec: lhc_rescale}
+
+\textcolor{blue}{This section will describe the process going from a Latin 
+hypercube to a set of CAMB power spectra. We will describe how an array of six 
+parameter values is fleshed out into a params object understood by CAMB.}
 
 \textcolor{blue}{What happens to $A_s$ in the massless-neutrino case? Is it 
 fixed at the default for model 0? I'm pretty sure it is!}
+
+%s Preface the script as a whole. Where do I put this?
+\textcolor{gray}{\texttt{ged} includes more complicated functions that apply the 
+framework established in \texttt{ci} to the filling in of the 
+hypercube object that we obtained from \texttt{lhc} via
+\texttt{ui}.}
+
+%s Introduce the build_cosmology script
+
+Now that we have a unit LHS $\matr{X}_u$, we need to scale it 
+so that each axis, which currently runs from zero to one, runs along a range 
+dictated by one of the priors. This scaling is handled by the \texttt{ged}
+function \verb|build_cosmology|. It accepts as parameters the values of
+$\omega_b$, $\omega_c$, $n_s$, $\sigma_{12}$, $A_s$, $\omega_\nu$, and, 
+optionally, a dictionary of priors. If this
+dictionary is not provided, the cosmological parameters are assumed to
+already have been scaled. When building a massless-neutrino emulator,
+the information $\omega_\nu = 0$ and $A_s = A_s(\text{Aletheia model 0})$ is
+automatically provided to \verb|build_cosmology| by
+\verb|fill_hypercube|. 
+% We really should redo build_cosmology so that it assumes indices match to
+% the same parameters every time! This is how the rest of the code works,
+% after all.
+
+The precise form of the scaling is given by the formula for transforming a
+random variable $x \sim \mathcal{U}(0, 1)$ to a random variable
+$x' \sim \mathcal{U}(a, b)$:
+
+\begin{equation}
+x' = x (b - a) + a
+\end{equation}
+
+After scaling the parameters, \verb|build_cosmology| finishes bridging the gap
+between the LHS and the CAMB \verb|pars| object (as introduced in
+chapter~\label{chap: CAMB_setup}) by using default values to fill in the
+remaining values demanded by CAMB. For example, $H_0$, $w_a$ and $w_0$ are
+not parameters over
+which we train the emulator, but CAMB requires that they be specified before
+a power spectrum can be calculated. In all such cases, we use Aletheia model
+0 as default values. \textcolor{orange}{I'm not referring to table 1.2 here
+because I would have to expand it with parameters not essential to this work,
+so I would have to redo the captions for fig 1.1 and table 1.2...}
+
+\section{Integrating Evolution Mapping}
+\label{sec: generate_emu_data}
 
 Another paragraph I want to have in this section: stress the part of the 
 evolution mapping introduction, that the $\sigma_{12}$ value we're using to 
@@ -155,49 +199,13 @@ later in the section on the \verb|generate_emu_data| script.
 
 % generate\_emu\_data.py
 
-\textcolor{blue}{This section will describe the process going from a Latin 
-hypercube to a set of CAMB power spectra. We will describe how an array of six 
-parameter values is fleshed out into a params object understood by CAMB. We 
+\textcolor{blue}{We 
 will describe the procedure of modifying $h$ and $z$ until we arrive roughly 
-at the $\sigma_{12}$ value that we desire, as well as the process of writing 
-the \textit{actual} $\sigma_{12}$ value that we obtained back to the original 
-hypercube. Why is this important? Because the Latin hypercube is used again 
-later in the user\_interface.py script for the purpose of training the 
-Gaussian emulator object.}
-
-%s Preface the script as a whole. Where do I put this?
-\verb|generate_emu_data.py| includes more complicated functions that apply the 
-framework established in \verb|camb_interface.py| to the filling in of the 
-hypercube object that we obtained from \verb|lhc.py| over
-\verb|user_interface.py|.
-
-%s Introduce the build_cosmology script
-
-Now that we have a ``good enough'' unit LHC $\matr{X}$, we need to rescale it 
-so that each axis, which currently runs from zero to one, runs along a range 
-dictated by one of the cosmological parameters over which we are training the 
-emulator. This rescaling is handled by the function \verb|build_cosmology| in
-the \verb|generate_emu_data| script. It accepts as parameters the values of
-$\omega_b$, $\omega_c$, $n_s$, $\sigma_{12}$, $A_s$, $\omega_nu$, and, 
-optionally, a dictionary of parameter ranges. If the
-parameter ranges are not provided, the cosmological parameters are assumed to
-already have been rescaled. 
-% We really should redo build_cosmology so that it assumes indices match to
-% the same parameters every time! This is how the rest of the code works,
-% after all.
-
-\textcolor{orange}{What are the equations for rescaling that build cosmology
-uses?}
-
-The \verb|build_cosmology| function bridges the gap between the LHC format and 
-the format expected by CAMB. Remember as described in
-section~\ref{sec: 2emu_intro} that our LHC has either four or six dimensions 
-depending on whether the neutrinos have mass. Separate from this, when 
-computing a CAMB power spectrum, we need to
-specify\footnote{By ``specify,'' we also mean the parameters for which CAMB
-provides default values.}
-several more parameters. These include, among others, the Hubble constant 
-$H_0$ as well as the DE EOS parameters $w_a$ and $w_0$.
+at the $\tilde{\sigma}_{12}$ value that we desire, as well as the process of 
+writing the \textit{actual} $\tilde{\sigma}_{12}$ value that we obtained back 
+to the original hypercube. Why is this important? Because the Latin hypercube 
+is used again later in \texttt{ui} for the purpose of training the 
+GPR object.}
 
 In practice, we split these parameters into two categories: we modify the
 values of $h$ and $z$ until we obtain the desired value of $\sigma_{12}$
@@ -212,36 +220,49 @@ I'm almost certain these are evolution parameters! Also: $\omega_\text{DE}$
 is only an evolution parameter when everything else (all other omegas) is 
 fixed...}
 
-So, \verb|build_cosmology| makes a copy of the full Aletheia model 0 cosmology 
-and replaces four or six entries depending on the dimensionality of the LHC. 
-
-%s What kinds of assumptions does build_cosmology make
-
-Remember that Aletheia model 0 corresponds to the Planck best fit parameters
-this entails a flat Universe, $\omega_K = 0$.
-\textcolor{red}{According to Andrea P., extreme values of $\omega_K$
-affect the shape of $P(k)$. Doesn't that mean that $\omega_K$ is truly a
-shape parameter?} We do not emulate over $\omega_K$ but assume take
-it to be zero for all cells. However, as we explain in
-section~\ref{sec: ev_mapping_intro}, this does not limit the applicability of
-our emulators. The use of nonzero $\omega_K$ values will simply entail a
-relabeling of the emulated power spectra. \textcolor{orange}{Then again, I'm
-holding $\sigma_{12}$ fixed, so does it change anything at all?}
 
 %s Now talk about fill_hypercube, a central function of this script
 
-\verb|fill_hypercube| iterates through the rows $\bm{x}$ of the unit LHC
-$\matr{X}$, packages them into a fully-specified cosmology using the function
-\verb|build_cosmology|, and passes them to one of the evaluation functions,
-which combines the CAMB calls from the \verb|camb_interface| script with the
-principles of evolution mapping. Currently, the default evaluation function is
-\verb|direct_eval_cell|, which relies on the \verb|evaluate_cosmology|
-function from the \verb|camb_interface| script.
-
-% 
+\verb|fill_hypercube| is the central function of \texttt{ged}. It iterates 
+through the rows $\bm{x}$ of the unit LHS
+$\matr{X}_u$, packages them into a fully-specified cosmology using
+\verb|build_cosmology|, and passes the cosmology to one of the 
+evaluation functions. \texttt{ged} provides two evaluation functions, which 
+combine the CAMB calls from \texttt{ci} with the
+principles of evolution mapping: \verb|direct_eval_cell| relies on
+\verb|evaluate_cosmology| while \verb|interpolate_cell| relies on
+\verb|cosmology_to_Pk_interpolator|. These two options are designed to give
+the same results and will differ at a level insignificant to the conclusions
+of this work. The emulator pipeline uses the direct evaluation approach by
+default.
 
 %s What exactly does it mean here to integrate evolution mapping into the 
 %s code?
+
+Recall from chapter~\ref{chap: CAMB_setup} that CAMB does not accept
+$\sigma_{12}$ as an input. The importance of \verb|direct_eval_cell| and 
+\verb|interpolate_cell| is in circumventing this problem.
+After \verb|build_cosmology| returns a complete cosmology dictionary, these
+functions computer the MEMNeC. Then, they request CAMB power spectra for the
+MEMNeCs at 150 linearly-spaced redshifts in the
+interval [0, 10]. \textcolor{orange}{log spacing would have been better for
+redshift}. This interval suffices to capture the reddest galaxies
+in our galaxy redshift surveys. \textcolor{green}{citation}. Next, these
+functions request a one-dimensional interpolator from \texttt{scipy} with
+the $\tilde{\sigma}_{12}$ values as the $x$ and the $z$ values as the $y$.
+By passing the desired $\tilde{\sigma}_{12}$ value to the interpolator, we
+can in principle find the redshift at which we need to call CAMB.
+
+In practice, some cosmologies cannot be analyzed in this way. CAMB does not
+support negative redshifts. Since all power spectra grow in amplitude with
+time, we can quickly establish whether the cosmology is ``solvable'' by
+verifying that
+
+\begin{equation}
+\tilde{\sigma}_{12}(z = 0) \geq \tilde{\sigma}_{12}(z_\text{target})
+.\end{equation}
+
+power spectrum today ($z = 0$) should always yield the maximum 
 
 We will now describe the process of rescaling a cosmology with the evolution 
 parameters z and h in order to match the desired $\sigma_{12}$ value.

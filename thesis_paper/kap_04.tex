@@ -48,7 +48,7 @@ CL is packaged with three pairs of priors files (the pairing will be explained
 in section~\ref{sec: 2emu_intro}). The parameter domains for each pair are
 described in tables~\ref{tab: MEGA_priors},~\ref{tab: CLASSIC_priors},
 and~\ref{tab: COMET_priors}. The three pairs of files share the same priors in
-$\omega_\nu$, [0, 0.01], and $\sigma_{12}$, [0.2, 1], and so these are
+$\omega_\nu$, [0, 0.01], and $\tilde{\sigma}_{12}$, [0.2, 1], and so these are
 omitted. \textcolor{red}{Is it okay for me to omit like that or should I just
 repeat the information?}
 
@@ -138,10 +138,10 @@ all axes of our \textit{unit} LHSs run \textit{uniformly} over the interval
 [0, 1]. However, the rescaled 
 parameter domains can be more flexible. For example, the fourth axis
 of an LHS
-describes $\sigma_{12}$ in the default implementation of the code. We can also
-interpret the axis as a set of $\sigma_{12}^2$ values instead,
+describes $\tilde{\sigma}_{12}$ in the default implementation of the code. We can also
+interpret the axis as a set of $\tilde{\sigma}_{12}^2$ values instead,
 in case we wish to
-increase our sampling in larger values of $\sigma_{12}$ over the same
+increase our sampling in larger values of $\tilde{\sigma}_{12}$ over the same
 interval. Unfortunately, this non-uniform sampling does not seem to be
 correctly implemented
 in the current (as of 2 October 2023) version of the code. Nonetheless, as we
@@ -171,7 +171,7 @@ already-computed test set with a different emulator? For example, one could
 re-use a test set built from an $N_s=3000$ LHS to test an emulator built from
 an $N_s=7000$ training LHS.
 
-When using \texttt{lhs} to generate the training and testing
+When using \texttt{lhc} to generate the training and testing
 LHSs, remaining questions are answered: how even does the LHS need to be
 (e.g. threshold value for $s^*$)? How many samples should each data set have?
 By default, we pick $N_s = 5000$.
@@ -204,12 +204,12 @@ would be a really easy way to expand the code in a meaningful way.}
 \begin{tabular}{l|c|l}
 \hline
 Script & Abbreviation & Purpose \\ \hline
-\Verb|lhs.py| & \texttt{lhs} & Creates unit LHSs. \\
+\Verb|lhc.py| & \texttt{lhc} & Creates unit Latin hypercubes. \\
 \Verb|generate_emu_data.py| & \texttt{ged} & Computes spectra for an LHS.\\
 \Verb|camb_interface.py| & \texttt{ci} & Computes an individual spectrum. \\
 \Verb|train_emu.py| & \texttt{te} & Trains and tests emulator. \\
 \Verb|user_interface.py| & \texttt{ui} & Bridges
-	\texttt{lhs}, \texttt{ged}, and \texttt{te} scripts. \\
+	\texttt{lhc}, \texttt{ged}, and \texttt{te} scripts. \\
 \Verb|utils.py| & \texttt{utils} & Miscellaneous utility functions. 
 \end{tabular}
  \cprotect\caption[Summary of CL Scripts]{The scripts that make up CL.
@@ -275,11 +275,12 @@ $\omega_\nu \in [0, 0.01]$, with $A_s$ depending on the priors file used
 and~\ref{tab: COMET_priors}). The secondary emulator is specifically trained
 to handle the massless neutrino case. In 
 practice, this entails the same prior ranges for the parameters $\omega_b$, 
-$\omega_c$, $n_s$, and $\sigma_{12}$. However, here we no longer need $A_s$;
+$\omega_c$, $n_s$, and $\tilde{\sigma}_{12}$. However, here we no longer need 
+$A_s$;
 as discussed in chapter~\ref{chap: A_s}, $A_s$ helps to characterize the
 structure growth suppression induced by massive neutrinos. Besides this,
 $A_s$ behaves as an evolution parameter, and we are already specifying the 
-amplitude of the power spectrum through $\sigma_{12}$. Therefore, the
+amplitude of the power spectrum through $\tilde{\sigma}_{12}$. Therefore, the
 dimension of our LHS decreases from six to four.
 
 To train this massless-neutrino emulator, we use the same pipeline introduced
