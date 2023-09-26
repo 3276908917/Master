@@ -161,6 +161,7 @@ random variable $x \sim \mathcal{U}(0, 1)$ to a random variable
 $x' \sim \mathcal{U}(a, b)$:
 
 \begin{equation}
+\label{eq: scaling}
 x' = x (b - a) + a
 \end{equation}
 
@@ -180,20 +181,12 @@ prior-scaled value from the LHS, it should not matter that
 we use the model 0 values, as these are evolution parameters.
 \textcolor{red}{Or should it? If this logic really held, shouldn't we be able 
 to modify $w_a$ and $w_0$ in order to get the correct value of
-$\tilde{\sigma}_{12}$? But I'm almost certain these are evolution parameters!}
+$\tilde{\sigma}_{12}$? But these are evolution parameters, so why don't we?}
 
 \section{Integrating Evolution Mapping}
 \label{sec: generate_emu_data}
 
 % generate\_emu\_data.py
-
-\textcolor{blue}{We 
-will describe the procedure of modifying $h$ and $z$ until we arrive roughly 
-at the $\tilde{\sigma}_{12}$ value that we desire, as well as the process of 
-writing the \textit{actual} $\tilde{\sigma}_{12}$ value that we obtained back 
-to the original hypercube. Why is this important? Because the Latin hypercube 
-is used again later in \texttt{ui} for the purpose of training the 
-GPR object.}
 
 %s Now talk about fill_hypercube, a central function of this script
 
@@ -232,25 +225,45 @@ can in principle find the redshift at which we need to call CAMB.
 
 Since we are estimating this redshift from an interpolation over 150 power
 spectrum samples, the $z_\text{interp}$ returned by our interpolator does not
-\textit{exactly} match the theoretical $z_\text{target}$ at which the
-power spectrum would exactly match the desired input $\tilde{\sigma}_{12}$,
-$\tilde{\sigma}_{12}(z_\text{target})$. In order to speed up \texttt{ged},
+\textit{exactly} match the theoretical $z_\text{exact}$ at which the
+power spectrum would exactly match the desired input value,
+$\tilde{\sigma}_{12}(z_\text{exact})$. In order to speed up \texttt{ged},
 which is by far the most time-intensive step in the emulator pipeline,
 \verb|direct_eval_cell| and \verb|interpolate_cell| stop at one iteration of 
 interpolation and return $\tilde{\sigma}_{12}(z_\text{interp})$. Then,
-\verb|fill_hypercube| mutates the original LHS
-\\ IN PROGRESS
-when we calculate the power spectrum using this redshift, get the actual sigma12 value from CAMB and replace the LHC entry with the true value.
-We’ve implemented this now. We should definitely talk about how little of a difference that this makes. We should make error plots (comparing the two approaches with hyper cube as a control), but I strongly suspect the error will be negligible.
+\verb|fill_hypercube| mutates the $\tilde{\sigma}_{12}$ column of the original 
+LHS by using the reverse transformation of~\ref{eq: scaling}:
 
-In practice, some cosmologies cannot be analyzed in this way. CAMB does not
-support negative redshifts. Since all power spectra grow in amplitude with
+\begin{equation}
+x = \frac{x' - a}{b - a}
+\end{equation}
+
+to obtain the unit counterpart to $\tilde{\sigma}_{12}(z_\text{interp})$.
+This transformed value replaces the original value found in the LHS.
+Once \verb|fill_hypercube| finishes computing the spectra, the user
+should save the LHS to a new file (marked ``final'' in
+figure~\ref{fig: flow_chart}); this LHS is used in the emulator's training.
+
+This shortcut saves a good deal of time but moves the value of
+$\tilde{\sigma}_{12}$ negligibly
+\textcolor{green}{cite some numbers for this claim!}.
+The only downside of moving $\tilde{\sigma}_{12}$ could be that it
+decreases the $s^*$ of the LHS. Since the value shifts only weakly, we do not
+consider it to produce a relevant decrease in the accuracy of the emulator.
+
+\textcolor{orange}{We should make error plots (comparing the two approaches 
+with hyper cube as a control), but I strongly suspect the error will be 
+negligible.}
+
+In theory, the above procedure suffices to match any $\tilde{\sigma}_{12}$
+value. However, for some cosmologies, $z_\text{exact} < 0$, a case not
+currently supported by CAMB. Since all power spectra grow in amplitude with
 time, we can quickly establish whether the cosmology is ``solvable'' by
 verifying that
 
 \begin{equation}
 \label{eq: solvability_cond}
-\tilde{\sigma}_{12}(z = 0) \geq \tilde{\sigma}_{12}(z_\text{target})
+\tilde{\sigma}_{12}(z = 0) \geq \tilde{\sigma}_{12}(z_\text{exact})
 .\end{equation}
 
 When this condition is not fulfilled, we can modify the value of $h$ to
@@ -281,7 +294,8 @@ unsolvable cosmology indicates that the actual range of parameters in the
 training data is narrower than the nominal input priors. 
 
 The problem of unsolvable cosmologies led us to create the
-increasingly restrictive prior sets described in section~\ref{lhc_outline}.
+increasingly restrictive prior sets described in
+section~\ref{sec: lhc_outline}.
 Of the three provided pairs of priors files, only the COMET priors
 (table~\ref{tab: COMET_priors}) are narrow enough to completely evade the 
 issue of unsolvable cosmologies. For this reason, the COMET priors are the
