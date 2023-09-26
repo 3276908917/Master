@@ -314,23 +314,34 @@ and therefore easier to handle in training.}
 
 % train\_emu.py
 
-\textcolor{blue}{This section will focus on the particular lines of}
-\verb|GPy| \textcolor{blue}{that we used, as well
-as the various data-cleaning and normalization statements that we used.
-Normalization will be a really important topic. I want to explain some of
-the theory behind why the emulator performs poorly with values outside of this
-[0, 1] range.}
+Once \texttt{ged}'s \verb|fill_hypercube| completes, the user is ready to
+begin training the emulator. We recommend that the user store all of the
+relevant data files in a subdirectory of \verb|data_sets|, which is a
+subdirectory of the \texttt{cassL} code directory. This organization
+allows the user to load and repackage all of the essential data with the
+\texttt{ui} function \verb|get_data_dict|, which returns the
+``data dictionary'' represented in figure~\ref{fig: flow_chart}.
+Once the user passes the data dictionary to the \texttt{ui} function
+\verb|build_and_test_emulator|, the end of the emulator pipeline has been 
+reached, and the remaining work is automatic.
 
-I don't know how to justify this kernel that I got from Alex via AndreaP...
-\textcolor{orange}{That's no problem; Ariel says, just say ``we played around
-and found that this works best.''}
+First, \verb|build_and_test_emulator| cleans the input data by dropping
+unsolved cosmologies from the training and testing sets. Next, to train a new 
+emulator, \verb|build_and_test_emulator| instantiates the
+\verb|Emulator_Trainer| class. We will refer to such objects 
+as \textit{trainers}.
 
-\textcolor{blue}{Briefly explain what GPy is doing—don’t treat it like some black box.}
+Each emulator is an instance of
+the \texttt{Emulator} class with a \texttt{GPy} GPR object at its core. We 
+will refer instances of the \texttt{Emulator} class as \textit{emulator 
+objects}.
 
-This script contains the functions used to build an emulator from the 
-generated data sets. To train a new emulator, one instantiates the
-\verb|Emulator_Trainer| class. We will henceforth refer to objects therefrom 
-as trainers.
+Besides
+accessing this GPR object, emulator objects also convert $\bm{x}$ inputs and
+$\bm{y}$ outputs in order to facilitate scientific access. Specifically, 
+the GPR itself accepts $\bm{x}$ inputs and predicts $\bm{y}$ outputs 
+in a normalized fashion which will not be easily understood unless first 
+appropriately transformed.
 
 We separate the \verb|Emulator_Trainer| class from the \verb|Emulator| class
 to make saving and loading more efficient. When transferring an emulator to a
@@ -344,14 +355,7 @@ data sets used.
 However, we still need the \verb|Emulator| class to hold more than just the 
 GPR, for example the normalization parameters.
 
-Each emulator is an instance of
-the \verb|Emulator| class with a \verb|GPy| GPR object at its core. We will 
-henceforth refer to such instances as emulator \textit{objects}. Besides the 
-GPR object at the core, emulator objects also convert $\bm{x}$ inputs and
-$\bm{y}$ outputs in order to facilitate scientific access. Specifically, 
-the GPR itself accepts $\bm{x}$ inputs and predicts $\bm{y}$ outputs 
-in a normalized fashion which will not be easily understood unless first 
-appropriately transformed.
+
 
 %s Now talk about normalization
 
@@ -369,6 +373,19 @@ massless-neutrino emulator}; the lack of neutrino dependence would dominate
 the error in the resultant emulator.
 \textcolor{orange}{Great start! But can we add some material in
 section~\ref{sec: gpr_intro}: why is GPR vulnerable in this way?}
+ 
+\textcolor{blue}{This section will focus on the particular lines of}
+\verb|GPy| \textcolor{blue}{that we used, as well
+as the various data-cleaning and normalization statements that we used.
+Normalization will be a really important topic. I want to explain some of
+the theory behind why the emulator performs poorly with values outside of this
+[0, 1] range.}
+
+I don't know how to justify this kernel that I got from Alex via AndreaP...
+\textcolor{orange}{That's no problem; Ariel says, just say ``we played around
+and found that this works best.''}
+
+\textcolor{blue}{Briefly explain what GPy is doing--don’t treat it like some black box.}
 
 
 \section{Testing the Emulator}
