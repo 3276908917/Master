@@ -139,19 +139,6 @@ section~\ref{sec: future_work}}.
 \section{Rescaling the LHS}
 \label{sec: lhc_rescale}
 
-\textcolor{blue}{This section will describe the process going from a Latin 
-hypercube to a set of CAMB power spectra. We will describe how an array of six 
-parameter values is fleshed out into a params object understood by CAMB.}
-
-\textcolor{blue}{What happens to $A_s$ in the massless-neutrino case? Is it 
-fixed at the default for model 0? I'm pretty sure it is!}
-
-%s Preface the script as a whole. Where do I put this?
-\textcolor{gray}{\texttt{ged} includes more complicated functions that apply the 
-framework established in \texttt{ci} to the filling in of the 
-hypercube object that we obtained from \texttt{lhc} via
-\texttt{ui}.}
-
 %s Introduce the build_cosmology script
 
 Now that we have a unit LHS $\matr{X}_u$, we need to scale it 
@@ -188,14 +175,15 @@ a power spectrum can be calculated. In all such cases, we use Aletheia model
 because I would have to expand it with parameters not essential to this work,
 so I would have to redo the captions for fig 1.1 and table 1.2...}
 
+So long as the power spectrum's value for $\sigma_{12}$ agrees with the
+prior-scaled value from the LHS, it should not matter that 
+we use the model 0 values, as these are evolution parameters.
+\textcolor{red}{Or should it? If this logic really held, shouldn't we be able 
+to modify $w_a$ and $w_0$ in order to get the correct value of
+$\tilde{\sigma}_{12}$? But I'm almost certain these are evolution parameters!}
+
 \section{Integrating Evolution Mapping}
 \label{sec: generate_emu_data}
-
-Another paragraph I want to have in this section: stress the part of the 
-evolution mapping introduction, that the $\sigma_{12}$ value we're using to 
-describe the model is actually the $\sigma_{12}$ value of the model's MEMNeC! 
-This is so important and confusing that maybe I'll even recapitulate again 
-later in the section on the \verb|generate_emu_data| script.
 
 % generate\_emu\_data.py
 
@@ -206,20 +194,6 @@ writing the \textit{actual} $\tilde{\sigma}_{12}$ value that we obtained back
 to the original hypercube. Why is this important? Because the Latin hypercube 
 is used again later in \texttt{ui} for the purpose of training the 
 GPR object.}
-
-In practice, we split these parameters into two categories: we modify the
-values of $h$ and $z$ until we obtain the desired value of $\sigma_{12}$
-(this will be explained later in this section), and the rest are parameters
-that we set to set to ``default'' values according to Aletheia model 0.
-So long as the power spectrum's value for $\sigma_{12}$ agrees with the
-prior-scaled value from the LHS, \textcolor{green}{it should not matter that 
-we use the model 0 values, as these are evolution parameters}.
-\textit{red}{Or should it? If this logic really held, shouldn't we be able to 
-modify $w_a$ and $w_0$ in order to get the correct value of $\sigma_{12}$? But
-I'm almost certain these are evolution parameters! Also: $\omega_\text{DE}$
-is only an evolution parameter when everything else (all other omegas) is 
-fixed...}
-
 
 %s Now talk about fill_hypercube, a central function of this script
 
@@ -244,7 +218,8 @@ $\sigma_{12}$ as an input. The importance of \verb|direct_eval_cell| and
 \verb|interpolate_cell| is in circumventing this problem.
 After \verb|build_cosmology| returns a complete cosmology dictionary, these
 functions computer the MEMNeC. Then, they request CAMB power spectra for the
-MEMNeCs at 150 linearly-spaced redshifts in the
+MEMNeCs at 150\footnote{150 is the maximum number of redshifts that CAMB will
+accept in a single call.} linearly-spaced redshifts in the
 interval [0, 10]. \textcolor{orange}{log spacing would have been better for
 redshift}. This interval suffices to capture the reddest galaxies
 in our galaxy redshift surveys. \textcolor{green}{citation}. Next, these
@@ -252,6 +227,21 @@ functions request a one-dimensional interpolator from \texttt{scipy} with
 the $\tilde{\sigma}_{12}$ values as the $x$ and the $z$ values as the $y$.
 By passing the desired $\tilde{\sigma}_{12}$ value to the interpolator, we
 can in principle find the redshift at which we need to call CAMB.
+
+%s Bonus section that doesn't really fit anywhere specific: speed-up
+
+Since we are estimating this redshift from an interpolation over 150 power
+spectrum samples, the $z_\text{interp}$ returned by our interpolator does not
+\textit{exactly} match the theoretical $z_\text{target}$ at which the
+power spectrum would exactly match the desired input $\tilde{\sigma}_{12}$,
+$\tilde{\sigma}_{12}(z_\text{target})$. In order to speed up \texttt{ged},
+which is by far the most time-intensive step in the emulator pipeline,
+\verb|direct_eval_cell| and \verb|interpolate_cell| stop at one iteration of 
+interpolation and return $\tilde{\sigma}_{12}(z_\text{interp})$. Then,
+\verb|fill_hypercube| mutates the original LHS
+\\ IN PROGRESS
+when we calculate the power spectrum using this redshift, get the actual sigma12 value from CAMB and replace the LHC entry with the true value.
+We’ve implemented this now. We should definitely talk about how little of a difference that this makes. We should make error plots (comparing the two approaches with hyper cube as a control), but I strongly suspect the error will be negligible.
 
 In practice, some cosmologies cannot be analyzed in this way. CAMB does not
 support negative redshifts. Since all power spectra grow in amplitude with
@@ -262,7 +252,6 @@ verifying that
 \label{eq: solvability_cond}
 \tilde{\sigma}_{12}(z = 0) \geq \tilde{\sigma}_{12}(z_\text{target})
 .\end{equation}
-
 
 When this condition is not fulfilled, we can modify the value of $h$ to
 compensate. Recall from chapter~\ref{chap: A_s} that changing $h$ while
@@ -286,34 +275,20 @@ Unfortunately, even when setting the dimensionless Hubble parameter to its
 minimum safe value, some power spectra will still fail
 condition~\ref{eq: solvability_cond}.
 For the purposes of this treatment, we refer to such cosmologies as
-``unsolvable.'' The problem of unsolvable cosmologies led us to create the
+``unsolvable.'' An emulator can still be trained even if only one of the input 
+cosmologies is solvable. However, the occurrence of even one
+unsolvable cosmology indicates that the actual range of parameters in the
+training data is narrower than the nominal input priors. 
+
+The problem of unsolvable cosmologies led us to create the
 increasingly restrictive prior sets described in section~\ref{lhc_outline}.
 Of the three provided pairs of priors files, only the COMET priors
 (table~\ref{tab: COMET_priors}) are narrow enough to completely evade the 
 issue of unsolvable cosmologies. For this reason, the COMET priors are the
-defaults used by CL.
-
-CAMB does not allow for negative redshifts, although it prove be 
-interesting to try to resolve this issue with a code that does allow negative 
-redshifts, such as CLASS. \textcolor{orange}{Re-iterate the discussion from
-section~\ref{sec: boltzmann_intro}: why didn’t we use CLASS for this project?}
+defaults used by CL. We defer further discussion of unsolvable cells to
+section~\ref{sec: prior_woes}.
 
 %s Don't give up skeleton!
-
-The consequences of unsolvable cells will be discussed more in
-section~\ref{sec: prior_woes}. Despite the discouraging situation described 
-there,
-unsolvable cells do not immediately sink the entire data set. The remaining
-still be used to train an emulator as long as even one cell has been solved.
-\textcolor{orange}{This will be explained in section~\ref{sec: train_emu}}.
-
-We will now describe the process of rescaling a cosmology with the evolution 
-parameters z and h in order to match the desired $\sigma_{12}$ value.
-
-%s Bonus section that doesn't really fit anywhere specific: speed-up
-
-Ariel’s idea for speeding up the program: use a best-guess z which only approximates the desired sigma12. Then, when we calculate the power spectrum using this redshift, get the actual sigma12 value from CAMB and replace the LHC entry with the true value.
-We’ve implemented this now. We should definitely talk about how little of a difference that this makes. We should make error plots (comparing the two approaches with hyper cube as a control), but I strongly suspect the error will be negligible.
 
 
 \section{Training the Emulator}
