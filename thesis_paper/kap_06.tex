@@ -13,23 +13,52 @@ rounded to four significant figures.
 
 \section{Quantifying the Performance of the Emulator}
 
-Before I even show any results for this emulator, I would like to motivate the 
-challenge of gauging the accuracy and reliability of the emulator. Since we 
-have to quantify performance over a hypervolume of parameter space, there is 
-no concept of, for example, a chi-squared test that can applied here. So I am 
-trying to pre-empt objections like those raised by Stella.
+To evaluate the performance of the emulator, we use the testing pipeline
+explained in chapters~\ref{chap: emu_outline} and~\ref{chap: implementation}.
+That is, we create an LHS of test cosmologies, which the training stages have
+never seen, and compare the output of the emulator object to that of
+CAMB. As in neural network contexts, GPR performance is typically evaluated
+using test sets (\citealp{Mancini}, \citealp{Arico}, and
+\citealp{Eggemeier}).\footnote{However, these test sets are
+more commonly referred to as ``validation sets.'' We use the phrase
+``test set'' to call to mind the three conventional data sets in a machine
+learning setup: training, validation, and testing. This distinction will
+prove useful in section~\ref{sec: future_work}.}
 
-I would like to include a brief review of the relevant literature to explain 
-the kinds of performance metrics that are most commonly applied in emulator 
-papers (as I remember, largely percent-level bounds when comparing against 
-ground truth data sets). Then, I would like to break down Ariel's arguments 
-for why absolute error is of greater consequence to us than relative errors.
+We appreciate that appraisal based on test sets
+may not provide hard boundaries on the true
+range of errors associated with the emulators,
+because the continuity of the parameter hypervolume means that an infinite
+number of cosmologies could be tested. Therefore, traditional
+goodness-of-fit tests such as $\chi^2$ do not apply here.
+However, precisely because
+power spectra vary smoothly in this space\footnote{Indeed, without this
+property, interpolation would be unproductive.}, we expect the error 
+curves to vary similarly. So long as the test LHS represents a reasonable
+coverage of the parameter space, we expect the errors calculated therefrom to
+be similarly representative of emulator performance. On the other
+hand, at the edges of the parameter space, where interpolation begins to
+break down, the errors will be at their highest, and the following analyses
+may not be representative of these edge cases.
 
-For the purpose of this paper, we use the weak and approximate performance 
-metric of simply generating a large number of additional CAMB spectra and 
-comparing them to the predictions of the emulator.
+For this chapter as well as chapter~\ref{chap: disc_and_conc}, we will focus
+on just two error metrics: percent error and squared error. We include percent
+error as it is more common in the literature and because it is immediately
+interpretable (\citealp{Mancini}, \citealp{Arico}, and
+\citealp{Eggemeier}). By contrast, the squared errors are difficult to
+understand unless compared across multiple similar cases.
+Nevertheless, we argue
+that squared errors represent a more useful metric, at least within a single
+paper, because they are unbiased with respect to the magnitude of the emulated
+quantity. Consider that $P(k)$ is smallest at the largest $k$; if an emulator
+mispredicts $P(k)$ with a constant offset, then the percent error curves will
+be largest at the smallest $k$. As a further example, consider that the
+overall amplitude of $P(k)$ is smaller for smaller $\tilde{\sigma_{12}}$;
+if we again imagine a constant offset, $\tilde{\sigma_{12}}$ will appear as a
+problematic parameter if we look only at percent error.
 
-\section{Percent versus Absolute Errors on Random Cosmologies}
+
+\section{Percent and Square Errors on Random Cosmologies}
 
 This will be a fairly short section, basically just showing the plot of 5000 
 error curves in these two ways. I may focus in on different k-ranges, but the 

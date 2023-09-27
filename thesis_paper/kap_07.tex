@@ -81,6 +81,18 @@ emulator performance trained on hyper cubes of various minimum distances.
 This might go better in the CassL section, but I think I ought to motivate the 
 decision to use length-300 arrays.
 
+This is a special case where we would argue that percent error is more useful 
+than squared error.
+That is because percent error can be considered on its own, whereas squared
+error relies on comparison for its meaning to emerge. But in this case, the
+comparisons are obscure. Consider, for example, comparing an $N_k = 100$
+emulator with an $N_k = 500$ emulator: the $N_k = 100$ emulator will have
+fewer points from which to compute errors. Simple interpolation is not enough
+to restore direct comparability, as the $N_k = 500$ emulator by definition
+will suffer less from interpolation than the $N_k = 100$ emulator, for which
+each point will have to inform five times as much as the interpolated function
+domain.
+
 \section{Number of Training Samples}
 \label{sec: num_samples}
 
