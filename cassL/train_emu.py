@@ -91,6 +91,7 @@ class Emulator_Trainer:
             self.ymu = ymu
             self.ystdev = ystdev
             self.ydim = len(ymu)
+            
 
         def convert_to_normalized_params(self, config):
             """
@@ -268,6 +269,7 @@ class Emulator_Trainer:
         print("Sum of squared errors across all models:",
               sum(sum(self.sq_errors)))
 
+
     def set_scales(self, scales):
         if len(scales) != self.emu.ydim:
             raise ValueError("The dimension of the given set of scales " + \
@@ -275,10 +277,12 @@ class Emulator_Trainer:
         
         self._scales = scales
 
+
     def enforce_error_calculation(self):
         if not hasattr(self, "deltas"):
             raise AttributeError("Errors have not been computed yet! Use " + \
                 " the function 'test'")
+
 
     def get_errors(self, metric):
         if metric == "deltas":
@@ -292,6 +296,7 @@ class Emulator_Trainer:
 
         raise ValueError("Unknown error metric specified. Available " + \
             "options are 'deltas', 'relative', 'percent', and 'sqerr'.")
+
 
     def error_curves(self, metric="relative", plot_every=1, param_index=None,
         param_label=None, param_range=None, fixed_k=None, save_label=None):
@@ -388,6 +393,7 @@ class Emulator_Trainer:
 
         plt.show()
 
+
     def error_statistics(self, metric="relative", error_aggregator=np.median):
         """
         Maybe this function, like error_curve, should include a parameter range
@@ -414,6 +420,7 @@ class Emulator_Trainer:
         print("median is", np.median(meds))
         print("mean is", np.mean(meds))
         print("st.dev. is", np.std(meds))
+
 
     def error_hist(self, metric="relative", error_aggregator=np.median,
                    aggregator_description="Median", bins=None):
@@ -442,6 +449,7 @@ class Emulator_Trainer:
         plt.savefig("plots/err_hist_" + self.emu.name + ".png")
 
         plt.show()
+
 
     def save(self, file_name=None):
         """
