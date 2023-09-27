@@ -208,7 +208,7 @@ def build_train_and_test_sets(scenario_name):
     #X Step 6: call build_and_test_emulator
 
 
-def get_data_dict(emu_name, prior_name="COMET", test_name=None):
+def get_data_dict(emu_name, prior_name, test_name=None):
     #! WATCH OUT! THIS FUNCTION ASSUMES MASSIVE NEUTRINOS ALWAYS
 
     # This will return a dictionary which the new iteration of
