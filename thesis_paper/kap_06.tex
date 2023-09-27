@@ -61,15 +61,16 @@ problematic parameter if we look only at percent error.
 
 \section{Percent and Square Errors on Random Cosmologies}
 
-This will be a fairly short section, basically just showing the plot of 5000 
-error curves in these two ways. I may focus in on different k-ranges, but the 
-error curves are currently quite flat, so I don't think that would be a good 
-use of space.
+* Percent error curves massless
+* Squared error curves massless
+* Percent error curves massive
+* Squared error curves massive
 
-Furthermore, I will try to select a couple of cosmologies out of the 5000 
-(maybe a low-error case and a high-error case) as examples of the performance 
-on just one at a time. But I'm not sure how insightful that will be, I don't 
-know if that will tell the reader a whole lot.
+This will be a fairly short section, basically just showing the plot of 5000 
+error curves in these two ways.
+
+\textcolor{orange}{Create some plots focusing on the BAO error spikes? i.e.
+zoom-in on k-ranges.}
 
 \textcolor{green}{redo the numbers in this next paragraph}
 
@@ -79,16 +80,47 @@ between k=0.09 and 0.2 / Mpc. Outside of this range, the errors tend to
 sub-0.01\% in the large-scale regime and sub-0.005\% in the small-scale 
 regime. Please refer to figures XXX through XXX for illustrations thereof.
 
+As we can see from figures~\ref{fig: massless_default} 
+and~\ref{massive_default}, both emulators are most accurate at very large and
+very small $k$, with significant difficulties around the BAO region. We
+consider the small-scale performance a powerful confirmation of our
+techniques, as the impact of massive neutrinos is most significant at small
+scales.
+
+We highlight that the massive emulator
+performs significantly worse than its massless counterpart. We attribute this
+discrepancy to the results of section~\ref{sec: fit_testing}, which indicate
+that evolution parameters besides $A_s$ are necessary for complete
+characterization of the impact of massive neutrinos. Nevertheless, the
+overall percent error of the massive emulator is \textcolor{green}{nearly}
+at the level of CAMB itself, so we consider the massless emulator an
+encouraging success.
 
 \section{Performance in Different Parameters}
+\label{sec: param_breakdown}
+
+As evolution-mapping emulation for \textit{massive}-neutrino cosmologies
+is the novel feature of this work, we will henceforth concentrate exclusively
+on the massive-neutrino emulator.
 
 Here, I will either include color plots or, as Dante suggests, monochrome 
 plots with error as one axis and parameter value as the other (i.e. $k$ 
 fixed). Then, if I haven't tightened the $\sigma_{12}$ performance by the time 
 of submission, I can talk about how this is the most promising avenue for 
-refinement of the emulator. In any case, I plan to spend some time talking 
+refinement of the emulator.
+
+\textcolor{orange}{I plan to spend some time talking 
 about \textit{why} parameter x is the current biggest problem for the 
-emulator. 
+emulator.}
+
+\textcolor{orange}{It would have been nice if you had done like Andrea said,
+and produced a plot colored by the ``extremeness'' of the parameters. We
+could implement an extremeness index for parameter $x$ simply by taking
+subtracting 0.5 and taking the absolute value, assuming that $x$ comes from
+the unit LHS. Then, we could take the average over six parameters to get
+an extremeness index for the cosmology as a whole. Optionally, for plot
+optimization, you could multiply the final value by 2 so that the extremeness
+runs from 0 to 1.}
 
 
 \section{Improvement from Two-emulator Solution}
