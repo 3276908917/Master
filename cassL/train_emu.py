@@ -53,6 +53,7 @@ def eliminate_unusable_entries(X_raw, Y_raw,
     
     return X_raw, Y_raw
 
+
 def _normalize_spectra(Y):
     Ylog = np.log(Y)
     ymu = np.mean(Ylog, axis=0)
@@ -60,6 +61,7 @@ def _normalize_spectra(Y):
     ystdev = np.std(Ylog, axis=0)
     Y_normalized = np.divide(Y_shifted, ystdev)
     return Y_normalized, ymu, ystdev
+
 
 def is_normalized_X(X):
     # By default, np.min and np.max, without an explicit axis, will check every

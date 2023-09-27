@@ -275,7 +275,8 @@ range of solvable cosmologies. Although CAMB nominally accepts $h$ values as
 low as 0.01, in practice we find that values below around
 $h_\text{min} \approx 0.07$ sometimes lead to crashes.
 
-We call this process of tweaking the $h$ and $z$ values `rescaling' to
+We call this process of tweaking the $h$ and $z$ values
+`\textit{re}scaling' to
 succinctly distinguish it from the application of priors to scale a unit LHS.
 In chapter~\ref{chap: emu_outline}, we noted that \texttt{ged} outputs
 files containing rescale parameters. These files contain the $(h, z)$ pairs
@@ -308,10 +309,6 @@ section~\ref{sec: prior_woes}.
 \section{Training the Emulator}
 \label{sec: train_emu}
 
-\textcolor{orange}{Don't forget to explain that the training X is actually the
-unit LHS, not the rescaled LHS, because the unit LHS is already normalized
-and therefore easier to handle in training.}
-
 % train\_emu.py
 
 Once \texttt{ged}'s \verb|fill_hypercube| completes, the user is ready to
@@ -328,65 +325,86 @@ reached, and the remaining work is automatic.
 First, \verb|build_and_test_emulator| cleans the input data by dropping
 unsolved cosmologies from the training and testing sets. Next, to train a new 
 emulator, \verb|build_and_test_emulator| instantiates the
-\verb|Emulator_Trainer| class. We will refer to such objects 
-as \textit{trainers}.
-
+\verb|Emulator_Trainer| class. We refer to such objects as \textit{trainers}.
 Each emulator is an instance of
-the \texttt{Emulator} class with a \texttt{GPy} GPR object at its core. We 
-will refer instances of the \texttt{Emulator} class as \textit{emulator 
+the \texttt{Emulator} class with a \texttt{GPy}
+\texttt{GPRegression} object at its core. We 
+refer to instances of the \texttt{Emulator} class as \textit{emulator 
 objects}.
 
-Besides
-accessing this GPR object, emulator objects also convert $\bm{x}$ inputs and
-$\bm{y}$ outputs in order to facilitate scientific access. Specifically, 
-the GPR itself accepts $\bm{x}$ inputs and predicts $\bm{y}$ outputs 
-in a normalized fashion which will not be easily understood unless first 
-appropriately transformed.
+The GPR object is the core of the emulator and handles the training
+and prediction. An extremely simple setup for training a GPR object
+\texttt{gpr} would consist of the following four lines:
 
-We separate the \verb|Emulator_Trainer| class from the \verb|Emulator| class
-to make saving and loading more efficient. When transferring an emulator to a
-different computer, for example, it is not necessary to transfer all of the
-data sets used.
-% Although these data sets only turn out to be 2\% as large as the GPR object, 
-% which is provided by GPy and which performs the predictions. Maybe the
-% situation justifies my approach with the large-k data sets? I don't think
-% so--I think the GPR object simply gets bigger to keep the proportion the
-% same...
-However, we still need the \verb|Emulator| class to hold more than just the 
-GPR, for example the normalization parameters.
+\begin{verbatim}
+kernel = GPy.ker.RBF(input_dim=6, variance=1., lengthscale=1.)
+gpr = GPy.models.GPRegression(X_train, Y_train, kernel)
+gpr.constrain_positive('')
+gpr.optimize()
+\end{verbatim}
 
+\textcolor{red}{Does it make any sense to put a comma after the code listing?}
 
+where `' in the second line is a regex matching all parameter names. This
+example of course assumes a massive-neutrino setup, as the kernel dimension is
+six. The true kernel used by CL is more complicated. After experimenting with
+different options, we find that combining the RBF, Mat\'{e}rn, and white noise
+kernels leads to the best results.
 
-%s Now talk about normalization
+The primary purpose of \texttt{Emulator} is to simplify access to the
+\texttt{GPRegression} object. The \texttt{GPRegression} object is trained on
+normalized $\matr{X}$ and $\matr{Y}$ data, and therefore outputs normalized
+predictions. The emulator object will automatically convert input cosmologies
+to a normalized format and output power spectra to a denormalized format.
 
-\textcolor{orange}{Needs segue.}
-The normalizations are necessary for the high performance of the emulators. 
-This need goes beyond numerical instabilities. For example, if a parameter's 
+Normalization involves transforming the $\matr{X}$ and $\matr{Y}$ data sets
+away from extreme values, optimally toward a [0, 1] interval.
+Normalization represents a crucial step in the emulation pipeline,
+as it makes a significant difference in accuracy. For example, the difference
+between an emulator with $\matr{Y}$ normalized and an emulator with
+both $\matr{X}$ and $\matr{Y}$ normalized can be an order of magnitude in the
+dynamic range of the error curves. 
+
+The $\matr{Y}$ normalization is by far the more important. As seen in
+figure~\ref{fig: first_power_spectrum}, the power spectrum spans a over five
+orders of magnitude. In order to decrease both the overall magnitude as well
+as the dynamic range, we apply the following transformation:
+
+\begin{equation}
+y'_i = \frac{\ln{y_i} - \bar{y}_i}{\sigma_{y_i}}
+,\end{equation}
+
+where the $i$ subscripts indicate the index of the $k$-bin; $y'$ is the 
+normalized spectrum; $\bar{y}_i$ is the average over all
+$\bm{y} \in \matr{Y}$; and $\sigma_{y_i}$ is the 
+standard deviation over all $\bm{y} \in \matr{Y}$.
+
+By contrast, as long as we keep the priors separate from the unit LHS, we can
+simply use $\matr{X}_u$ as our training data. This explains why we
+maintain the priors and LHSs as separate entities throughout the entire
+pipeline, and only ever combine them temporarily, such as during the
+calculation of the CAMB spectra. 
+
+The need for normalization transcends more mundane numerical instabilities
+like overflow and underflow. For example, even if a parameter's 
 prior range falls within the relatively reasonable [0.0001, 0.0006] interval, 
-its emulation will still be improved by normalizing it to a [0, 1] interval. 
-Nonetheless, the improvement will be more dramatic the further away a prior is 
-from this [0, 1] interval. The prior in $A_s$, regardless of the choice
-between the three default priors files, covers extremely small values. Consequently, 
-without the appropriate normalization, the trained GPR will be nearly 
-insensitive to the impact of $A_s$ and \textcolor{green}{almost behave like a 
-massless-neutrino emulator}; the lack of neutrino dependence would dominate 
-the error in the resultant emulator.
-\textcolor{orange}{Great start! But can we add some material in
+its emulation will still be improved by normalizing the parameter to a [0, 1] 
+interval. Nonetheless, the improvement will be more dramatic the further away 
+a prior is from this [0, 1] interval.
+
+Consider the prior in $A_s$, which 
+regardless of the choice between the three default priors files, covers 
+extremely small values (on the order of $10^{-9}$). Without the appropriate 
+normalization, the trained GPR will be nearly insensitive to the impact of 
+$A_s$. Since $A_s$ is essential to capturing the effect of $\omega_\nu$,
+the emulator behaves similarly to a massless-neutrino emulator, and the lack 
+of neutrino dependence dominates the error.
+
+\textcolor{orange}{Can we add some material in
 section~\ref{sec: gpr_intro}: why is GPR vulnerable in this way?}
- 
-\textcolor{blue}{This section will focus on the particular lines of}
-\verb|GPy| \textcolor{blue}{that we used, as well
-as the various data-cleaning and normalization statements that we used.
-Normalization will be a really important topic. I want to explain some of
-the theory behind why the emulator performs poorly with values outside of this
-[0, 1] range.}
 
-I don't know how to justify this kernel that I got from Alex via AndreaP...
-\textcolor{orange}{That's no problem; Ariel says, just say ``we played around
-and found that this works best.''}
-
-\textcolor{blue}{Briefly explain what GPy is doing--don’t treat it like some black box.}
-
+\textcolor{orange}{Briefly explain what GPy is doing--don’t treat it like some 
+black box.}
 
 \section{Testing the Emulator}
 \label{test_emu}
@@ -447,6 +465,15 @@ otherwise Sturges' rule is used.
 
 
 \section{Accessing and Using the Emulator}
+
+Besides
+accessing the GPR object, emulator objects also convert $\bm{x}$ inputs and
+$\bm{y}$ outputs in order to facilitate scientific access. Specifically, 
+the GPR itself accepts $\bm{x}$ inputs and predicts $\bm{y}$ outputs 
+in a normalized fashion which will not be easily understood unless first 
+appropriately transformed.
+
+The emulator automatically normalizes the user's input as follows.
 
 % user\_interface.py
 
