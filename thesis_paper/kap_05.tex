@@ -419,7 +419,7 @@ that the $\matr{X}$ data are already normalized, so remember to keep the unit
 LHS separate from the priors. By contrast, the trainer assumes that the
 $\matr{Y}$ are not yet normalized. It automatically computes and stores
 $\bar{\bm{y}}$ and $\bm{\sigma}_y$, and then computes
-transformation~\label{eq: y_normalization}.
+transformation~\ref{eq: y_normalization}.
 The $\bar{\bm{y}}$ and $\bm{\sigma}_y$ are determined exclusively by the
 training data and are therefore constants.
 
@@ -449,18 +449,22 @@ y_i = \exp (\sigma_{y_i} y'_i + \bar{y}_i)
 The majority of the quantification and visualization of the performance of the
 emulator are left to the user. However, a couple of functions are provided for 
 the sake of simple ``eyeball'' evaluation of the emulator's accuracy.
-The \verb|test| function in the \verb|Emulator_Trainer| class (in the
-\verb|train_emu| script) takes a set of $\matr{X}$ and $\matr{Y}$ test data 
-and computes errors automatically. Specifically, it stores three sets of error 
-metrics as class attributes for the trainer object: \verb|deltas| (the simple 
-difference between the predicted spectra $\hat{\bm{y}}$ and the test spectra
-$\bm{y}$, \verb|rel_errors| (the ratio of \verb|deltas| to the $\bm{y}$), and
-\verb|sq_errors| (the squares of \verb|deltas|).
+The trainer's \texttt{test} function takes a set of $\matr{X}$ and $\matr{Y}$ 
+test data and computes errors automatically. As in the trainer's constructor,
+the $\matr{X}_u$ should be the \textit{unit} LHS for the training data, and
+therefore already normalized. In the same manner, the $\matr{Y}$ should not
+already be normalized.
 
+The \texttt{test} function stores three sets of error 
+metrics as class attributes for the trainer: \texttt{deltas[i][j]}
+is the simple difference between the $i$-th predicted spectrum and the
+$i$-th test spectrum in the $j$-th $k$-bin;
+\verb|rel_errors[i][j]| is the ratio of \texttt{deltas[i][j]} to the
+value of the $i$-th test spectrum in the $j$-th $k$-bin; and
+\verb|sq_errors[i][j]| is the square of \texttt{deltas[i][j]}).
 It follows from the definition of these error metrics that all of them have 
-the same shape: each is a set of arrays equal in number to the $bm{y}$; and 
-the size of each element array is determined by the number of scales at which 
-the training power spectra were evaluated. \textcolor{orange}{In the current
+the same dimensions as $\matr{Y}_\text{test}$.
+\textcolor{orange}{In the current
 version of the code, this number of scales must be equal in the training and
 testing sets. But, if we add another layer of interpolation, we could easily
 eliminate this limitation}.
@@ -473,13 +477,9 @@ individual cosmological parameters, there is a \verb|param_index| function
 parameter which will automatically color each curve according to its value in 
 the chosen cosmological parameter. Since colors can sometimes be difficult to 
 quickly compare, there is also a \verb|fixed_k| function parameter. When a 
-fixed value for the inverse scale is provided, the plot becomes a scatter 
+fixed value for $k$ is provided, the output is a scatter 
 plot, with percent error as the $y$-axis and the chosen cosmological parameter 
 as the $x$-axis.
-
-%! Did I make sure to refer to priors correctly when transcribing ^ this 
-%! function into train_emu.py? I think so… but it wouldn’t hurt to look one 
-%! more time, especially since the X values are now automatically unit!
 
 The \verb|error_statistics| function issues a rudimentary summary of the 
 application of some NumPy aggregator\footnote{The user may also pass in
@@ -500,3 +500,4 @@ function is applied to the selected error array, then the aggregates are
 binned and plotted as a histogram. The user can specify the number of bins,
 otherwise Sturges' rule is used.
 
+\textcolor{orange}{Where are the training errors?}
