@@ -1,24 +1,25 @@
 \chapter{Implementation Details}
 \label{chap: implementation}
 
-\textcolor{blue}{This will be a rather long, dry, and technical section with 
-subsections based on each of the core scripts making up the Python package \
-that I have been developing. It will in some ways paraphrase and summarize the 
-documentation, explaining the basic use of the package as well as important 
-limitations. Of course, fairly early on in this section, there will be a 
-footnote linking to my GitHub repository, which will be made public once I'm 
-ready to hand in this thesis.}
+This chapter covers the steps outlined in chapter~\ref{chap: emu_outline} in
+significantly greater technical detail. We will name functions with which the
+reader will need to be familiar in order to train an accurate emulator with
+CL, as well as their limitations and the assumptions they make about their
+inputs. Therefore, this chapter contains information necessary even if the
+reader is interested only in using and not in modifying CL.
 
-\textcolor{blue}{Even if my code doesn't end up in a bigger repository, I 
-nevertheless think that it's important to the scientific process that I 
-describe in detail the code that I have written. Besides, if any readers want 
-to experiment specifically with the ideas discussed in this thesis, they may 
-find my code more accessible because it is, in a sense, ``single-purpose''--that 
-is to say, written almost exclusively to investigate the topics of this 
-paper.}
+CL may be installed in the fashion typical of Python packages: after cloning
+the repository\footnote{https://github.com/3276908917/Master}
+or downloading and unzipping it, the command
 
-\textcolor{orange}{It only takes a couple of sentences, but we also need to 
-describe how to install the package.}
+\verb|pip install -e .|
+
+should be run in the top-level directory (``Master'') and in the
+appropriate environment (when using a package manager such as Anaconda).
+The reader should keep in mind that we refer to the package as CL in this
+thesis to clearly distinguish it from the Boltzmann solver CLASS, but its
+true name (for example, for use in \texttt{import} statements) is
+\texttt{cassL}.
 
 \section{Building the Latin Hypercube}
 \label{sec: build_lhc}
