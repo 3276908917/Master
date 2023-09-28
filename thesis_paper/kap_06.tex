@@ -1,10 +1,52 @@
-\chapter{Discussion and Conclusion}
-\label{chap: disc_and_conc}
+\chapter{Conclusion}
+\label{chap: conclusion}
 
-For the same reason as in~\ref{sec: param_breakdown}, we will concentrate
-in this chapter exclusively on massive-neutrino emulators.
+Massive neutrinos represent a challenge for evolution-mapping emulators
+because their damping of the power spectrum depends on redshift.
+This redshift dependence results in $\omega_\nu$ impacting both the
+amplitude and the shape of the linear-theory cold-matter power spectrum.
+This behavior precludes exclusive categorization as either a shape or
+evolution parameter.
 
-\section{Summary of the Paper}
+``The goal of this project is to produce an emulator of the linear-theory
+power spectrum based on evolution mapping'' (A. G. S\'{a}nchez, private
+communication). An emulator is a multi-dimensional function
+produced by interpolation across many training points $(x, y)$. The power
+spectrum can be thought of as a statistical description of the ``clumpiness''
+of matter in the Universe. Evolution mapping is a technique for simplifying
+the parameter space by identifying many cosmological parameters as basically
+the same in their impact on the power spectrum.
+
+The evolution mapping scheme of \cbib{San21} has already achieved success in
+emulators of the nonlinear power spectrum. However, massive neutrinos do not
+fit neatly into the scheme. Consequently, emulators implementing evolution
+mapping have typically fixed the physical density of the Universe in 
+neutrinos, $\omega_\nu$, to zero.
+
+This work seeks to extend the evolution mapping scheme to massive-neutrino 
+cosmologies through expansion of the parameter space over which the emulator
+is trained. In particular, we find that the scalar mode amplitude $A_s$, which
+is traditionally treated as an evolution parameter and therefore excluded from 
+the parameter space. can be used to quantify the suppression of structure 
+growth due to massive neutrinos.
+
+We find that, by including $A_s$ in our parameter space, we can successfully 
+train over the physical density of the universe in massive neutrinos. We 
+introduce a new emulation code, Cassandra-Linear (CL), which combines this 
+expanded parameter space with evolution
+mapping. We include various error statistics and show that the emulator
+performs roughly at the level of error associated with CAMB itself, which is
+guaranteed to be no worse than 0.1\% \cbib{Seljak}.
+
+\textcolor{orange}{Why does this work? Before, the shape impact of
+$\omega_\nu$ 
+was $z$-dependent. In other words, if we held $\omega_nu$ constant and varied
+$z$, the power spectrum would not vary only in overall amplitude. However, if
+we fix $\omega_\nu$ and $A_s$, $z$ becomes an evolution parameter again. Why
+does fixing $A_s$ accomplish this? That's something for the theorists to 
+figure out!}
+
+% Just use one big block of text, don't split into sections
 
 What was the main objective of this thesis? What were the key results of this 
 work? Why are they important? How do these results compare with results from 

@@ -107,12 +107,89 @@ Script & Abbreviation & Purpose \\ \hline
 \section{Latin Hypercube Sampling}
 \label{sec: lhc}
 
+We use Latin hypercube sampling to sample 
+the space of cosmological configurations.
+A unit Latin hypercube sample (LHS) is primarily characterized by its 
+dimension $d$ and number of samples $N_s$. A number $d$ of separate intervals, 
+all running from zero to unity, are
+each split into $N_s$ subintervals. Then, each subinterval is sampled
+exactly once. By contrast, simple random sampling (SRS) may sample any 
+particular subinterval any number of times, including not at all. SRS
+can require vast numbers of samples before all regions of the space are
+represented. For a pictorial representation of SRS versus Latin hypercube
+sampling, see figure~\ref{fig: sample_comparison}.
+
+% The following plots were generated with h_units_bad.ipynb
+\begin{figure}[ht!]
+    \begin{subfigure}{0.32 \textwidth}
+    \centering
+ 		\includesvg[width=\textwidth]{intro/lhs/random}
+ 		\caption{}
+ 		\label{fig: random_sample}
+    \end{subfigure}
+    \begin{subfigure}{0.32 \textwidth}
+    \centering
+ 		\includesvg[width=\textwidth]{intro/lhs/bad_LHS}
+ 		\caption{}
+ 		\label{fig: poor_lhs}
+    \end{subfigure}
+    \begin{subfigure}{0.32 \textwidth}
+    \centering
+ 		\includesvg[width=\textwidth]{intro/lhs/better_LHS}
+ 		\caption{}
+ 		\label{fig: better_lhs}
+    \end{subfigure}
+    \centering
+    \caption[Comparison of SRS and Latin hypercube sampling.]{Comparison of an 
+    example
+    	random sample with two examples of LHSs.
+    	\ref{fig: random_sample} a random sample.
+    	Some subintervals are sampled repeatedly.
+	\ref{fig: poor_lhs} An LHS with a low $s^*$.    	
+    	\ref{fig: better_lhs} A different LHS with a higher $s^*$.
+    	Unlike random sampling,
+    	Latin hypercube sampling guarantees that every subinterval will be 
+    	sampled. However, if
+    	the minimum separation is low enough, there will still be large
+    	undersampled regions.}
+    \label{fig: sample_comparison}
+\end{figure}
+
+Latin hypercube sampling does not always improve significantly over SRS. It is 
+convenient to
+assess the quality of an LHS according to the minimum separation $s^*$ 
+between any two sample points in the LHS. A high $s^*$ indicates that 
+the sample space is evenly covered. To visually appreciate the difference 
+between LHSs of different $s^*$ values, see again
+figure~\ref{fig: sample_comparison}.
+
+For each value of $d$ and $N_s$, there is a theoretical maximum value of
+$s^*$:
+
+\begin{equation}
+\label{eq: best_lhs_sep}
+s^*_\text{best} = \left( \frac{1}{N_s} \right)^{1 / d}
+\end{equation}
+
+For example, for a six-parameter emulator trained over 5000 samples, the best
+possible LHS sample would have $s^* \approx 0.2418$.
+\textcolor{orange}{Talk about how you got this equation?}
+
 The LHSs give the values of the cosmological parameters and therefore
 the give the inputs over which we train the emulator.
 Therefore, we referred to the LHSs as the
 $\matr{X}$ data sets in the previous section. Each
 row $\bm{x}$ in $\matr{X}$ will describe a different cosmology, and each
 row $\bm{y}$ in $\matr{Y}$ will be the power spectrum for that cosmology.
+
+Once we have a unit LHS, we can rescale each coordinate according to a 
+different parameter's prior to map the LHS into our parameter space. The
+choice of priors will be discussed in the conceptual outline of our
+emulator (see section~\ref{sec: lhc_outline}). Similarly,
+although the unit LHS entails linear sampling of the [0, 1] interval, it is 
+straightforward to transform these samples into a different distribution
+the interpretation stage.
+
 
 % Intro sentence?
 
