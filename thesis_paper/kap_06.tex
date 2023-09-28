@@ -54,16 +54,19 @@ paper, because they are unbiased with respect to the magnitude of the emulated
 quantity. Consider that $P(k)$ is smallest at the largest $k$; if an emulator
 mispredicts $P(k)$ with a constant offset, then the percent error curves will
 be largest at the smallest $k$. As a further example, consider that the
-overall amplitude of $P(k)$ is smaller for smaller $\tilde{\sigma_{12}}$;
-if we again imagine a constant offset, $\tilde{\sigma_{12}}$ will appear as a
+overall amplitude of $P(k)$ is smaller for smaller $\tilde{\sigma}_{12}$;
+if we again imagine a constant offset, $\tilde{\sigma}_{12}$ will appear as a
 problematic parameter if we look only at percent error.
 
 
 \section{Percent and Square Errors on Random Cosmologies}
 
 * Percent error curves massless
+
 * Squared error curves massless
+
 * Percent error curves massive
+
 * Squared error curves massive
 
 This will be a fairly short section, basically just showing the plot of 5000 
@@ -81,15 +84,21 @@ sub-0.01\% in the large-scale regime and sub-0.005\% in the small-scale
 regime. Please refer to figures XXX through XXX for illustrations thereof.
 
 As we can see from figures~\ref{fig: massless_default} 
-and~\ref{massive_default}, both emulators are most accurate at very large and
+and~\ref{fig: massive_default}, 
+both emulators are most accurate at very large and
 very small $k$, with significant difficulties around the BAO region. We
 consider the small-scale performance a powerful confirmation of our
 techniques, as the impact of massive neutrinos is most significant at small
 scales.
 
-We highlight that the massive emulator
-performs significantly worse than its massless counterpart. We attribute this
-discrepancy to the results of section~\ref{sec: fit_testing}, which indicate
+We highlight that the massive emulator performs significantly worse than its 
+massless counterpart. The emulators are difficult to compare because they
+were constructed from LHSs of different dimension: four in the massless case,
+six in the massive case. Since $N_s = 5000$ is constant, we expect the 
+massless LHS to sample the parameter space much more densely than the massive
+LHS. In any case, the discrepancy in accuracies will be worsened by the
+approximate nature of our fit from section~\ref{sec: proposed_fit}:
+the results of section~\ref{sec: fit_testing} indicate
 that evolution parameters besides $A_s$ are necessary for complete
 characterization of the impact of massive neutrinos. Nevertheless, the
 overall percent error of the massive emulator is \textcolor{green}{nearly}
@@ -104,15 +113,10 @@ on the massive-neutrino emulator.
 \label{sec: param_breakdown}
 
 In this section, we will break down the performance of the emulator
-by coloring
-the same error plots as before (figure~\ref{fig: massive_default})
-according to different parameters.
-
-Here, I will either include color plots or, as Dante suggests, monochrome 
-plots with error as one axis and parameter value as the other (i.e. $k$ 
-fixed). Then, if I haven't tightened the $\sigma_{12}$ performance by the time 
-of submission, I can talk about how this is the most promising avenue for 
-refinement of the emulator.
+by coloring the same error plots as before (figure~\ref{fig: massive_default})
+according to different parameters. We use these color plots to argue that our
+emulator successfully captures the impact of all of the different parameters
+over which it was trained.
 
 \textcolor{orange}{I plan to spend some time talking 
 about \textit{why} parameter x is the current biggest problem for the 
@@ -130,6 +134,17 @@ runs from 0 to 1.}
 
 \section{Improvement from Two-emulator Solution}
 \label{sec: 2emu_improvement}
+
+We conclude this chapter with a brief demonstration of the advantage of our
+two-emulator solution. We will task the massive-neutrino emulator with
+predictions over the test set of the massless-neutrino emulator. We consider
+this a fair test because we sampled $\omega_\nu$ values for the
+massive-neutrino emulator from a uniform distribution [0, 0.01]. Therefore,
+in principle, the $\omega_\nu = 0$ case should only be a slight extrapolation.
+
+To understand these results, we remind the reader the overall error of the
+massive emulator is larger than that of the massless emulator. As mentioned
+in 
 
 To justify our decision and to quantify the improvement from this approach, we
 have prepared \textcolor{orange}{some} plots in
