@@ -8,6 +8,37 @@ amplitude and the shape of the linear-theory cold-matter power spectrum.
 This behavior precludes exclusive categorization as either a shape or
 evolution parameter.
 
+We find that two simple adjustments to evolution mapping can extend its
+efficacy to the case of massive neutrinos. By recasting the evolution mapping
+relation in terms of $\tilde{\sigma}_12}$ rather than $\sigma_{12}$--that is,
+in terms of the MEMNeC amplitude rather than the desired cosmology's
+amplitude--we are able to circumvent the impact of $\omega_\nu$ on the
+amplitude of the power spectrum, particularly on large scales. Furthermore,
+we find that $A_s$ is not exclusively an evolution parameter but contains
+information about the impact of massive neutrinos on the small-scale
+power spectrum. By including it as a parameter over which we train the
+emulator, we find that the small-scale accuracy significantly improves.
+
+We introduce a new code, the Python package Cassandra-Linear, to construct
+and test an emulator of the linear-theory cold-matter power spectrum based on
+these extensions to the evolution mapping recipe. We offer a detailed survey
+of the capabilities of this code so that interested readers can build and
+experiment with their own emulators.
+
+We compare the accuracies of two emulators trained using this code: one
+including $A_s$ and $\omega_\nu$, and the other featuring no massive 
+neutrinos. We find that the massless-neutrino emulator performs significantly
+better when the number of samples is held fixed, but argue that this
+comparison is unfair. We show that for the majority of scales and the majority
+of cosmologies, the level of error of our massive-neutrino emulator is
+comparable to that of CAMB, the Boltzmann solver we use to produce the
+training spectra with which we train the emulator.
+
+FUTURE WORK: SEE SPECIFICALLY HOW THE DISCREPANCY BETWEEN THE TWO EMULATORS
+DECREASES AS WE INCREASE THE NUMBER OF SAMPLES $N_s$: IF WE HOLD $N_s$ FIXED
+FOR THE MASSLESS EMULATOR, CAN WE EVER CONSTRUCT A MASSIVE EMULATOR OF HIGHER
+ACCURACY?
+
 ``The goal of this project is to produce an emulator of the linear-theory
 power spectrum based on evolution mapping'' (A. G. S\'{a}nchez, private
 communication). An emulator is a multi-dimensional function
