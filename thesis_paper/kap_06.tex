@@ -1,155 +1,115 @@
-\chapter{Results and Analysis}
-\label{chap: default_emu}
+\chapter{Discussion and Conclusion}
+\label{chap: disc_and_conc}
 
-In this chapter, we will discuss the performance of a two-emulator setup
-built using the default configuration of CL: both the massless- and
-massive-neutrino emulators appraised here use the COMET priors
-(table~\ref{tab: COMET_priors}), $N_k = 300$, and $N_s = 3000$ for both the
-training and testing data sets.
+For the same reason as in~\ref{sec: param_breakdown}, we will concentrate
+in this chapter exclusively on massive-neutrino emulators.
 
-The final training LHS had an $s^*$ of 0.07972 in the massive case and 
-0.02274 in the massless case. The final testing LHS had an $s^*$ of 0.07275 in 
-the massive case and 0.02015 in the massless case. All numbers have been 
-rounded to four significant figures.
+\section{Summary of the Paper}
 
-\section{Quantifying the Performance of the Emulator}
+What was the main objective of this thesis? What were the key results of this 
+work? Why are they important? How do these results compare with results from 
+papers on similar subjects?
 
-To evaluate the performance of the emulator, we use the testing pipeline
-explained in chapters~\ref{chap: emu_outline} and~\ref{chap: implementation}.
-That is, we create an LHS of test cosmologies, which the training stages have
-never seen, and compare the output of the emulator object to that of
-CAMB. As in neural network contexts, GPR performance is typically evaluated
-using test sets (\citealp{Mancini}, \citealp{Arico}, and
-\citealp{Eggemeier}).\footnote{However, these test sets are
-more commonly referred to as ``validation sets.'' We use the phrase
-``test set'' to call to mind the three conventional data sets in a machine
-learning setup: training, validation, and testing. This distinction will
-prove useful in section~\ref{sec: future_work}.}
+\section{Emulation over Uncertainties}
 
-We appreciate that appraisal based on test sets
-may not provide hard boundaries on the true
-range of errors associated with the emulators,
-because the continuity of the parameter hypervolume means that an infinite
-number of cosmologies could be tested. Therefore, traditional
-goodness-of-fit tests such as $\chi^2$ do not apply here.
-However, precisely because
-power spectra vary smoothly in this space\footnote{Indeed, without this
-property, interpolation would be unproductive.}, we expect the error 
-curves to vary similarly. So long as the test LHS represents a reasonable
-coverage of the parameter space, we expect the errors calculated therefrom to
-be similarly representative of emulator performance. On the other
-hand, at the edges of the parameter space, where interpolation begins to
-break down, the errors will be at their highest, and the following analyses
-may not be representative of these edge cases.
+\textcolor{blue}{This content should be subsumed into future work, since we
+didn't manage to complete this feature in time.}
 
-For this chapter as well as chapter~\ref{chap: disc_and_conc}, we will focus
-on just two error metrics: percent error and squared error. We include percent
-error as it is more common in the literature and because it is immediately
-interpretable (\citealp{Mancini}, \citealp{Arico}, and
-\citealp{Eggemeier}). By contrast, the squared errors are difficult to
-understand unless compared across multiple similar cases.
-Nevertheless, we argue
-that squared errors represent a more useful metric, at least within a single
-paper, because they are unbiased with respect to the magnitude of the emulated
-quantity. Consider that $P(k)$ is smallest at the largest $k$; if an emulator
-mispredicts $P(k)$ with a constant offset, then the percent error curves will
-be largest at the smallest $k$. As a further example, consider that the
-overall amplitude of $P(k)$ is smaller for smaller $\tilde{\sigma}_{12}$;
-if we again imagine a constant offset, $\tilde{\sigma}_{12}$ will appear as a
-problematic parameter if we look only at percent error.
+For a further step of accuracy, we can add a third data set to our pipeline
+and introduce a second layer of emulation.
+
+Up to this point, our pipeline has included a training set and a testing set.
+If we add a validation set, then we can train a second emulator over the
+errors associated with the first emulator's performance on this validation
+set.
+
+Within the current (as of \textcolor{orange}{24.08.2023}) setup of
+Cassandra-Linear, we typically generate two Latin hypercubes for each
+emulator. The first represents our training set and an emulator cannot be
+produced without it. The second one represents our validation set.
+
+\textcolor{orange}{In a future
+release of Cassandra-Linear, this set will be used to train an ``uncertainty''
+emulator, which will train over the errors from the main emulator in order to
+provide the user with an uncertainty estimate for any cosmology located within
+the space of priors over which the main emulator was trained.} 
+
+\textcolor{orange}{However, this functionality has not yet been implemented. 
+Currently, we are 
+using the validation hypercube more as a test hypercube: we compute the 
+uncertainties at discrete points and examine these uncertainties (e.g. with
+scatterplots and histograms) to assess the performance of the emulator.}
 
 
-\section{Percent and Square Errors on Random Cosmologies}
+\section{Future Work}
+\label{sec: future_work}
 
-* Percent error curves massless
+Here I will talk about what kinds of questions we estimate will be most 
+fruitful for further inquiries about this topic and this code.
 
-* Squared error curves massless
+%s Theoretical inquiries
 
-* Percent error curves massive
+Is there a theoretically perfect LHC generator?
 
-* Squared error curves massive
+%s CLASS versus CAMB again
 
-This will be a fairly short section, basically just showing the plot of 5000 
-error curves in these two ways.
+In order to expand the priors, it would be helpful to investigate why CAMB 
+does not allow negative redshifts, in case this can be adapted. Alternatively, 
+CLASS \textcolor{green}{allows} negative redshifts, so it may be worthwhile to 
+repeat the work of this thesis using power spectra from CLASS. This would 
+involve familiarization with a new platform, however, and so this escapes the 
+scope of this thesis. Remember that negative redshifts would be a helpful 
+feature for this work because it would allow us to investigate much broader 
+priors.
 
-\textcolor{orange}{Create some plots focusing on the BAO error spikes? i.e.
-zoom-in on k-ranges.}
+% Inquiries using different technologies
 
-\textcolor{green}{redo the numbers in this next paragraph}
+Should we use a neural network instead of a Gaussian process for our emulator? 
+AndreaP and Alex Eggemeier are already on the job: they are converting COMET 
+to a neural network approach. We recommend that the reader follow future COMET 
+papers for investigations into this question.
 
-The current state of the massless-neutrino emulator features sub-0.1\% error 
-for the vast majority of scales, with the exception of some wild fluctuations  
-between k=0.09 and 0.2 / Mpc. Outside of this range, the errors tend to 
-sub-0.01\% in the large-scale regime and sub-0.005\% in the small-scale 
-regime. Please refer to figures XXX through XXX for illustrations thereof.
+GP's allow natural propagation of
+uncertainty in predictions to the final posterior distribution; neural
+networks lack this feature. At the same time, NNs provide larger speedups 
+\textcolor{green}{CITATIONS}. We performed limited testing of a neural network
+but did not allocate enough time to arrive at conclusive / quantitative
+comparisons.
 
-As we can see from figures~\ref{fig: massless_default} 
-and~\ref{fig: massive_default}, 
-both emulators are most accurate at very large and
-very small $k$, with significant difficulties around the BAO region. We
-consider the small-scale performance a powerful confirmation of our
-techniques, as the impact of massive neutrinos is most significant at small
-scales.
+Symbolic regression for the perfect $A_s$ formula?
+As mentioned in section~\ref{sec: fit_testing}.
+Of course, we would 
+like to reiterate that, though we have applied a symbolic regression approach 
+in order to independently justify our analytical expression from
+chapter~\ref{chap: A_s}, this by no means guarantees that we have found the 
+optimal analytical expression.
 
-We highlight that the massive emulator performs significantly worse than its 
-massless counterpart. The emulators are difficult to compare because they
-were constructed from LHSs of different dimension: four in the massless case,
-six in the massive case. Since $N_s = 5000$ is constant, we expect the 
-massless LHS to sample the parameter space much more densely than the massive
-LHS. In any case, the discrepancy in accuracies will be worsened by the
-approximate nature of our fit from section~\ref{sec: proposed_fit}:
-the results of section~\ref{sec: fit_testing} indicate
-that evolution parameters besides $A_s$ are necessary for complete
-characterization of the impact of massive neutrinos. Nevertheless, the
-overall percent error of the massive emulator is \textcolor{green}{nearly}
-at the level of CAMB itself, so we consider the massless emulator an
-encouraging success.
+%s Code improvements
 
-As evolution-mapping emulation for \textit{massive}-neutrino cosmologies
-is the novel feature of this work, we will henceforth concentrate exclusively
-on the massive-neutrino emulator.
+The code should be expanded with documentation and unit tests. Also, the
+user interface script is still in progress.
 
-\section{Performance in Different Parameters}
-\label{sec: param_breakdown}
+To simplify the user experience, this two-emulator solution lives ``under the
+hood'' and by default \textcolor{orange}{will be} hidden behind an interface
+which automatically queries the correct emulator given some user-input
+cosmology.
 
-In this section, we will break down the performance of the emulator
-by coloring the same error plots as before (figure~\ref{fig: massive_default})
-according to different parameters. We use these color plots to argue that our
-emulator successfully captures the impact of all of the different parameters
-over which it was trained.
+We want to build an emulator over the validation set in order to quote an 
+uncertainty to the user and to try to further correct for errors? I'm not sure 
+I understood that last part, we would have to ask Ariel again.
 
-\textcolor{orange}{I plan to spend some time talking 
-about \textit{why} parameter x is the current biggest problem for the 
-emulator.}
+Extend the two-emulator solution to create emulators with different mass
+hierarchies. Mass hierarchy should also be an option to specify in the
+scenario file, like: degenerate, normal, inverted, both normal and inverted. 
+Remember to scale the mnu correctly to bridge the gap between degenerate and
+normal that we observed when playing around.
 
-\textcolor{orange}{It would have been nice if you had done like Andrea said,
-and produced a plot colored by the ``extremeness'' of the parameters. We
-could implement an extremeness index for parameter $x$ simply by taking
-subtracting 0.5 and taking the absolute value, assuming that $x$ comes from
-the unit LHS. Then, we could take the average over six parameters to get
-an extremeness index for the cosmology as a whole. Optionally, for plot
-optimization, you could multiply the final value by 2 so that the extremeness
-runs from 0 to 1.}
+\textcolor{orange}{The integration of 
+multiple emulators into one user-facing script can be further exploited with, 
+for example, different emulators for different neutrino mass hierarchies.}
 
+(For example, $\sigma_{12}^2$ sampling--although we did not
+get it to work, the infrastructure is still there for whomever comes along in
+the future. This suggestion builds on the concepts of
+section~\ref{sec: lhc_outline}.)
 
-\section{Improvement from Two-emulator Solution}
-\label{sec: 2emu_improvement}
-
-We conclude this chapter with a brief demonstration of the advantage of our
-two-emulator solution. We will task the massive-neutrino emulator with
-predictions over the test set of the massless-neutrino emulator. We consider
-this a fair test because we sampled $\omega_\nu$ values for the
-massive-neutrino emulator from a uniform distribution [0, 0.01]. Therefore,
-in principle, the $\omega_\nu = 0$ case should only be a slight extrapolation.
-
-To understand these results, we remind the reader the overall error of the
-massive emulator is larger than that of the massless emulator. As mentioned
-in 
-
-To justify our decision and to quantify the improvement from this approach, we
-have prepared \textcolor{orange}{some} plots in
-section~\ref{sec: 2emu_improvement}.
-
-\textcolor{blue}{This will be an extremely short section with some error
-plots of the massive-neutrino cosmology evaluating massless-neutrino
-cosmologies.}
