@@ -372,7 +372,7 @@ class Emulator_Trainer:
                                  linewidth=linewidth)
                     else:
                         plt.plot(self._scales, valid_errors[i], alpha=0.05,
-                                 linewidth=linewdith)
+                                 linewidth=linewidth)
                     plt.xscale('log')
 
         title = "Emulator " + self.emu.name + ", " + \
