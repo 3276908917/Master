@@ -945,8 +945,9 @@ def model_ratios(snap_index, sims, canvas, massive=True, skips=[],
     if 'y' in active_labels:
         plot_area.set_ylabel(ylabel, fontsize=24)
 
-    if title != "" and title[len(title) - 1] != ":":
-        title += ": "
+    if title != "" and title[-1] != ":":
+        if len(title) < 2 or title[-2:] != "\n":
+            title += ": "
         
     plot_area.set_title(title + r"$\omega_\nu$ = " + omnuh2_str +
                         "; Snapshot " + str(snap_index), fontsize=24)
