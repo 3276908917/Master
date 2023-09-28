@@ -12,6 +12,7 @@ comet-emu
 ringberg
 CAMB_notebooks/plots
 thesis_paper/unstaged
+cassL/plots
 
 # Other unnecessary data files
 CAMB_demo/planck_2018.ini

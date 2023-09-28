@@ -282,10 +282,10 @@ def multithread_unit_LHC_builder(dim, n_samples, label="unlabeled",
         The two obvious options are np.greater and np.less. np.greater is the
         default and should be used if you are unsure.
     """
-    total_calls = 0
+    total_calls_counter = 0
     start_time = time.time()
     
-    function_calls = np.array([])
+    function_calls_record = np.array([])
     bests = np.array([])
     wall_times = np.array([])
 
@@ -301,7 +301,7 @@ def multithread_unit_LHC_builder(dim, n_samples, label="unlabeled",
 
         # Now collapse everything
         for future in futures:
-            function_calls += 50
+            total_calls_counter += 50
             this_lhc, this_min_dist = future.result()
             if comparator(this_min_dist, overall_min_dist):
                 overall_min_dist = this_min_dist
@@ -314,12 +314,13 @@ def multithread_unit_LHC_builder(dim, n_samples, label="unlabeled",
                       ") found! Saving...")
                 
                 if track_performance:
-                    function_calls = np.append(function_calls, total_calls)
+                    function_calls_record = np.append(function_calls_record,
+                                                      total_calls_counter)
                     bests = np.append(bests, overall_min_dist)
                     wall_times = np.append(wall_times,
                                            time.time() - start_time)
                     
-                    np.save("fn_calls.npy", function_calls)
+                    np.save("fn_calls.npy", function_calls_record)
                     np.save("bests.npy", bests)
                     np.save("wall_times.npy", wall_times)
 
