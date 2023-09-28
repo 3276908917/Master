@@ -96,8 +96,28 @@ LHSs that are eventually used to train the emulators. To understand the
 computational and wall-time costs associated with this solution, we include 
 plots~\ref{fig: function_calls} and~\ref{fig: wall_time}.
 
+% The following plots were generated with h_units_bad.ipynb
+\begin{figure}[ht!]
+    \begin{subfigure}{0.45 \textwidth}
+    \centering
+ 		\includegraphics[width=\textwidth]{wall_time}
+ 		\caption{Using $h$ units.}
+ 		\label{fig: wall_time}
+    \end{subfigure}
+    \begin{subfigure}{0.45 \textwidth}
+    \centering
+ 		\includegraphics[width=\textwidth]{fn_calls}
+ 		\caption{Using absolute units.}
+ 		\label{fig: function_calls}
+    \end{subfigure}
+        \centering
+    \caption[Efficiency of Brute-Force LHS Approach]
+    		{It's not very good...}
+    \label{fig: random_lhs_performance}
+\end{figure}
+
 \begin{comment} % The following paragraph says this stuff better
-we left the system to run for three consecutive days. In this time, the 
+we left the system to run for two days. In this time, the 
 largest minimum separation that we generated was approximately 0.08022.  
 Recall from section sec_B1 that the theoretical best possible value for this 
 setup is approximately 0.24183. It would have been more meaningful if you had 
