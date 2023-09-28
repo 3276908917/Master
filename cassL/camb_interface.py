@@ -952,7 +952,8 @@ def model_ratios(snap_index, sims, canvas, massive=True, skips=[],
                         "; Snapshot " + str(snap_index), fontsize=24)
     
     if not suppress_legend:
-        plot_area.legend(fontsize=24)
+        plot_area.legend(fontsize=24, loc='center left',
+                         bbox_to_anchor=(1, 0.5))
         
     plot_area.tick_params(labelsize=24)
 
@@ -1038,7 +1039,8 @@ def compare_wrappers(k_list, p_list, sims, snap_index, canvas, massive,
 
         label_in = "model " + str(i)
         plot_area.plot(truncated_k, truncated_y_py / aligned_p_for,
-                       label=label_in, c=colors[i], linestyle=styles[i])
+                       label=label_in, c=colors[i], linestyle=styles[i],
+                       linewidth=5)
 
     plot_area.set_xscale('log')
     if 'x' in active_labels:
