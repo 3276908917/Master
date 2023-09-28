@@ -87,6 +87,31 @@ def check_existing_files(scenario_name):
     return train_complete, test_complete
     
 
+def get_scenario(scenario_name):
+    scenario = {}
+    file_handle = "scenarios/" + scenario_name + ".txt"
+    
+    with open(file_handle, 'r') as file:
+        lines = file.readlines()
+        key = None
+        for line in lines:
+            if line[0] == "#":
+                continue
+            if line.strip() == "":
+                continue
+
+            if line[0] == "$":
+                key = line[1:].strip()
+            else:
+                val = line.strip()
+                if val == "None":
+                    val = None
+                elif val.isnumeric() and key != "num_spectra_points":
+                    val = float(val)
+                scenario[key] = val
+                
+    return scenario
+
 def build_train_and_test_sets(scenario_name):
     """
     #! This situation's misconfigured. This function should only build the
@@ -123,27 +148,7 @@ def build_train_and_test_sets(scenario_name):
     
     # Keep track of the scenario folder, so that we can save things there...
     
-    scenario = {}
-    file_handle = "scenarios/" + scenario_name + ".txt"
-    
-    with open(file_handle, 'r') as file:
-        lines = file.readlines()
-        key = None
-        for line in lines:
-            if line[0] == "#":
-                continue
-            if line.strip() == "":
-                continue
-
-            if line[0] == "$":
-                key = line[1:].strip()
-            else:
-                val = line.strip()
-                if val == "None":
-                    val = None
-                elif val.isnumeric() and key != "num_spectra_points":
-                    val = float(val)
-                scenario[key] = val
+    scenario = get_scenario(scenario_name)
     
     #X Step 2: build train LHC
     
@@ -208,7 +213,7 @@ def build_train_and_test_sets(scenario_name):
     #X Step 6: call build_and_test_emulator
 
 
-def get_data_dict(emu_name, prior_name, test_name=None):
+def get_data_dict(scenario_name):
     #! WATCH OUT! THIS FUNCTION ASSUMES MASSIVE NEUTRINOS ALWAYS
 
     # This will return a dictionary which the new iteration of
@@ -217,10 +222,12 @@ def get_data_dict(emu_name, prior_name, test_name=None):
     
     # e.g. emu_name is Hnu2_5k_knockoff
     
+    scenario = get_scenario(scenario_name)
+    
     # This function will have to be expanded dramatically once we implement
     # the scenario structure
-    directory = "data_sets/" + emu_name + "/"
-    data_dict = {"emu_name": emu_name}
+    directory = "data_sets/" + scenario_name + "/"
+    data_dict = {"emu_name": scenario_name}
 
     X_train = np.load(directory + "lhc_train_final.npy", allow_pickle=False)
     data_dict["X_train"] = X_train
@@ -237,8 +244,7 @@ def get_data_dict(emu_name, prior_name, test_name=None):
     Y_test = np.load(directory + "samples_test.npy", allow_pickle=False)
     data_dict["Y_test"] = Y_test
     
-    priors = prior_file_to_dict(prior_name=prior_name)
-    data_dict["priors"] = priors
+    data_dict["priors"] = prior_file_to_dict(scenario["priors"])
 
     return data_dict
 

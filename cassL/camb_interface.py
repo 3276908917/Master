@@ -874,7 +874,7 @@ def s12_from_interpolator(PK, z):
 def model_ratios(snap_index, sims, canvas, massive=True, skips=[],
                  subplot_indices=None, active_labels=['x', 'y'],
                  title="Ground truth", omnuh2_str="0.002", models=cosm,
-                 suppress_legend=False):
+                 suppress_legend=False, linewidth=1):
     """
     There are a couple of annoying formatting differences with the power nu
     dictionary which add up to an unpleasant time trying to squeeze it into the
@@ -925,14 +925,15 @@ def model_ratios(snap_index, sims, canvas, massive=True, skips=[],
 
         label_in = "model " + str(i)
         plot_area.plot(truncated_k, aligned_p / truncated_p,
-                       label=label_in, c=colors[i], linestyle=styles[i])
+                       label=label_in, c=colors[i], linestyle=styles[i],
+                       linewidth=linewidth)
 
         k_list.append(truncated_k)
         rat_list.append(aligned_p / truncated_p)
 
     plot_area.set_xscale('log')
     if 'x' in active_labels:
-        plot_area.set_xlabel(r"k [1 / Mpc]")
+        plot_area.set_xlabel(r"k [1 / Mpc]", fontsize=24)
 
     ylabel = r"и($k$)"
     if P_accessor is not None:
@@ -942,12 +943,14 @@ def model_ratios(snap_index, sims, canvas, massive=True, skips=[],
             ylabel = r"$P_\mathrm{massless} / P_\mathrm{massless, model \, 0}$"
 
     if 'y' in active_labels:
-        plot_area.set_ylabel(ylabel)
+        plot_area.set_ylabel(ylabel, fontsize=24)
 
     if title != "" and title[len(title) - 1] != ":":
         title += ": "
+        
     plot_area.set_title(title + r"$\omega_\nu$ = " + omnuh2_str +
-                        "; Snapshot " + str(snap_index))
+                        "; Snapshot " + str(snap_index), fontsize=24)
+    
     if not suppress_legend:
         plot_area.legend()
 

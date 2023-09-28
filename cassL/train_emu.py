@@ -299,7 +299,8 @@ class Emulator_Trainer:
 
 
     def error_curves(self, metric="relative", plot_every=1, param_index=None,
-        param_label=None, param_range=None, fixed_k=None, save_label=None):
+        param_label=None, param_range=None, fixed_k=None, save_label=None,
+        linewidth=1):
         """
         If param_index is None, all error curves are plotted together and in
         the same color.
@@ -367,9 +368,11 @@ class Emulator_Trainer:
                 else:
                     if param_index:
                         plt.plot(self._scales, valid_errors[i],
-                            color=colors[i], alpha=0.05)
+                                 color=colors[i], alpha=0.05,
+                                 linewidth=linewidth)
                     else:
-                        plt.plot(self._scales, valid_errors[i], alpha=0.05)
+                        plt.plot(self._scales, valid_errors[i], alpha=0.05,
+                                 linewidth=linewdith)
                     plt.xscale('log')
 
         title = "Emulator " + self.emu.name + ", " + \
@@ -378,10 +381,10 @@ class Emulator_Trainer:
         if param_index:
             title += "\ncolored by " + param_label + " value"
 
-        plt.title(title)
+        plt.title(title, fontsize=24)
 
-        plt.ylabel(metric + " error between CAMB and CassL")
-        plt.xlabel("scale $k$ [1 / Mpc]")
+        plt.ylabel(metric + " error between CAMB and CassL", fontsize=24)
+        plt.xlabel("scale $k$ [1 / Mpc]", fontsize=24)
 
         if param_index:
             norm = mpl.colors.Normalize(vmin=min(valid_vals),
