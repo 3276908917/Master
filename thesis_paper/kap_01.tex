@@ -172,22 +172,23 @@ R = \frac{6K}{a^2}
 where $R$ is the scalar of curvature.
 
 All the energy species that make up the Universe can be approximated as
-barotropic fluids with a constant of proportionality $w$ between the
-pressure $p$ and the density $\rho$ of the fluid, i.e. $p = w \rho$. $w$ is
+barotropic fluids with a constant of proportionality $\eulw$ between the
+pressure $p$ and the density $\rho$ of the fluid, i.e. $p = \eulw \rho$.
+$\eulw$ is
 referred to as the equation of state parameter and in most cases is a
-well-known constant; for radiation, $w_\gamma = 1/3$, while for matter,
-$w_m = 0$. In
+well-known constant; for radiation, $\eulw_\gamma = 1/3$, while for matter,
+$\eulw_m = 0$. In
 the case of dark energy, constancy cannot be taken for granted and we
 adopt a more general form called the Chevallier-Polarski-Linder (CPL) 
 parameterization \cbib{Scherrer}:
 
 \begin{equation}
-w_\text{DE} = w_0 + w_a (1 - a)
+w_\text{DE} = \eulw_0 + \eulw_a (1 - a)
 \end{equation}
 
-These $w_0$ and $w_a$ are cosmological parameters which also appear in our
+These $\eulw_0$ and $\eulw_a$ are cosmological parameters which also appear in our
 statistical analyses, although our observations so far appear to support
-a cosmological constant solution: $w_0 = -1$ and $w_a$ = 0. In the first
+a cosmological constant solution: $\eulw_0 = -1$ and $\eulw_a$ = 0. In the first
 Friedmann equation, this form of dark energy would appear as an added
 constant:
 
@@ -214,7 +215,7 @@ conservation (\textcolor{orange}{Look up a derivation}) to find that
 
 \begin{equation}
 \label{eq: scale_factor_to_density}
-\rho_i \propto a^{-3 (1 + w_i)}
+\rho_i \propto a^{-3 (1 + \eulw_i)}
 \end{equation}
 
 For matter and radiation, this relation yields intuitive results. Imagine
@@ -247,7 +248,7 @@ relation~\ref{eq: scale_factor_to_density} will
 apply to each species separately, and we can sum over all species to write:
 
 \begin{equation}
-\rho = \sum_i \frac{\rho_{i, 0}}{a^{3(1 + w_i)}}
+\rho = \sum_i \frac{\rho_{i, 0}}{a^{3(1 + \eulw_i)}}
 \end{equation}
 
 where the nought indicates the value today.
@@ -258,7 +259,9 @@ We can combine this with \ref{eq: Friedmann1} to write:
 \label{eq: Friedmann1_sum}
 \left( \frac{\dot{a}}{a} \right)^2
 =
-\frac{8 \pi G}{3} \, \sum_i \frac{\rho_{i, 0}}{a^{3(1 + w_i)}} - \frac{K}{a^2}
+\frac{8 \pi G}{3}
+\,
+\sum_i \frac{\rho_{i, 0}}{a^{3(1 + \eulw_i)}} - \frac{K}{a^2}
 \end{equation}
 
 %s Introduce h

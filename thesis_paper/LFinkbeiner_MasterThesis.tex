@@ -39,6 +39,7 @@
 % Get verbatim in captions
 \usepackage{cprotect}
 \usepackage{natbib}
+%\usepackage{eulervm}
 
 %\IfFileExists{biblatex.sty} {
 %    \usepackage[style=authoryear]{biblatex}
@@ -60,6 +61,9 @@
 \newcommand{\de}{\mbox{\usefont{T2A}{\rmdefault}{m}{n}\cyrd}}
 \newcommand{\ee}{\mbox{\usefont{T2A}{\rmdefault}{m}{n}\cyri}}
 
+\DeclareSymbolFont{eulerletters}{U}{zeur}{m}{n}
+% May God bless Agnė Semėnaitė
+\DeclareMathSymbol{\eulw}{\mathord}{eulerletters}{`w}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% Definition der Kopfzeile %%

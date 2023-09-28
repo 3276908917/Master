@@ -952,7 +952,9 @@ def model_ratios(snap_index, sims, canvas, massive=True, skips=[],
                         "; Snapshot " + str(snap_index), fontsize=24)
     
     if not suppress_legend:
-        plot_area.legend()
+        plot_area.legend(fontsize=24)
+        
+    plot_area.tick_params(labelsize=24)
 
     return k_list, rat_list
 
