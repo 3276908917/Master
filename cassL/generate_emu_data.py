@@ -11,6 +11,7 @@ from camb import model, initialpower, get_matter_power_interpolator
 
 from cassL import camb_interface as ci
 from cassL import user_interface as ui
+from cassL import utils
 
 model0 = ci.cosm.loc[0]
 
@@ -247,11 +248,11 @@ def interpolate_cell(input_cosmology, standard_k_axis):
 
     return p, actual_sigma12, np.array((input_cosmology['h'], float(z_best)))
 
-def fill_hypercube(parameter_values, standard_k_axis,
-    param_ranges=None, massive_neutrinos=True, eval_func=direct_eval_cell,
-    cell_range=None, samples=None, write_period=None, save_label="unlabeled"):
+def fill_hypercube(lhs, standard_k_axis, priors=None,
+    eval_func=direct_eval_cell, cell_range=None, samples=None,
+    write_period=None, save_label="unlabeled"):
     """
-    @parameter_values: this should be a list of tuples to
+    @lhs: this should be a list of tuples to
         evaluate kp at.
         #! This is confusing with the param_ranges label. Maybe we can call it
             cosmo_configs or something?
@@ -259,22 +260,23 @@ def fill_hypercube(parameter_values, standard_k_axis,
     @cell_range adjust this value in order to pick up from where you
         left off, and to run this method in saveable chunks.
 
-    BE CAREFUL! This function deliberately mutates the parameter_values object,
+    BE CAREFUL! This function deliberately mutates the lhs object,
         replacing the target sigma12 values with the actual sigma12 values used.
     """
     if cell_range is None:
-        cell_range = range(len(parameter_values))
+        cell_range = range(len(lhs))
     if samples is None:
-        samples = np.zeros((len(parameter_values), len(standard_k_axis)))
+        samples = np.zeros((len(lhs), len(standard_k_axis)))
 
     # Recent change: now omega_nu comes last
-
-    bundle_parameters = lambda row: build_cosmology(row[0], row[1], row[2],
-        row[3], row[4], row[5], param_ranges)
-
-    if massive_neutrinos == False:
+    
+    bundle_parameters = None
+    if utils.neutrinos_are_massive(len(lhs[0]), priors):
         bundle_parameters = lambda row: build_cosmology(row[0], row[1], row[2],
-            row[3], A_S_DEFAULT, 0, param_ranges)
+            row[3], row[4], row[5], priors)
+    else:
+        bundle_parameters = lambda row: build_cosmology(row[0], row[1], row[2],
+            row[3], A_S_DEFAULT, 0, priors)
 
     # This just provides debugging information
     rescaling_parameters_list = None
@@ -282,7 +284,7 @@ def fill_hypercube(parameter_values, standard_k_axis,
     unwritten_cells = 0
     for i in cell_range:
         this_p = None
-        this_cosmology = bundle_parameters(parameter_values[i])
+        this_cosmology = bundle_parameters(lhs[i])
 
         # We're only making the following switch in order to test out the
         # interpolator approach.
@@ -311,28 +313,28 @@ def fill_hypercube(parameter_values, standard_k_axis,
         # allows us to repeatedly evaluate a cosmology with the same
         # deterministic result.
         if this_actual_sigma12 is not None:
-            parameter_values[i][3] = this_actual_sigma12
+            lhs[i][3] = this_actual_sigma12
 
-            if "sigma12" in param_ranges: # we have to normalize
-                prior = param_ranges["sigma12"]
+            if "sigma12" in priors: # we have to normalize
+                prior = priors["sigma12"]
                 this_normalized_actual_sigma12 = \
                     (this_actual_sigma12 - prior[0]) / (prior[1] - prior[0])
-                parameter_values[i][3] = this_normalized_actual_sigma12
+                lhs[i][3] = this_normalized_actual_sigma12
             #! Make the use of sigma12_2 more user-friendly
-            elif "sigma12_2" in param_ranges: # we have to square and normalize
+            elif "sigma12_2" in priors: # we have to square and normalize
                 this_actual_sigma12_2 = np.square(this_actual_sigma12)
-                prior = param_ranges["sigma12_2"]
+                prior = priors["sigma12_2"]
                 this_normalized_actual_sigma12_2 = \
                     (this_actual_sigma12_2 - prior[0]) / (prior[1] - prior[0])
-                parameter_values[i][3] = this_normalized_actual_sigma12_2
-            elif "sigma12_root" in param_ranges: # we have to square and
+                lhs[i][3] = this_normalized_actual_sigma12_2
+            elif "sigma12_root" in priors: # we have to square and
                 # normalize
                 this_actual_sigma12_root = np.sqrt(this_actual_sigma12)
-                prior = param_ranges["sigma12_root"]
+                prior = priors["sigma12_root"]
                 this_normalized_actual_sigma12_root = \
                     (this_actual_sigma12_root - prior[0]) / \
                         (prior[1] - prior[0])
-                parameter_values[i][3] = this_normalized_actual_sigma12_root
+                lhs[i][3] = this_normalized_actual_sigma12_root
 
         samples[i] = this_p
 
@@ -344,6 +346,6 @@ def fill_hypercube(parameter_values, standard_k_axis,
             np.save("rescalers_backup_i" + str(i) + "_" + save_label + ".npy",
                 rescaling_parameters_list, allow_pickle=True)
             np.save("hc_backup_i" + str(i) + "_" + save_label + ".npy",
-                parameter_values, allow_pickle=True)
+                lhs, allow_pickle=True)
             unwritten_cells = 0
     return samples, rescaling_parameters_list

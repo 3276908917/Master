@@ -180,7 +180,7 @@ def build_train_and_test_sets(scenario_name):
                             "/lhc_train_initial.npy")
 
         samples_train, rescalers_train = \
-            ged.fill_hypercube(lhc_train, standard_k, param_ranges=priors,
+            ged.fill_hypercube(lhc_train, standard_k, priors=priors,
                 save_label=scenario_name + "_train")
         
         np.save(save_path + "/samples_train.npy", samples_train)
@@ -201,9 +201,9 @@ def build_train_and_test_sets(scenario_name):
 
         lhc_test = np.load("data_sets/" + scenario["LHC_train"] + \
                             "/lhc_test_initial.npy")
-        
+                            
         samples_test, rescalers_test = \
-            ged.fill_hypercube(lhc_test, standard_k, param_ranges=priors,
+            ged.fill_hypercube(lhc_test, standard_k, priors=priors,
                 save_label=scenario_name + "_test")
         
         np.save(save_path + "/samples_test.npy", samples_test)
@@ -235,8 +235,8 @@ def get_data_dict(scenario_name):
     Y_train = np.load(directory + "samples_train.npy", allow_pickle=False)
     data_dict["Y_train"] = Y_train
 
-    if test_name is not None:
-        directory = "data_sets/" + test_name + "/"
+    if scenario["same_test_set"] is not None:
+        directory = "data_sets/" + scenario["same_test_set"] + "/"
 
     X_test = np.load(directory + "lhc_test_final.npy", allow_pickle=False)
     data_dict["X_test"] = X_test
@@ -248,7 +248,7 @@ def get_data_dict(scenario_name):
 
     return data_dict
 
-def build_and_test_emulator(data_dict):
+def build_and_test_emulator(scenario_name):
     """
     Build a new Gaussian process regression over X_train and Y_train, then
     test its accuracy using X_test and Y_test.
@@ -257,6 +257,8 @@ def build_and_test_emulator(data_dict):
     Just like the code in train_emu.py, this cannot yet handle the case of
     different sampling distributions, e.g. root- or square-sampling in sigma12.
     """
+    data_dict = get_data_dict(scenario_name)
+    
     X_train_clean, Y_train_clean = \
         te.eliminate_unusable_entries(data_dict["X_train"],
                                       data_dict["Y_train"])
