@@ -16,7 +16,7 @@ file_suffix = emu_vlabel + "_" + emu_stage + fending
 standard_k = np.load("data_sets/k/100k.npy", allow_pickle=True)
 hc = np.load("../best_lhc_unit_" + hc_vlabel + "_" + emu_stage + fending,
     allow_pickle=True)
-param_ranges = ui.get_param_ranges(prior_name="COMET_with_nu")
+param_ranges = ui.prior_file_to_dict(prior_name="COMET_with_nu")
 # del param_ranges["sigma12"]
 #param_ranges["sigma12_root"] = [0.4472135954999579, 1]
 
@@ -36,7 +36,7 @@ if completed_index > -1:
 
 samples, rescalers = ged.fill_hypercube(
     hc, standard_k, param_ranges, samples=samples,
-    eval_func=ged.evaluate_cell,
+    eval_func=ged.direct_eval_cell,
     massive_neutrinos=massive_neutrinos, write_period=500,
     cell_range=range(completed_index + 1, len(hc)),
     save_label="unit_" + file_suffix

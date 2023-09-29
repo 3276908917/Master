@@ -55,8 +55,9 @@ page: \url{https://github.com/3276908917/Master/issues}}.
 
 %s Section 1: science improvements
 
-Based on the results of sections~\ref{sec: error_from_lhc} and~\ref{sec: 
-num_samples}, it would behoove future inquiries to investigate whether we
+It would behoove future inquiries to follow up on
+sections~\ref{sec: error_from_lhc} and~\ref{sec: num_samples} by investigating 
+whether we
 can in some way compensate for the different impact of $N_s$ on the massive
 and massless emulators so that their accuracies may be directly compared.
 Such a comparison would help us to understand the error associated
@@ -65,12 +66,27 @@ chapter~\ref{chap: A_s}. Even if a direct comparison method cannot be
 established, it would be useful to know how much larger $N_s$ would have to
 be for a massive emulator to reach equivalent levels of error.
 
+% I can't touch this paragraph until the results are in
 Based on the results of section~\ref{sec: error_from_lhc},
 \textcolor{blue}{we do not consider LHC improvement to be a significant
 priority}. But if it were... we would look through the theory. Can we build
 a generator of perfect, or at least much  better, LHCs?
 
+We have taken for granted that the speedup is much better when using emulation
+than using a Boltzmann solver. Or, better said, we've stopped looking at
+speeds after noticing the speedup. But it would be helpful to produce more
+numbers--does the speed of prediction depend on what emulator you build with
+CL?
+
 %s Section 2: code improvements. Segue offered by the uncertainty emulator.
+
+The most important next step for the Cassandra-Linear code is the
+extension of the emulator pipeline with a third data set, which we call the
+\textit{validation} set. From the validation data we will build a validation
+emulator, which will estimate the emulator error for any given cosmology.
+We expect that combination of this information with the original emulator
+predictions will achieve greater performance. 
+% across the board, universally, whatever!!!
 
 We want to build an emulator over the validation set in order to quote an 
 uncertainty to the user and to try to further correct for errors? I'm not sure 
