@@ -44,39 +44,7 @@ In conclusion...
 \textcolor{red}{How do these results compare with results from 
 papers on similar subjects?}
 
-\section{Emulation over Uncertainties}
-
-\textcolor{blue}{This content should be subsumed into future work, since we
-didn't manage to complete this feature in time.}
-
-For a further step of accuracy, we can add a third data set to our pipeline
-and introduce a second layer of emulation.
-
-Up to this point, our pipeline has included a training set and a testing set.
-If we add a validation set, then we can train a second emulator over the
-errors associated with the first emulator's performance on this validation
-set.
-
-Within the current (as of \textcolor{orange}{24.08.2023}) setup of
-Cassandra-Linear, we typically generate two Latin hypercubes for each
-emulator. The first represents our training set and an emulator cannot be
-produced without it. The second one represents our validation set.
-
-\textcolor{orange}{In a future
-release of Cassandra-Linear, this set will be used to train an ``uncertainty''
-emulator, which will train over the errors from the main emulator in order to
-provide the user with an uncertainty estimate for any cosmology located within
-the space of priors over which the main emulator was trained.} 
-
-\textcolor{orange}{However, this functionality has not yet been implemented. 
-Currently, we are 
-using the validation hypercube more as a test hypercube: we compute the 
-uncertainties at discrete points and examine these uncertainties (e.g. with
-scatterplots and histograms) to assess the performance of the emulator.}
-
-
-\section{Future Work}
-\label{sec: future_work}
+%s FUTURE WORK
 
 To conclude this work, we here identify several promising paths to advancing
 both the Cassandra-Linear code as well as the scientific analyses in
@@ -107,6 +75,30 @@ a generator of perfect, or at least much  better, LHCs?
 We want to build an emulator over the validation set in order to quote an 
 uncertainty to the user and to try to further correct for errors? I'm not sure 
 I understood that last part, we would have to ask Ariel again.
+\
+For a further step of accuracy, we can add a third data set to our pipeline
+and introduce a second layer of emulation. Up to this point, our pipeline has 
+included a training set and a testing set.
+If we add a validation set, then we can train a second emulator over the
+errors associated with the first emulator's performance on this validation
+set.
+\
+Within the current (as of \textcolor{orange}{24.08.2023}) setup of
+Cassandra-Linear, we typically generate two Latin hypercubes for each
+emulator. The first represents our training set and an emulator cannot be
+produced without it. The second one represents our validation set.
+\
+\textcolor{orange}{In a future
+release of Cassandra-Linear, this set will be used to train an ``uncertainty''
+emulator, which will train over the errors from the main emulator in order to
+provide the user with an uncertainty estimate for any cosmology located within
+the space of priors over which the main emulator was trained.} 
+\
+\textcolor{orange}{However, this functionality has not yet been implemented. 
+Currently, we are 
+using the validation hypercube more as a test hypercube: we compute the 
+uncertainties at discrete points and examine these uncertainties (e.g. with
+scatterplots and histograms) to assess the performance of the emulator.}
 
 \textcolor{orange}{The integration of 
 multiple emulators into one user-facing script can be further exploited with, 
@@ -121,6 +113,17 @@ normal that we observed when playing around.
 get it to work, the infrastructure is still there for whomever comes along in
 the future. This suggestion builds on the concepts of
 section~\ref{sec: lhc_outline}.)
+\
+We also tried sampling in $\sigma_{12}^2$ as well as $\sqrt{\sigma_{12}}$.
+Unfortunately, we were unable to conclude anything about the effectiveness of
+these strategies--there appears to have been some mistake in our code, such
+that the errors are much larger than can be explained on account of poor
+sampling.
+\
+See figures~\ref{fig: sigsquare_sample} and~\ref{fig: sigroot_sample} for
+illustrations of the problem. In a future work, it would be helpful to
+investigate these problems further. We may find that a different sampling
+strategy will more efficiently reduce the deltas that we see in our emulator.
 
 %s Section 3: use of different technologies
 
@@ -129,7 +132,8 @@ section~\ref{sec: lhc_outline}.)
 Although our priors should already suffice for most conventional parameter
 inference studies, we believe that wider priors would be of benefit to those
 seeking to understand exotic cosmologies. The chief obstacle to 
-implementation of wider priors in CL is CAMB's requirement that $z \geq 0$. 
+implementation of wider priors in CL is CAMB's requirement that $z \geq 0$,
+which limits the range of cosmologies we can probe. 
 Negative redshifts do not violate any conditions in the equations of
 cosmological evolution, so it could prove fruitful to investigate why CAMB 
 has this requirement; if the code could be easily amended, the results of
@@ -141,7 +145,7 @@ Should we use a neural network instead of a Gaussian process for our emulator?
 AndreaP and Alex Eggemeier are already on the job: they are converting COMET 
 to a neural network approach. We recommend that the reader follow future COMET 
 papers for investigations into this question.
-
+\
 GP's allow natural propagation of
 uncertainty in predictions to the final posterior distribution; neural
 networks lack this feature. At the same time, NNs provide larger speedups 
@@ -164,26 +168,11 @@ hood'' and by default \textcolor{orange}{will be} hidden behind an interface
 which automatically queries the correct emulator given some user-input
 cosmology.
 \end{comment}
+%%%
 
-
-\section{Tightness of the Priors Used}
-\label{sec: prior_woes}
-
-With this section I would like to revisit the specific values for the priors,
-that I only briefly mentioned back in section~\ref{sec: build_lhc}.
-
-First of all, from a purely practical consideration, expanding the priors was
-not feasible due to the high incidence of unsolvable cells.
-
-But second, this may not be a significant limitation to the utility of the
-emulators introduced here, because they are already quite wide compared to
-current state-of-the-art parameter inferences. \textcolor{green}{CITATIONS}.
-
-As of 19.06.23, ``COMET'' is the default for the emulator. It is the most 
-restrictive of the three options and was implemented in order to totally 
-eliminate the problem of unsolvable cells, allowing us to train our 
-demonstration emulator over an LHS without any significant gaps.
-
+%%% Way too much detail for this thesis, but I'm glad that I at least thought
+%%% about these things.
+\begin{comment}
 Our hope was that the narrow parameter ranges would furthermore help the 
 demonstration emulator to achieve high accuracy--in principal, success here
 means that we can simply ``scale up'' the approach of this work by
@@ -223,22 +212,5 @@ example, any prior ranges in table 00A; in truth, the emulator would
 correspond to a potentially (this is a dangerous word and opens you up to hard 
 questions) complicated shape inscribed within the six-dimensional rectangular 
 hyperprism.
-
-CAMB does not allow for negative redshifts, although it prove be 
-interesting to try to resolve this issue with a code that does allow negative 
-redshifts, such as CLASS. \textcolor{orange}{Re-iterate the discussion from
-section~\ref{sec: boltzmann_intro}: why didn’t we use CLASS for this project?}
-
-\section{Linear Sampling in Different Parameters}
-
-We also tried sampling in $\sigma_{12}^2$ as well as $\sqrt{\sigma_{12}}$.
-Unfortunately, we were unable to conclude anything about the effectiveness of
-these strategies--there appears to have been some mistake in our code, such
-that the errors are much larger than can be explained on account of poor
-sampling.
-
-See figures~\ref{fig: sigsquare_sample} and~\ref{fig: sigroot_sample} for
-illustrations of the problem. In a future work, it would be helpful to
-investigate these problems further. We may find that a different sampling
-strategy will more efficiently reduce the deltas that we see in our emulator.
-
+\end{comment}
+%%%
