@@ -10,6 +10,7 @@ description of the pipeline, with motivations behind several key components.
 For a more detailed and technical breakdown of the implementation of the steps
 mentioned here, refer to chapter~\ref{chap: implementation}.
 
+
 \section{Pipeline}
 \label{sec: flow_chart}
 
@@ -92,7 +93,7 @@ Script & Abbreviation & Purpose \\ \hline
 % The following plots were generated with h_units_bad.ipynb
 \begin{figure}[ht!]
     \centering
- 	\includesvg[height=0.85\textheight]{chap4/flow_chart}
+ 	\includesvg[height=0.85\textheight]{CL/flow_chart}
  	\caption[CL Flow Chart]{Flow chart broadly describing the structure
  		of the
  		code as it pertains to constructing an emulator. Dotted lines
@@ -123,19 +124,19 @@ sampling, see figure~\ref{fig: sample_comparison}.
 \begin{figure}[ht!]
     \begin{subfigure}{0.32 \textwidth}
     \centering
- 		\includesvg[width=\textwidth]{intro/lhs/random}
+ 		\includesvg[width=\textwidth]{lhs/random}
  		\caption{}
  		\label{fig: random_sample}
     \end{subfigure}
     \begin{subfigure}{0.32 \textwidth}
     \centering
- 		\includesvg[width=\textwidth]{intro/lhs/bad_LHS}
+ 		\includesvg[width=\textwidth]{lhs/bad_LHS}
  		\caption{}
  		\label{fig: poor_lhs}
     \end{subfigure}
     \begin{subfigure}{0.32 \textwidth}
     \centering
- 		\includesvg[width=\textwidth]{intro/lhs/better_LHS}
+ 		\includesvg[width=\textwidth]{lhs/better_LHS}
  		\caption{}
  		\label{fig: better_lhs}
     \end{subfigure}
@@ -194,8 +195,7 @@ the interpretation stage.
 % Intro sentence?
 
 We will generate our LHSs so that their values range from zero to unity.
-In continuity with the language of section~\ref{sec: lhc_theory}, we will 
-refer to such LHSs as \textit{unit} LHSs. These unit LHSs are saved as
+These unit LHSs are saved as
 \texttt{npy} files and later rescaled according to priors in order to
 specify the training
 domain in each parameter. This two-step process, first of generating a unit
@@ -311,6 +311,192 @@ in the current (as of 2 October 2023) version of the code. Nonetheless, as we
 will repeat in section~\ref{sec: future_work},
 the feature is in principle simple to implement.
 
+
+\section{Building the Latin Hypercube}
+\label{sec: build_lhc}
+
+% lhc.py
+
+In this section, we will discuss the building of LHSs, which within CL is 
+handled by \texttt|lhs|. As mentioned in section~\ref{sec: lhc_outline},
+we first create a unit LHS and then later rescale it according to a set of
+priors.
+
+Each entry $\bm{x}$ in our LHS $\matr{X}$ will be either a four- or
+six-dimensional vector, 
+depending on the emulator's support for massive neutrinos. When building a
+massless-neutrino emulator, each $\bm{x}$ will describe the $\omega_b$,
+$\omega_c$, $n_s$, and
+$\tilde{\sigma}_{12}$ values for a different cosmology in 
+this order. When building a massive-neutrino emulator, each $\bm{x}$ will 
+additionally specify the $A_s$ and $\omega_\nu$ values for that cosmology, 
+again in this order.
+
+To get started generating LHSs, we integrated demonstration code written by 
+Daniel Farrow \textcolor{orange}{(and who else?) add these people to the 
+Danksagung}. We begin by invoking the \texttt{lhs} function of
+\texttt{pyDOE2} a number of times. Each time we get a random new unit LHC, 
+whose spacing we analyze with the \texttt{cdist} function from
+\texttt{scipy.spatial.distance}.
+Recall from section~\ref{sec: lhc_theory} that
+our samples more evenly cover the sample space if the minimum separation
+$s^*$ increases. Therefore, from among the numerous calls of \texttt{lhs} we 
+select the LHS with the largest minimum separation.
+
+In order to maximize the number of random hypercubes generated per unit of
+wall time, we have written a multithreaded function called
+\verb|multithread_unit_LHC_builder| \textcolor{orange}{Keep your eye on this
+one, I'm thinking about condensing lhc.py to just a couple of functions.}
+Through the function parameter \verb|num_workers| the user is free to assign
+any number of CPU threads to the task; in principle, a CPU can be
+wholly dedicated to the optimization of the LHS.
+\verb|multithread_unit_LHC_builder| does not contain a return statement but
+instead triggers an unending query for LHSs. The user is notified via command
+line printout whenever an LHS has been generated whose $s^*$ exceeds
+the previous record. Whenever such a superior LHS is
+encountered, the function writes the LHS to a file and continues. Therefore,
+the user may run this script in the background and terminate whenever. The
+function always writes LHSs to the same file, so each new record-setting LHS
+overwrites the old one. When the user terminates the function, whatever output
+file remains represents the best LHS seen since the function was first called.
+
+%%% It's just too much detail for a master's thesis, no one will care
+\begin{comment}
+The \verb|cdist| function can be re-used to compare LHSs loaded from 
+different
+files. However, since there is generally little reason to keep old LHSs
+(except, perhaps, to reconstruct specific emulators), it reduces clutter to
+simply continue overwriting the same file. Therefore, the function
+\verb|multithread_unit_LHC_builder| also includes a parameter
+\verb|previous_record|, which is recommended whenever the user would like to
+stop the function and then resume it later. In such a case, the parameter
+should be set to the \verb|cdist| value of the exis}
+\end{comment}
+%%%
+
+% I've got a better idea: the function should automatically ask the user if
+% he's sure, in the case that we find a file under the name under which we
+% intend to write. If the user is sure, we take the cdist of that existing
+% file and use it as the previous record!
+
+% we multithreaded the Python script to spawn 12 workers on an 11th gen Intel 
+% i7-11700 @ 2.50 GHz. IF YOU ARE USING THE WORK DESKTOP
+
+As of 2 October 2023, CL relies on this brute-force approach to build the
+LHSs that are eventually used to train the emulators. To understand the 
+computational and wall-time costs associated with this solution, we include 
+plots~\ref{fig: function_calls} and~\ref{fig: wall_time}.
+
+% The following plots were generated with h_units_bad.ipynb
+\begin{figure}[ht!]
+    \begin{subfigure}{0.45 \textwidth}
+    \centering
+ 		\includegraphics[width=\textwidth]{CL/wall_time}
+ 		\caption{Using $h$ units.}
+ 		\label{fig: wall_time}
+    \end{subfigure}
+    \begin{subfigure}{0.45 \textwidth}
+    \centering
+ 		\includegraphics[width=\textwidth]{CL/fn_calls}
+ 		\caption{Using absolute units.}
+ 		\label{fig: function_calls}
+    \end{subfigure}
+        \centering
+    \caption[Efficiency of Brute-Force LHS Approach]
+    		{It's not very good...}
+    \label{fig: random_lhs_performance}
+\end{figure}
+
+\begin{comment} % The following paragraph says this stuff better
+we left the system to run for two days. In this time, the 
+largest minimum separation that we generated was approximately 0.08022.  
+Recall from section sec_B1 that the theoretical best possible value for this 
+setup is approximately 0.24183. It would have been more meaningful if you had 
+counted the total number of function calls, but it isn’t too late to set up 
+such a run. So, even after assigning a relatively large amount of compute to 
+this brute force solution, we fail to obtain an LHC of even a third of the 
+best minimum separation.
+\end{comment} 
+
+Remember from section~\ref{sec: lhc_theory} equation~\ref{eq: best_lhs_sep},
+which tells us the best possible $s^*$
+given dimension $d$ and total number of samples $N_s$. Let us consider a 
+massless-neutrino emulator (a total of four dimensions per cosmology vector)
+trained over five-thousand CAMB spectra. If we plug in $d = 4$ and $N=5000$,
+we find $s^*_\text{best} \approx 0.1189$. Clearly, the brute force method
+achieves only a comparatively low $s^*$, even over the span of multiple days.
+
+Based on figures~\ref{fig: function_calls} and~\ref{fig: wall_time}, we
+claim that our approach is inefficient and not well-suited to the approach of 
+maximizing $s^*$. Since suboptimal $s^*$ values imply unevenness in the
+coverage of the space of cosmologies, we expect low $s^*$ values to impact
+the emulator by increasing variance in the errors, because the worst errors
+will be significantly worse, while the best errors will be slightly better in
+oversampled regions. We also expect the average error to increase slightly,
+as the oversampled regions should benefit less than the undersampled regions
+suffer.
+
+% One could argue that the variance in oversampled regions will decrease to
+% compensate, right? I need to clarify that the decrease in variance in the
+% oversampled regions would not be able to compensate the increased variance
+% in the undersampled regions, because the space of power spectra is
+% continuous, so closely spaced points reveal less about the true function
+% than well spaced points.
+
+We will test these expectations in section~\ref{sec: error_from_lhc} by
+varying the $s^*$ of the LHS with which we train the emulator.
+\textcolor{orange}{We will explore the question of superior methods in
+section~\ref{sec: future_work}}.
+
+
+\section{Rescaling the LHS}
+\label{sec: lhc_rescale}
+
+%s Introduce the build_cosmology script
+
+Now that we have a unit LHS $\matr{X}_u$, we need to scale it 
+so that each axis, which currently runs from zero to one, runs along a range 
+dictated by one of the priors. This scaling is handled by the \texttt{ged}
+function \verb|build_cosmology|. It accepts as parameters the values of
+$\omega_b$, $\omega_c$, $n_s$, $\sigma_{12}$, $A_s$, $\omega_\nu$, and, 
+optionally, a dictionary of priors. If this
+dictionary is not provided, the cosmological parameters are assumed to
+already have been scaled. When building a massless-neutrino emulator,
+the information $\omega_\nu = 0$ and $A_s = A_s(\text{Aletheia model 0})$ is
+automatically provided to \verb|build_cosmology| by
+\verb|fill_hypercube|. 
+% We really should redo build_cosmology so that it assumes indices match to
+% the same parameters every time! This is how the rest of the code works,
+% after all.
+
+The precise form of the scaling is given by the formula for transforming a
+random variable $x \sim \mathcal{U}(0, 1)$ to a random variable
+$x' \sim \mathcal{U}(a, b)$:
+
+\begin{equation}
+\label{eq: scaling}
+x' = x (b - a) + a
+\end{equation}
+
+After scaling the parameters, \verb|build_cosmology| finishes bridging the gap
+between the LHS and the CAMB \verb|pars| object (as introduced in
+chapter~\ref{chap: CAMB_setup}) by using default values to fill in the
+remaining values demanded by CAMB. For example, $H_0$, $w_a$ and $w_0$ are
+not parameters over
+which we train the emulator, but CAMB requires that they be specified before
+a power spectrum can be calculated. In all such cases, we use Aletheia model
+0 as default values. \textcolor{orange}{I'm not referring to table 1.2 here
+because I would have to expand it with parameters not essential to this work,
+so I would have to redo the captions for fig 1.1 and table 1.2...}
+
+So long as the power spectrum's value for $\sigma_{12}$ agrees with the
+prior-scaled value from the LHS, it should not matter that 
+we use the model 0 values, as these are evolution parameters.
+\textcolor{red}{Or should it? If this logic really held, shouldn't we be able 
+to modify $w_a$ and $w_0$ in order to get the correct value of
+$\tilde{\sigma}_{12}$? But these are evolution parameters, so why don't we?}
+
+
 \section{Creation of Separate Emulators}
 \label{sec: 2emu_intro}
 
@@ -397,189 +583,6 @@ The reader should keep in mind that we refer to the package as CL in this
 thesis to clearly distinguish it from the Boltzmann solver CLASS, but its
 true name (for example, for use in \texttt{import} statements) is
 \texttt{cassL}.
-
-\section{Building the Latin Hypercube}
-\label{sec: build_lhc}
-
-% lhc.py
-
-In this section, we will discuss the building of LHSs, which within CL is 
-handled by \texttt|lhs|. As mentioned in section~\ref{sec: lhc_outline},
-we first create a unit LHS and then later rescale it according to a set of
-priors.
-
-Each entry $\bm{x}$ in our LHS $\matr{X}$ will be either a four- or
-six-dimensional vector, 
-depending on the emulator's support for massive neutrinos. When building a
-massless-neutrino emulator, each $\bm{x}$ will describe the $\omega_b$,
-$\omega_c$, $n_s$, and
-$\tilde{\sigma}_{12}$ values for a different cosmology in 
-this order. When building a massive-neutrino emulator, each $\bm{x}$ will 
-additionally specify the $A_s$ and $\omega_\nu$ values for that cosmology, 
-again in this order.
-
-To get started generating LHSs, we integrated demonstration code written by 
-Daniel Farrow \textcolor{orange}{(and who else?) add these people to the 
-Danksagung}. We begin by invoking the \texttt{lhs} function of
-\texttt{pyDOE2} a number of times. Each time we get a random new unit LHC, 
-whose spacing we analyze with the \texttt{cdist} function from
-\texttt{scipy.spatial.distance}.
-Recall from section~\ref{sec: lhc_theory} that
-our samples more evenly cover the sample space if the minimum separation
-$s^*$ increases. Therefore, from among the numerous calls of \texttt{lhs} we 
-select the LHS with the largest minimum separation.
-
-In order to maximize the number of random hypercubes generated per unit of
-wall time, we have written a multithreaded function called
-\verb|multithread_unit_LHC_builder| \textcolor{orange}{Keep your eye on this
-one, I'm thinking about condensing lhc.py to just a couple of functions.}
-Through the function parameter \verb|num_workers| the user is free to assign
-any number of CPU threads to the task; in principle, a CPU can be
-wholly dedicated to the optimization of the LHS.
-\verb|multithread_unit_LHC_builder| does not contain a return statement but
-instead triggers an unending query for LHSs. The user is notified via command
-line printout whenever an LHS has been generated whose $s^*$ exceeds
-the previous record. Whenever such a superior LHS is
-encountered, the function writes the LHS to a file and continues. Therefore,
-the user may run this script in the background and terminate whenever. The
-function always writes LHSs to the same file, so each new record-setting LHS
-overwrites the old one. When the user terminates the function, whatever output
-file remains represents the best LHS seen since the function was first called.
-
-%%% It's just too much detail for a master's thesis, no one will care
-\begin{comment}
-The \verb|cdist| function can be re-used to compare LHSs loaded from 
-different
-files. However, since there is generally little reason to keep old LHSs
-(except, perhaps, to reconstruct specific emulators), it reduces clutter to
-simply continue overwriting the same file. Therefore, the function
-\verb|multithread_unit_LHC_builder| also includes a parameter
-\verb|previous_record|, which is recommended whenever the user would like to
-stop the function and then resume it later. In such a case, the parameter
-should be set to the \verb|cdist| value of the exis}
-\end{comment}
-%%%
-
-% I've got a better idea: the function should automatically ask the user if
-% he's sure, in the case that we find a file under the name under which we
-% intend to write. If the user is sure, we take the cdist of that existing
-% file and use it as the previous record!
-
-% we multithreaded the Python script to spawn 12 workers on an 11th gen Intel 
-% i7-11700 @ 2.50 GHz. IF YOU ARE USING THE WORK DESKTOP
-
-As of 2 October 2023, CL relies on this brute-force approach to build the
-LHSs that are eventually used to train the emulators. To understand the 
-computational and wall-time costs associated with this solution, we include 
-plots~\ref{fig: function_calls} and~\ref{fig: wall_time}.
-
-% The following plots were generated with h_units_bad.ipynb
-\begin{figure}[ht!]
-    \begin{subfigure}{0.45 \textwidth}
-    \centering
- 		\includegraphics[width=\textwidth]{wall_time}
- 		\caption{Using $h$ units.}
- 		\label{fig: wall_time}
-    \end{subfigure}
-    \begin{subfigure}{0.45 \textwidth}
-    \centering
- 		\includegraphics[width=\textwidth]{fn_calls}
- 		\caption{Using absolute units.}
- 		\label{fig: function_calls}
-    \end{subfigure}
-        \centering
-    \caption[Efficiency of Brute-Force LHS Approach]
-    		{It's not very good...}
-    \label{fig: random_lhs_performance}
-\end{figure}
-
-\begin{comment} % The following paragraph says this stuff better
-we left the system to run for two days. In this time, the 
-largest minimum separation that we generated was approximately 0.08022.  
-Recall from section sec_B1 that the theoretical best possible value for this 
-setup is approximately 0.24183. It would have been more meaningful if you had 
-counted the total number of function calls, but it isn’t too late to set up 
-such a run. So, even after assigning a relatively large amount of compute to 
-this brute force solution, we fail to obtain an LHC of even a third of the 
-best minimum separation.
-\end{comment} 
-
-Remember from section~\ref{sec: lhc_theory} equation~\ref{eq: best_lhs_sep},
-which tells us the best possible $s^*$
-given dimension $d$ and total number of samples $N_s$. Let us consider a 
-massless-neutrino emulator (a total of four dimensions per cosmology vector)
-trained over five-thousand CAMB spectra. If we plug in $d = 4$ and $N=5000$,
-we find $s^*_\text{best} \approx 0.1189$. Clearly, the brute force method
-achieves only a comparatively low $s^*$, even over the span of multiple days.
-
-Based on figures~\ref{fig: function_calls} and~\ref{fig: wall_time}, we
-claim that our approach is inefficient and not well-suited to the approach of 
-maximizing $s^*$. Since suboptimal $s^*$ values imply unevenness in the
-coverage of the space of cosmologies, we expect low $s^*$ values to impact
-the emulator by increasing variance in the errors, because the worst errors
-will be significantly worse, while the best errors will be slightly better in
-oversampled regions. We also expect the average error to increase slightly,
-as the oversampled regions should benefit less than the undersampled regions
-suffer.
-
-% One could argue that the variance in oversampled regions will decrease to
-% compensate, right? I need to clarify that the decrease in variance in the
-% oversampled regions would not be able to compensate the increased variance
-% in the undersampled regions, because the space of power spectra is
-% continuous, so closely spaced points reveal less about the true function
-% than well spaced points.
-
-We will test these expectations in section~\ref{sec: error_from_lhc} by
-varying the $s^*$ of the LHS with which we train the emulator.
-\textcolor{orange}{We will explore the question of superior methods in
-section~\ref{sec: future_work}}.
-
-\section{Rescaling the LHS}
-\label{sec: lhc_rescale}
-
-%s Introduce the build_cosmology script
-
-Now that we have a unit LHS $\matr{X}_u$, we need to scale it 
-so that each axis, which currently runs from zero to one, runs along a range 
-dictated by one of the priors. This scaling is handled by the \texttt{ged}
-function \verb|build_cosmology|. It accepts as parameters the values of
-$\omega_b$, $\omega_c$, $n_s$, $\sigma_{12}$, $A_s$, $\omega_\nu$, and, 
-optionally, a dictionary of priors. If this
-dictionary is not provided, the cosmological parameters are assumed to
-already have been scaled. When building a massless-neutrino emulator,
-the information $\omega_\nu = 0$ and $A_s = A_s(\text{Aletheia model 0})$ is
-automatically provided to \verb|build_cosmology| by
-\verb|fill_hypercube|. 
-% We really should redo build_cosmology so that it assumes indices match to
-% the same parameters every time! This is how the rest of the code works,
-% after all.
-
-The precise form of the scaling is given by the formula for transforming a
-random variable $x \sim \mathcal{U}(0, 1)$ to a random variable
-$x' \sim \mathcal{U}(a, b)$:
-
-\begin{equation}
-\label{eq: scaling}
-x' = x (b - a) + a
-\end{equation}
-
-After scaling the parameters, \verb|build_cosmology| finishes bridging the gap
-between the LHS and the CAMB \verb|pars| object (as introduced in
-chapter~\ref{chap: CAMB_setup}) by using default values to fill in the
-remaining values demanded by CAMB. For example, $H_0$, $w_a$ and $w_0$ are
-not parameters over
-which we train the emulator, but CAMB requires that they be specified before
-a power spectrum can be calculated. In all such cases, we use Aletheia model
-0 as default values. \textcolor{orange}{I'm not referring to table 1.2 here
-because I would have to expand it with parameters not essential to this work,
-so I would have to redo the captions for fig 1.1 and table 1.2...}
-
-So long as the power spectrum's value for $\sigma_{12}$ agrees with the
-prior-scaled value from the LHS, it should not matter that 
-we use the model 0 values, as these are evolution parameters.
-\textcolor{red}{Or should it? If this logic really held, shouldn't we be able 
-to modify $w_a$ and $w_0$ in order to get the correct value of
-$\tilde{\sigma}_{12}$? But these are evolution parameters, so why don't we?}
 
 \section{Integrating Evolution Mapping}
 \label{sec: generate_emu_data}

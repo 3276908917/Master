@@ -34,8 +34,6 @@ the error of our massive-neutrino emulator is
 comparable to that of CAMB, the Boltzmann solver we use to produce the
 training spectra used for training.
 
-\textcolor{red}{Should I re-define the following symbols?}
-
 We explore the impact of $s^*$, $N_k$, and $N_s$ on the performance of the
 emulator and find...
 
@@ -104,26 +102,40 @@ Based on the results of section~\ref{sec: error_from_lhc},
 priority}. But if it were... we would look through the theory. Can we build
 a generator of perfect, or at least much  better, LHCs?
 
-% Section 2: code improvements. Segue offered by the uncertainty emulator.
+%s Section 2: code improvements. Segue offered by the uncertainty emulator.
 
-% Section 3: use of different technologies
+We want to build an emulator over the validation set in order to quote an 
+uncertainty to the user and to try to further correct for errors? I'm not sure 
+I understood that last part, we would have to ask Ariel again.
+
+\textcolor{orange}{The integration of 
+multiple emulators into one user-facing script can be further exploited with, 
+for example, different emulators for different neutrino mass hierarchies.}
+Extend the two-emulator solution to create emulators with different mass
+hierarchies. Mass hierarchy should also be an option to specify in the
+scenario file, like: degenerate, normal, inverted, both normal and inverted. 
+Remember to scale the mnu correctly to bridge the gap between degenerate and
+normal that we observed when playing around.
+
+(For example, $\sigma_{12}^2$ sampling--although we did not
+get it to work, the infrastructure is still there for whomever comes along in
+the future. This suggestion builds on the concepts of
+section~\ref{sec: lhc_outline}.)
+
+%s Section 3: use of different technologies
 
 %s CLASS versus CAMB again
 
 Although our priors should already suffice for most conventional parameter
 inference studies, we believe that wider priors would be of benefit to those
-seeking to understand exotic cosmologies. In order to expand the priors, it would be helpful to investigate why CAMB 
-does not allow negative redshifts, in case this can be adapted. 
-Alternatively, 
+seeking to understand exotic cosmologies. The chief obstacle to 
+implementation of wider priors in CL is CAMB's requirement that $z \geq 0$. 
+Negative redshifts do not violate any conditions in the equations of
+cosmological evolution, so it could prove fruitful to investigate why CAMB 
+has this requirement; if the code could be easily amended, the results of
+this work could be extended to broader priors. Alternatively,
 CLASS \textcolor{green}{allows} negative redshifts, so it may be worthwhile 
-to 
-repeat the work of this thesis using power spectra from CLASS. This would 
-involve familiarization with a new platform, however, and so this escapes the 
-scope of this thesis. Remember that negative redshifts would be a helpful 
-feature for this work because it would allow us to investigate much broader 
-priors.
-
-% Inquiries using different technologies
+to repeat the work of this thesis using power spectra from CLASS.
 
 Should we use a neural network instead of a Gaussian process for our emulator? 
 AndreaP and Alex Eggemeier are already on the job: they are converting COMET 
@@ -137,16 +149,13 @@ networks lack this feature. At the same time, NNs provide larger speedups
 but did not allocate enough time to arrive at conclusive / quantitative
 comparisons.
 
-Symbolic regression for the perfect $A_s$ formula?
-As mentioned in section~\ref{sec: fit_testing}.
-Of course, we would 
-like to reiterate that, though we have applied a symbolic regression approach 
-in order to independently justify our analytical expression from
-chapter~\ref{chap: A_s}, this by no means guarantees that we have found the 
-optimal analytical expression.
+
+% Inquiries using different technologies
 
 %s Code improvements
 
+%%% Unprofessional to mention the following here:
+\begin{comment}
 The code should be expanded with documentation and unit tests. Also, the
 user interface script is still in progress.
 
@@ -154,25 +163,8 @@ To simplify the user experience, this two-emulator solution lives ``under the
 hood'' and by default \textcolor{orange}{will be} hidden behind an interface
 which automatically queries the correct emulator given some user-input
 cosmology.
+\end{comment}
 
-We want to build an emulator over the validation set in order to quote an 
-uncertainty to the user and to try to further correct for errors? I'm not sure 
-I understood that last part, we would have to ask Ariel again.
-
-Extend the two-emulator solution to create emulators with different mass
-hierarchies. Mass hierarchy should also be an option to specify in the
-scenario file, like: degenerate, normal, inverted, both normal and inverted. 
-Remember to scale the mnu correctly to bridge the gap between degenerate and
-normal that we observed when playing around.
-
-\textcolor{orange}{The integration of 
-multiple emulators into one user-facing script can be further exploited with, 
-for example, different emulators for different neutrino mass hierarchies.}
-
-(For example, $\sigma_{12}^2$ sampling--although we did not
-get it to work, the infrastructure is still there for whomever comes along in
-the future. This suggestion builds on the concepts of
-section~\ref{sec: lhc_outline}.)
 
 \section{Tightness of the Priors Used}
 \label{sec: prior_woes}
