@@ -109,15 +109,6 @@ As evolution-mapping emulation for \textit{massive}-neutrino cosmologies
 is the novel feature of this work, we will henceforth concentrate exclusively
 on the massive-neutrino emulator.
 
-\section{Performance in Different Parameters}
-\label{sec: param_breakdown}
-
-In this section, we will break down the performance of the emulator
-by coloring the same error plots as before (figure~\ref{fig: massive_default})
-according to different parameters. We use these color plots to argue that our
-emulator successfully captures the impact of all of the different parameters
-over which it was trained.
-
 \textcolor{orange}{I plan to spend some time talking 
 about \textit{why} parameter x is the current biggest problem for the 
 emulator.}
@@ -154,70 +145,6 @@ section~\ref{sec: 2emu_improvement}.
 plots of the massive-neutrino cosmology evaluating massless-neutrino
 cosmologies.}
 
-
-\section{Tightness of the Priors Used}
-\label{sec: prior_woes}
-
-With this section I would like to revisit the specific values for the priors,
-that I only briefly mentioned back in section~\ref{sec: build_lhc}.
-
-First of all, from a purely practical consideration, expanding the priors was
-not feasible due to the high incidence of unsolvable cells.
-
-But second, this may not be a significant limitation to the utility of the
-emulators introduced here, because they are already quite wide compared to
-current state-of-the-art parameter inferences. \textcolor{green}{CITATIONS}.
-
-As of 19.06.23, ``COMET'' is the default for the emulator. It is the most 
-restrictive of the three options and was implemented in order to totally 
-eliminate the problem of unsolvable cells, allowing us to train our 
-demonstration emulator over an LHS without any significant gaps.
-
-Our hope was that the narrow parameter ranges would furthermore help the 
-demonstration emulator to achieve high accuracy--in principal, success here
-means that we can simply ``scale up'' the approach of this work by
-simultaneously expanding the priors as well as the total number of training
-samples. Unfortunately, it is not clear if we can scale up the emulator past
-the point at which unsolvable cells begin to appear. Since Latin hypercube
-sampling is designed to evenly sample a space, unsolvable cells certainly
-indicate that parts of the parameter space lack representation in the training
-data. In these regions, our emulator will be forced to interpolate across
-large gaps, or worse, extrapolate (if the unsolvable cells occur at the edges
-of the parameter space \textcolor{orange}{This is something that I should have
-shown... i.e. with plots}).
-% Andrea recommends a plot coloring points by the "extremeness" in our sample
-% space.
-
-We predict that increasing the total number of cells will only marginally
-reduce the issue of unsolvable cells \textcolor{orange}{This is something that 
-I should have shown... i.e. with plots}). We can imagine the subspace of
-solvable points as some hypervolume within a hypercube determined by our
-priors, and the emulator's training coverage as an approximation of this 
-hypervolume with small hypercubes whose size is determined by the separation 
-between points in the sample. In the ideal case, the space of solvable points 
-is the same as the Latin hypercube. When this is not so, we can at least
-reduce the error associated with our approximation of the space of solvable
-points by shrinking the hypercubes we use in our approximation (i.e. by
-increasing the total number of points in our sample). \textcolor{orange}{
-To give a sense of the marginal nature of this error reduction, we can
-consider how small our hypercubes already are. For simplicity, let's examine
-just one axis of the hypercube. With 5000 samples in the ``MEGA'' priors,
-the length of the training coverage MOST STRONGLY DETERMINED BY ONE HYPERCUBE
-IS: UNFINISHED THOUGHT}
-
-It seems reasonable to think that unsolvable cells indicate extreme regions of 
-the parameter space, rather than isolated holes. Therefore, it would be 
-misleading to claim that the final ``MEGA'' emulator corresponds to, for 
-example, any prior ranges in table 00A; in truth, the emulator would 
-correspond to a potentially (this is a dangerous word and opens you up to hard 
-questions) complicated shape inscribed within the six-dimensional rectangular 
-hyperprism.
-
-CAMB does not allow for negative redshifts, although it prove be 
-interesting to try to resolve this issue with a code that does allow negative 
-redshifts, such as CLASS. \textcolor{orange}{Re-iterate the discussion from
-section~\ref{sec: boltzmann_intro}: why didn’t we use CLASS for this project?}
-
 \section{Minimum Separation of the Training LHC}
 \label{sec: error_from_lhc}
 
@@ -226,9 +153,9 @@ should be a proxy for the evenness of the coverage of the space of
 cosmologies. Therefore, we expect the error variance to increase much more
 dramatically than, say, the average bias.
 
-How would we
-be able to quantify the error due to this? We could try to compare the
-emulator performance trained on hyper cubes of various minimum distances.
+How would we be able to quantify the error due to this? We could try to 
+compare the emulator performance trained on hyper cubes of various minimum 
+distances.
 
 \section{Resolution of the k Axis}
 
@@ -258,18 +185,5 @@ trend plot showing diminishing returns in test error?}
 
 \textcolor{orange}{I'll have to concede that the results of this section are 
 not entirely comprehensive; we didn't train any emulators over the 
-uncertainties of analogous validation hypercubes. All comparisons here use the 
+uncertainties of analogous validation hypercubes. All comparisons here use the
 simpler pipeline of just two data sets, training and testing.}
-
-\section{Linear Sampling in Different Parameters}
-
-We also tried sampling in $\sigma_{12}^2$ as well as $\sqrt{\sigma_{12}}$.
-Unfortunately, we were unable to conclude anything about the effectiveness of
-these strategies--there appears to have been some mistake in our code, such
-that the errors are much larger than can be explained on account of poor
-sampling.
-
-See figures~\ref{fig: sigsquare_sample} and~\ref{fig: sigroot_sample} for
-illustrations of the problem. In a future work, it would be helpful to
-investigate these problems further. We may find that a different sampling
-strategy will more efficiently reduce the deltas that we see in our emulator.

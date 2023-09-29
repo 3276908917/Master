@@ -10,7 +10,7 @@ evolution parameter.
 
 We find that two simple adjustments to evolution mapping can extend its
 efficacy to the case of massive neutrinos. By recasting the evolution mapping
-relation in terms of $\tilde{\sigma}_12}$ rather than $\sigma_{12}$--that is,
+relation in terms of $\tilde{\sigma}_12$ rather than $\sigma_{12}$--that is,
 in terms of the MEMNeC amplitude rather than the desired cosmology's
 amplitude--we are able to circumvent the impact of $\omega_\nu$ on the
 amplitude of the power spectrum, particularly on large scales. Furthermore,
@@ -28,60 +28,23 @@ experiment with their own emulators.
 We compare the accuracies of two emulators trained using this code: one
 including $A_s$ and $\omega_\nu$, and the other featuring no massive 
 neutrinos. We find that the massless-neutrino emulator performs significantly
-better when the number of samples is held fixed, but argue that this
-comparison is unfair. We show that for the majority of scales and the majority
-of cosmologies, the level of error of our massive-neutrino emulator is
+better when the number of samples is held fixed. Nevertheless, we show that
+the $3\sigma$ confidence interval is below the 0.1\% error level. This means
+the error of our massive-neutrino emulator is
 comparable to that of CAMB, the Boltzmann solver we use to produce the
-training spectra with which we train the emulator.
+training spectra used for training.
 
-FUTURE WORK: SEE SPECIFICALLY HOW THE DISCREPANCY BETWEEN THE TWO EMULATORS
-DECREASES AS WE INCREASE THE NUMBER OF SAMPLES $N_s$: IF WE HOLD $N_s$ FIXED
-FOR THE MASSLESS EMULATOR, CAN WE EVER CONSTRUCT A MASSIVE EMULATOR OF HIGHER
-ACCURACY?
+\textcolor{red}{Should I re-define the following symbols?}
 
-``The goal of this project is to produce an emulator of the linear-theory
-power spectrum based on evolution mapping'' (A. G. S\'{a}nchez, private
-communication). An emulator is a multi-dimensional function
-produced by interpolation across many training points $(x, y)$. The power
-spectrum can be thought of as a statistical description of the ``clumpiness''
-of matter in the Universe. Evolution mapping is a technique for simplifying
-the parameter space by identifying many cosmological parameters as basically
-the same in their impact on the power spectrum.
+We explore the impact of $s^*$, $N_k$, and $N_s$ on the performance of the
+emulator and find...
 
-The evolution mapping scheme of \cbib{San21} has already achieved success in
-emulators of the nonlinear power spectrum. However, massive neutrinos do not
-fit neatly into the scheme. Consequently, emulators implementing evolution
-mapping have typically fixed the physical density of the Universe in 
-neutrinos, $\omega_\nu$, to zero.
-
-This work seeks to extend the evolution mapping scheme to massive-neutrino 
-cosmologies through expansion of the parameter space over which the emulator
-is trained. In particular, we find that the scalar mode amplitude $A_s$, which
-is traditionally treated as an evolution parameter and therefore excluded from 
-the parameter space. can be used to quantify the suppression of structure 
-growth due to massive neutrinos.
-
-We find that, by including $A_s$ in our parameter space, we can successfully 
-train over the physical density of the universe in massive neutrinos. We 
-introduce a new emulation code, Cassandra-Linear (CL), which combines this 
-expanded parameter space with evolution
-mapping. We include various error statistics and show that the emulator
-performs roughly at the level of error associated with CAMB itself, which is
-guaranteed to be no worse than 0.1\% \cbib{Seljak}.
-
-\textcolor{orange}{Why does this work? Before, the shape impact of
-$\omega_\nu$ 
-was $z$-dependent. In other words, if we held $\omega_nu$ constant and varied
-$z$, the power spectrum would not vary only in overall amplitude. However, if
-we fix $\omega_\nu$ and $A_s$, $z$ becomes an evolution parameter again. Why
-does fixing $A_s$ accomplish this? That's something for the theorists to 
-figure out!}
+In conclusion...
 
 % Just use one big block of text, don't split into sections
 
-What was the main objective of this thesis? What were the key results of this 
-work? Why are they important? How do these results compare with results from 
-papers on similar subjects?
+\textcolor{red}{How do these results compare with results from 
+papers on similar subjects?}
 
 \section{Emulation over Uncertainties}
 
@@ -117,6 +80,12 @@ scatterplots and histograms) to assess the performance of the emulator.}
 \section{Future Work}
 \label{sec: future_work}
 
+FUTURE WORK: SEE SPECIFICALLY HOW THE DISCREPANCY BETWEEN THE TWO EMULATORS
+DECREASES AS WE INCREASE THE NUMBER OF SAMPLES $N_s$: IF WE HOLD $N_s$ FIXED
+FOR THE MASSLESS EMULATOR, CAN WE EVER CONSTRUCT A MASSIVE EMULATOR OF HIGHER
+ACCURACY?
+
+
 Here I will talk about what kinds of questions we estimate will be most 
 fruitful for further inquiries about this topic and this code.
 
@@ -127,8 +96,10 @@ Is there a theoretically perfect LHC generator?
 %s CLASS versus CAMB again
 
 In order to expand the priors, it would be helpful to investigate why CAMB 
-does not allow negative redshifts, in case this can be adapted. Alternatively, 
-CLASS \textcolor{green}{allows} negative redshifts, so it may be worthwhile to 
+does not allow negative redshifts, in case this can be adapted. 
+Alternatively, 
+CLASS \textcolor{green}{allows} negative redshifts, so it may be worthwhile 
+to 
 repeat the work of this thesis using power spectra from CLASS. This would 
 involve familiarization with a new platform, however, and so this escapes the 
 scope of this thesis. Remember that negative redshifts would be a helpful 
@@ -185,4 +156,80 @@ for example, different emulators for different neutrino mass hierarchies.}
 get it to work, the infrastructure is still there for whomever comes along in
 the future. This suggestion builds on the concepts of
 section~\ref{sec: lhc_outline}.)
+
+\section{Tightness of the Priors Used}
+\label{sec: prior_woes}
+
+With this section I would like to revisit the specific values for the priors,
+that I only briefly mentioned back in section~\ref{sec: build_lhc}.
+
+First of all, from a purely practical consideration, expanding the priors was
+not feasible due to the high incidence of unsolvable cells.
+
+But second, this may not be a significant limitation to the utility of the
+emulators introduced here, because they are already quite wide compared to
+current state-of-the-art parameter inferences. \textcolor{green}{CITATIONS}.
+
+As of 19.06.23, ``COMET'' is the default for the emulator. It is the most 
+restrictive of the three options and was implemented in order to totally 
+eliminate the problem of unsolvable cells, allowing us to train our 
+demonstration emulator over an LHS without any significant gaps.
+
+Our hope was that the narrow parameter ranges would furthermore help the 
+demonstration emulator to achieve high accuracy--in principal, success here
+means that we can simply ``scale up'' the approach of this work by
+simultaneously expanding the priors as well as the total number of training
+samples. Unfortunately, it is not clear if we can scale up the emulator past
+the point at which unsolvable cells begin to appear. Since Latin hypercube
+sampling is designed to evenly sample a space, unsolvable cells certainly
+indicate that parts of the parameter space lack representation in the training
+data. In these regions, our emulator will be forced to interpolate across
+large gaps, or worse, extrapolate (if the unsolvable cells occur at the edges
+of the parameter space \textcolor{orange}{This is something that I should have
+shown... i.e. with plots}).
+% Andrea recommends a plot coloring points by the "extremeness" in our sample
+% space.
+
+We predict that increasing the total number of cells will only marginally
+reduce the issue of unsolvable cells \textcolor{orange}{This is something that 
+I should have shown... i.e. with plots}). We can imagine the subspace of
+solvable points as some hypervolume within a hypercube determined by our
+priors, and the emulator's training coverage as an approximation of this 
+hypervolume with small hypercubes whose size is determined by the separation 
+between points in the sample. In the ideal case, the space of solvable points 
+is the same as the Latin hypercube. When this is not so, we can at least
+reduce the error associated with our approximation of the space of solvable
+points by shrinking the hypercubes we use in our approximation (i.e. by
+increasing the total number of points in our sample). \textcolor{orange}{
+To give a sense of the marginal nature of this error reduction, we can
+consider how small our hypercubes already are. For simplicity, let's examine
+just one axis of the hypercube. With 5000 samples in the ``MEGA'' priors,
+the length of the training coverage MOST STRONGLY DETERMINED BY ONE HYPERCUBE
+IS: UNFINISHED THOUGHT}
+
+It seems reasonable to think that unsolvable cells indicate extreme regions of 
+the parameter space, rather than isolated holes. Therefore, it would be 
+misleading to claim that the final ``MEGA'' emulator corresponds to, for 
+example, any prior ranges in table 00A; in truth, the emulator would 
+correspond to a potentially (this is a dangerous word and opens you up to hard 
+questions) complicated shape inscribed within the six-dimensional rectangular 
+hyperprism.
+
+CAMB does not allow for negative redshifts, although it prove be 
+interesting to try to resolve this issue with a code that does allow negative 
+redshifts, such as CLASS. \textcolor{orange}{Re-iterate the discussion from
+section~\ref{sec: boltzmann_intro}: why didn’t we use CLASS for this project?}
+
+\section{Linear Sampling in Different Parameters}
+
+We also tried sampling in $\sigma_{12}^2$ as well as $\sqrt{\sigma_{12}}$.
+Unfortunately, we were unable to conclude anything about the effectiveness of
+these strategies--there appears to have been some mistake in our code, such
+that the errors are much larger than can be explained on account of poor
+sampling.
+
+See figures~\ref{fig: sigsquare_sample} and~\ref{fig: sigroot_sample} for
+illustrations of the problem. In a future work, it would be helpful to
+investigate these problems further. We may find that a different sampling
+strategy will more efficiently reduce the deltas that we see in our emulator.
 
