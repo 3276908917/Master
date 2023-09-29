@@ -88,29 +88,31 @@ suggestions.\footnote{For smaller suggestions, refer to the GitHub issues
 page: \url{https://github.com/3276908917/Master/issues}}.
 
 %s Section 1: science improvements
-Readers observing the errors associated with our asymptotic fits in
-chapter~\ref{chap: A_s} may suggest the use of a symbolic regression 
 
-Here I will talk about what kinds of questions we estimate will be most 
-fruitful for further inquiries about this topic and this code.
+Based on the results of sections~\ref{sec: error_from_lhc} and~\ref{sec: 
+num_samples}, it would behoove future inquiries to investigate whether we
+can in some way compensate for the different impact of $N_s$ on the massive
+and massless emulators so that their accuracies may be directly compared.
+Such a comparison would help us to understand the error associated
+specifically with the evolution mapping extensions introduced in
+chapter~\ref{chap: A_s}. Even if a direct comparison method cannot be
+established, it would be useful to know how much larger $N_s$ would have to
+be for a massive emulator to reach equivalent levels of error.
 
-FUTURE WORK: SEE SPECIFICALLY HOW THE DISCREPANCY BETWEEN THE TWO EMULATORS
-DECREASES AS WE INCREASE THE NUMBER OF SAMPLES $N_s$: IF WE HOLD $N_s$ FIXED
-FOR THE MASSLESS EMULATOR, CAN WE EVER CONSTRUCT A MASSIVE EMULATOR OF HIGHER
-ACCURACY?
+Based on the results of section~\ref{sec: error_from_lhc},
+\textcolor{blue}{we do not consider LHC improvement to be a significant
+priority}. But if it were... we would look through the theory. Can we build
+a generator of perfect, or at least much  better, LHCs?
 
-% Section 2: code improvements. Segue offered by 
+% Section 2: code improvements. Segue offered by the uncertainty emulator.
 
-
-
-
-%s Theoretical inquiries
-
-Is there a theoretically perfect LHC generator?
+% Section 3: use of different technologies
 
 %s CLASS versus CAMB again
 
-In order to expand the priors, it would be helpful to investigate why CAMB 
+Although our priors should already suffice for most conventional parameter
+inference studies, we believe that wider priors would be of benefit to those
+seeking to understand exotic cosmologies. In order to expand the priors, it would be helpful to investigate why CAMB 
 does not allow negative redshifts, in case this can be adapted. 
 Alternatively, 
 CLASS \textcolor{green}{allows} negative redshifts, so it may be worthwhile 
