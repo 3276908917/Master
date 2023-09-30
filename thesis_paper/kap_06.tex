@@ -101,22 +101,15 @@ see how the \texttt{mnu} parameter would need to be modified so that the
 results are directly comparable with those cited here, which make use of the
 degenerate mass hierarchy.
 
-We would like to expand the range of customization for 
-(For example, $\sigma_{12}^2$ sampling--although we did not
-get it to work, the infrastructure is still there for whomever comes along in
-the future. This suggestion builds on the concepts of
-section~\ref{sec: lhc_outline}.)
-\
-We also tried sampling in $\sigma_{12}^2$ as well as $\sqrt{\sigma_{12}}$.
-Unfortunately, we were unable to conclude anything about the effectiveness of
-these strategies--there appears to have been some mistake in our code, such
-that the errors are much larger than can be explained on account of poor
-sampling.
-\
-See figures~\ref{fig: sigsquare_sample} and~\ref{fig: sigroot_sample} for
-illustrations of the problem. In a future work, it would be helpful to
-investigate these problems further. We may find that a different sampling
-strategy will more efficiently reduce the deltas that we see in our emulator.
+Our code would be more versatile if the user were allowed to specify a
+distribution for each parameter in $\matr{X}$. For example, the emulator
+performance appears to depend on $\tilde{sigma}_{12}$,
+even if only for the trivial
+reason that percent error depends on the amplitude of the true quantity.
+Therefore, we were curious if the emulators would perform better by
+sampling $\sqrt{\tilde{\sigma}}_{12}$ rather than $\tilde{\sigma}_{12}$.
+In principle, the change should be fairly simple, but we encountered an
+unknown error during the implementation and the feature is incomplete.
 
 %s Section 3: use of different technologies
 
@@ -134,18 +127,11 @@ this work could be extended to broader priors. Alternatively,
 CLASS \textcolor{green}{allows} negative redshifts, so it may be worthwhile 
 to repeat the work of this thesis using power spectra from CLASS.
 
-Should we use a neural network instead of a Gaussian process for our emulator? 
-AndreaP and Alex Eggemeier are already on the job: they are converting COMET 
-to a neural network approach. We recommend that the reader follow future COMET 
-papers for investigations into this question.
-\
-GP's allow natural propagation of
-uncertainty in predictions to the final posterior distribution; neural
-networks lack this feature. At the same time, NNs provide larger speedups 
-\textcolor{green}{CITATIONS}. We performed limited testing of a neural network
-but did not allocate enough time to arrive at conclusive / quantitative
-comparisons.
-
+Lastly, we suggest the promulgation of quantitative results comparing the
+performance of GPRs and neural networks. COMET is an example of a GPR-based
+project that is switching to neural networks. It would be useful to consider
+whether the emulators showcased here could be made more effective simply by
+implementing a different machine learning setup. 
 
 % Inquiries using different technologies
 
