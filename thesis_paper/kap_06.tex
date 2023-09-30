@@ -76,9 +76,9 @@ After finding that our emulator requires orders of magnitude less
 time to produce a power spectrum than CAMB, we ceased to consider the precise
 time cost. Instead, we compared different emulators exclusively on the
 basis of accuracy. It would be helpful to compare the computation times of the
-the various.
-numbers--does the speed of prediction depend on what emulator you build with
-CL?
+the various emulators. The large-$N_s$ samples, for example, lead to larger
+emulators. The $N_s = 3000$ emulator is 219 MB, while the $N_s = 7000$
+emulator is 1.5 GB. Do larger file sizes also mean slower emulators?
 
 %s Section 2: code improvements. Segue offered by the uncertainty emulator.
 
@@ -87,46 +87,21 @@ extension of the emulator pipeline with a third data set, which we call the
 \textit{validation} set. From the validation data we will build a validation
 emulator, which will estimate the emulator error for any given cosmology.
 We expect that combination of this information with the original emulator
-predictions will achieve greater performance. 
-% across the board, universally, whatever!!!
+predictions will achieve greater performance for the vast majority of
+cosmologies. However, this will double the
+computational cost both of building and querying the emulator.
 
-We want to build an emulator over the validation set in order to quote an 
-uncertainty to the user and to try to further correct for errors? I'm not sure 
-I understood that last part, we would have to ask Ariel again.
-\
-For a further step of accuracy, we can add a third data set to our pipeline
-and introduce a second layer of emulation. Up to this point, our pipeline has 
-included a training set and a testing set.
-If we add a validation set, then we can train a second emulator over the
-errors associated with the first emulator's performance on this validation
-set.
-\
-Within the current (as of \textcolor{orange}{24.08.2023}) setup of
-Cassandra-Linear, we typically generate two Latin hypercubes for each
-emulator. The first represents our training set and an emulator cannot be
-produced without it. The second one represents our validation set.
-\
-\textcolor{orange}{In a future
-release of Cassandra-Linear, this set will be used to train an ``uncertainty''
-emulator, which will train over the errors from the main emulator in order to
-provide the user with an uncertainty estimate for any cosmology located within
-the space of priors over which the main emulator was trained.} 
-\
-\textcolor{orange}{However, this functionality has not yet been implemented. 
-Currently, we are 
-using the validation hypercube more as a test hypercube: we compute the 
-uncertainties at discrete points and examine these uncertainties (e.g. with
-scatterplots and histograms) to assess the performance of the emulator.}
+We used a two-emulator approach analyzed in \ref{sec: 2emu_improvement},
+which extended the range of applicability of our emulator. We can extend this
+approach to account for discrete aspects of the cosmology. In particular, 
+one could train two emulators of different mass hierarchies, inverted and
+normal. The CAMB settings to change are in principle simple (see
+section~\ref{sec: neutrino_settings}), but some work would need to be done to
+see how the \texttt{mnu} parameter would need to be modified so that the
+results are directly comparable with those cited here, which make use of the
+degenerate mass hierarchy.
 
-\textcolor{orange}{The integration of 
-multiple emulators into one user-facing script can be further exploited with, 
-for example, different emulators for different neutrino mass hierarchies.}
-Extend the two-emulator solution to create emulators with different mass
-hierarchies. Mass hierarchy should also be an option to specify in the
-scenario file, like: degenerate, normal, inverted, both normal and inverted. 
-Remember to scale the mnu correctly to bridge the gap between degenerate and
-normal that we observed when playing around.
-
+We would like to expand the range of customization for 
 (For example, $\sigma_{12}^2$ sampling--although we did not
 get it to work, the infrastructure is still there for whomever comes along in
 the future. This suggestion builds on the concepts of

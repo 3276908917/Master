@@ -11,9 +11,9 @@ import numpy as np
 ignore = ["template", "Hnu2MEGA", "Hnu2CLASSIC"]
 
 def acquire_colors(X_test):
-    sigma12_vals = self.X_test[:, 3]
-    normalized_vals = utils.normalize(valid_vals)
-    return plt.cm.plasma(normalized_vals)
+    sigma12_vals = X_test[:, 3]
+    normalized_vals = utils.normalize(sigma12_vals)
+    return plt.cm.plasma(sigma12_vals)
 
 for file in os.listdir("scenarios"):
     # The name, as user_interface expects, lacks the file ending
