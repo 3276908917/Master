@@ -18,4 +18,3 @@ for file in os.listdir("scenarios"):
         print("There is something wrong with this scenario file!")
         
 print("Done!")
-    

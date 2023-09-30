@@ -46,7 +46,7 @@ papers on similar subjects?}
 
 %s FUTURE WORK
 
-To conclude this work, we here identify several promising paths to advancing
+To conclude this work, we identify several promising paths to advancing
 both the Cassandra-Linear code as well as the scientific analyses in
 chapter~\ref{chap: results}. The potential improvements are
 numerous, but we here concentrate on the most important
@@ -72,9 +72,11 @@ Based on the results of section~\ref{sec: error_from_lhc},
 priority}. But if it were... we would look through the theory. Can we build
 a generator of perfect, or at least much  better, LHCs?
 
-We have taken for granted that the speedup is much better when using emulation
-than using a Boltzmann solver. Or, better said, we've stopped looking at
-speeds after noticing the speedup. But it would be helpful to produce more
+After finding that our emulator requires orders of magnitude less
+time to produce a power spectrum than CAMB, we ceased to consider the precise
+time cost. Instead, we compared different emulators exclusively on the
+basis of accuracy. It would be helpful to compare the computation times of the
+the various.
 numbers--does the speed of prediction depend on what emulator you build with
 CL?
 
