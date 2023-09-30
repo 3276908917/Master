@@ -8,7 +8,10 @@ import matplotlib.pyplot as plt
 import os
 import numpy as np
 
-ignore = ["template", "Hnu2MEGA", "Hnu2CLASSIC"]
+ignore = ["template", "Hnu2MEGA", "Hnu2CLASSIC",
+    "Hnu2direct", "Hnu2_100scales", "Hnu2_200scales",
+    "Hnu2_3000samples", "Hnu2_4000samples", "Hnu2_400scales",
+    "Hnu2_500scales"]
 
 def acquire_colors(X_test):
     sigma12_vals = X_test[:, 3]
