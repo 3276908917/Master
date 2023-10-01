@@ -68,43 +68,6 @@ include figure~\ref{fig: flow_chart}.
 \textcolor{orange}{The emulator should also compute training errors!! This
 would be a really easy way to expand the code in a meaningful way.}
 
-\begin{table}[ht!]
-\centering
-\begin{tabular}{l|c|l}
-\hline
-Script & Abbreviation & Purpose \\ \hline
-\Verb|lhc.py| & \texttt{lhc} & Creates unit Latin hypercubes. \\
-\Verb|generate_emu_data.py| & \texttt{ged} & Computes spectra for an LHS.\\
-\Verb|camb_interface.py| & \texttt{ci} & Computes an individual spectrum. \\
-\Verb|train_emu.py| & \texttt{te} & Trains and tests emulator. \\
-\Verb|user_interface.py| & \texttt{ui} & Bridges
-	\texttt{lhc}, \texttt{ged}, and \texttt{te} scripts. \\
-\Verb|utils.py| & \texttt{utils} & Miscellaneous utility functions. 
-\end{tabular}
- \cprotect\caption[Summary of CL Scripts]{The scripts that make up CL.
- 	The second column indicates the abbreviations we will use throughout this 
- 	chapter and chapter~\ref{chap: implementation}. The third column is just
- 	for quick reference: all scripts (except for \texttt{utils}) will be
- 	addressed in detail in these two chapters. \textcolor{red}{Should I axe
- 	the last column or could it be appropriate for this thesis?}}
- \label{tab: script_summary}
-\end{table}
-
-% The following plots were generated with h_units_bad.ipynb
-\begin{figure}[ht!]
-    \centering
- 	\includesvg[height=0.85\textheight]{CL/flow_chart}
- 	\caption[CL Flow Chart]{Flow chart broadly describing the structure
- 		of the
- 		code as it pertains to constructing an emulator. Dotted lines
- 		indicate connections still in development as of 2 October 2023.
- 		Double lines indicate references of one file in another.
- 		\Verb|utils| contains code which is frequently used throughout
- 		the entire pipeline. However, due to its miscellaneous nature, its
- 		inclusion in this flow chart would lead to unnecessary clutter.}
- 	\label{fig: flow_chart}
-\end{figure}
-
 \section{Latin Hypercube Sampling}
 \label{sec: lhc}
 
@@ -402,8 +365,16 @@ plots~\ref{fig: function_calls} and~\ref{fig: wall_time}.
  		\label{fig: function_calls}
     \end{subfigure}
         \centering
-    \caption[Efficiency of Brute-Force LHS Approach]
-    		{It's not very good...}
+    \caption[Efficiency of Brute-Force LHS Approach]{We multithreaded our 
+    		Python script to spawn 12 workers on an 11th-generation Intel
+    		i7-11700 running at 2.50 GHz. After leaving the workers to generate
+    		new random LHSs for approximately 50 hours, we measured the progress
+    		in two plots. Figure~\ref{fig: wall_time} shows the wall-time cost of
+    		reaching a particular $s^*$, while figure~\ref{fig: function_calls}
+    		shows this cost through the number of function calls. This second
+    		metric will be more useful to users as a system-agnostic example of
+    		the cost. However, due to the random nature of LHS generation, these
+    		results should be recognized as only an example outcome.}
     \label{fig: random_lhs_performance}
 \end{figure}
 
@@ -910,3 +881,45 @@ have covered all of the essential steps in building an emulator, we are
 prepared to investigate its accuracy. We begin in
 chapter~\ref{chap: default_emu} by concentrating on a simple case: the
 default emulators CL will build.
+
+% We're putting this figure at the end of the chapter because, despite ht!,
+% it's too big to ever wrap any text around it. Since LaTeX always puts the
+% figure at the end of the chapter anyway, it will kick any figures after it
+% unless we move the code itself...
+
+\begin{table}[ht!]
+\centering
+\begin{tabular}{l|c|l}
+\hline
+Script & Abbreviation & Purpose \\ \hline
+\Verb|lhc.py| & \texttt{lhc} & Creates unit Latin hypercubes. \\
+\Verb|generate_emu_data.py| & \texttt{ged} & Computes spectra for an LHS.\\
+\Verb|camb_interface.py| & \texttt{ci} & Computes an individual spectrum. \\
+\Verb|train_emu.py| & \texttt{te} & Trains and tests emulator. \\
+\Verb|user_interface.py| & \texttt{ui} & Bridges
+	\texttt{lhc}, \texttt{ged}, and \texttt{te} scripts. \\
+\Verb|utils.py| & \texttt{utils} & Miscellaneous utility functions. 
+\end{tabular}
+ \cprotect\caption[Summary of CL Scripts]{The scripts that make up CL.
+ 	The second column indicates the abbreviations we will use throughout this 
+ 	chapter and chapter~\ref{chap: implementation}. The third column is just
+ 	for quick reference: all scripts (except for \texttt{utils}) will be
+ 	addressed in detail in these two chapters. \textcolor{red}{Should I axe
+ 	the last column or could it be appropriate for this thesis?}}
+ \label{tab: script_summary}
+\end{table}
+
+% The following plots were generated with h_units_bad.ipynb
+\begin{figure}[ht!]
+    \centering
+ 	\includesvg[height=0.85\textheight]{CL/flow_chart}
+ 	\caption[CL Flow Chart]{Flow chart broadly describing the structure
+ 		of the
+ 		code as it pertains to constructing an emulator. Dotted lines
+ 		indicate connections still in development as of 2 October 2023.
+ 		Double lines indicate references of one file in another.
+ 		\Verb|utils| contains code which is frequently used throughout
+ 		the entire pipeline. However, due to its miscellaneous nature, its
+ 		inclusion in this flow chart would lead to unnecessary clutter.}
+ 	\label{fig: flow_chart}
+\end{figure}
