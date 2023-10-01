@@ -2,7 +2,7 @@
 \label{chap: A_s}
 
 This chapter will motivate our two extensions of evolution mapping:
-replacement of $\sigma_{12}$ with $\tilde{\sigma_{12}}$ and the inclusion 
+replacement of $\sigma_{12}$ with $\tilde{\sigma}_{12}$ and the inclusion 
 of the additional parameter $A_s$ in the evolution mapping framework.
 Because the focus of this thesis is regression rather than theory,
 we will merely show that $A_s$ contains information relevant to the impact of
@@ -17,11 +17,12 @@ use to predict power spectra.
 % going to proceed under the current scheme and MAYBE allow ourselves to redo
 % it shortly before submission.
 
-\section{Characterizing the Amplitude of the Power Spectrum}
+\section{Characterizing the Power Spectrum Amplitude}
 
 Consider the trivial exact relation
 
 \begin{equation}
+\label{eq: trivial}
 P_\nu(k) = \de(k) \, P_0 (k)
 ,\end{equation}
 
@@ -34,23 +35,26 @@ indicate MEMNeC parameters, while symbols without tildes indicate parameters
 in the original, massive-neutrino cosmology. Only the parameters $\omega_\nu$
 and $\omega_c$ can differ between any cosmology and its MEMNeC.
 
+% The following plots were generated with divergence_asymptotes.ipynb
+\begin{figure}
+    \centering
+ 	\includegraphics[width=0.67\textwidth]{de}
+ 	\caption[$\de(k)$ for the Aletheia models]{Here we have plotted
+ 		$\de(k)$ curves for a handful of cosmologies with the same shape
+ 		parameters but different evolution parameters.
+ 		The cosmologies are evaluated at different redshifts such that they 
+ 		have the same value of $\tilde{\sigma}_{12}$. Notice that all curves
+ 		converge to unity at the largest scales.}
+ 	\label{fig: model_ratios}
+\end{figure}
+
 To improve evolution mapping's effectiveness in massive-neutrino cosmologies,
 we want to understand the behavior of $\de(k)$. In
 figure~\ref{tilde_sigma_poc}, we show $\de(k)$ for a handful of cosmologies
-with the same shape parameters but different evolution parameters. The
-cosmologies are evaluated at different redshifts such that they have the same
-value of $\tilde{\sigma}_{12}$
-
-We can approximate $\de(k)$ by fixing it to some $\de^*(k)$ that we calculate
-once for each set of shape parameters. This limits the applicability of our 
-emulator to cosmologies with small $\omega_\nu$, where we can treat the
-interaction between massive neutrinos and evolution parameters as a 
-perturbation on a baseline model.
-
-%s what is a MEMNeC?
-
-Keep in mind that we must now adapt the evolution mapping relation as follows:
-\textcolor{red}{Should I now use $\approx$??}
+with the same shape parameters but different evolution parameters. When
+comparing different cosmologies at fixed $\tilde{\sigma}_{12}$, we find that
+evolution mapping handles the large scales remarkably well, as $\de(k)$
+invariably converges to unity. Consequently, we adapt the evolution mapping relation as follows:
 
 \begin{equation}
 \label{eq: evMapping_modded}
@@ -63,26 +67,25 @@ Keep in mind that we must now adapt the evolution mapping relation as follows:
 In other words, $\sigma_{12}$ is now replaced by $\tilde{\sigma}_{12}$, the
 $\sigma_{12}$ value associated with the cosmology's MEMNeC.
 
-The goal of this work is to improve on this solution after exploring the 
-impact 
-of massive neutrinos in greater depth. In the next chapter, we will carefully 
-explain our CAMB setup, which will allow us to test possible improvements.
-
 \section{Characterizing Small-scale Deviations}
 
 % Redo section title?
 
-\textcolor{blue}{Rewrite the first part of this section!}
-
-We combine the power spectrum of its MEMNeC with an approximation of the ratio
-between the two:
+Next, we are interested in a way to extend the recipe also to smaller scales.
+Consider again equation~\ref{eq: trivial}. We can approximate $\de(k)$ by 
+fixing it to some $\de^*(k)$ that we calculate
+once for each set of shape parameters.
 
 \begin{equation}
 \label{eq: MEMNeC_approx}
 P_\nu(k) \approx \de^* (k) P_0 (k)
 ,\end{equation}
 
-The essence of this chapter is to increase the accuracy in our $P_\nu(k)$
+This limits the applicability of our 
+emulator to cosmologies with small $\omega_\nu$, where we can treat the
+interaction between massive neutrinos and evolution parameters as a 
+perturbation on a baseline model.
+We want to increase the accuracy in our $P_\nu(k)$
 predictions by estimating the true $\de(k)$. Specifically, we are interested
 in how the true $\de(k)$ deviates from $\de^*(k)$. Therefore, we pay special
 attention to the quantity:
