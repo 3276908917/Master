@@ -1,4 +1,4 @@
-\chapter{Conceptual Outline of Our Emulator Code and Pipeline}
+\chapter{Description of Emulator Code and Pipeline}
 \label{chap: cassL}
 
 Now that we have a solution which allows integration of massive neutrinos
@@ -43,8 +43,8 @@ I'm not sure how to better structure them.}
 First, the user needs to decide on the desired properties and domain of the
 emulator. Most of these properties are currently set within a ``scenario
 file.'' Over what range in each parameter should the emulator be trained?
-The user should specify these with a priors file (see section~\ref{sec: 
-lhc_outline}) and reference it in the scenario file. At how many points in
+The user should specify these with a priors file (see section~\ref{sec: lhc}) 
+and reference it in the scenario file. At how many points in
 $k$ should CL predict the power spectrum? By default, we pick $N_k = 300$. 
 Where are the training and testing $\matr{X}$ stored?
 Does this scenario share an
@@ -248,7 +248,7 @@ $A_s$\footnotemark & $1.049 \cdot 10^{-9}$ & $4.990 \cdot 10^{-9}$  \\
 values in words?}
 
 At first, we used the ambitious ``CLASSIC'' set of priors
-(table~\ref{tab: MEGA_priors}), whose values we decided based on the recent 
+(table~\ref{tab: CLASSIC_priors}), whose values we decided based on the recent 
 emulator papers from \citet{Mancini} and \citet{Arico}.
 However, during the process of generating training data, 
 we found that CAMB was occasionally unable to compute the power spectrum for
@@ -272,12 +272,10 @@ recommend copying one of the existing priors files as a template.
 \begin{comment}
 As one final note on the general implementation of LHSs in CL, we note that
 all axes of our \textit{unit} LHSs run \textit{uniformly} over the interval
-[0, 1]. However, the rescaled 
-parameter domains can be more flexible. For example, the fourth axis
-of an LHS
-describes $\tilde{\sigma}_{12}$ in the default implementation of the code. We can also
-interpret the axis as a set of $\tilde{\sigma}_{12}^2$ values instead,
-in case we wish to
+[0, 1]. However, the rescaled parameter domains can be more flexible. For 
+example, the fourth axis of an LHS describes $\tilde{\sigma}_{12}$ in the 
+default implementation of the code. We can also interpret the axis as a set of 
+$\tilde{\sigma}_{12}^2$ values instead, in case we wish to
 increase our sampling in larger values of $\tilde{\sigma}_{12}$ over the same
 interval. Unfortunately, this non-uniform sampling does not seem to be
 correctly implemented
@@ -485,8 +483,8 @@ To address this unique problem among our parameter ranges, we train two
 independent CL emulators. The primary 
 emulator is trained over the aforementioned prior range,
 $\omega_\nu \in [0, 0.01]$, with $A_s$ depending on the priors file used
-(see tables~\ref{tab: MEGA_priors},~\ref{tab: CLASSIC_priors},
-and~\ref{tab: COMET_priors}). The secondary emulator is specifically trained
+(see tables~\ref{tab: CLASSIC_priors} and~\ref{tab: COMET_priors}). The 
+secondary emulator is specifically trained
 to handle the massless neutrino case. In 
 practice, this entails the same prior ranges for the parameters $\omega_b$, 
 $\omega_c$, $n_s$, and $\tilde{\sigma}_{12}$. However, here we no longer need 
@@ -498,8 +496,7 @@ amplitude of the power spectrum through $\tilde{\sigma}_{12}$. Therefore, the
 dimension of our LHS decreases from six to four.
 
 To train this massless-neutrino emulator, we use the same pipeline introduced
-in section~\ref{sec: flow_chart} and the same code as described in 
-chapter~\ref{chap: implementation}. However, when specifying the priors, we
+in section~\ref{sec: flow_chart}. However, when specifying the priors, we
 take care to exclude the now irrelevant parameters. This explains why our
 priors files come in pairs. For example, to build a massless-neutrino emulator
 with the COMET priors, one would modify the line after \verb|$priors| in the 
@@ -610,7 +607,7 @@ $h_\text{min} \approx 0.07$ sometimes lead to crashes.
 We call this process of tweaking the $h$ and $z$ values
 `\textit{re}scaling' to
 succinctly distinguish it from the application of priors to scale a unit LHS.
-In chapter~\ref{chap: emu_outline}, we noted that \texttt{ged} outputs
+In section~\ref{sec: flow_chart}, we noted that \texttt{ged} outputs
 files containing rescale parameters. These files contain the $(h, z)$ pairs
 at which we evaluated each cosmology in the input LHS. Since we train our
 emulator over neither $h$ nor $z$, this information is inconsequential to the
@@ -628,7 +625,7 @@ training data is narrower than the nominal input priors.
 
 The problem of unsolvable cosmologies led us to create the
 increasingly restrictive prior sets described in
-section~\ref{sec: lhc_outline}.
+section~\ref{sec: lhc}.
 Of the three provided pairs of priors files, only the COMET priors
 (table~\ref{tab: COMET_priors}) are narrow enough to completely evade the 
 issue of unsolvable cosmologies. For this reason, the COMET priors are the
