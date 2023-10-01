@@ -218,9 +218,8 @@ $\omega_c$ & 0.05 & 0.255 \\
 $n_s$ & 0.84 & 1.1 \\
 $A_s$\footnotemark & $1.049 \cdot 10^{-9}$ & $4.990 \cdot 10^{-9}$  \\
 \end{tabular}
-	\cprotect\caption[``CLASSIC'' priors]{``CLASSIC'' priors. Despite
- 	significantly smaller ranges than table~\ref{tab: MEGA_priors}, this
- 	parameter space is still easily large enough to accommodate modern
+	\cprotect\caption[``CLASSIC'' priors]{``CLASSIC'' priors. We expect this
+ 	parameter space to be more than large enough to accommodate modern
  	statistical analyses. \textcolor{green}{citation.}}
  \label{tab: CLASSIC_priors}
 \end{table}
@@ -237,9 +236,9 @@ $A_s$\footnotemark & $1.049 \cdot 10^{-9}$ & $4.990 \cdot 10^{-9}$  \\
 \end{tabular}
 	\cprotect\caption[``COMET'' priors]{``COMET'' priors.
 	These values are significantly more restrictive than in
-	tables~\ref{tab: MEGA_priors} and~\ref{tab: CLASSIC_priors},
+	table~\ref{tab: CLASSIC_priors},
 	but the parameter space should still be large enough to accommodate
-	most modern statistical analyses. \textcolor{green}{citation.}
+	most modern statistical analyses.
 	These priors were taken from table 2 of \citet{Eggemeier}.}
  \label{tab: COMET_priors}
 \end{table}
@@ -629,10 +628,7 @@ section~\ref{sec: lhc}.
 Of the three provided pairs of priors files, only the COMET priors
 (table~\ref{tab: COMET_priors}) are narrow enough to completely evade the 
 issue of unsolvable cosmologies. For this reason, the COMET priors are the
-defaults used by CL. We defer further discussion of unsolvable cells to
-section~\ref{sec: prior_woes}.
-
-%s Don't give up skeleton!
+defaults used by CL.
 
 
 \section{Training the Emulator}
@@ -833,10 +829,10 @@ otherwise Sturges' rule is used.
 
 These testing functions are important to understand because their results
 drive the appraisals of the various emulators produced and discussed in
-chapters~\ref{chap: default_emu} and~\ref{chap: disc_and_conc}. Now that we
+chapter~\ref{chap: results}. Now that we
 have covered all of the essential steps in building an emulator, we are
 prepared to investigate its accuracy. We begin in
-chapter~\ref{chap: default_emu} by concentrating on a simple case: the
+chapter~\ref{chap: results} by concentrating on a simple case: the
 default emulators CL will build.
 
 % We're putting this figure at the end of the chapter because, despite ht!,
@@ -859,7 +855,7 @@ Script & Abbreviation & Purpose \\ \hline
 \end{tabular}
  \cprotect\caption[Summary of CL Scripts]{The scripts that make up CL.
  	The second column indicates the abbreviations we will use throughout this 
- 	chapter and chapter~\ref{chap: implementation}. The third column is just
+ 	chapter. The third column is just
  	for quick reference: all scripts (except for \texttt{utils}) will be
  	addressed in detail in these two chapters. \textcolor{red}{Should I axe
  	the last column or could it be appropriate for this thesis?}}

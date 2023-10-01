@@ -19,7 +19,8 @@ using test sets (\citealp{Mancini}, \citealp{Arico}, and
 more commonly referred to as ``validation sets.'' We use the phrase
 ``test set'' to call to mind the three conventional data sets in a machine
 learning setup: training, validation, and testing. This distinction will
-prove useful in section~\ref{sec: future_work}.}
+prove useful when we discuss the future direction of the code in
+chapter~\ref{chap: conclusion}.}
 
 We appreciate that appraisal based on test sets
 may not provide hard boundaries on the true
@@ -37,14 +38,15 @@ hand, at the edges of the parameter space, where interpolation begins to
 break down, the errors will be at their highest, and the following analyses
 may not be representative of these edge cases.
 
-For this chapter as well as chapter~\ref{chap: disc_and_conc}, we will focus
-on just two error metrics: percent error and squared error. We include percent
+For this chapter, we will focus
+on just two error metrics: percent error and absolute error, or the absolute
+value of the difference between the predicted and CAMB-calculated $P_L(k)$. We include percent
 error as it is more common in the literature and because it is immediately
 interpretable (\citealp{Mancini}, \citealp{Arico}, and
-\citealp{Eggemeier}). By contrast, the squared errors are difficult to
+\citealp{Eggemeier}). By contrast, the absolute errors are difficult to
 understand unless compared across multiple similar cases.
 Nevertheless, we argue
-that squared errors represent a more useful metric, at least within a single
+that absolute errors represent a more useful metric, at least within a single
 paper, because they are unbiased with respect to the magnitude of the emulated
 quantity. Consider that $P(k)$ is smallest at the largest $k$; if an emulator
 mispredicts $P(k)$ with a constant offset, then the percent error curves will
@@ -162,7 +164,7 @@ that evolution parameters besides $A_s$ are necessary for complete
 characterization of the impact of massive neutrinos. Nevertheless, the
 overall percent error of the massive emulator is comparable with that
 of CAMB itself, so we consider the massive emulator a confirmation of the
-techniques introduced in chapter~\ref{A_s}.
+techniques introduced in chapter~\ref{chap: A_s}.
 
 \textcolor{orange}{I plan to spend some time talking 
 about \textit{why} parameter x is the current biggest problem for the 
