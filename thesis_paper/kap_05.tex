@@ -59,7 +59,7 @@ problematic parameter if we look only at percent error.
 \begin{figure}[ht!]
   \centering
   \includegraphics[width=\textwidth]{error_on_emulators/def_massive_curves}
-  \caption[Default Massive Emulator Error Curves]{1000 error curves provided 
+  \caption[Default Massive Emulator Error Curves]{5000 error curves provided 
   by running the test set through the emulator. The curves are colored
   according to their value in $\tilde{\sigma}_{12}$. The opacity of the curves
   allows us to conclude that the dynamic range, at least in the percent
@@ -107,7 +107,15 @@ overall distribution of error.
 \begin{figure}[ht!]
   \centering
   \includegraphics[width=\textwidth]{error_on_emulators/def_massless_curves}
-  \caption[Default Massless Emulator Error Curves]{1000 error curves provided by running the test set through the emulator.}
+  \caption[Default Massless Emulator Error Curves]{5000 error curves provided 
+  by running the test set through the emulator. The curves are colored
+  according to their value in $\tilde{\sigma}_{12}$.
+  In absolute terms, the emulator
+  clearly performs best on the small scales. In relative terms, the
+  performance is about the same on large and small scales.
+  Regardless of the metric used, the
+  error is most extreme on medium scales, and drastic fluctuations can be seen 
+  in the percent error plot.}
   \label{fig: def_massless_curves}
 \end{figure}
 
@@ -118,30 +126,28 @@ overall distribution of error.
   \label{fig: def_massless_hist}
 \end{figure}
 
-This will be a fairly short section, basically just showing the plot of 5000 
-error curves in these two ways.
+In figures~\ref{fig: def_massless_curves} and~\ref{fig: def_massless_hist},
+we have included analogous plots from our massless-neutrino emulator.
+The overall shape of the error curves appears similar to the massive
+case, although here the absolute errors are small enough that fluctuations
+in the BAO region can be clearly seen in both cases. Furthermore, the
+percent error curves appear to be tightly concentrated both at small and
+large $k$, whereas the spread towards large $k$ increased visibly
+in the massive case. From the histograms we can appreciate that the error
+distributions are roughly similar but the spread has been tightened in both
+histograms by roughly a factor of two. By contrast, the percent error
+curves have decreased in dynamic range by a factor of four.
 
+The BAO fluctuations are proportionally much more significant here, suggesting
+that the BAO errors are the most significant contributor to percent errors
+across all cosmologies. This
+further encourages future work to focus on BAO modeling, as both the massive-
+and massless-neutrino emulators could benefit significantly.
 
 \textcolor{orange}{Create some plots focusing on the BAO error spikes? i.e.
 zoom-in on k-ranges.}
 
-\textcolor{green}{redo the numbers in this next paragraph}
-
-The current state of the massless-neutrino emulator features sub-0.1\% error 
-for the vast majority of scales, with the exception of some wild fluctuations  
-between k=0.09 and 0.2 / Mpc. Outside of this range, the errors tend to 
-sub-0.01\% in the large-scale regime and sub-0.005\% in the small-scale 
-regime. Please refer to figures XXX through XXX for illustrations thereof.
-
-As we can see from figures~\ref{fig: massless_default} 
-and~\ref{fig: massive_default}, 
-both emulators are most accurate at very large and
-very small $k$, with significant difficulties around the BAO region. We
-consider the small-scale performance a powerful confirmation of our
-techniques, as the impact of massive neutrinos is most significant at small
-scales.
-
-We highlight that the massive emulator performs significantly worse than its 
+The massive emulator clearly performs worse than its 
 massless counterpart. The emulators are difficult to compare because they
 were constructed from LHSs of different dimension: four in the massless case,
 six in the massive case. Since $N_s = 5000$ is constant, we expect the 
@@ -151,13 +157,9 @@ approximate nature of our fit from section~\ref{sec: proposed_fit}:
 the results of section~\ref{sec: fit_testing} indicate
 that evolution parameters besides $A_s$ are necessary for complete
 characterization of the impact of massive neutrinos. Nevertheless, the
-overall percent error of the massive emulator is \textcolor{green}{nearly}
-at the level of CAMB itself, so we consider the massless emulator an
-encouraging success.
-
-As evolution-mapping emulation for \textit{massive}-neutrino cosmologies
-is the novel feature of this work, we will henceforth concentrate exclusively
-on the massive-neutrino emulator.
+overall percent error of the massive emulator is comparable with that
+of CAMB itself, so we consider the massive emulator a confirmation of the
+techniques introduced in chapter~\ref{A_s}.
 
 \textcolor{orange}{I plan to spend some time talking 
 about \textit{why} parameter x is the current biggest problem for the 
@@ -175,6 +177,10 @@ runs from 0 to 1.}
 
 \section{Improvement from Two-emulator Solution}
 \label{sec: 2emu_improvement}
+
+As mentioned in section~\ref{sec: 2emu_intro}, we created the massless
+emulator not just for comparison, but also to handle a case of real interest
+to our analyses. We could have predicted 
 
 \begin{figure}[ht!]
   \centering
@@ -206,6 +212,10 @@ section~\ref{sec: 2emu_improvement}.
 \textcolor{blue}{This will be an extremely short section with some error
 plots of the massive-neutrino cosmology evaluating massless-neutrino
 cosmologies.}
+
+As evolution-mapping emulation for \textit{massive}-neutrino cosmologies
+is the novel feature of this work, we will henceforth concentrate exclusively
+on the massive-neutrino emulator.
 
 \section{Minimum Separation of the Training LHC}
 \label{sec: error_from_lhc}
