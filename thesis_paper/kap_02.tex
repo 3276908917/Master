@@ -1,10 +1,8 @@
-\chapter{Expansion of the Parameter Space}
+\chapter{Adapting Evolution Mapping to Massive-neutrino Cosmologies}
 \label{chap: A_s}
 
-Now that we have a comprehensive set of convenience functions with which to
-configure CAMB, we can easily obtain the theoretical power spectra we need in
-order to demonstrate our solution to the neutrino difficulties introduced in
-section~\ref{sec: neutrino_problem}. This chapter will motivate the inclusion 
+This chapter will motivate our two extensions of evolution mapping:
+replacement of $\sigma_{12}$ with $\tilde{\sigma_{12}}$ and the inclusion 
 of the additional parameter $A_s$ in the evolution mapping framework.
 Because the focus of this thesis is regression rather than theory,
 we will merely show that $A_s$ contains information relevant to the impact of
@@ -19,14 +17,64 @@ use to predict power spectra.
 % going to proceed under the current scheme and MAYBE allow ourselves to redo
 % it shortly before submission.
 
-\section{Formal Statement of the Solution}
+\section{Characterizing the Amplitude of the Power Spectrum}
+
+Consider the trivial exact relation
+
+\begin{equation}
+P_\nu(k) = \de(k) \, P_0 (k)
+,\end{equation}
+
+where $\de(k) \equiv P_\nu (k) / P_0 (k)$, $P_\nu (k)$ is the power spectrum 
+of the massive-neutrino cosmology in which we are interested, and $P_0(k)$ is 
+the power spectrum of the corresponding matter-equivalent massless-neutrino
+cosmology (MEMNeC). The MEMNeC is defined such that $\tilde{\omega}_c = 
+\omega_c + \omega_\nu$ and $\tilde{\omega}_\nu = 0$. All symbols with tildes
+indicate MEMNeC parameters, while symbols without tildes indicate parameters
+in the original, massive-neutrino cosmology. Only the parameters $\omega_\nu$
+and $\omega_c$ can differ between any cosmology and its MEMNeC.
+
+To improve evolution mapping's effectiveness in massive-neutrino cosmologies,
+we want to understand the behavior of $\de(k)$. In
+figure~\ref{tilde_sigma_poc}, we show $\de(k)$ for a handful of cosmologies
+with the same shape parameters but different evolution parameters. The
+cosmologies are evaluated at different redshifts such that they have the same
+value of $\tilde{\sigma}_{12}$
+
+We can approximate $\de(k)$ by fixing it to some $\de^*(k)$ that we calculate
+once for each set of shape parameters. This limits the applicability of our 
+emulator to cosmologies with small $\omega_\nu$, where we can treat the
+interaction between massive neutrinos and evolution parameters as a 
+perturbation on a baseline model.
+
+%s what is a MEMNeC?
+
+Keep in mind that we must now adapt the evolution mapping relation as follows:
+\textcolor{red}{Should I now use $\approx$??}
+
+\begin{equation}
+\label{eq: evMapping_modded}
+    P_L (k | z, \Theta_s, \Theta_e)
+    =
+    P_L (k | \Theta_s,
+    		\tilde{\sigma}_{12} \left( z, \Theta_s, \Theta_e \right))
+.\end{equation}
+
+In other words, $\sigma_{12}$ is now replaced by $\tilde{\sigma}_{12}$, the
+$\sigma_{12}$ value associated with the cosmology's MEMNeC.
+
+The goal of this work is to improve on this solution after exploring the 
+impact 
+of massive neutrinos in greater depth. In the next chapter, we will carefully 
+explain our CAMB setup, which will allow us to test possible improvements.
+
+\section{Characterizing Small-scale Deviations}
 
 % Redo section title?
 
-We begin with the second proposal from section~\ref{sec: neutrino_problem}:
-to approximate the power spectrum of a massive-neutrino cosmology, we
-combine the
-power spectrum of its MEMNeC with an approximation of the ratio
+\textcolor{blue}{Rewrite the first part of this section!}
+
+We combine the power spectrum of its MEMNeC with an approximation of the ratio
 between the two:
 
 \begin{equation}
