@@ -146,18 +146,8 @@ $\matr{X}$ data sets in the previous section. Each
 row $\bm{x}$ in $\matr{X}$ will describe a different cosmology, and each
 row $\bm{y}$ in $\matr{Y}$ will be the power spectrum for that cosmology.
 
-Once we have a unit LHS, we can rescale each coordinate according to a 
-different parameter's prior to map the LHS into our parameter space. The
-choice of priors will be discussed in the conceptual outline of our
-emulator (see section~\ref{sec: lhc_outline}). Similarly,
-although the unit LHS entails linear sampling of the [0, 1] interval, it is 
-straightforward to transform these samples into a different distribution
-the interpretation stage.
-
-
-% Intro sentence?
-
-We will generate our LHSs so that their values range from zero to unity.
+Once we generate a unit LHS, we can rescale each coordinate according to a 
+different parameter's prior to map the LHS into our parameter space.
 These unit LHSs are saved as
 \texttt{npy} files and later rescaled according to priors in order to
 specify the training
@@ -166,18 +156,19 @@ LHC and then rescaling it, allows us to build many different emulators from a
 single LHS file. That is, rescaling the same LHS in different ways allows us
 to cut down on the number of LHSs that we need to generate.
 
+% Intro sentence?
+
 % One reason this goes here: priors show up in almost every script,
 % so there isn't a great cass-L section in which to put this.
 
 CL accomplishes this rescaling through the use of priors files.
-CL is packaged with three pairs of priors files (the pairing will be explained
+CL is packaged with two pairs of priors files (the pairing will be explained
 in section~\ref{sec: 2emu_intro}). The parameter domains for each pair are
-described in tables~\ref{tab: MEGA_priors},~\ref{tab: CLASSIC_priors},
-and~\ref{tab: COMET_priors}. The three pairs of files share the same priors in
+described in tables~\ref{tab: CLASSIC_priors} and~\ref{tab: COMET_priors}. The two pairs of files share the same priors in
 $\omega_\nu$, [0, 0.01], and $\tilde{\sigma}_{12}$, [0.2, 1], and so these are
-omitted. \textcolor{red}{Is it okay for me to omit like that or should I just
-repeat the information?}
+omitted.
 
+\begin{comment}
 \begin{table}[ht!]
 \centering
 \begin{tabular}{l|l|l}
@@ -197,6 +188,7 @@ $A_s$\footnotemark & $5.003 \cdot 10^{-10}$ & $1.484 \cdot 10^{-8}$  \\
  	should scrap it from the discussion?}}
  \label{tab: MEGA_priors}
 \end{table}
+\end{comment}
 
 \begin{table}[ht!]
 \centering
@@ -237,28 +229,29 @@ $A_s$\footnotemark & $1.049 \cdot 10^{-9}$ & $4.990 \cdot 10^{-9}$  \\
 \textcolor{orange}{Talk a little more about the prior ranges, what are their
 values in words?}
 
-At first, we used the highly ambitious ``MEGA'' set of priors
+At first, we used the ambitious ``CLASSIC'' set of priors
 (table~\ref{tab: MEGA_priors}), whose values we decided based on the recent 
 emulator papers from \citet{Mancini} and \citet{Arico}.
 However, during the process of generating training data, 
-we found that CAMB was frequently unable to compute the power spectrum for
-all the
-resulting cosmologies (this issue will be explained in
+we found that CAMB was occasionally unable to compute the power spectrum for
+all the resulting cosmologies (this issue will be explained in
 section~\ref{sec: generate_emu_data}). We do not recommend the use of this
 file because the priors are not representative of the ranges appearing in the
 training set.
 
-The ``CLASSIC'' priors (table~\ref{tab: CLASSIC_priors}) are mostly solvable, 
-but only the ``COMET'' priors (table~\ref{tab: COMET_priors}) are consistently
+By contrast, the ``COMET'' priors (table~\ref{tab: COMET_priors}) are 
 entirely solvable. For this reason and for the cheaper (by number of samples) 
 accuracy that comes with tighter priors, the COMET priors are the defaults for 
 CL.
 
-The user is welcome to write sets of priors suitable to their applications.
+The user is welcome to write sets of priors suitable to different 
+applications.
 To do so, one need only create a new prior file. The format is very simple, 
 but must be followed carefully for the file to be read correctly. We
 recommend copying one of the existing priors files as a template. 
 
+%%% Ran out of time to implement this feature
+\begin{comment}
 As one final note on the general implementation of LHSs in CL, we note that
 all axes of our \textit{unit} LHSs run \textit{uniformly} over the interval
 [0, 1]. However, the rescaled 
@@ -273,17 +266,8 @@ correctly implemented
 in the current (as of 2 October 2023) version of the code. Nonetheless, as we
 will repeat in section~\ref{sec: future_work},
 the feature is in principle simple to implement.
-
-
-\section{Building the Latin Hypercube}
-\label{sec: build_lhc}
-
-% lhc.py
-
-In this section, we will discuss the building of LHSs, which within CL is 
-handled by \texttt|lhs|. As mentioned in section~\ref{sec: lhc_outline},
-we first create a unit LHS and then later rescale it according to a set of
-priors.
+\end{comment}
+%%%
 
 Each entry $\bm{x}$ in our LHS $\matr{X}$ will be either a four- or
 six-dimensional vector, 
@@ -295,25 +279,21 @@ this order. When building a massive-neutrino emulator, each $\bm{x}$ will
 additionally specify the $A_s$ and $\omega_\nu$ values for that cosmology, 
 again in this order.
 
-To get started generating LHSs, we integrated demonstration code written by 
-Daniel Farrow \textcolor{orange}{(and who else?) add these people to the 
-Danksagung}. We begin by invoking the \texttt{lhs} function of
+To generate the LHS, we begin by invoking the \texttt{lhs} function of
 \texttt{pyDOE2} a number of times. Each time we get a random new unit LHC, 
 whose spacing we analyze with the \texttt{cdist} function from
-\texttt{scipy.spatial.distance}.
-Recall from section~\ref{sec: lhc_theory} that
+\texttt{scipy.spatial.distance}. Recall that
 our samples more evenly cover the sample space if the minimum separation
 $s^*$ increases. Therefore, from among the numerous calls of \texttt{lhs} we 
 select the LHS with the largest minimum separation.
 
 In order to maximize the number of random hypercubes generated per unit of
 wall time, we have written a multithreaded function called
-\verb|multithread_unit_LHC_builder| \textcolor{orange}{Keep your eye on this
-one, I'm thinking about condensing lhc.py to just a couple of functions.}
+\verb|multithread_unit_LHC_builder|.
 Through the function parameter \verb|num_workers| the user is free to assign
 any number of CPU threads to the task; in principle, a CPU can be
 wholly dedicated to the optimization of the LHS.
-\verb|multithread_unit_LHC_builder| does not contain a return statement but
+This function lacks a return statement but
 instead triggers an unending query for LHSs. The user is notified via command
 line printout whenever an LHS has been generated whose $s^*$ exceeds
 the previous record. Whenever such a superior LHS is
@@ -348,7 +328,7 @@ should be set to the \verb|cdist| value of the exis}
 As of 2 October 2023, CL relies on this brute-force approach to build the
 LHSs that are eventually used to train the emulators. To understand the 
 computational and wall-time costs associated with this solution, we include 
-plots~\ref{fig: function_calls} and~\ref{fig: wall_time}.
+figures~\ref{fig: wall_time} and ~\ref{fig: function_calls}.
 
 % The following plots were generated with h_units_bad.ipynb
 \begin{figure}[ht!]
@@ -389,23 +369,23 @@ this brute force solution, we fail to obtain an LHC of even a third of the
 best minimum separation.
 \end{comment} 
 
-Remember from section~\ref{sec: lhc_theory} equation~\ref{eq: best_lhs_sep},
-which tells us the best possible $s^*$
+Recall that equation~\ref{eq: best_lhs_sep}, tells us the best possible $s^*$
 given dimension $d$ and total number of samples $N_s$. Let us consider a 
 massless-neutrino emulator (a total of four dimensions per cosmology vector)
 trained over five-thousand CAMB spectra. If we plug in $d = 4$ and $N=5000$,
 we find $s^*_\text{best} \approx 0.1189$. Clearly, the brute force method
 achieves only a comparatively low $s^*$, even over the span of multiple days.
 
-Based on figures~\ref{fig: function_calls} and~\ref{fig: wall_time}, we
-claim that our approach is inefficient and not well-suited to the approach of 
+Based on figures~\ref{fig: wall_time} and~\ref{fig: function_calls}, we
+claim that our approach is inefficient and not well-suited to the task of 
 maximizing $s^*$. Since suboptimal $s^*$ values imply unevenness in the
 coverage of the space of cosmologies, we expect low $s^*$ values to impact
 the emulator by increasing variance in the errors, because the worst errors
 will be significantly worse, while the best errors will be slightly better in
 oversampled regions. We also expect the average error to increase slightly,
 as the oversampled regions should benefit less than the undersampled regions
-suffer.
+suffer. We will test these expectations in section~\ref{sec: error_from_lhc} 
+by varying the $s^*$ of the LHS with which we train the emulator.
 
 % One could argue that the variance in oversampled regions will decrease to
 % compensate, right? I need to clarify that the decrease in variance in the
@@ -413,17 +393,6 @@ suffer.
 % in the undersampled regions, because the space of power spectra is
 % continuous, so closely spaced points reveal less about the true function
 % than well spaced points.
-
-We will test these expectations in section~\ref{sec: error_from_lhc} by
-varying the $s^*$ of the LHS with which we train the emulator.
-\textcolor{orange}{We will explore the question of superior methods in
-section~\ref{sec: future_work}}.
-
-
-\section{Rescaling the LHS}
-\label{sec: lhc_rescale}
-
-%s Introduce the build_cosmology script
 
 Now that we have a unit LHS $\matr{X}_u$, we need to scale it 
 so that each axis, which currently runs from zero to one, runs along a range 
@@ -453,19 +422,14 @@ After scaling the parameters, \verb|build_cosmology| finishes bridging the gap
 between the LHS and the CAMB \verb|pars| object (as introduced in
 chapter~\ref{chap: CAMB_setup}) by using default values to fill in the
 remaining values demanded by CAMB. For example, $H_0$, $w_a$ and $w_0$ are
-not parameters over
-which we train the emulator, but CAMB requires that they be specified before
-a power spectrum can be calculated. In all such cases, we use Aletheia model
-0 as default values. \textcolor{orange}{I'm not referring to table 1.2 here
+not parameters over which we train the emulator, but CAMB requires that they 
+be specified before a power spectrum can be calculated. In all such cases, we 
+use Aletheia model 0 as default values. So long as the power spectrum's value 
+for $\sigma_{12}$ agrees with the prior-scaled value from the LHS, it should 
+not matter that we use the model 0 values, as these are evolution parameters.
+\textcolor{orange}{I'm not referring to table 1.2 here
 because I would have to expand it with parameters not essential to this work,
 so I would have to redo the captions for fig 1.1 and table 1.2...}
-
-So long as the power spectrum's value for $\sigma_{12}$ agrees with the
-prior-scaled value from the LHS, it should not matter that 
-we use the model 0 values, as these are evolution parameters.
-\textcolor{red}{Or should it? If this logic really held, shouldn't we be able 
-to modify $w_a$ and $w_0$ in order to get the correct value of
-$\tilde{\sigma}_{12}$? But these are evolution parameters, so why don't we?}
 
 
 \section{Creation of Separate Emulators}
