@@ -323,9 +323,6 @@ LHSs is appropriate for our purposes.
 
 \section{Resolution of the k Axis}
 
-This might go better in the CassL section, but I think I ought to motivate the 
-decision to use length-300 arrays.
-
 \begin{figure}[ht!]
   \centering
   \includegraphics[scale=0.5]{error_on_emulators/percents-hist-N_k}
@@ -333,17 +330,25 @@ decision to use length-300 arrays.
   \label{fig: Nk_experiment}
 \end{figure}
 
-This is a special case where we would argue that percent error is more useful 
-than squared error.
-That is because percent error can be considered on its own, whereas squared
-error relies on comparison for its meaning to emerge. But in this case, the
-comparisons are obscure. Consider, for example, comparing an $N_k = 100$
-emulator with an $N_k = 500$ emulator: the $N_k = 100$ emulator will have
-fewer points from which to compute errors. Simple interpolation is not enough
-to restore direct comparability, as the $N_k = 500$ emulator by definition
-will suffer less from interpolation than the $N_k = 100$ emulator, for which
-each point will have to inform five times as much as the interpolated function
-domain.
+To understand the impact of our choice of $N_k = 300$ for the emulator, we
+also constructed and tested emulators for $N_k = 100$, 200, 400, and 500.
+To control for interpolation error, each emulator has its own test set where
+the test spectra have the same $N_k$. The
+difference in test sets contributes random error that obscures the comparison.
+We are interested in whether our GPR infrastructure is less efficient at
+learning lower- than higher-resolution spectra.
+
+The absolute errors cannot be directly compared across different emulators.
+This is because the $N_k = 500$ emulator is tested at five times as many
+points as the $N_k = 100$ emulator. Consequently, for this section, we focus
+exclusively on percent errors.
+
+In figure~\ref{fig: Nk_experiment}, we show a histogram of the median absolute
+percent errors. The histograms are difficult to distinguish and do not admit
+of an immediate preference for any $N_k$ value. Again, we produce a summary
+of relevant statistics in table~\ref{tab: Nk_experiment_percerr_stats}. As
+with our study of the impact of $s^*$, the values within each column do not
+vary widely from each other, and do not confrom to any consistent trend.
 
 % The following table was generated with emu_experiment_stats.ipynb
 \begin{table}[ht!]
@@ -357,9 +362,19 @@ $300$ & 0.002883 & 0.002255 & 0.002058 & 0.291348 \\
 $400$ & 0.003034 & 0.002461 & 0.002042 & 0.277015 \\
 $500$ & 0.002881 & 0.002221 & 0.002088 & 0.296367 \\
 \end{tabular}
-	\cprotect\caption[$N_k$ Experiment: Percent Error Statistics]{Caption!}
+	\cprotect\caption[$N_k$ Experiment: Percent Error Statistics]{Median of
+		absolute percent errors.}
  \label{tab: Nk_experiment_percerr_stats}
 \end{table}
+
+Unlike with $s^*$, we lack a theoretical basis for believing $N_k$ to be a
+quantity important to the performance of the emulator. Instead, the value of
+$N_k$ should be modified by the user according to the use case. However, we
+caution that our results here cannot be interpreted as conclusive evidence
+against $N_k$'s relevance. Our inconclusive results from the $s^*$ experiment
+suggest that our tests are not sufficiently thorough to establish a
+hyperparameter's relevance, because in that case we have a strong theoretical
+basis for the parameter's importance.
 
 \section{Number of Training Samples}
 \label{sec: num_samples}
