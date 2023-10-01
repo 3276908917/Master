@@ -322,6 +322,7 @@ LHSs is appropriate for our purposes.
 
 
 \section{Resolution of the k Axis}
+\ref{sec: Nk_experiment}
 
 \begin{figure}[ht!]
   \centering
@@ -394,8 +395,13 @@ basis for the parameter's importance.
 \section{Number of Training Samples}
 \label{sec: num_samples}
 
-\textcolor{blue}{Justify choice of 5000 samples for each: maybe we can make a
-trend plot showing diminishing returns in test error?}
+As a final experiment, we study the impact of our choice of
+$N_s = 5000$ on the accuracy of the emulator.
+As with $s^*$, we expect to find an
+unambiguous trend toward increasing accuracy with greater $N_s$ values.
+We create new emulators to test the $N_s$ values 3000, 4000, 6000, and 7000.
+All emulators use the same $N_s = 5000$ test set created for the default
+emulator.
 
 % The following plots were generated with emu_experiment_histograms.ipynb
 \begin{figure}[ht!]
@@ -419,6 +425,12 @@ trend plot showing diminishing returns in test error?}
     			makes a difference.}
     \label{fig: Ns_experiment}
 \end{figure}
+
+In figures~\ref{fig: Ns_experiment_deltas}
+and~\ref{fig: Ns_experiment_percerr} we include two histograms showing the
+median absolute and absolute percent errors for each emulator. Although the
+impact of $N_s$ is clear, the differences between the error distributions
+are not dramatic.
 
 % The following table was generated with emu_experiment_stats.ipynb
 \begin{table}[ht!]
@@ -457,11 +469,32 @@ $7000$ & 0.0027 & 0.0021 & 0.0019 & 0.1189 \\
  \label{tab: Ns_experiment_percerr_stats}
 \end{table}
 
+To display the differences in a somewhat more obvious format, we have again
+produced tables of statistical aggregates over the same data sets. All of
+the columns in tables~\ref{fig: Ns_experiment_deltas}
+and~\ref{tab: Ns_experiment_percerr_stats} show expected trends except for
+the maximum PTPs. We do not consider the lack of a trend in the final column
+to be a cause for concern, as the metric is by nature volatile: it tracks only
+the worst error curve in each group. We still consider the statistic
+valuable as an easily-quotable result, because it immediately conveys the
+worst error seen in 5000 test cases. Nevertheless, the volatility exposed by 
+these tables provides useful perspective when interpreting the results of
+sections~\ref{sec: error_from_lhc} and~\ref{sec: Nk_experiment}.
 
-% This might go better in the CassL section, but I think I ought to motivate 
-% the decision to use 5000 training arrays.
+We also point out that the trends, while unambiguous, are surprisingly
+subtle. Proportionally, for example, the median median percent error does
+decrease by almost 50\%, but the value at $N_s=3000$ already falls well below
+the error bounds of CAMB itself.
+This suggests that the emulator error is already in a regime of
+diminishing returns even by $N_s = 3000$. Future studies could extend this
+investigation by building emulators with $N_s = 2000$ and lower.
 
-\textcolor{orange}{I'll have to concede that the results of this section are 
-not entirely comprehensive; we didn't train any emulators over the 
-uncertainties of analogous validation hypercubes. All comparisons here use the
-simpler pipeline of just two data sets, training and testing.}
+However, for users concerned with worst-case performance regardless of its
+rarity, increasing $N_s$ further may be worthwhile. Consider, for example,
+that the worst-case error for the $N_s = 7000$ emulator spans a dynamic range
+almost three times smaller than that for the $N_s = 3000$ emulator.
+
+The results of this chapter lead us to suggest that the accuracies given for
+our default emulator are broadly representative of the code's abilities, as
+varying $s^*$, $N_k$, and $N_s$ do not significantly alter the comparability
+of our errors with those of CAMB>
