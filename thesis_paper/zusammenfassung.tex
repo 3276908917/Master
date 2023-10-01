@@ -3,6 +3,7 @@
 
 \chapter*{Abstract}
 
+\begin{comment}
 The color code in this document: \textcolor{blue}{Explanations to the
 proofreader; we'll simply cut these out shortly before submission.}
 \textcolor{orange}{Notes to myself--I don't need input here, I just need time
@@ -11,41 +12,45 @@ justification for the claims here, either by generating more plots or by going
 back and looking through the papers I used to get started with this project.}
 \textcolor{red}{I have some confusion about this area and I would appreciate
 feedback from the proofreader.}
+\end{comment}
 
 \textcolor{red}{I feel like the extreme simplifications in the next paragraph
 would be helpful for someone with no idea about this field, but what do you
 think? Maybe they would be more appropriate for easing the reader into
 particular sections on these topics?}
 
-``The goal of this project is to produce an emulator of the linear-theory
-power spectrum based on evolution mapping'' (A. G. S\'{a}nchez, private
-communication). An emulator is a multi-dimensional function
-produced by interpolation across many training points $(x, y)$. The power
-spectrum can be thought of as a statistical description of the ``clumpiness''
-of matter in the Universe. Evolution mapping is a technique for simplifying
-the parameter space by identifying many cosmological parameters as basically
-the same in their impact on the power spectrum.
+The power spectrum can be thought of as a statistical description of the way 
+matter clumps together in the Universe.
+Comparison of galaxy redshift survey observations with theoretical predictions 
+for the cold-matter linear-theory power spectrum $P_L (k)$ establish
+increasingly tight estimates of various parameters describing our Universe.
 
-The evolution mapping scheme of \cbib{San21} has already achieved success in
-emulators of the nonlinear power spectrum. However, massive neutrinos do not
-fit neatly into the scheme. Consequently, emulators implementing evolution
-mapping have typically fixed the physical density of the Universe in 
-neutrinos, $\omega_\nu$, to zero.
+In order to facilitate these comparisons, we an emulator of $P_L (k)$
+that greatly decreases the computational cost. An emulator is a multi-
+dimensional function produced by interpolation across many training points $
+(x, y)$.
+
+Evolution mapping is a technique for simplifying the parameter space via
+exploitation of a degeneracy in the impact of several cosmological parameters
+on the power spectrum. The evolution mapping scheme of \cbib{San21} has 
+already achieved success in emulators produced by the COMET team.
+However, these emulators exclude massive neutrinos
+(setting the physical density of the Universe in massive neutrinos to zero)
+as they present a challenge to the evolution mapping framework.
 
 This work seeks to extend the evolution mapping scheme to massive-neutrino 
-cosmologies through expansion of the parameter space over which the emulator
-is trained. In particular, we find that the scalar mode amplitude $A_s$, which
-is traditionally treated as an evolution parameter and therefore excluded from 
-the parameter space. can be used to quantify the suppression of structure 
+cosmologies through two primary modifications: replacement of $\sigma_{12}$
+with $\tilde{\sigma}_{12}$ in the evolution mapping relation, and
+recategorization of the scalar mode amplitude $A_s$ as a shape parameter.
+We find that $A_s$, which is traditionally treated as an evolution parameter, 
+can be used to quantify the suppression of structure 
 growth due to massive neutrinos.
 
-We find that, by including $A_s$ in our parameter space, we can successfully 
-train over the physical density of the universe in massive neutrinos. We 
-introduce a new emulation code, Cassandra-Linear (CL), which combines this 
-expanded parameter space with evolution
-mapping. We include various error statistics and show that the emulator
-performs roughly at the level of error associated with CAMB itself, which is
-guaranteed to be no worse than 0.1\% \cbib{Seljak}.
+We introduce a new Python package, Cassandra-Linear, which implements these
+modifications to produce emulators of $P_L(k)$. We include various error 
+statistics and show that the for the vast majority of tested cosmologies, the 
+emulator performs within the 0.1\% \cbib{Seljak} error bounds quoted about 
+CAMB.
 
 \textcolor{orange}{Why does this work? Before, the shape impact of
 $\omega_\nu$ 
