@@ -14,43 +14,40 @@ back and looking through the papers I used to get started with this project.}
 feedback from the proofreader.}
 \end{comment}
 
-\textcolor{red}{I feel like the extreme simplifications in the next paragraph
-would be helpful for someone with no idea about this field, but what do you
-think? Maybe they would be more appropriate for easing the reader into
-particular sections on these topics?}
+The cold-matter linear-theory power spectrum $P_L (k)$ can be thought of as
+a statistical description of the way matter clumps together in the Universe.
+Comparison of new galaxy redshift survey observations with theoretical 
+predictions of $P_L(k)$ help to establish increasingly tight estimates of 
+various cosmological parameters.
 
-The power spectrum can be thought of as a statistical description of the way 
-matter clumps together in the Universe.
-Comparison of galaxy redshift survey observations with theoretical predictions 
-for the cold-matter linear-theory power spectrum $P_L (k)$ establish
-increasingly tight estimates of various parameters describing our Universe.
-
-In order to facilitate these comparisons, we an emulator of $P_L (k)$
-that greatly decreases the computational cost. An emulator is a multi-
-dimensional function produced by interpolation across many training points $
-(x, y)$.
+In order to facilitate these comparisons, we apply emulation to greatly
+decrease the computational cost of evaluating $P_L (k)$ for any given
+cosmology. An emulator is a multi-dimensional function produced by 
+interpolation across many training points $(x, y)$.
 
 Evolution mapping is a technique for simplifying the parameter space via
 exploitation of a degeneracy in the impact of several cosmological parameters
-on the power spectrum. The evolution mapping scheme of \cbib{San21} has 
-already achieved success in emulators produced by the COMET team.
-However, these emulators exclude massive neutrinos
-(setting the physical density of the Universe in massive neutrinos to zero)
-as they present a challenge to the evolution mapping framework.
+on the power spectrum. The COMET team has already achieved successed in
+applying the evolution mapping scheme of \citet{San21} to the problem of
+emulation. However, these emulators assume that the physical density of the
+Universe in massive neutrinos is $\omega_\nu = 0$. Massive neutrinos are 
+excluded because they challenge the evolution mapping framework.
 
 This work seeks to extend the evolution mapping scheme to massive-neutrino 
-cosmologies through two primary modifications: replacement of $\sigma_{12}$
-with $\tilde{\sigma}_{12}$ in the evolution mapping relation, and
-recategorization of the scalar mode amplitude $A_s$ as a shape parameter.
+cosmologies through two primary modifications. First, for any given cosmology,
+we replace $\sigma_{12}$ in the evolution mapping relation with
+$\tilde{\sigma}_{12}$; this is the $\sigma_{12}$ value of the cosmology's
+matter-equivalent massive-neutrino cosmology (MEMNeC).
+Second, we recategorize the scalar mode amplitude $A_s$ as a shape parameter.
 We find that $A_s$, which is traditionally treated as an evolution parameter, 
-can be used to quantify the suppression of structure 
-growth due to massive neutrinos.
+can be used to quantify the suppression of structure growth due to massive 
+neutrinos.
 
 We introduce a new Python package, Cassandra-Linear, which implements these
 modifications to produce emulators of $P_L(k)$. We include various error 
 statistics and show that the for the vast majority of tested cosmologies, the 
-emulator performs within the 0.1\% \cbib{Seljak} error bounds quoted about 
-CAMB.
+emulator performs within the 0.1\% error bounds quoted about 
+CAMB \cbib{Seljak}.
 
 \textcolor{orange}{Why does this work? Before, the shape impact of
 $\omega_\nu$ 
