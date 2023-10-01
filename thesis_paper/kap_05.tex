@@ -217,20 +217,6 @@ on the massive-neutrino emulator.
 \section{Minimum Separation of the Training LHC}
 \label{sec: error_from_lhc}
 
-The final training LHS had an $s^*$ of 0.07972 in the massive case and 
-0.02274 in the massless case. The final testing LHS had an $s^*$ of 0.07275 in 
-the massive case and 0.02015 in the massless case. All numbers have been 
-rounded to four significant figures.
-
-What is the impact of the minimum separation? Surely the minimum separation
-should be a proxy for the evenness of the coverage of the space of
-cosmologies. Therefore, we expect the error variance to increase much more
-dramatically than, say, the average bias.
-
-How would we be able to quantify the error due to this? We could try to 
-compare the emulator performance trained on hyper cubes of various minimum 
-distances.
-
 % The following plots were generated with emu_experiment_histograms.ipynb
 \begin{figure}[ht!]
     \begin{subfigure}{0.35 \textheight}
@@ -248,10 +234,24 @@ distances.
         \centering
     \caption[Impact of $s^*$ on Accuracy]
     		{Histograms of errors associated with emulators trained on LHSs of
-    			different $s^*$ values. Doesn't seem to make much difference. For the tested values, see
-    			table~\ref{tab:}.}
+    			different $s^*$ values. Despite the theoretical importance of
+    			the quantity, its impact on the errors appears extremely limited.}
     \label{fig: minsep_experiment}
 \end{figure}
+
+The final training LHS had an $s^*$ of 0.07972 in the massive case and 
+0.02274 in the massless case, rounded to four significant figures. In order
+to quantitatively explore the impact of the LHS's $s^*$ on the performance
+of the emulator, we created three additional emulators of different $s^*$
+values and compared their performance using the test set for the default
+emulator, which is also the one with the highest $s^*$.
+
+In figure~\ref{fig: minsep_experiment}, we have prepared two histograms to
+compare the errors from the four emulators. Surprisingly, $s^*$ does not
+appear to affect the error distribution in any distinct way. As a further
+step, we include tables~\ref{tab: minsep_experiment_delta_stats}
+and~\ref{tab: minsep_experiment_percerr_stats}. None of the columns evolves
+in a consistent manner, and so we call the experiment inconclusive.
 
 % The following table was generated with emu_experiment_stats.ipynb
 \begin{table}[ht!]
@@ -293,6 +293,25 @@ $0.0797$ & 0.002883 & 0.002255 & 0.002058 & 0.291348 \\
 		run more experiments?}
  \label{tab: minsep_experiment_percerr_stats}
 \end{table}
+
+As mentioned in section~\ref{sec: lhc}, we expected the errors to consistently
+decrease with increasing $s^*$, as this quantity communicates the evenness of 
+the coverage of the space of cosmologies.
+
+The tested range in $s^*$ may have been too small for us to appreciate a
+consistent impact. The scope of this experiment was limited by our approach
+to generating LHCs, as the smallest and largest $s^*$ values tested came at
+the cost of several days of computation time. Alternatively, we may have been
+able to detect a consistent difference in the emulators by expanding the
+testing set with many more cosmologies. For example, if we test over
+30000 cosmologies (instead of the 5000 used here), we may find that noise in
+our random selection of cosmologies obscures the effect of $s^*$.
+
+Despite these two suggestions, we nevertheless conclude that the impact of
+$s^*$ may be extremely weak, even if a higher $s^*$ value is theoretically
+preferred. This suggests that our brute-force solution of randomly generating
+LHSs is appropriate for our purposes.
+
 
 \section{Resolution of the k Axis}
 
