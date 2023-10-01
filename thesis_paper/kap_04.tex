@@ -5,11 +5,29 @@ Now that we have a solution which allows integration of massive neutrinos
 into the evolution mapping framework, we are ready to plan and build the
 machinery which leads to an emulator. CL represents a full emulation pipeline from the generation of training and 
 testing data to the plotting of error statistics associated with
-the emulation. This chapter will concentrate on a high-level and accessible 
-description of the pipeline, with motivations behind several key components.
-For a more detailed and technical breakdown of the implementation of the steps
-mentioned here, refer to chapter~\ref{chap: implementation}.
+the emulation. This chapter will concentrate on an accessible 
+description of the pipeline, motivations behind several key components, as
+well as a more detailed and technical breakdown of the implementation of
+the steps.
 
+We will name functions with which the
+reader will need to be familiar in order to train an accurate emulator with
+CL, as well as their limitations and the assumptions they make about their
+inputs. Therefore, this chapter contains information necessary even if the
+reader is interested only in using and not in modifying CL.
+
+CL may be installed in the fashion typical of Python packages: after cloning
+the repository\footnote{https://github.com/3276908917/Master}
+or downloading and unzipping it, the command
+
+\verb|pip install -e .|
+
+should be run in the top-level directory (``Master'') and in the
+appropriate environment (when using a package manager such as Anaconda).
+The reader should keep in mind that we refer to the package as CL in this
+thesis to clearly distinguish it from the Boltzmann solver CLASS, but its
+true name (for example, for use in \texttt{import} statements) is
+\texttt{cassL}.
 
 \section{Pipeline}
 \label{sec: flow_chart}
@@ -497,28 +515,6 @@ parameters. Recall from section~\ref{sec: fit_testing} that $A_s$ cannot be
 enough to fully characterize the $\el$ values for different cosmologies. This
 error will of course only affect the massive-neutrino emulator.
 
-\section{Old Intro, needs to be moved}
-
-This chapter covers the steps outlined in chapter~\ref{chap: emu_outline} in
-significantly greater technical detail. We will name functions with which the
-reader will need to be familiar in order to train an accurate emulator with
-CL, as well as their limitations and the assumptions they make about their
-inputs. Therefore, this chapter contains information necessary even if the
-reader is interested only in using and not in modifying CL.
-
-CL may be installed in the fashion typical of Python packages: after cloning
-the repository\footnote{https://github.com/3276908917/Master}
-or downloading and unzipping it, the command
-
-\verb|pip install -e .|
-
-should be run in the top-level directory (``Master'') and in the
-appropriate environment (when using a package manager such as Anaconda).
-The reader should keep in mind that we refer to the package as CL in this
-thesis to clearly distinguish it from the Boltzmann solver CLASS, but its
-true name (for example, for use in \texttt{import} statements) is
-\texttt{cassL}.
-
 \section{Integrating Evolution Mapping}
 \label{sec: generate_emu_data}
 
@@ -779,7 +775,7 @@ y_i = \exp (\sigma_{y_i} y'_i + \bar{y}_i)
 \end{equation}
 
 
-\section{Testing the Emulator}
+\section{How to Test the Emulator}
 \label{sec: test_emu}
 
 The majority of the quantification and visualization of the performance of the
