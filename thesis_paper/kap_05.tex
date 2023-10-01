@@ -59,7 +59,22 @@ if we again imagine a constant offset, $\tilde{\sigma}_{12}$ will appear as a
 problematic parameter if we look only at percent error.
 
 
-\section{Percent and Square Errors on Random Cosmologies}
+\section{Percent and Absolute Errors on Random Cosmologies}
+
+\begin{figure}[ht!]
+  \centering
+  \includegraphics[width=\textwidth]{error_on_emulators/default_massive}
+  \caption[Default Massive Emulator Performance]{1000 error curves provided by running the test set through the emulator.}
+  \label{fig: def_massive_errs}
+\end{figure}
+
+\begin{figure}[ht!]
+  \centering
+  \includegraphics[width=\textwidth]{error_on_emulators/default_massless}
+  \caption[Default Massless Emulator Performance]{1000 error curves provided by running the test set through the emulator.}
+  \label{fig: def_massless_errs}
+\end{figure}
+
 
 * Percent error curves massless
 
@@ -126,8 +141,19 @@ runs from 0 to 1.}
 \section{Improvement from Two-emulator Solution}
 \label{sec: 2emu_improvement}
 
-We conclude this chapter with a brief demonstration of the advantage of our
-two-emulator solution. We will task the massive-neutrino emulator with
+\begin{figure}[ht!]
+  \centering
+  \includegraphics[width=\textwidth]{error_on_emulators/two_emu_improvement}
+  \caption[Default Massive Emulator Performance]{1000 error curves provided
+  	by running the massless-neutrino test set through the massive-neutrino 
+  	emulator. To adjust the four-dimensional massless-neutrino test LHS to
+  	the six-dimensional massive-neutrino emulator, we filled in
+  	$A_s \approx 2.1272 \cdot 10^{-9}$ and $\omega_\nu = 0$ everywhere.}
+  \label{fig: two_emu_errs}
+\end{figure}
+
+To justify our use of a two-emulator solution to increase
+accuracy in the massless-neutrino case, we task the massive-neutrino emulator with
 predictions over the test set of the massless-neutrino emulator. We consider
 this a fair test because we sampled $\omega_\nu$ values for the
 massive-neutrino emulator from a uniform distribution [0, 0.01]. Therefore,
@@ -157,10 +183,39 @@ How would we be able to quantify the error due to this? We could try to
 compare the emulator performance trained on hyper cubes of various minimum 
 distances.
 
+% The following plots were generated with emu_experiment_histograms.ipynb
+\begin{figure}[ht!]
+    \begin{subfigure}{0.35 \textheight}
+    \centering
+ 		\includegraphics[width=\textwidth]{error_on_emulators/deltas-hist-minsep}
+ 		\caption{Median absolute errors.}
+ 		\label{fig: minsep_experiment_deltas}
+    \end{subfigure}
+    \begin{subfigure}{0.35 \textheight}
+    \centering
+ 		\includegraphics[width=\textwidth]{error_on_emulators/percents-hist-minsep}
+ 		\caption{Median absolute percent errors.}
+ 		\label{fig: minsep_experiment_percerr}
+    \end{subfigure}
+        \centering
+    \caption[Impact of $s^*$ on Accuracy]
+    		{Histograms of errors associated with emulators trained on LHSs of
+    			different $s^*$ values. Doesn't seem to make much difference. For the tested values, see
+    			table~\ref{tab:}.}
+    \label{fig: minsep_experiment}
+\end{figure}
+
 \section{Resolution of the k Axis}
 
 This might go better in the CassL section, but I think I ought to motivate the 
 decision to use length-300 arrays.
+
+\begin{figure}[ht!]
+  \centering
+  \includegraphics[scale=0.5]{error_on_emulators/percents-hist-N_k}
+  \caption[Impact of $N_k$ on Accuracy]{The test is too fair!}
+  \label{fig: Nk_experiment}
+\end{figure}
 
 This is a special case where we would argue that percent error is more useful 
 than squared error.
@@ -179,6 +234,30 @@ domain.
 
 \textcolor{blue}{Justify choice of 5000 samples for each: maybe we can make a
 trend plot showing diminishing returns in test error?}
+
+% The following plots were generated with emu_experiment_histograms.ipynb
+\begin{figure}[ht!]
+    \begin{subfigure}{0.35 \textheight}
+    \centering
+ 		\includegraphics[width=\textwidth]{error_on_emulators/deltas-hist-N_s}
+ 		\caption{Median absolute errors.}
+ 		\label{fig: Ns_experiment_deltas}
+    \end{subfigure}
+    \begin{subfigure}{0.35 \textheight}
+    \centering
+ 		\includegraphics[width=\textwidth]{error_on_emulators/percents-hist-N_s}
+ 		\caption{Median absolute percent errors.}
+ 		\label{fig: Ns_experiment_percerr}
+    \end{subfigure}
+        \centering
+    \caption[Impact of $s^*$ on Accuracy]
+    		{Histograms of errors associated with emulators trained on LHSs of
+    			different $N_s$ values. Doesn't seem to make much difference,
+    			but unlike the other cases, we can definitely say here that it
+    			makes a difference.}
+    \label{fig: Ns_experiment}
+\end{figure}
+
 
 % This might go better in the CassL section, but I think I ought to motivate 
 % the decision to use 5000 training arrays.
