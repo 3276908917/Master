@@ -108,7 +108,7 @@ If we can estimate $\el$ accurately, then in principle our task
 is complete, because the slope toward smaller $k$ values is
 even and analytically predictable.
 
-\textcolor{orange}{Do you know of a relevant
+\selfcomment{Do you know of a relevant
 paper to which I could refer the viewer? Or perhaps you would say that all of
 the necessary information is already contained in FECS?}
 
@@ -134,7 +134,8 @@ remaining function parameters, we refer the reader to the docstring} Tt
 computes and plots all of the $\ee_i$ spectra in the input set. We show an
 example output in figure~\ref{fig: model_ratios}. This function
 is recommended for any users seeking to improve the characterization of
-$\ee_i$.
+$\ee_i$. \selfcomment{The above paragraph only describes the function in the
+case ``massive=`x'''}
 
 % The following plots were generated with divergence_asymptotes.ipynb
 \begin{figure}
@@ -146,9 +147,6 @@ $\ee_i$.
  		horizontal lines. The agreement appears sound in all cases.}
  	\label{fig: model_ratios}
 \end{figure}
-
-\textcolor{orange}{The above paragraph only describes the function in the
-case ``massive=`x'''}
 
 After experimenting with different functions and parameters, we find the
 following fitting function:
@@ -188,15 +186,16 @@ Model Index & {Percent Error} \\ \hline
 \label{sec: fit_testing}
 
 To verify that our approach has general applicability, we now test the
-asymptotic fit on a much broader selection of models.
-
-\textcolor{orange}{What if we tested this fitting function on an independent
+asymptotic fit on a much broader selection of models. \selfcomment{What if
+we tested this fitting function on an independent
 set of models with a consistent but different set of shape parameters?}
 
 First, we created the function \verb|get_random_cosmology| function, which
 accepts an $\omega_\nu$ value and returns a cosmology with randomized
-evolution parameters over the following ranges:~\ref{tab: fit_test_params}.
+evolution parameters over the ranges in table~\ref{tab: fit_test_params}.
 All of the shape parameters are still consistent with Aletheia model 0.
+\selfcomment{Is it poor form to have a footnote that looks like an
+exponent? How should I do it differently?}
 
 \begin{table}[ht!]
 \centering
@@ -214,9 +213,6 @@ $A_s$\footnotemark & $5.003 \cdot 10^{-10}$ & $1.484 \cdot 10^{-8}$  \\
  	generality of fit~\ref{eq: fit}, and their domains.}
  \label{tab: fit_test_params}
 \end{table}
-
-\textcolor{orange}{Is it poor form to have a footnote that looks like an
- 	exponent? How should I do it differently?}
 
 \addtocounter{footnote}{-1}
 
@@ -327,11 +323,6 @@ figure~\ref{fig: degenerate_cosmology_experiment},
 
 % I'm not sure if this section will survive, we'll see how big the conclusion
 % here ends up being.
-
-\textcolor{blue}{Now you also have to include a summary of the finding on
-$\sigma_{12}$. Remember to include in the new section 1.1 the ratio
-plots, the first ones Ariel ever asked you to make. Those prove the 
-effectiveness of the trick.}
 
 In this chapter, we have explained a useful convergence in $\de(k)$ which
 allows us to extend evolution mapping to characterize the large-scale
