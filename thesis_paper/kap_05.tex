@@ -178,41 +178,38 @@ runs from 0 to 1.}
 \section{Improvement from Two-emulator Solution}
 \label{sec: 2emu_improvement}
 
-As mentioned in section~\ref{sec: 2emu_intro}, we created the massless
-emulator not just for comparison, but also to handle a case of real interest
-to our analyses. We could have predicted 
-
 \begin{figure}[ht!]
   \centering
   \includegraphics[width=\textwidth]{error_on_emulators/two_emu_curves}
   \caption[Performance of Massive Emulator in Massless Case]{1000 error
   	curves provided
   	by running the massless-neutrino test set through the massive-neutrino 
-  	emulator. To adjust the four-dimensional massless-neutrino test LHS to
-  	the six-dimensional massive-neutrino emulator, we filled in
-  	$A_s \approx 2.1272 \cdot 10^{-9}$ and $\omega_\nu = 0$ everywhere.}
+  	emulator. The shape of both plots is significantly different from the
+  	massive-emulator's test cosmologies shown in
+  	figure~\ref{fig: def_massive_curves}. We therefore consider our
+  	two-emulator solution strongly motivated.}
   \label{fig: two_emu_curves}
 \end{figure}
 
 To justify our use of a two-emulator solution to increase
-accuracy in the massless-neutrino case, we task the massive-neutrino emulator with
-predictions over the test set of the massless-neutrino emulator. We consider
+accuracy in the massless-neutrino case, we task the massive-neutrino emulator 
+with predictions over the test set of the massless-neutrino emulator.
+To adjust the four-dimensional massless-neutrino test LHS to
+the six-dimensional massive-neutrino emulator, we filled in
+$A_s \approx 2.1272 \cdot 10^{-9}$ and $\omega_\nu = 0$ everywhere.
+We consider
 this a fair test because we sampled $\omega_\nu$ values for the
 massive-neutrino emulator from a uniform distribution [0, 0.01]. Therefore,
 in principle, the $\omega_\nu = 0$ case should only be a slight extrapolation.
 
-To understand these results, we remind the reader the overall error of the
-massive emulator is larger than that of the massless emulator. As mentioned
-in 
+The overall error of the massive emulator is larger, but this does not
+explain all of the results that we see--these error curves also differ
+significantly in shape, with increasingly aberrant behavior at large scales.
+Also, the BAO feature seems to be slightly complicated by the presence of
+massive neutrinos.
 
-To justify our decision and to quantify the improvement from this approach, we
-have prepared \textcolor{orange}{some} plots in
-section~\ref{sec: 2emu_improvement}.
-
-\textcolor{blue}{This will be an extremely short section with some error
-plots of the massive-neutrino cosmology evaluating massless-neutrino
-cosmologies.}
-
+Now that we have used the massless-emulator test set to motivate our use of
+a two-emulator solution, we move on from the massless emulator.
 As evolution-mapping emulation for \textit{massive}-neutrino cosmologies
 is the novel feature of this work, we will henceforth concentrate exclusively
 on the massive-neutrino emulator.
