@@ -104,7 +104,9 @@ this ratio $\el$
 
 If we can estimate $\el$ accurately, then in principle our task 
 is complete, because the slope toward smaller $k$ values is
-even and analytically predictable. \textcolor{red}{Do you know of a relevant
+even and analytically predictable.
+
+\textcolor{orange}{Do you know of a relevant
 paper to which I could refer the viewer? Or perhaps you would say that all of
 the necessary information is already contained in FECS?}
 
@@ -207,11 +209,12 @@ $A_s$\footnotemark & $5.003 \cdot 10^{-10}$ & $1.484 \cdot 10^{-8}$  \\
 \end{tabular}
  \cprotect\caption[Parameter Ranges for Random Test
  	Cosmologies]{Parameters which we vary for the purpose of testing the
- 	generality of fit~\ref{eq: fit}, and their domains.
- 	\textcolor{red}{Is it poor form to have a footnote that looks like an
- 	exponent? How should I do it differently?}}
+ 	generality of fit~\ref{eq: fit}, and their domains.}
  \label{tab: fit_test_params}
 \end{table}
+
+\textcolor{orange}{Is it poor form to have a footnote that looks like an
+ 	exponent? How should I do it differently?}
 
 \addtocounter{footnote}{-1}
 
@@ -246,10 +249,7 @@ affect $\omega_\text{DE}$.}
     			fit. Indeed, reruns of this experiment can lead to
     			significantly different spreads in the histogram.
     			The reduced $\chi^2$ value for this particular run of the
-    			experiment is approximately $5.005 \cdot 10^{-7}$.
-    		\textcolor{red}{Would it have been better if I just included the
-    		right plot and no left plot?}
-    		\textcolor{red}{UNACCEPTABLE! FONTS ARE VERY TINY!}}
+    			experiment is approximately $5.005 \cdot 10^{-7}$.}
     \label{fig: random_cosmology_experiment}
 \end{figure}
 
@@ -293,10 +293,7 @@ figure~\ref{fig: degenerate_battery_errs}.
     			fit. Indeed, reruns of this experiment can lead to
     			significantly different spreads in the histogram.
     			The reduced $\chi^2$ value for this particular run of the
-    			experiment is approximately $2.514 \cdot 10^{-8}$.
-    			\textcolor{red}{Would it have been better if I just included the
-    			right plot and no left plot?}
-    			\textcolor{red}{UNACCEPTABLE! FONTS ARE VERY TINY!}}
+    			experiment is approximately $2.514 \cdot 10^{-8}$.}
     \label{fig: degenerate_cosmology_experiment}
 \end{figure}
 
@@ -334,7 +331,14 @@ $\sigma_{12}$. Remember to include in the new section 1.1 the ratio
 plots, the first ones Ariel ever asked you to make. Those prove the 
 effectiveness of the trick.}
 
-In this chapter, we have illustrated how the scalar mode amplitude $A_s$
+In this chapter, we have explained a useful convergence in $\de(k)$ which
+allows us to extend evolution mapping to characterize the large-scale
+behavior of $P_L(k)$ in massive neutrino cosmologies. This directs us to
+adapt evolution mapping to massive-neutrino cosmologies by replacing
+$\sigma_{12}$ with the $\sigma_{12}$ value associated with the cosmologies'
+MEMNeCs; we label this value $\tilde{\sigma}_{12}$.
+
+Furthermore, we illustrated how the scalar mode amplitude $A_s$
 contains information of great relevance to the application of evolution
 mapping to the emulation of massive-neutrino power spectra. As a result of 
 these demonstrations, we know to construct 
@@ -346,7 +350,7 @@ these six parameters. Conceptually, adding $A_s$ to the set of
 emulation parameters allows us to treat $\omega_\nu$ like a shape
 parameter.
 
-Expansion of the parameter space represents the single most 
-important novel step in this work. The remaining chapters will
-focus on the integration of this modified evolution mapping framework
+These modifications of evolution mapping represent the most 
+important novel steps in this work. The remaining chapters will
+focus on the integration of these modifications
 into a beginner-friendly emulation code.
