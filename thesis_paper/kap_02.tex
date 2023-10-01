@@ -45,16 +45,18 @@ and $\omega_c$ can differ between any cosmology and its MEMNeC.
  		The cosmologies are evaluated at different redshifts such that they 
  		have the same value of $\tilde{\sigma}_{12}$. Notice that all curves
  		converge to unity at the largest scales.}
- 	\label{fig: model_ratios}
+ 	\label{fig: tilde_sigma_poc}
 \end{figure}
 
 To improve evolution mapping's effectiveness in massive-neutrino cosmologies,
 we want to understand the behavior of $\de(k)$. In
-figure~\ref{tilde_sigma_poc}, we show $\de(k)$ for a handful of cosmologies
+figure~\ref{fig: tilde_sigma_poc},
+we show $\de(k)$ for a handful of cosmologies
 with the same shape parameters but different evolution parameters. When
 comparing different cosmologies at fixed $\tilde{\sigma}_{12}$, we find that
 evolution mapping handles the large scales remarkably well, as $\de(k)$
-invariably converges to unity. Consequently, we adapt the evolution mapping relation as follows:
+invariably converges to unity. Consequently, we adapt the evolution mapping 
+relation as follows:
 
 \begin{equation}
 \label{eq: evMapping_modded}
@@ -130,7 +132,7 @@ format returned by
 layer.\footnote{For explanations of the
 remaining function parameters, we refer the reader to the docstring} Tt
 computes and plots all of the $\ee_i$ spectra in the input set. We show an
-example output in figure~\ref{fig: model_ratios_demo}. This function
+example output in figure~\ref{fig: model_ratios}. This function
 is recommended for any users seeking to improve the characterization of
 $\ee_i$.
 
@@ -311,7 +313,7 @@ between $A_s$, $\omega_\nu$, and the small-scale suppression of the power
 spectrum. A symbolic regression investigation could prove highly effective at
 resolving this ambiguity by efficiently searching out improved formulas. 
 However, we do not consider this a promising avenue
-for the continuation of this work (see section~\ref{sec: future_work} for our
+for the continuation of this work (see chapter~\ref{chap: conclusion} for our
 recommendations); the error
 is so low here that we do not believe the imperfect predictions to
 significantly detract from the performance of the emulator. Besides this,
