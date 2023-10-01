@@ -29,19 +29,24 @@ We compare the accuracies of two emulators trained using this code: one
 including $A_s$ and $\omega_\nu$, and the other featuring no massive 
 neutrinos. We find that the massless-neutrino emulator performs significantly
 better when the number of samples is held fixed. Nevertheless, we show that
-the $3\sigma$ confidence interval is below the 0.1\% error level. This means
-the error of our massive-neutrino emulator is
+the error is below 0.3\% across all tested cosmologies, and below 0.05\%
+for the vast majority of tested cosmologies. This means
+the error of our default emulator is
 comparable to that of CAMB, the Boltzmann solver we use to produce the
 training spectra used for training.
 
-We explore the impact of $s^*$, $N_k$, and $N_s$ on the performance of the
-emulator and find...
-
-In conclusion...
+We analyze the hyperparameters associated with the default emulator by
+exploring the impacts of $s^*$, $N_k$, and $N_s$ on the performance of the
+emulator. We find in the case of $s^*$ and $N_k$ that the accuracy metrics do 
+not vary in a consistent manner, indicating that if these parameters influence
+the accuracy of the emulator, the influence is extremely limited. We find that
+increases in $N_s$ lead to more accurate emulators, as expected. However, in
+the range of $N_s$ values tested, we do not find this connection to be
+dramatic.
 
 % Just use one big block of text, don't split into sections
 
-\textcolor{red}{How do these results compare with results from 
+\textcolor{orange}{How do these results compare with results from 
 papers on similar subjects?}
 
 %s FUTURE WORK
@@ -123,8 +128,10 @@ Negative redshifts do not violate any conditions in the equations of
 cosmological evolution, so it could prove fruitful to investigate why CAMB 
 has this requirement; if the code could be easily amended, the results of
 this work could be extended to broader priors. Alternatively,
-CLASS \textcolor{green}{allows} negative redshifts, so it may be worthwhile 
+CLASS allows negative redshifts, so it may be worthwhile 
 to repeat the work of this thesis using power spectra from CLASS.
+
+\textcolor{orange}{This claim about CLASS's abilities is unfounded!}
 
 Lastly, we suggest the promulgation of quantitative results comparing the
 performance of GPRs and neural networks. COMET is an example of a GPR-based
