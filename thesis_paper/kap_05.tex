@@ -264,12 +264,14 @@ $0.0629$ & 0.169627 & 0.044320 & 0.234392 & 174.772714 \\
 $0.0713$ & 0.194701 & 0.050606 & 0.275545 & 203.590333 \\
 $0.0797$ & 0.173023 & 0.044955 & 0.244320 & 224.434379 \\
 \end{tabular}
-	\cprotect\caption[$s^*$ Experiment: Percent Error Statistics]{Lower is
-		better. The
-		results of this experiment are surprising. We consider that there
-		may have been an error in our execution of the experiment...
-		None of the statistics shows a trend consistent with our expectations,
-		and only in the case of the median of medians is the last-row value
+	\cprotect\caption[$s^*$ Experiment: Percent Error Statistics]{Table of
+		absolute error statistics
+		when applying the default massless emulator's test
+		set to emulators trained on LHSs of different $s^*$ values. In all
+		columns, lower values indicate preferred outcomes. ``STD:'' standard
+		deviation. ``PTP:'' peak-to-peak, or the difference in the maximum
+		and minimum values. None of the columns shows a consistent trend.
+		Only in the case of the median of medians is the last-row value
 		lower than that of the first row.}
  \label{tab: minsep_experiment_delta_stats}
 \end{table}
@@ -285,12 +287,18 @@ $0.0629$ & 0.002850 & 0.002179 & 0.002079 & 0.196711 \\
 $0.0713$ & 0.003052 & 0.002409 & 0.002059 & 0.266151 \\
 $0.0797$ & 0.002883 & 0.002255 & 0.002058 & 0.291348 \\
 \end{tabular}
-	\cprotect\caption[$s^*$ Experiment: Percent Error Statistics]{The
-		results of this experiment are surprising. We consider that there
-		may have been an error in our execution of the experiment...
-		we find it a strange coincidence that the percent errors steadily
-		get worse... perhaps the effect is so subtle that we would have to
-		run more experiments?}
+	\cprotect\caption[$s^*$ Experiment: Percent Error Statistics]{Table of
+		absolute percent error statistics
+		when applying the default massless emulator's test
+		set to emulators trained on LHSs of different $s^*$ values. In all
+		columns, lower values indicate preferred outcomes. ``STD:'' standard
+		deviation. ``PTP:'' peak-to-peak, or the difference in the maximum
+		and minimum values. None of the columns shows an expected trend.
+		We consider it a coincidence that the maximum PTP in percent error
+		\textit{increases} consistently with increasing $s^*$, especially
+		since the corresponding column in the absolute errors
+		(see table~\ref{tab: minsep_experiment_delta_stats}) lacks this
+		trend.}
  \label{tab: minsep_experiment_percerr_stats}
 \end{table}
 
