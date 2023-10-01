@@ -326,7 +326,11 @@ LHSs is appropriate for our purposes.
 \begin{figure}[ht!]
   \centering
   \includegraphics[scale=0.5]{error_on_emulators/percents-hist-N_k}
-  \caption[Impact of $N_k$ on Accuracy]{The test is too fair!}
+  \caption[Impact of $N_k$ on Accuracy]{Histogram of median percent errors
+  	across all 5000 cosmologies tested. The test data are different for each
+  	emulator but each test set contains 5000 spectra. We fail to observe any
+  	meaningful connection between the value of $N_k$ and the shape of the
+  	distribution.}
   \label{fig: Nk_experiment}
 \end{figure}
 
@@ -362,8 +366,19 @@ $300$ & 0.002883 & 0.002255 & 0.002058 & 0.291348 \\
 $400$ & 0.003034 & 0.002461 & 0.002042 & 0.277015 \\
 $500$ & 0.002881 & 0.002221 & 0.002088 & 0.296367 \\
 \end{tabular}
-	\cprotect\caption[$N_k$ Experiment: Percent Error Statistics]{Median of
-		absolute percent errors.}
+	\cprotect\caption[$N_k$ Experiment: Percent Error Statistics]{Table of
+		absolute percent error statistics
+		for emulators constructed with different $N_k$.
+		The test data are different for each
+  		emulator but each test set contains 5000 spectra.
+		In all
+		columns, lower values indicate preferred outcomes. ``STD:'' standard
+		deviation. ``PTP:'' peak-to-peak, or the difference in the maximum
+		and minimum values. None of the columns shows a consistent trend.
+		In combination with the results of
+		figure~\ref{fig: Nk_experiment}, these statistics suggest that
+		$N_k$ does not significantly influence the performance of the
+		emulator.} 
  \label{tab: Nk_experiment_percerr_stats}
 \end{table}
 
@@ -397,7 +412,7 @@ trend plot showing diminishing returns in test error?}
  		\label{fig: Ns_experiment_percerr}
     \end{subfigure}
         \centering
-    \caption[Impact of $s^*$ on Accuracy]
+    \caption[Impact of $N_s$ on Accuracy]
     		{Histograms of errors associated with emulators trained on LHSs of
     			different $N_s$ values. Doesn't seem to make much difference,
     			but unlike the other cases, we can definitely say here that it
