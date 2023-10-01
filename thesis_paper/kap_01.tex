@@ -25,7 +25,7 @@ and II covered about one million galaxies in a redshift range of $0.07 < 0.2$
 and were completed over the periods 2000-2005 and 2005-2008, respectively.
 The Dark Energy Spectroscopic Instrument, which had its first light in 2019, 
 is expected to complete its mission of 30 million targets in 2026
-\cbib{Finkbeiner}. \textcolor{orange}{Redshift range?}
+\cbib{Finkbeiner}. \selfcomment{Redshift range?}
 These probes allow us to describe the matter power spectrum
 with greater precision. The power spectrum is the amplitude of density
 fluctuations as a function of scale. It is therefore a representation of how
@@ -211,7 +211,7 @@ indistinguishable from a vacuum energy solution, and the two terms are
 sometimes used interchangeably \cbib{FECS}. 
 
 We can combine the equations of state for the barotropic fluids with energy 
-conservation (\textcolor{orange}{Look up a derivation}) to find that
+conservation \selfcomment{(Look up a derivation)} to find that
 
 \begin{equation}
 \label{eq: scale_factor_to_density}
@@ -412,9 +412,10 @@ P(k) = \int d^3 r \, \xi(r) \exp [i \bm{r} \cdot \bm{k}]
 
 The power spectrum describes the variance of the amplitudes of the Fourier
 modes. In this thesis we focus on the \textit{linear-theory} power spectrum 
-$P_\text{L}(k)$, which is obtained when $delta \ll 1$ and only linear terms in 
+$P_\text{L}(k)$, which is obtained when
+$\delta \ll 1$ and only linear terms in 
 the perturbative expansion of $\delta(\bm{x})$ are taken into account. 
-\textcolor{red}{Consequently, we neglect all but the dominant energy species' 
+\selfcomment{Consequently, we neglect all but the dominant energy species' 
 impact on
 the growth of density fluctuations in any given period of the Universe's
 history.}
@@ -936,9 +937,8 @@ an evolution parameter, so it appears on the RHS only as an argument
 to the $\sigma_{12}$ ``function.'' We write it separately from
 $\Theta_e$ to
 emphasize that $z$ does not describe a property of the Universe, but is
-simply used as a proxy here for \textcolor{red}{conformal?} time
-\textcolor{red}{elapsed since the Big Bang? (but we can only observe up to
-$z = 1100$...)}.} 
+simply used as a proxy here for conformal time
+elapsed since the Big Bang.} 
 We stress that the evolution mapping relation does not hold when $P_L$ is
 expressed in $h$ units.
 
@@ -985,13 +985,6 @@ will be efficiently distributed throughout the parameter space. By contrast,
 if we explicitly trained over additional evolution parameters, the same set of
 training samples would much less densely cover the parameter space.
 
-\textcolor{red}{A segue into neutrinos would be possible here, but it
-wouldn't look too good since the neutrino section comes at the end. Should I
-put the neutrino section right after this one?}
-
-% To-do:
-
-% Make the plot where the different models overlap through sigma-matching
 
 \section{Emulation}
 \label{sec: emulation_intro}
@@ -1028,15 +1021,16 @@ the modern literature. Emulator flexibility and generality is desirable, but
 comes at the price of a significantly more sample-expensive training phase in
 order to maintain accuracy levels.
 
-However, due to the
+% Cut paragraph. It's mostly incorrect
+\begin{comment}
+	However, due to the
 generality-accuracy tradeoff, currently available emulators tend to sample
 only sample a few cosmological parameters and over restrictive ranges
 \cbib{San21}. \textcolor{red}{This comment only applied to the emulators
 trained over N-body simulations, right? So it would probably be inappropriate
 to mention it in this paper, since we are emulating over Boltzmann solver
 spectra}.
-% Also part of this cut paragraph:
-\begin{comment}
+
 	``Due to the high computational cost of the required
 	simulations, [...] current emulators leave out parameters such as the
 	curvature of the Universe or dynamic energy models beyond the standard CPL
@@ -1074,7 +1068,7 @@ linear power spectrum emulation. \verb|COMET| uses GPR, although the
 development team
 has recently decided to switch to an NN \cbib{Eggemeier}.
 
-\textcolor{orange}{I need material on the accuracy and ranges over which
+\selfcomment{I need material on the accuracy and ranges over which
 COMET can operate.}
 
 % Other things we could talk about: make more explicit that we are using a
@@ -1083,9 +1077,6 @@ COMET can operate.}
 % limited by the accuracy of the input spectra...
 
 % This section really is short. Am I forgetting to talk about anything?
-
-\section{Gaussian Process Regression}
-\label{sec: gpr_intro}
 
 In this work, we apply a GPR to emulate power spectra. A Gaussian Process 
 (GP) is a Gaussian distribution over random functions,\footnote{The functions
@@ -1097,7 +1088,7 @@ powerful non-linear multivariate interpolation tool because in addition to
 allowing conventional predictions, GPR can also give us an uncertainty on the
 prediction, which is not typically obtained when training an NN.
 
-\textcolor{red}{Should I put some equations here, to outline the basics?
+\selfcomment{I should put some equations here, to outline the basics
 For example, I could refer to
 \url{https://gaussianprocess.org/gpml/chapters/RW.pdf} as the COMET paper
 does.}
@@ -1116,7 +1107,7 @@ over its development, several regenerations of the various emulator data sets
 were necessary. This practical constraint motivated the use of a GP for our
 emulator.
 
-\textcolor{orange}{Are there other prediction approaches besides GPs and NNs? 
+\selfcomment{Are there other prediction approaches besides GPs and NNs? 
 If so, I need to further justify WHY we’re using GPs.
 GPs work best when there are few samples and a lot of 
 parameters, right? But why is that so? What is the math behind that?}
@@ -1133,13 +1124,14 @@ the evolution mapping framework, COMET fixes this parameter at zero.
 
 At this point, we add that we are focusing on the power spectrum of cold
 matter (baryons and CDM--i.e. matter excluding
-neutrinos).\footnote{\textcolor{red}{Andrea 
+neutrinos).\selfcomment{\footnote{\textcolor{red}{Andrea 
 added the following comment: ``We should 
 justify this assumption. It is standard practice to assume that the galaxy 
 density field is determined only by the underlying cdm+b density field, 
 without taking into consideration the cold neutrino component (which also 
 behaves as matter).'' Do you have recommendations for sources I can consult in
-order to add this information to this paragraph?}} Several currently-available 
+order to add this information to this paragraph?}}}
+Several currently-available 
 emulators, such as \verb|baccoemu| and \verb|CosmoPower|, are able to handle 
 massive neutrinos because they do not use evolution mapping.
 
