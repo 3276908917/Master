@@ -28,7 +28,7 @@ irreconcilable results.}
 \end{comment}
 %%%
 
-\textcolor{orange}{Ariel recommends
+\selfcomment{Ariel recommends
 just talking about the correct lines, don't talk about what happens when
 they're wrong.}
 
@@ -114,7 +114,7 @@ computation time invested now will result in an emulator which is more
 accurate and equally fast.
 
 \verb|pars.Accuracy.lAccuracyBoost = 3| \quad requests more multipoles in the 
-Boltzmann hierarchy. \textcolor{orange}{Whatever that is}
+Boltzmann hierarchy. \selfcomment{Whatever that is}
 
 \verb|pars.Accuracy.AccuracyBoost = 3| 
 
@@ -122,7 +122,7 @@ The second line is explained in the CAMB documentation only as a ``general
 accuracy setting effecting [\textit{sic}] everything related to step sizes 
 etc.'' \citet{Lesgourges} compares CLASS and CAMB at various values for this
 attribute and find that at 3, the code precision already reaches the 0.1\% 
-level. \textcolor{orange}{But what, more specifically, does it do? And it may
+level. \selfcomment{But what, more specifically, does it do? And it may
 be a good idea to test the emulator with a much better precision: the value of
 12 is the largest meaningful value in the Lesgourges paper.}
 
@@ -181,7 +181,7 @@ The \verb|input_cosmology| function implements the following additional
 settings universal to all of our power spectra:
 
 \verb|tau=0.0952| \quad specified in the call to \verb|pars.set_cosmology|.
-$\tau$ describes the optical depth to the CMB. \textcolor{orange}{What kinds 
+$\tau$ describes the optical depth to the CMB. \selfcomment{What kinds 
 of parameters are $Y_\text{He}$ and $\tau$ in evolution mapping?
 Do they affect the power spectrum at all?}
 
@@ -195,7 +195,7 @@ referred to as cosmological constant $\Lambda$, we use the two-
 fluid approximation. Wherever the EoS departs from this, we use instead the
 more flexible parametrized post-Friedmann (PPF) model.
 
-\textcolor{orange}{What is the difference between the ``fluid'' and ``PPF''
+\selfcomment{What is the difference between the ``fluid'' and ``PPF''
 models?? Can you show that these two models agree when $w_a$ and $W-0$ are
 given by best fit values?}
 
@@ -209,7 +209,7 @@ parameter $\omega_\nu$ and will need to vary it. CAMB does not seem to accept
 $\omega_\nu$ values directly, in what may be a bug. For example, setting
 \verb|pars.omnuh2| does not affect the return values of
 
-\textcolor{orange}{This is wrong. Andrea was able to use camb.set\_params to 
+\selfcomment{This is wrong. Andrea was able to use camb.set\_params to 
 get the desired omnuh2!!}
 
 \verb|camb.get_results(pars).get_matter_power_spectrum|.
@@ -217,14 +217,15 @@ get the desired omnuh2!!}
 However, it may simply be the case that the \verb|omnuh2| attribute is
 intended only as an output field. The \verb|pars.set_cosmology| function
 accepts \verb|mnu| (the sum of the masses of the different neutrino flavors,
-$\sum_i m_{\nu, i}$ \textcolor{orange}{in eV? Or what are the units??}),
+$\sum_i m_{\nu, i}$\selfcomment{in eV? Or what are the units??}),
 which then updates the value of \verb|pars.omnuh2|.
 In order to transform between the two, we have included in
 \verb|camb_interface.py| the two convenience functions
 \verb|omnuh2_to_mnu| and \verb|mnu_to_omnuh2|, which merely present the 
-internal logic of CAMB in an isolated and user-accessible way.
+internal logic of CAMB in an isolated and user-accessible way. CAMB makes use
+of the following relation:
 
-\textcolor{orange}{Explain the equation being used here:}
+\selfcomment{Explain the equation being used here:}
 
 \begin{equation}
 \sum_i m_{\nu, i}
@@ -232,7 +233,7 @@ internal logic of CAMB in an isolated and user-accessible way.
 \omega_\nu \, x_\nu \, \left( \frac{3}{N_\nu^\text{eff}} \right)^{3/4}
 ,\end{equation}
 
-where $x_\nu$ is \textcolor{orange}{the mysterious ``neutrino mass fac''} and
+where $x_\nu$ is the \selfcomment{mysterious} ``neutrino mass fac'' and
 $N_\nu$ is the effective number of massive neutrino species. The standard
 particle model predicts this to be 3.046 \cbib{Archidiacono}.
 
@@ -275,7 +276,7 @@ dictionary. \verb|specify_neutrino_mass| is not a helper function
 automatically called by others, but needs to be called whenever computing
 power spectra with CL.
 
-\textcolor{orange}{How can I justify using $N_\nu^\text{eff} = 3.046$ for the
+\selfcomment{How can I justify using $N_\nu^\text{eff} = 3.046$ for the
 ``mnu'' conversion while I use $N_\nu^\text{massive} = 1$ for the call to
 ``set\_cosmology''? The truth is that it doesn't really matter, right? since
 CAMB uses these as the default values anyway. But why do they do that?}
@@ -351,7 +352,7 @@ settings in the call to \\
 \verb|get_matter_power_interpolator| which are not
 modifiable through CL functions:
 
-\verb|nonlinear=False| (\textcolor{orange}{Why are we specifying the linear
+\verb|nonlinear=False| \selfcomment{(Why are we specifying the linear
 power spectrum in two cases?)} \quad requests linear power spectrum.
 
 \verb|var1=`delta_nonu'| and \verb|var2=`delta_nonu'| requests the power
