@@ -59,19 +59,50 @@ problematic parameter if we look only at percent error.
 \begin{figure}[ht!]
   \centering
   \includegraphics[width=\textwidth]{error_on_emulators/def_massive_curves}
-  \caption[Default Massive Emulator Error Curves]{1000 error curves provided by running the test set through the emulator.}
+  \caption[Default Massive Emulator Error Curves]{1000 error curves provided 
+  by running the test set through the emulator. The curves are colored
+  according to their value in $\tilde{\sigma}_{12}$. The opacity of the curves
+  allows us to conclude that the dynamic range, at least in the percent
+  error case, is dominated by a small number of cosmologies.
+  In absolute terms, the emulator
+  clearly performs best on the small scales. In relative terms, the
+  performance is best on large scales. Regardless of the metric used, the
+  error is most extreme on medium scales, and drastic fluctuations can be seen 
+  in the percent error plot.}
   \label{fig: def_massive_curves}
 \end{figure}
 
 \begin{figure}[ht!]
   \centering
   \includegraphics[width=\textwidth]{error_on_emulators/def_massive_hist}
-  \caption[Default Massive Emulator Error Histograms]{1000 error curves provided by running the test set through the emulator.}
+  \caption[Default Massive Emulator Error Histograms]{The left plot is a
+  	histogram of the medians of the absolute values of each difference curve.
+  	The right plot is a histogram of the maxima of the absolute values of
+  	each percent error curve. In both cases, we find the plots to have
+  	extremely long tails, so we have truncated these plots at arbitrary
+  	right endpoints in order to focus on the central shape.}
   \label{fig: def_massive_hist}
 \end{figure}
 
-In figure~\ref{fig: def_massive_errs}, we show the performance of the default
-massive-neutrino emulator. 
+In figure~\ref{fig: def_massive_curves}, we 
+show the performance of the default massive-neutrino emulator. We consider
+the overall performance encouraging. Even the worst error curve, which
+appears to have been the worst by far, did not exceed a 0.3\% error.
+In the follow-up histograms (figure~\ref{fig: def_massive_hist}), we find
+that in the vast majority of tested cosmologies, the error does not
+exceed 0.04\%.
+
+The curves of figure~\ref{fig: def_massive_curves} were colored according to
+their values in $\tilde{\sigma_{12}}$, which we found was the only parameter
+associated with a consistent trend. At large scales, lower values of
+$\tilde{\sigma}_{12}$ are associated with higher percent errors. However, at
+all scales, higher values of $\tilde{\sigma}_{12}$ are strongly tied to
+increased absolute error.
+
+The dramatic
+oscillations around the BAO region suggest to us that improving the emulator's
+handling of the BAO would be the most promising avenue for tightening the
+overall distribution of error.
 
 \begin{figure}[ht!]
   \centering
