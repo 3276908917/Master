@@ -35,10 +35,9 @@ true name (for example, for use in \texttt{import} statements) is
 % Disgusting hack to get verbatim functionality in tabel
 
 In this section we outline the general procedure for building and testing an
-emulator. For an explanation of the abbreviations used here, see table~\ref{tab: script_summary}. 
-
-\textcolor{red}{The following two paragraphs are not very easy to read, but 
-I'm not sure how to better structure them.}
+emulator. For an explanation of the abbreviations used here, see 
+table~\ref{tab: script_summary}. \selfcomment{The following two paragraphs are 
+not very easy to read, but I'm not sure how to better structure them.}
 
 First, the user needs to decide on the desired properties and domain of the
 emulator. Most of these properties are currently set within a ``scenario
@@ -82,9 +81,6 @@ calculates some simple error metrics according to the provided test set.
 
 As a digestible visualization of the procedure as described here, we
 include figure~\ref{fig: flow_chart}.
-
-\textcolor{orange}{The emulator should also compute training errors!! This
-would be a really easy way to expand the code in a meaningful way.}
 
 \section{Latin Hypercube Sampling}
 \label{sec: lhc}
@@ -155,7 +151,7 @@ s^*_\text{best} = \left( \frac{1}{N_s} \right)^{1 / d}
 
 For example, for a six-parameter emulator trained over 5000 samples, the best
 possible LHS sample would have $s^* \approx 0.2418$.
-\textcolor{orange}{Talk about how you got this equation?}
+\selfcomment{Talk about how you got this equation?}
 
 The LHSs give the values of the cosmological parameters and therefore
 the give the inputs over which we train the emulator.
@@ -182,9 +178,10 @@ to cut down on the number of LHSs that we need to generate.
 CL accomplishes this rescaling through the use of priors files.
 CL is packaged with two pairs of priors files (the pairing will be explained
 in section~\ref{sec: 2emu_intro}). The parameter domains for each pair are
-described in tables~\ref{tab: CLASSIC_priors} and~\ref{tab: COMET_priors}. The two pairs of files share the same priors in
-$\omega_\nu$, [0, 0.01], and $\tilde{\sigma}_{12}$, [0.2, 1], and so these are
-omitted.
+described in tables~\ref{tab: CLASSIC_priors} and~\ref{tab: COMET_priors}. The 
+two pairs of files share the same priors in $\omega_\nu$, [0, 0.01], and
+$\tilde{\sigma}_{12}$, [0.2, 1], and so these are omitted. \selfcomment{Talk a 
+little more about the prior ranges, what are their values in words?}
 
 \begin{comment}
 \begin{table}[ht!]
@@ -220,7 +217,7 @@ $A_s$\footnotemark & $1.049 \cdot 10^{-9}$ & $4.990 \cdot 10^{-9}$  \\
 \end{tabular}
 	\cprotect\caption[``CLASSIC'' priors]{``CLASSIC'' priors. We expect this
  	parameter space to be more than large enough to accommodate modern
- 	statistical analyses. \textcolor{green}{citation.}}
+ 	statistical analyses. \selfcomment{citation.}}
  \label{tab: CLASSIC_priors}
 \end{table}
 
@@ -242,9 +239,6 @@ $A_s$\footnotemark & $1.049 \cdot 10^{-9}$ & $4.990 \cdot 10^{-9}$  \\
 	These priors were taken from table 2 of \citet{Eggemeier}.}
  \label{tab: COMET_priors}
 \end{table}
-
-\textcolor{orange}{Talk a little more about the prior ranges, what are their
-values in words?}
 
 At first, we used the ambitious ``CLASSIC'' set of priors
 (table~\ref{tab: CLASSIC_priors}), whose values we decided based on the recent 
@@ -442,7 +436,7 @@ be specified before a power spectrum can be calculated. In all such cases, we
 use Aletheia model 0 as default values. So long as the power spectrum's value 
 for $\sigma_{12}$ agrees with the prior-scaled value from the LHS, it should 
 not matter that we use the model 0 values, as these are evolution parameters.
-\textcolor{orange}{I'm not referring to table 1.2 here
+\selfcomment{I'm not referring to table 1.2 here
 because I would have to expand it with parameters not essential to this work,
 so I would have to redo the captions for fig 1.1 and table 1.2...}
 
@@ -541,9 +535,9 @@ After \verb|build_cosmology| returns a complete cosmology dictionary, these
 functions computer the MEMNeC. Then, they request CAMB power spectra for the
 MEMNeCs at 150\footnote{150 is the maximum number of redshifts that CAMB will
 accept in a single call.} linearly-spaced redshifts in the
-interval [0, 10]. \textcolor{orange}{log spacing would have been better for
-redshift}. This interval suffices to capture the reddest galaxies
-in our galaxy redshift surveys. \textcolor{green}{citation}. Next, these
+interval [0, 10]. \selfcomment{log spacing would have been better for
+redshift}. This interval captures all but the reddest galaxies
+in our galaxy redshift surveys. \selfcomment{citation.} Next, these
 functions request a one-dimensional interpolator from \texttt{scipy} with
 the $\tilde{\sigma}_{12}$ values as the $x$ and the $z$ values as the $y$.
 By passing the desired $\tilde{\sigma}_{12}$ value to the interpolator, we
@@ -574,12 +568,11 @@ figure~\ref{fig: flow_chart}); this LHS is used in the emulator's training.
 
 This shortcut saves a good deal of time but moves the value of
 $\tilde{\sigma}_{12}$ negligibly
-\textcolor{green}{cite some numbers for this claim!}.
+\selfcomment{cite some numbers for this claim!}.
 The only downside of moving $\tilde{\sigma}_{12}$ could be that it
 decreases the $s^*$ of the LHS. Since the value shifts only weakly, we do not
 consider it to produce a relevant decrease in the accuracy of the emulator.
-
-\textcolor{orange}{We should make error plots (comparing the two approaches 
+\selfcomment{We should make error plots (comparing the two approaches 
 with hyper cube as a control), but I strongly suspect the error will be 
 negligible.}
 
@@ -669,9 +662,8 @@ gpr.constrain_positive('')
 gpr.optimize()
 \end{verbatim}
 
-\textcolor{red}{Does it make any sense to put a comma after the code listing?}
-
-where `' in the second line is a regex matching all parameter names. This
+where \texttt{''} in the third line is a regex matching all parameter names. 
+This
 example of course assumes a massive-neutrino setup, as the kernel dimension is
 six. The true kernel used by CL is more complicated. After experimenting with
 different options, we find that combining the RBF, Mat\'{e}rn, and white noise
@@ -789,7 +781,7 @@ value of the $i$-th test spectrum in the $j$-th $k$-bin; and
 \verb|sq_errors[i][j]| is the square of \texttt{deltas[i][j]}).
 It follows from the definition of these error metrics that all of them have 
 the same dimensions as $\matr{Y}_\text{test}$.
-\textcolor{orange}{In the current
+\selfcomment{In the current
 version of the code, this number of scales must be equal in the training and
 testing sets. But, if we add another layer of interpolation, we could easily
 eliminate this limitation}.
@@ -825,15 +817,13 @@ function is applied to the selected error array, then the aggregates are
 binned and plotted as a histogram. The user can specify the number of bins,
 otherwise Sturges' rule is used.
 
-\textcolor{orange}{Where are the training errors?}
-
 These testing functions are important to understand because their results
 drive the appraisals of the various emulators produced and discussed in
 chapter~\ref{chap: results}. Now that we
 have covered all of the essential steps in building an emulator, we are
 prepared to investigate its accuracy. We begin in
 chapter~\ref{chap: results} by concentrating on a simple case: the
-default emulators CL will build.
+default emulators CL will build. \selfcomment{Where are the training errors?}
 
 % We're putting this figure at the end of the chapter because, despite ht!,
 % it's too big to ever wrap any text around it. Since LaTeX always puts the
@@ -857,8 +847,7 @@ Script & Abbreviation & Purpose \\ \hline
  	The second column indicates the abbreviations we will use throughout this 
  	chapter. The third column is just
  	for quick reference: all scripts (except for \texttt{utils}) will be
- 	addressed in detail in these two chapters. \textcolor{red}{Should I axe
- 	the last column or could it be appropriate for this thesis?}}
+ 	addressed in detail in these two chapters.}
  \label{tab: script_summary}
 \end{table}
 
