@@ -33,6 +33,7 @@
 \usepackage{amsmath, verbatim, bm, amssymb}
 \usepackage{ulem, fancyvrb, fvextra}
 
+\usepackage{pdfpages}
 \usepackage{svg}
 \usepackage{caption, subcaption}
 
@@ -135,16 +136,16 @@
 
   \vspace*{\stretch{3}}
   \begin{center}
-    \Large Dissertation\\
-    \Large an der #4\\
-    \Large der Ludwig--Maximilians--Universit\"at\\
-    \Large M\"unchen\\
+    \Large Master's Thesis\\
+    \Large at the #4\\
+    \Large of the Ludwig--Maximilians--Universit\"at\\
+    \Large Munich\\
     \vspace*{\stretch{1}}
-    \Large vorgelegt von\\
+    \Large submitted by\\
     \Large #2\\
-    \Large aus #3\\
+    \Large from #3\\
     \vspace*{\stretch{2}}
-    \Large M\"unchen, den #6
+    \Large Munich, #6
   \end{center}
 
   \newpage
@@ -172,17 +173,21 @@
   \frontmatter
   \VerbatimFootnotes
 
-  \LMUTitle
+  % English title: Emulation of Linear Matter Power Spectra for Massive-Neutrino Cosmologies
+  \LMUTitle % German title: Emulation vom linearen Materie-Leistungsspektrum für Kosmologien mit massiven Neutrinos
       {Emulation of Linear Matter Power Spectra for Massive-Neutrino Cosmologies}               % Titel der Arbeit
       {Lukas Finkbeiner}                       % Vor- und Nachname des Autors
       {Boston}                             % Geburtsort des Autors
-      {Fakultät für Physik}                         % Name der Fakultaet
-      {M\"unchen 2022-23}                          % Ort und Jahr der Erstellung
-      {2. Oktober 2023}                            % Tag der Abgabe
+      {Faculty for Physics}                         % Name der Fakultaet
+      {Munich 2022-23}                          % Ort und Jahr der Erstellung
+      {October 2, 2023}                            % Tag der Abgabe
       {Ariel G. S\'{a}nchez}                      % Name des Erstgutachters
       {N.A.}                         % Name des Zweitgutachters
       {N.A.}                         % Datum der muendlichen Pruefung
 
+
+  %\include{insertions/german_title}
+  \includepdf[pages=-]{insertions/German_title.pdf}
 
   \tableofcontents
   \markboth{Table of Contents}{Table of Contents}
