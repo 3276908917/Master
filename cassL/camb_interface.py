@@ -599,6 +599,9 @@ def input_cosmology(cosmology):
     A. We're setting "omk" with OmK * h ** 2. Should I have used OmK? If so,
         the capitalization here is nonstandard.
     """
+    if "h" not in cosmology.keys():
+        raise ValueError("The provided cosmology does not specify h!")
+
     h = cosmology["h"]
 
     # tau is a desperation argument
