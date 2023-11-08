@@ -21,7 +21,7 @@ def build_cosmology(om_b_in, om_c_in, ns_in, sigma12_in, As_in, om_nu_in,
     param_ranges=None):
     # We should replace this function with a function that assumes, e.g.
     # index 0 is om_b, index 1 is om_c, etc.
-    
+
     # Use Aletheia model 0 as a base
     cosmology = cp.deepcopy(model0)
 
@@ -101,31 +101,8 @@ def direct_eval_cell(input_cosmology, standard_k_axis, debug=False):
 
     _redshifts=np.flip(np.linspace(0, 10, 150))
 
-    if debug:
-        print("\nMEMNeC:")
-        ui.print_cosmology(MEMNeC)
-        print("\nOriginal cosmology:")
-        ui.print_cosmology(input_cosmology)
-        print("\n")
-
     _, _, _, list_sigma12 = ci.evaluate_cosmology(MEMNeC, _redshifts,
         fancy_neutrinos=False, k_points=num_k_points, hubble_units=False)
-
-    #print(list_s12)
-    if debug:
-        print("Maximum s12:", max(list_sigma12))
-        import matplotlib.pyplot as plt
-        # Original intersection problem we're trying to solve
-        plt.plot(_redshifts, list_sigma12);
-        plt.axhline(input_cosmology["sigma12"], c="black")
-        plt.title("$\sigma_{12}$ vs. $z$")
-        plt.ylabel("$\sigma_{12}$")
-        plt.xlabel("$z$")
-        plt.show()
-
-    # remember that list_s12[0] corresponds to the highest value z
-    if debug:
-        print("Target sigma12:", input_cosmology["sigma12"])
 
     interpolator = interp1d(np.flip(list_sigma12), np.flip(_redshifts),
         kind='cubic')
@@ -145,9 +122,6 @@ def direct_eval_cell(input_cosmology, standard_k_axis, debug=False):
 
         input_cosmology['h'] -= 0.1
         return direct_eval_cell(input_cosmology, standard_k_axis, debug)
-
-    if debug:
-        print("recommended redshift", z_best)
 
     p = np.zeros(len(standard_k_axis))
 

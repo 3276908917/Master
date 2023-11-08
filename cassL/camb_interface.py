@@ -624,7 +624,7 @@ def specify_neutrino_mass(cosmology, omnuh2_in, nnu_massive_in=None):
     Also, should we replace default_nnu with something else in the
     following expression? Even if we're changing N_massive to 1,
     N_total_eff = 3.046 nonetheless, right?'''
-    full_cosmology["mnu"] = omnuh2_to_mnu(full_cosmology["omnuh2"])
+    # full_cosmology["mnu"] = omnuh2_to_mnu(full_cosmology["omnuh2"])
 
     # print("The mnu value", mnu_in, "corresponds to the omnuh2 value",
     #    omnuh2_in)
@@ -638,7 +638,7 @@ def specify_neutrino_mass(cosmology, omnuh2_in, nnu_massive_in=None):
     return full_cosmology
 
 
-def input_cosmology(cosmology, hubble_units=False):
+def input_cosmology(cosmology):
     """
     Helper function for kzps.
     Read entries from a dictionary representing a cosmological configuration.
@@ -655,7 +655,7 @@ def input_cosmology(cosmology, hubble_units=False):
 
     # tau is a desperation argument
     # Why are we using the degenerate hierarchy? Isn't that wrong?
-    pars.set_cosmology(
+    pars.set_params(
         H0=h * 100,
         ombh2=cosmology["ombh2"],
         omch2=cosmology["omch2"],
@@ -678,6 +678,27 @@ def input_cosmology(cosmology, hubble_units=False):
 
     return pars
 
+def get_CAMB_sigma12(pars, redshifts=[0]):
+    """
+    Helper function for evaluate_sigma12.
+    Given a fully set-up pars function, return the sigma12 values.
+    """
+
+    pars.set_matter_power(redshifts=redshifts, kmax=10.0 / pars.h,
+                          nonlinear=False)
+    results = camb.get_results(pars)
+    return results.get_sigmaR(12, hubble_units=False)
+
+def evaluate_sigma12(cosmology, redshifts=[0]):
+    if not isinstance(redshifts, list) and \
+        not isinstance(redshifts, np.ndarray):
+        raise TypeError("If you want to use a single redshift, you must " + \
+            "still nest it in an array.")
+
+    pars = input_cosmology(cosmology, hubble_units)
+    apply_universal_output_settings(pars)
+
+    return get_CAMB_sigma12(pars, redshifts)
 
 def get_CAMB_pspectrum(pars, redshifts=[0], k_points=100000,
                        hubble_units=False):
@@ -748,9 +769,10 @@ def evaluate_cosmology(cosmology, redshifts=[0], fancy_neutrinos=False,
         assert "sigma12" not in cosmology.keys() or mlc["sigma12"] is None, \
             "Redshift and sigma12 cannot be supplied simultaneously."
     '''
-    assert isinstance(redshifts, list) or isinstance(redshifts, np.ndarray), \
-        "If you want to use a single redshift, you must still nest it in" + \
-        " an array."
+    if not isinstance(redshifts, list) and \
+        not isinstance(redshifts, np.ndarray):
+        raise TypeError("If you want to use a single redshift, you must " + \
+            "still nest it in an array.")
 
     pars = input_cosmology(cosmology, hubble_units)
 
