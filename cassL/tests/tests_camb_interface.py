@@ -32,10 +32,21 @@ def test_input_cosmology_direct_values():
     # Now check to make sure mnu was computed correctly.
 
 def test_input_cosmology_indirect_vals():
-    assert pars.Omb == pars.ombh2 / (pars.H0 / 100) ** 2, \
-        "fractional density B incorrectly computed"
-    assert pars.mnu == ci.omnuh2_to_mnu(pars.omnuh2), \
-        "sum of neutrino masses incorrectly computed"
+    m0 = ci.specify_neutrino_mass(ci.cosm.iloc[0], 0)
+    pars = ci.input_cosmology(m0)
+
+    try:
+        pars.Omb
+        pars.Omc
+        assert False, "fractional densities should not be calculated."
+    except Exception:
+        pass
+
+    try:
+        pars.mnu
+        assert False, "the sum of neutrino masses should not be calculated."
+    except Exception:
+        pass
 
 def test_input_cosmology_err_handling():
     mA = ci.specify_neutrino_mass(ci.cosm.iloc[0], 0)

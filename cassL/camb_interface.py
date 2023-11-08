@@ -86,57 +86,6 @@ def parse_redshifts(model_num):
 
     return np.flip(np.sort(np.array(z)))
 
-def omnuh2_to_mnu(omnuh2, nnu=camb.constants.default_nnu):
-    r"""
-    !!! Units?
-    Compute the sum of neutrino masses mnu corresponding to the physical
-    physical density in neutrinos nnu.
-
-    Parameters:
-    ----------
-    omnuh2: float
-        The physical density in neutrinos corresponding to the requested sum of
-        neutrino masses.
-
-        Based off of line 55 from constants.py (CAMB), I think this is supposed
-        to be a sum.
-    nnu: float
-        The effective number of massive neutrino species. According to the
-        Planck best fit, this is 3.044.
-
-    Returns:
-    -------
-    (float)
-        The sum of neutrino masses (in which units??) to which mnu corresponds.
-    """
-    return omnuh2 * camb.constants.neutrino_mass_fac / (nnu / 3.0) ** 0.75
-
-def mnu_to_omnuh2(mnu, nnu=camb.constants.default_nnu):
-    r"""
-    !!! Units?
-    Compute the physical density in neutrinos corresponding to the sum of
-    neutrino masses mnu.
-
-    Parameters:
-    ----------
-    mnu: float
-        The sum of neutrino masses (in what units??) corresponding to the
-        requested physical density in neutrinos.
-        (Besides, is this the neutrino mass per neutrino type or the sum over
-        all three types??)
-
-        Based off of line 55 from constants.py (CAMB), I think this is supposed
-        to be a sum.
-    nnu: float
-        The effective number of massive neutrino species. According to the
-        Planck best fit, this is 3.044.
-
-    Returns:
-    -------
-    (float)
-        The physical density in neutrinos to which mnu corresponds.
-    """
-    return mnu * (nnu / 3.0) ** 0.75 / camb.constants.neutrino_mass_fac
 
 def balance_neutrinos_with_CDM(cosmology, new_omnuh2):
     r"""
@@ -174,11 +123,10 @@ def balance_neutrinos_with_CDM(cosmology, new_omnuh2):
     """
     new_cosmology = cp.deepcopy(cosmology)
 
+    # If omnuh2 has not yet been specified, assume it is zero by default.
     old_omnuh2 = 0
     if "omnuh2" in cosmology:
         old_omnuh2 = cosmology["omnuh2"]
-    elif "mnu" in cosmology:
-        old_omnuh2 = mnu_to_omnuh2(cosmology["mnu"])
 
     delta = new_omnuh2 - old_omnuh2
     assert delta < cosmology["omch2"], "Not enough density in CDM to " + \
@@ -610,8 +558,11 @@ def specify_neutrino_mass(cosmology, omnuh2_in, nnu_massive_in=None):
     # Default behavior: if no nnu_massive_in specified, take it to be 1 in the
     # massive-neutrino case, 0 otherwise
     if nnu_massive_in is None:
-        nnu_massive_in = 0 if omnuh2_in == 0 else 1
-    
+        nnu_massive_in = 1
+    if omnuh2_in == 0 and nnu_massive_in == 0:
+        print("WARNING: CAMB crashes with nnu_massive == 0, even if omnuh2",
+            "is zero. We're overriding and setting nnuMassive = 0...")
+
     full_cosmology = cp.deepcopy(cosmology)
 
     full_cosmology["omnuh2"] = omnuh2_in
@@ -648,20 +599,17 @@ def input_cosmology(cosmology):
     A. We're setting "omk" with OmK * h ** 2. Should I have used OmK? If so,
         the capitalization here is nonstandard.
     """
-
-    pars = camb.CAMBparams()
-
     h = cosmology["h"]
 
     # tau is a desperation argument
     # Why are we using the degenerate hierarchy? Isn't that wrong?
-    pars.set_params(
+    pars = camb.set_params(
         H0=h * 100,
         ombh2=cosmology["ombh2"],
         omch2=cosmology["omch2"],
         omk=cosmology["OmK"],
-        mnu=cosmology["mnu"],
-        num_massive_neutrinos=cosmology["nnu_massive"],
+        omnuh2=cosmology["omnuh2"],
+        #num_massive_neutrinos=cosmology["nnu_massive"],
         tau=0.0952,  # for justification, ask Matteo
         neutrino_hierarchy="degenerate"  # 1 eigenstate approximation; our
         # neutrino setup (see below) is not valid for inverted/normal
@@ -774,7 +722,7 @@ def evaluate_cosmology(cosmology, redshifts=[0], fancy_neutrinos=False,
         raise TypeError("If you want to use a single redshift, you must " + \
             "still nest it in an array.")
 
-    pars = input_cosmology(cosmology, hubble_units)
+    pars = input_cosmology(cosmology)
 
     if fancy_neutrinos:
         make_neutrinos_fancy(pars, cosmology["nnu_massive"])
@@ -782,7 +730,7 @@ def evaluate_cosmology(cosmology, redshifts=[0], fancy_neutrinos=False,
     apply_universal_output_settings(pars)
 
     return get_CAMB_pspectrum(pars, redshifts, k_points=k_points,
-                            hubble_units=hubble_units)
+                              hubble_units=hubble_units)
 
 
 def get_CAMB_interpolator(pars, redshifts=[0], kmax=1, hubble_units=False):
