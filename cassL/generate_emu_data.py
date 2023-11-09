@@ -17,20 +17,40 @@ model0 = ci.cosm.loc[0]
 
 A_S_DEFAULT = 2.12723788013E-09
 
-def build_cosmology(om_b_in, om_c_in, ns_in, sigma12_in, As_in, om_nu_in,
-    param_ranges=None):
+def denormalize_row(lhs_row, param_ranges=None):
+    return lhs_row * np.ptp(param_ranges) + np.min(param_ranges)
+
+def build_cosmology(lhs_row, param_ranges=None):
+    """
+    Intended behavior:
+        if len(lhs_row) == 3 we're building a sigma12 emulator
+        if len(lhs_row) == 4 we're building a massless neutrino emulator
+        if len(lhs_row) == 6 we're building a massive neutrino emulator
+    """
     # We should replace this function with a function that assumes, e.g.
     # index 0 is om_b, index 1 is om_c, etc.
+
+    if len(lhs_row) not in [3, 4, 6]:
+        raise ValueError("The length of the input lhs row does not" + \
+            "correspond to any of the three known cases. Please refer to " + \
+            "the docstring.")
 
     # Use Aletheia model 0 as a base
     cosmology = cp.deepcopy(model0)
 
-    cosmology["ombh2"] = om_b_in
-    cosmology["omch2"] = om_c_in
-    cosmology["n_s"] = ns_in
+    cosmology["ombh2"] = lhs_row[0]
+    cosmology["omch2"] = lhs_row[1]
+    cosmology["n_s"] = lhs_row[2]
+
     # Incomplete
-    cosmology["sigma12"] = sigma12_in
-    cosmology["A_s"] = As_in
+    if len(lhs_row) > 3:
+        cosmology["sigma12"] = lhs_row[3]
+
+    if len(lhs_row) > 4:
+        cosmology["A_s"] = lhs_row[4]
+        return ci.specify_neutrino_mass(cosmology, lhs_row[5])
+    else:
+        cosmology["A_s"] = A_S_DEFAULT
 
     if param_ranges is not None:
         prior = param_ranges["ombh2"]
