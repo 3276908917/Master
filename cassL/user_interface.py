@@ -28,6 +28,29 @@ def print_cosmology(cosmology):
 def prior_file_to_dict(prior_name="COMET_with_nu"):
     """
     !
+    """
+    param_ranges = np.array([])
+
+    prior_file = "priors/" + prior_name + ".txt"
+    
+    with open(prior_file, 'r') as file:
+        lines = file.readlines()
+        key = None
+        for line in lines:
+            if line[0] == "$":
+                key = line[1:].strip()
+            else:
+                bounds = line.split(",")
+                param_ranges = np.append(param_ranges,
+                    append([float(bounds[0]), float(bounds[1])])
+
+    return np.array(param_ranges)
+
+
+def prior_file_to_dict(prior_name="COMET_with_nu"):
+    """
+    Legacy function, use prior_file_to_array now instead.
+    !
     Return a dictionary of arrays where each key is a cosmological parameter
     over which the emulator will be trained. The first entry of each array is
     the parameter's lower bound, the second entry is the parameter's upper
