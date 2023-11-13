@@ -132,20 +132,25 @@ def homogenize_k_axes(samples):
      
     return base_k, interpd_spectra
     
-def neutrinos_are_massive(lhc_dim, priors):
+def verify_LHS_dim(lhc_dim, priors):
+    if lhc_dim == 3:
+        if "sigma_12" in priors:
+            raise ValueError("Found sigma12 in priors, but LHS is 3D!")
     if lhc_dim == 4: # this had better be a massless-neutrino case
         if "A_s" in priors:
             raise ValueError("Found A_s in priors, but LHS is 4D!")
         if "omnuh2" in priors:
             raise ValueError("Found omnuh2 in priors, but LHS is 4D!")
-        return False
+        if "sigma12" not in priors:
+            raise ValueError("LHS is 4D, but sigma12 not found in priors!")
     elif lhc_dim == 6: # this had better be a massive-neutrino case
         if "A_s" not in priors:
             raise ValueError("LHS is 6D, but A_s not found in priors!")
         if "omnuh2" not in priors:
             raise ValueError("LHS is 6D, but omnuh2 not found in priors!")
-        return True
+        if "sigma12" not in priors:
+            raise ValueError("LHS is 6D, but sigma12 not found in priors!")
     else: # unrecognized
-        print("The LHS ought to have either four or six parameters per " + \
-               "row! If you are trying to expand the parameter set, you " + \
-               "will have to directly access the other scripts yourself.")
+        print("The LHS ought to have either three, four or six parameters" + \
+                "per row! If you are trying to expand the parameter set, " + \
+               "you will have to directly access the other scripts yourself.")

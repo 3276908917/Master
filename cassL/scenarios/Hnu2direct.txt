@@ -9,4 +9,4 @@ $num_spectra_points
 $same_test_set
 None
 $LHC_train
-Hnu2direct
+Hnu2

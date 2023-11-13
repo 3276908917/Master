@@ -20,6 +20,27 @@ A_S_DEFAULT = 2.12723788013E-09
 def denormalize_row(lhs_row, param_ranges=None):
     return lhs_row * np.ptp(param_ranges) + np.min(param_ranges)
 
+    # Some outdated sigma12 nonlinear sampling code which was probably wrong
+    # even before it needed to be updated to the current setup
+
+    if "sigma12" in param_ranges:
+        prior = param_ranges["sigma12"]
+        cosmology["sigma12"] = cosmology["sigma12"] * \
+            (prior[1] - prior[0]) + prior[0]
+    elif "sigma12_2" in param_ranges:
+        #! Make the use of sigma12_2 more user-friendly
+        prior = param_ranges["sigma12_2"]
+        # sigma12_in actually describes a sigma12_2 value
+        sigma12_2 = sigma12_in * (prior[1] - prior[0]) + prior[0]
+        cosmology["sigma12"] = np.sqrt(sigma12_2)
+    elif "sigma12_root" in param_ranges:
+        #! Make the use of sigma12_2 more user-friendly
+        prior = param_ranges["sigma12_root"]
+        # sigma12_in actually describes a sigma12_2 value
+        sigma12_root = sigma12_in * (prior[1] - prior[0]) + prior[0]
+        cosmology["sigma12"] = np.square(sigma12_root)
+
+
 def build_cosmology(lhs_row, param_ranges=None):
     """
     Intended behavior:
@@ -51,53 +72,7 @@ def build_cosmology(lhs_row, param_ranges=None):
         return ci.specify_neutrino_mass(cosmology, lhs_row[5])
     else:
         cosmology["A_s"] = A_S_DEFAULT
-
-    if param_ranges is not None:
-        prior = param_ranges["ombh2"]
-        cosmology["ombh2"] = cosmology["ombh2"] * (prior[1] - prior[0]) + \
-            prior[0]
-
-        prior = param_ranges["omch2"]
-        cosmology["omch2"] = cosmology["omch2"] * (prior[1] - prior[0]) + \
-            prior[0]
-
-        prior = param_ranges["n_s"]
-        cosmology["n_s"] = cosmology["n_s"] * (prior[1] - prior[0]) + prior[0]
-
-        if "sigma12" in param_ranges:
-            prior = param_ranges["sigma12"]
-            cosmology["sigma12"] = cosmology["sigma12"] * \
-                (prior[1] - prior[0]) + prior[0]
-        elif "sigma12_2" in param_ranges:
-            #! Make the use of sigma12_2 more user-friendly
-            prior = param_ranges["sigma12_2"]
-            # sigma12_in actually describes a sigma12_2 value
-            sigma12_2 = sigma12_in * (prior[1] - prior[0]) + prior[0]
-            cosmology["sigma12"] = np.sqrt(sigma12_2)
-        elif "sigma12_root" in param_ranges:
-            #! Make the use of sigma12_2 more user-friendly
-            prior = param_ranges["sigma12_root"]
-            # sigma12_in actually describes a sigma12_2 value
-            sigma12_root = sigma12_in * (prior[1] - prior[0]) + prior[0]
-            cosmology["sigma12"] = np.square(sigma12_root)
-
-        if "A_s" in param_ranges:
-            prior = param_ranges["A_s"]
-            cosmology["A_s"] = cosmology["A_s"] * (prior[1] - prior[0]) + \
-                prior[0]
-
-    #! Actually the last argument is not really important and is indeed just
-    # the default value. I'm writing this out explicitly because we're still
-    # in the debugging phase and so my code should always err on the verbose
-    # side.
-    nnu_massive = 0 if om_nu_in == 0 else 1
-
-    if param_ranges is not None and "omnuh2" in param_ranges:
-        prior = param_ranges["omnuh2"]
-        om_nu_in = om_nu_in * (prior[1] - prior[0]) + prior[0]
-
-    return ci.specify_neutrino_mass(cosmology, om_nu_in,
-        nnu_massive_in=nnu_massive)
+        return ci.specify_neutrino_mass(cosmology, 0)
 
 
 def direct_eval_cell(input_cosmology, standard_k_axis, debug=False):
@@ -265,12 +240,8 @@ def fill_hypercube(lhs, standard_k_axis, priors=None,
     # Recent change: now omega_nu comes last
     
     bundle_parameters = None
-    if utils.neutrinos_are_massive(len(lhs[0]), priors):
-        bundle_parameters = lambda row: build_cosmology(row[0], row[1], row[2],
-            row[3], row[4], row[5], priors)
-    else:
-        bundle_parameters = lambda row: build_cosmology(row[0], row[1], row[2],
-            row[3], A_S_DEFAULT, 0, priors)
+    if len(lhs[0]) != len(priors):
+        raise ValueError("Dimension disagreement between priors and LHS.")
 
     # This just provides debugging information
     rescaling_parameters_list = None
@@ -278,7 +249,8 @@ def fill_hypercube(lhs, standard_k_axis, priors=None,
     unwritten_cells = 0
     for i in cell_range:
         this_p = None
-        this_cosmology = bundle_parameters(lhs[i])
+        this_denormalized_row = denormalize_row(lhs[i])
+        this_cosmology = build_cosmology(this_denormalized_row)
 
         # We're only making the following switch in order to test out the
         # interpolator approach.
