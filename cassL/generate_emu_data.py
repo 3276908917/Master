@@ -235,7 +235,10 @@ def fill_hypercube(lhs, standard_k_axis, priors=None,
     if cell_range is None:
         cell_range = range(len(lhs))
     if samples is None:
-        samples = np.zeros((len(lhs), len(standard_k_axis)))
+        if len(lhs[0]) == 4 or len(lhs[0]) == 6:
+            samples = np.zeros((len(lhs), len(standard_k_axis)))
+        elif len(lhs[0]) == 3:
+            samples = np.zeros(len(lhs))
 
     # Recent change: now omega_nu comes last
     
@@ -261,8 +264,12 @@ def fill_hypercube(lhs, standard_k_axis, priors=None,
         this_actual_sigma12 = None
         these_rescaling_parameters = np.array([np.nan, np.nan])
         try:
-            this_p, this_actual_sigma12, these_rescaling_parameters = \
-                eval_func(this_cosmology, standard_k_axis)
+            if len(lhs[0]) == 4 or len(lhs[0]) == 6:
+                # we're emulating power spectra
+                this_p, this_actual_sigma12, these_rescaling_parameters = \
+                    eval_func(this_cosmology, standard_k_axis)
+            elif len(lhs[0]) == 3: # we're emulating sigma12
+                samples[i] = eval_func(this_cosmology)
         except camb.CAMBError:
             print("This cell is unsolvable. However, in this case, we " + \
                   "observed a CAMBError rather than a negative redshift. " + \
@@ -278,40 +285,45 @@ def fill_hypercube(lhs, standard_k_axis, priors=None,
         # We may actually want to remove this if-condition. For now, though, it
         # allows us to repeatedly evaluate a cosmology with the same
         # deterministic result.
-        if this_actual_sigma12 is not None:
-            lhs[i][3] = this_actual_sigma12
+        if len(lhs[0]) == 4 or len(lhs[0]) == 6:
+            if this_actual_sigma12 is not None:
+                lhs[i][3] = this_actual_sigma12
 
-            if "sigma12" in priors: # we have to normalize
-                prior = priors["sigma12"]
-                this_normalized_actual_sigma12 = \
-                    (this_actual_sigma12 - prior[0]) / (prior[1] - prior[0])
-                lhs[i][3] = this_normalized_actual_sigma12
-            #! Make the use of sigma12_2 more user-friendly
-            elif "sigma12_2" in priors: # we have to square and normalize
-                this_actual_sigma12_2 = np.square(this_actual_sigma12)
-                prior = priors["sigma12_2"]
-                this_normalized_actual_sigma12_2 = \
-                    (this_actual_sigma12_2 - prior[0]) / (prior[1] - prior[0])
-                lhs[i][3] = this_normalized_actual_sigma12_2
-            elif "sigma12_root" in priors: # we have to square and
-                # normalize
-                this_actual_sigma12_root = np.sqrt(this_actual_sigma12)
-                prior = priors["sigma12_root"]
-                this_normalized_actual_sigma12_root = \
-                    (this_actual_sigma12_root - prior[0]) / \
-                        (prior[1] - prior[0])
-                lhs[i][3] = this_normalized_actual_sigma12_root
+                if "sigma12" in priors: # we have to normalize
+                    prior = priors["sigma12"]
+                    this_normalized_actual_sigma12 = \
+                        (this_actual_sigma12 - prior[0]) / (prior[1] - prior[0])
+                    lhs[i][3] = this_normalized_actual_sigma12
+                #! Make the use of sigma12_2 more user-friendly
+                elif "sigma12_2" in priors: # we have to square and normalize
+                    this_actual_sigma12_2 = np.square(this_actual_sigma12)
+                    prior = priors["sigma12_2"]
+                    this_normalized_actual_sigma12_2 = \
+                        (this_actual_sigma12_2 - prior[0]) / (prior[1] - prior[0])
+                    lhs[i][3] = this_normalized_actual_sigma12_2
+                elif "sigma12_root" in priors: # we have to square and
+                    # normalize
+                    this_actual_sigma12_root = np.sqrt(this_actual_sigma12)
+                    prior = priors["sigma12_root"]
+                    this_normalized_actual_sigma12_root = \
+                        (this_actual_sigma12_root - prior[0]) / \
+                            (prior[1] - prior[0])
+                    lhs[i][3] = this_normalized_actual_sigma12_root
 
-        samples[i] = this_p
+            samples[i] = this_p
 
         print(i, "complete")
         unwritten_cells += 1
         if write_period is not None and unwritten_cells >= write_period:
             np.save("samples_backup_i" + str(i) + "_" + save_label + ".npy",
                 samples, allow_pickle=True)
-            np.save("rescalers_backup_i" + str(i) + "_" + save_label + ".npy",
-                rescaling_parameters_list, allow_pickle=True)
-            np.save("hc_backup_i" + str(i) + "_" + save_label + ".npy",
-                lhs, allow_pickle=True)
-            unwritten_cells = 0
+
+            if len(lhs[0]) != 3:
+                np.save("rescalers_backup_i" + str(i) + "_" + save_label + \
+                        ".npy", rescaling_parameters_list, allow_pickle=True)
+                np.save("hc_backup_i" + str(i) + "_" + save_label + ".npy",
+                        lhs, allow_pickle=True)
+
+                unwritten_cells = 0
+
     return samples, rescaling_parameters_list
