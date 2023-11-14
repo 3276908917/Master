@@ -646,7 +646,7 @@ def evaluate_sigma12(cosmology, redshifts=[0]):
         raise TypeError("If you want to use a single redshift, you must " + \
             "still nest it in an array.")
 
-    pars = input_cosmology(cosmology, hubble_units=False)
+    pars = input_cosmology(cosmology)
     apply_universal_output_settings(pars)
 
     return get_CAMB_sigma12(pars, redshifts)
@@ -776,7 +776,7 @@ def cosmology_to_PK_interpolator(cosmology, redshifts=[0],
         "If you want to use a single redshift, you must still nest it in" + \
         " an array."
 
-    pars = input_cosmology(cosmology, hubble_units)
+    pars = input_cosmology(cosmology)
 
     if fancy_neutrinos:
         make_neutrinos_fancy(pars, cosmology["nnu_massive"])
