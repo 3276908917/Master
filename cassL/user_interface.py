@@ -31,7 +31,7 @@ def prior_file_to_array(prior_name="COMET_with_nu"):
     """
     !
     """
-    param_ranges = np.array([])
+    param_ranges = None
 
     prior_file = data_prefix + "priors/" + prior_name + ".txt"
     
@@ -41,8 +41,13 @@ def prior_file_to_array(prior_name="COMET_with_nu"):
         for line in lines:
             if line[0] != "$":
                 bounds = line.split(",")
-                bounds = np.array([float(bounds[0]), float(bounds[1])])
-                param_ranges = np.append(param_ranges, bounds)
+                # Extra layer of square brackets so that np.append works
+                bounds = np.array([[float(bounds[0]), float(bounds[1])]])
+                
+                if param_ranges is None:
+                    param_ranges = bounds
+                else:
+                    param_ranges = np.append(param_ranges, bounds, axis=0)
 
     return param_ranges
 
