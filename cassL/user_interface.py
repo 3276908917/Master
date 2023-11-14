@@ -4,6 +4,8 @@ from cassL import generate_emu_data as ged
 from cassL import train_emu as te
 import os
 
+data_prefix = os.path.dirname(os.path.abspath(__file__)) + "/"
+
 # In keeping with the format of values typically quoted in the literature for
 # the scalar mode amplitude (see, for example, Spurio Mancini et al, 2021 ),
 # we here define our prior ranges with the use of exponentiation.
@@ -31,7 +33,7 @@ def prior_file_to_array(prior_name="COMET_with_nu"):
     """
     param_ranges = np.array([])
 
-    prior_file = "priors/" + prior_name + ".txt"
+    prior_file = data_prefix + "priors/" + prior_name + ".txt"
     
     with open(prior_file, 'r') as file:
         lines = file.readlines()

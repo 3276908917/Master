@@ -18,7 +18,7 @@ from cassL import utils
 try:
     # Keep in mind that 'cosmologies.dat' is NOT the same file as the original
     # 'cosmology_Aletheia.dat' that Ariel provided. In order to facilitate the
-    # reading-in of the file, we make some miner formatting adjustments such as
+    # reading-in of the file, we make some minor formatting adjustments such as
     # the removal of number signs. Use the unaltered version will cause a
     # segfault.
     path_to_cosms = data_prefix + "cosmologies.dat"
