@@ -68,6 +68,7 @@ def is_normalized_X(X):
     # value in the 2D array X
     return np.min(X) >= 0 and np.max(X) <= 1
 
+
 def train_emu(emu, X, Y):
     # The dimension is automatically the length of an X element.
     remaining_variance = np.var(Y)
@@ -90,6 +91,7 @@ def train_emu(emu, X, Y):
     # '' is a regex matching all parameter names
     emu.gpr.constrain_positive('')
     emu.gpr.optimize()
+
 
 class Emulator_Trainer:
 
@@ -140,6 +142,8 @@ class Emulator_Trainer:
             currently only support log normalization. i.e. this "np.exp" call
             is currently fixed.
             """
+            if self.ystdev = None and self.ymu = None:
+                return raw_prediction
             return np.exp(raw_prediction * self.ystdev + self.ymu)
 
 
@@ -228,7 +232,7 @@ class Emulator_Trainer:
     def train_p_emu(self):
         if self.X_train is None or self.normalized_Y is None:
             raise AttributeError("No data found over which to train.")
-        self.train_emu(self.p_emu, self.X_train, self.normalized_Y)
+        self.p_emu = train_emu(self.p_emu, self.X_train, self.normalized_Y)
         
     def validate(self, X_val, Y_val):
         """
@@ -255,10 +259,17 @@ class Emulator_Trainer:
         for i in range(len(X_val)):
             self.val_preds[i] = self.p_emu.predict_pspectrum(X_val[i])
 
-        self.deltas = self.val_preds - self.Y_val
+        uncertainties = self.val_preds - self.Y_val
         
-        self.delta_emu = self.Emulator(emu_name + "_uncertainties", xmin, xrange, ymu, ystdev)
+        xmin = np.min(self.priors, axis=1)
+        xrange = np.ptp(self.priors, axis=1)
         
+        # The deltas should already be well-behaved, so we don't need to
+        # normalize y.
+        self.delta_emu = self.Emulator(emu_name + "_uncertainties", xmin,
+            xrange, ymu=None, ystdev=None)
+        
+        train_emu(self.delta_emu, self.X_val, uncertainties)
         print("Uncertainty emulator trained!")
         
     def test(self, X_test, Y_test):
