@@ -17,7 +17,7 @@ model0 = ci.cosm.loc[0]
 
 A_S_DEFAULT = 2.12723788013E-09
 
-def denormalize_row(lhs_row, param_ranges=None):
+def denormalize_row(lhs_row, param_ranges):
     param_ranges = param_ranges[:len(lhs_row)]
     return lhs_row * np.ptp(param_ranges) + np.min(param_ranges)
 
@@ -257,7 +257,7 @@ def fill_hypercube(lhs, standard_k_axis, priors=None,
     unwritten_cells = 0
     for i in cell_range:
         this_p = None
-        this_denormalized_row = denormalize_row(lhs[i])
+        this_denormalized_row = denormalize_row(lhs[i], param_ranges=priors)
         this_cosmology = build_cosmology(this_denormalized_row)
 
         # We're only making the following switch in order to test out the
