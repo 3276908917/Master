@@ -39,7 +39,7 @@ def prior_file_to_array(prior_name="COMET_with_nu"):
         for line in lines:
             if line[0] != "$":
                 bounds = line.split(",")
-                bounds = np.array([float(bounds[0]), float(bounds[1]))
+                bounds = np.array([float(bounds[0]), float(bounds[1])])
                 param_ranges = np.append(param_ranges, bounds)
 
     return param_ranges
