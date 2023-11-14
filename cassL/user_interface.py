@@ -25,7 +25,7 @@ def print_cosmology(cosmology):
         if key not in disregard_keys:
             print(key, cosmology[key])
 
-def prior_file_to_dict(prior_name="COMET_with_nu"):
+def prior_file_to_array(prior_name="COMET_with_nu"):
     """
     !
     """
@@ -37,14 +37,12 @@ def prior_file_to_dict(prior_name="COMET_with_nu"):
         lines = file.readlines()
         key = None
         for line in lines:
-            if line[0] == "$":
-                key = line[1:].strip()
-            else:
+            if line[0] != "$":
                 bounds = line.split(",")
-                param_ranges = np.append(param_ranges,
-                    append([float(bounds[0]), float(bounds[1])])
+                bounds = np.array([float(bounds[0]), float(bounds[1]))
+                param_ranges = np.append(param_ranges, bounds)
 
-    return np.array(param_ranges)
+    return param_ranges
 
 
 def prior_file_to_dict(prior_name="COMET_with_nu"):
@@ -137,9 +135,6 @@ def get_scenario(scenario_name):
 
 def build_train_and_test_sets(scenario_name):
     """
-    #! This situation's misconfigured. This function should only build the
-    data sets, it shouldn't also be training the emulator!
-    
     That should be a separate function which marries this one with
         build_and_test_emulator
     
