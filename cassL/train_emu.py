@@ -68,6 +68,28 @@ def is_normalized_X(X):
     # value in the 2D array X
     return np.min(X) >= 0 and np.max(X) <= 1
 
+def train_emu(emu, X, Y):
+    # The dimension is automatically the length of an X element.
+    remaining_variance = np.var(Y)
+    
+    kernel1 = GPy.kern.RBF(input_dim=emu.xdim,
+                           variance=remaining_variance,
+                           lengthscale=np.ones(emu.xdim), ARD=True)
+
+    kernel2 = GPy.kern.Matern32(input_dim=emu.xdim, ARD=True,
+                                variance=remaining_variance,
+                                lengthscale=np.ones(emu.xdim))
+
+    kernel3 = GPy.kern.White(input_dim=emu.xdim,
+                             variance=remaining_variance)
+
+    kernel = kernel1 + kernel2 + kernel3
+
+    self.p_emu.gpr = GPy.models.GPRegression(X, Y, kernel)
+    
+    # '' is a regex matching all parameter names
+    emu.gpr.constrain_positive('')
+    emu.gpr.optimize()
 
 class Emulator_Trainer:
 
@@ -174,7 +196,7 @@ class Emulator_Trainer:
             if not isinstance(file_handle, str):
                 raise TypeError(constructor_complaint)
 
-            self.emu = pickle.load(open(file_handle, "rb"))
+            self.p_emu = pickle.load(open(file_handle, "rb"))
 
         elif len(args) == 4:
             emu_name = args[0]
@@ -195,46 +217,49 @@ class Emulator_Trainer:
                 raise ValueError("X and Y are unequal in length!")
                 
             self.normalized_Y, ymu, ystdev = _normalize_spectra(self.Y_train)
+            
+            xmin = np.min(priors, axis=1)
+            xrange = np.ptp(priors, axis=1)
 
-            xmin = np.array([])
-            xrange = np.array([])
-
-            for key in self.priors.keys():
-                xmin = np.append(xmin, self.priors[key][0])
-                xrange = np.append(xrange,
-                                   self.priors[key][1] - self.priors[key][0])
-
-            self.emu = self.Emulator(emu_name, xmin, xrange, ymu, ystdev)
+            self.p_emu = self.Emulator(emu_name, xmin, xrange, ymu, ystdev)
         else:
             raise TypeError(constructor_complaint)
-            
-            
-    def train(self):
+        
+    def train_p_emu(self):
         if self.X_train is None or self.normalized_Y is None:
             raise AttributeError("No data found over which to train.")
-
-        # The dimension is automatically the length of an X element.
-        remaining_variance = np.var(self.normalized_Y)
-
-        kernel1 = GPy.kern.RBF(input_dim=self.emu.xdim,
-                               variance=remaining_variance,
-                               lengthscale=np.ones(self.emu.xdim), ARD=True)
-
-        kernel2 = GPy.kern.Matern32(input_dim=self.emu.xdim, ARD=True,
-                                    variance=remaining_variance,
-                                    lengthscale=np.ones(self.emu.xdim))
-
-        kernel3 = GPy.kern.White(input_dim=self.emu.xdim,
-                                 variance=remaining_variance)
-
-        kernel = kernel1 + kernel2 + kernel3
-
-        self.emu.gpr = \
-            GPy.models.GPRegression(self.X_train, self.normalized_Y, kernel)
+        self.train_emu(self.p_emu, self.X_train, self.normalized_Y)
         
-        # '' is a regex matching all parameter names
-        self.emu.gpr.constrain_positive('')
-        self.emu.gpr.optimize()
+    def validate(self, X_val, Y_val):
+        """
+        !
+        Consider collapsing the validation and test functions, they read almost
+            identically!
+        """
+        # X_val should already be normalized
+        # Y_val should be a set of non-normalized spectra
+        if len(X_val) != len(Y_val):
+            raise ValueError("Size of X and Y do not match!")
+        if len(X_val[0]) != self.p_emu.xdim:
+            raise ValueError("Dimension of validation X does not match " + \
+                "the dimension of the training X!")
+        if len(Y_test[0]) != self.p_emu.ydim:
+            raise ValueError("Dimension of validation Y does not match " + \
+                "the dimension of the training Y!")
+        
+        self.X_val = X_val
+        self.Y_val = Y_val
+
+        self.val_preds = np.zeros(Y_val.shape)
+
+        for i in range(len(X_val)):
+            self.val_preds[i] = self.p_emu.predict_pspectrum(X_val[i])
+
+        self.deltas = self.val_preds - self.Y_val
+        
+        self.delta_emu = self.Emulator(emu_name + "_uncertainties", xmin, xrange, ymu, ystdev)
+        
+        print("Uncertainty emulator trained!")
         
     def test(self, X_test, Y_test):
         """
@@ -244,10 +269,10 @@ class Emulator_Trainer:
         """
         if len(X_test) != len(Y_test):
             raise ValueError("Size of X and Y do not match!")
-        if len(X_test[0]) != self.emu.xdim:
+        if len(X_test[0]) != self.p_emu.xdim:
             raise ValueError("Dimension of test X does not match the " + \
                 "dimension of the training X!")
-        if len(Y_test[0]) != self.emu.ydim:
+        if len(Y_test[0]) != self.p_emu.ydim:
             raise ValueError("Dimension of test Y does not match the " + \
                 "dimension of the training Y!")
         
@@ -257,9 +282,7 @@ class Emulator_Trainer:
         self.test_predictions = np.zeros(Y_test.shape)
 
         for i in range(len(X_test)):
-            #! This might complain about lack of nesting, but don't just nest,
-            # try to find a better way to resolve the issue.
-            self.test_predictions[i] = self.emu.predict_pspectrum(X_test[i])
+            self.test_predictions[i] = self.p_emu.predict_pspectrum(X_test[i])
 
         self.deltas = self.test_predictions - Y_test
         self.sq_errors = np.square(self.deltas)
@@ -271,7 +294,7 @@ class Emulator_Trainer:
 
 
     def set_scales(self, scales):
-        if len(scales) != self.emu.ydim:
+        if len(scales) != self.p_emu.ydim:
             raise ValueError("The dimension of the given set of scales " + \
                 "does not match the dimension of the spectra!")
         
@@ -375,7 +398,7 @@ class Emulator_Trainer:
                                  linewidth=linewidth)
                     plt.xscale('log')
 
-        title = "Emulator " + self.emu.name + ", " + \
+        title = "Emulator " + self.p_emu.name + ", " + \
             str(len(valid_errors)) + r" Random Massive-$\nu$ Models"
 
         if param_index:
@@ -442,14 +465,14 @@ class Emulator_Trainer:
             bins="sturges"
 
         plt.hist(error_array, bins=bins)
-        plt.title("Emulator " + self.emu.name + ": histogram of " + \
+        plt.title("Emulator " + self.p_emu.name + ": histogram of " + \
                   aggregator_description + " " + metric + " errors")
         plt.ylabel("Frequency [counts]")
 
         plt.xlabel(aggregator_description + " " + metric + \
                    " error between CAMB and Cassandra-L")
 
-        plt.savefig("plots/err_hist_" + self.emu.name + ".png")
+        plt.savefig("plots/err_hist_" + self.p_emu.name + ".png")
 
         plt.show()
 
@@ -460,7 +483,7 @@ class Emulator_Trainer:
         emulator.
         """
         if file_name is None:
-            file_name = self.emu.name
+            file_name = self.p_emu.name
         if file_name[:-4] != ".cle":
             file_name += ".cle"
-        pickle.dump(self.emu, open("emulators/" + file_name, "wb"), protocol=5)
+        pickle.dump(self.p_emu, open("emulators/" + file_name, "wb"), protocol=5)

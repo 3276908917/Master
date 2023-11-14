@@ -19,7 +19,9 @@ A_S_DEFAULT = 2.12723788013E-09
 
 def denormalize_row(lhs_row, param_ranges):
     param_ranges = param_ranges[:len(lhs_row)]
-    return lhs_row * np.ptp(param_ranges) + np.min(param_ranges)
+    xrange = np.ptp(param_ranges, axis=1)
+    xmin = np.min(param_ranges, axis=1)
+    return lhs_row * xrange + xmin
 
     # Some outdated sigma12 nonlinear sampling code which was probably wrong
     # even before it needed to be updated to the current setup
