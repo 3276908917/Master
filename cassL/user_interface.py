@@ -52,7 +52,7 @@ def prior_file_to_array(prior_name="COMET_with_nu"):
     return param_ranges
 
 
-def prior_file_to_dict(prior_name="COMET_with_nu"):
+def prior_file_to_dict(prior_name="COMET"):
     """
     Legacy function, use prior_file_to_array now instead.
     !

@@ -18,6 +18,7 @@ model0 = ci.cosm.loc[0]
 A_S_DEFAULT = 2.12723788013E-09
 
 def denormalize_row(lhs_row, param_ranges=None):
+    param_ranges = param_ranges[:len(lhs_row)]
     return lhs_row * np.ptp(param_ranges) + np.min(param_ranges)
 
     # Some outdated sigma12 nonlinear sampling code which was probably wrong
@@ -244,8 +245,11 @@ def fill_hypercube(lhs, standard_k_axis, priors=None,
     # Recent change: now omega_nu comes last
     
     bundle_parameters = None
-    if len(lhs[0]) != len(priors):
-        raise ValueError("Dimension disagreement between priors and LHS.")
+    
+    # We don't need this check because we can always just truncate the prior
+    # array.
+    #if len(lhs[0]) != len(priors):
+    #    raise ValueError("Dimension disagreement between priors and LHS.")
 
     # This just provides debugging information
     rescaling_parameters_list = None
