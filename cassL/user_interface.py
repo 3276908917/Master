@@ -289,8 +289,9 @@ def build_and_test_emulator(scenario_name):
                                       data_dict["Y_train"])
     trainer = te.Emulator_Trainer(data_dict["emu_name"], X_train_clean,
                                   Y_train_clean, data_dict["priors"])
-    trainer.train()
+    trainer.train_p_emu()
     
+    # Save early in case this function crashes
     trainer.save()
     
     X_test_clean, Y_test_clean = \
@@ -298,6 +299,8 @@ def build_and_test_emulator(scenario_name):
     trainer.test(X_test_clean, Y_test_clean)
 
     trainer.error_hist()
+    
+    trainer.save()
 
     return trainer
 

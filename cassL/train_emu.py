@@ -338,6 +338,14 @@ class Emulator_Trainer:
             return 100 * self.rel_errors
         elif metric == "sqerr":
             return self.sq_errors
+        elif metric == "delta_deltas":
+            return self.delta_deltas
+        elif metric == "delta_sqerr":
+            return self.delta_sq_errors
+        elif metric == "delta_relative":
+            return self.delta_rel_errors
+        elif metric == "delta_percent":
+            return 100 * self.delta_rel_errors
 
         raise ValueError("Unknown error metric specified. Available " + \
             "options are 'deltas', 'relative', 'percent', and 'sqerr'.")
