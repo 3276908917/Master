@@ -142,16 +142,16 @@ class Emulator_Trainer:
             currently only support log normalization. i.e. this "np.exp" call
             is currently fixed.
             """
-            if self.ystdev = None and self.ymu = None:
+            if self.ystdev is None and self.ymu is None:
                 return raw_prediction
             return np.exp(raw_prediction * self.ystdev + self.ymu)
 
 
-        def _predict_normalized_pspectrum(self, x):
+        def _predict_normalized(self, x):
             """
             This function should really only be used in debugging cases. To
             obtain a power spectrum from the emulator, use the function
-            predict_pspectrum
+            predict
             """
             #! Maybe we should actually experiment with these uncertainties and
             # see if they ever come in handy. Or we could just keep throwing
@@ -160,7 +160,7 @@ class Emulator_Trainer:
             return guess
 
 
-        def predict_pspectrum(self, X):
+        def predict(self, X):
             # Instead of solving the x formatting complaints by blindly
             # re-nesting x, let's try to get to the bottom of *why* the
             # formatting is so messed up in the first place.
@@ -175,8 +175,8 @@ class Emulator_Trainer:
                                  "normalized. Have you used " + \
                                  "convert_to_normalized_params?")
 
-            normalized_pspec = self._predict_normalized_pspectrum(X)
-            return self.inverse_ytransform(normalized_pspec)
+            normalized = self._predict_normalized(X)
+            return self.inverse_ytransform(normalized)
 
 
     def __init__(self, *args):
@@ -257,7 +257,7 @@ class Emulator_Trainer:
         self.val_preds = np.zeros(Y_val.shape)
 
         for i in range(len(X_val)):
-            self.val_preds[i] = self.p_emu.predict_pspectrum(X_val[i])
+            self.val_preds[i] = self.p_emu.predict(X_val[i])
 
         uncertainties = self.val_preds - self.Y_val
         
@@ -293,11 +293,22 @@ class Emulator_Trainer:
         self.test_predictions = np.zeros(Y_test.shape)
 
         for i in range(len(X_test)):
-            self.test_predictions[i] = self.p_emu.predict_pspectrum(X_test[i])
+            self.test_predictions[i] = self.p_emu.predict(X_test[i])
 
         self.deltas = self.test_predictions - Y_test
         self.sq_errors = np.square(self.deltas)
         self.rel_errors = self.deltas / Y_test
+        
+        try:
+            self.delta_predictions = np.zeros(Y_test.shape)
+            for i in range(len(X_test)):
+                self.delta_predictions[i] = self.delta_emu.predict(X_test[i])
+            
+            self.delta_deltas = self.delta_predictions - self.deltas
+            self.delta_sq_errors = np.square(self.delta_deltas)
+            self.delta_rel_errors = self.delta_deltas / self.deltas
+        except AttributeError:
+            pass
 
         print("Errors computed!")
         print("Sum of squared errors across all models:",
@@ -497,4 +508,4 @@ class Emulator_Trainer:
             file_name = self.p_emu.name
         if file_name[:-4] != ".cle":
             file_name += ".cle"
-        pickle.dump(self.p_emu, open("emulators/" + file_name, "wb"), protocol=5)
+        pickle.dump(self, open("emulators/" + file_name, "wb"), protocol=5)
