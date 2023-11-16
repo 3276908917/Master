@@ -10,6 +10,8 @@ from cassL import generate_emu_data as ged
 from cassL import user_interface as ui
 from cassL import utils
 
+import os
+data_prefix = os.path.dirname(os.path.abspath(__file__)) + "/"
 
 ### We should create an emulator object
 
@@ -518,4 +520,6 @@ class Emulator_Trainer:
             file_name = self.p_emu.name
         if file_name[:-4] != ".cle":
             file_name += ".cle"
-        pickle.dump(self, open("emulators/" + file_name, "wb"), protocol=5)
+
+        path_to_emus = data_prefix + "emulators/"
+        pickle.dump(self, open(path_to_emus + file_name, "wb"), protocol=5)

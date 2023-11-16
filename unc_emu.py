@@ -1,5 +1,6 @@
 from cassL import train_emu as te
 from cassL import user_interface as ui
+import numpy as np
 
 lhs_train = np.load("lhc_train_final.npy")
 lhs_val = np.load("lhc_val_final.npy")

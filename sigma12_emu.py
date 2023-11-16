@@ -8,13 +8,15 @@ priors = ui.prior_file_to_array("COMET")
 
 def eval_func(cosmology):
     return ci.evaluate_sigma12(cosmology, [1])
+    
+if False: # skip already-computed stuff
+    sigma12_train_lhs = np.load("lhc_sigma12_train_initial.npy")
 
-sigma12_train_lhs = np.load("lhc_sigma12_train_initial.npy")
+    sigma12_train_samples, _ = ged.fill_hypercube(sigma12_train_lhs, None, priors,
+        eval_func, save_label = "sigma12_train")
 
-sigma12_train_samples, _ = ged.fill_hypercube(sigma12_train_lhs, None, priors,
-    eval_func, save_label = "sigma12_train")
-
-np.save("sigma12_samples_train.npy", sigma12_train_samples)
+    np.save("sigma12_samples_train.npy", sigma12_train_samples)
+    np.save("lhc_sigma12_train_final.npy", sigma12_train_lhs)
 
 sigma12_test_lhs = np.load("lhc_sigma12_test_initial.npy")
 
@@ -22,13 +24,7 @@ sigma12_test_samples, _ = ged.fill_hypercube(sigma12_test_lhs, None, priors,
     eval_func, save_label = "sigma12_test")
     
 np.save("sigma12_samples_test.npy", sigma12_test_samples)
-
-# ------------
-
-np.save("lhc_sigma12_train_final.npy", sigma12_train_lhs)
 np.save("lhc_sigma12_test_final.npy", sigma12_test_lhs)
-
-# ------------
 
 lhs_train = np.load("lhc_sigma12_train.npy")
 lhs_test = np.load("lhc_test_final.npy")
