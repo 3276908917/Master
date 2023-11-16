@@ -10,8 +10,6 @@ from cassL import generate_emu_data as ged
 from cassL import user_interface as ui
 from cassL import utils
 
-constructor_complaint = "emu objects require either two NumPy arrays " + \
-    "(the data sets) or an emu file handle."
 
 ### We should create an emulator object
 
@@ -86,7 +84,7 @@ def train_emu(emu, X, Y):
 
     kernel = kernel1 + kernel2 + kernel3
 
-    self.p_emu.gpr = GPy.models.GPRegression(X, Y, kernel)
+    emu.gpr = GPy.models.GPRegression(X, Y, kernel)
     
     # '' is a regex matching all parameter names
     emu.gpr.constrain_positive('')
@@ -207,23 +205,27 @@ class Emulator_Trainer:
             self.X_train = args[1]
             self.Y_train = args[2]
             self.priors = args[3]
-            
+
+            constructor_complaint = "emu objects require either three " + \
+                "NumPy arrays (the two data sets + priors) or an emu " + \
+                "file handle."
             if not isinstance(self.X_train, np.ndarray):
                 raise TypeError(constructor_complaint)
-            
+
             if not isinstance(self.Y_train, np.ndarray):
                 raise TypeError(constructor_complaint)
             
-            if not isinstance(self.priors, dict):
+            if not isinstance(self.priors, np.ndarray):
                 raise TypeError(constructor_complaint)
             
             if len(self.X_train) != len(self.Y_train):
                 raise ValueError("X and Y are unequal in length!")
                 
             self.normalized_Y, ymu, ystdev = _normalize_spectra(self.Y_train)
-            
-            xmin = np.min(priors, axis=1)
-            xrange = np.ptp(priors, axis=1)
+
+            # Should these be class attributes?
+            xmin = np.min(self.priors, axis=1)
+            xrange = np.ptp(self.priors, axis=1)
 
             self.p_emu = self.Emulator(emu_name, xmin, xrange, ymu, ystdev)
         else:
