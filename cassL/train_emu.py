@@ -232,9 +232,7 @@ class Emulator_Trainer:
             raise TypeError(constructor_complaint)
         
     def train_p_emu(self):
-        if self.X_train is None or self.normalized_Y is None:
-            raise AttributeError("No data found over which to train.")
-        self.p_emu = train_emu(self.p_emu, self.X_train, self.normalized_Y)
+        train_emu(self.p_emu, self.X_train, self.normalized_Y)
         
     def validate(self, X_val, Y_val):
         """

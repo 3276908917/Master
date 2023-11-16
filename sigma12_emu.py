@@ -12,9 +12,13 @@ sigma12_train_lhs = np.load("lhc_sigma12_train.npy")
 
 sigma12_train_samples, _ = ged.fill_hypercube(sigma12_train_lhs, None, priors,
     eval_func, save_label = "sigma12_train")
-    
+
+np.save("sigma12_samples_train.npy", sigma12_train_samples)
+
 sigma12_test_lhs = np.load("lhc_sigma12_test.npy")
 
 sigma12_test_samples, _ = ged.fill_hypercube(sigma12_test_lhs, None, priors,
     eval_func, save_label = "sigma12_test")
+    
+np.save("sigma12_samples_test.npy", sigma12_test_samples)
     
