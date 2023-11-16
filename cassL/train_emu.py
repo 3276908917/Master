@@ -11,9 +11,9 @@ from cassL import user_interface as ui
 from cassL import utils
 
 import os
-data_prefix = os.path.dirname(os.path.abspath(__file__)) + "/"
 
-### We should create an emulator object
+data_prefix = os.path.dirname(os.path.abspath(__file__)) + "/"
+path_to_emus = data_prefix + "emulators/"
 
 def eliminate_unusable_entries(X_raw, Y_raw,
     bad_X_vals = [float('-inf'), float('inf'), None, True, np.nan],
@@ -181,9 +181,8 @@ class Emulator_Trainer:
 
     def __init__(self, *args):
         """
-        There are two ways one can go about instantiating:
-        1. provide an X and Y data set as well as a set of priors -> emulator i
-            trained
+        Provide an X and Y data set as well as a set of priors over which the
+            emulator is to be trained
             
             IMPORTANT: the X and Y sets should not contain any unusable entries
                 (when in doubt, use eliminate_unusable_entries). Furthermore,
@@ -191,51 +190,42 @@ class Emulator_Trainer:
                 normalization information (i.e. mean and standard deviation of
                 the log'ed spectra) becomes part of the emulator's prediction
                 pipeline!
-            
-        2. provide the file handle associated with a trained emulator object
         """
-        if len(args) == 1:
-            # We're expecting an already-trained emulator object
-            file_handle = args[0]
-            if not isinstance(file_handle, str):
-                raise TypeError(constructor_complaint)
-
-            self.p_emu = pickle.load(open(file_handle, "rb"))
-
-        elif len(args) == 4:
-            emu_name = args[0]
-            self.X_train = args[1]
-            self.Y_train = args[2]
-            self.priors = args[3]
-
-            constructor_complaint = "emu objects require either three " + \
-                "NumPy arrays (the two data sets + priors) or an emu " + \
-                "file handle."
-            if not isinstance(self.X_train, np.ndarray):
-                raise TypeError(constructor_complaint)
-
-            if not isinstance(self.Y_train, np.ndarray):
-                raise TypeError(constructor_complaint)
-            
-            if not isinstance(self.priors, np.ndarray):
-                raise TypeError(constructor_complaint)
-            
-            if len(self.X_train) != len(self.Y_train):
-                raise ValueError("X and Y are unequal in length!")
-                
-            self.normalized_Y, ymu, ystdev = _normalize_spectra(self.Y_train)
-
-            # Should these be class attributes?
-            xmin = np.min(self.priors, axis=1)
-            xrange = np.ptp(self.priors, axis=1)
-
-            self.p_emu = self.Emulator(emu_name, xmin, xrange, ymu, ystdev)
-        else:
+        if len(args) != 4:
             raise TypeError(constructor_complaint)
         
+        emu_name = args[0]
+        self.X_train = args[1]
+        self.Y_train = args[2]
+        self.priors = args[3]
+
+        constructor_complaint = "emu objects require either three " + \
+            "NumPy arrays (the two data sets + priors) or an emu " + \
+            "file handle."
+        if not isinstance(self.X_train, np.ndarray):
+            raise TypeError(constructor_complaint)
+
+        if not isinstance(self.Y_train, np.ndarray):
+            raise TypeError(constructor_complaint)
+        
+        if not isinstance(self.priors, np.ndarray):
+            raise TypeError(constructor_complaint)
+        
+        if len(self.X_train) != len(self.Y_train):
+            raise ValueError("X and Y are unequal in length!")
+            
+        self.normalized_Y, ymu, ystdev = _normalize_spectra(self.Y_train)
+
+        # Should these be class attributes?
+        xmin = np.min(self.priors, axis=1)
+        xrange = np.ptp(self.priors, axis=1)
+
+        self.p_emu = self.Emulator(emu_name, xmin, xrange, ymu, ystdev)
+
+
     def train_p_emu(self):
         train_emu(self.p_emu, self.X_train, self.normalized_Y)
-        
+       
     def validate(self, X_val, Y_val):
         """
         !
@@ -249,7 +239,7 @@ class Emulator_Trainer:
         if len(X_val[0]) != self.p_emu.xdim:
             raise ValueError("Dimension of validation X does not match " + \
                 "the dimension of the training X!")
-        if len(Y_test[0]) != self.p_emu.ydim:
+        if len(Y_val[0]) != self.p_emu.ydim:
             raise ValueError("Dimension of validation Y does not match " + \
                 "the dimension of the training Y!")
         
@@ -268,7 +258,7 @@ class Emulator_Trainer:
         
         # The deltas should already be well-behaved, so we don't need to
         # normalize y.
-        self.delta_emu = self.Emulator(emu_name + "_uncertainties", xmin,
+        self.delta_emu = self.Emulator(self.p_emu.name + "_uncertainties", xmin,
             xrange, ymu=None, ystdev=None)
         
         train_emu(self.delta_emu, self.X_val, uncertainties)
@@ -330,7 +320,7 @@ class Emulator_Trainer:
     def enforce_error_calculation(self):
         if not hasattr(self, "deltas"):
             raise AttributeError("Errors have not been computed yet! Use " + \
-                " the function 'test'")
+                "the function 'test'")
 
 
     def get_errors(self, metric):
@@ -521,5 +511,4 @@ class Emulator_Trainer:
         if file_name[:-4] != ".cle":
             file_name += ".cle"
 
-        path_to_emus = data_prefix + "emulators/"
         pickle.dump(self, open(path_to_emus + file_name, "wb"), protocol=5)

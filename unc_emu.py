@@ -16,9 +16,12 @@ X_train, Y_train = te.eliminate_unusable_entries(lhs_train, samples_train)
 X_val, Y_val = te.eliminate_unusable_entries(lhs_val, samples_val)
 X_test, Y_test = te.eliminate_unusable_entries(lhs_test, samples_test)
 
-trainer = te.Emulator_Trainer("Hnu2unc", X_train, Y_train, priors)
-trainer.train_p_emu()
-trainer.save()
+if False: # Skip main emulator training since we've already completed that.
+    trainer = te.Emulator_Trainer("Hnu2unc", X_train, Y_train, priors)
+    trainer.train_p_emu()
+    trainer.save()
+else:
+    trainer = np.load(te.path_to_emus + "Hnu2unc.cle", allow_pickle=True)
 
 trainer.validate(X_val, Y_val)
 trainer.save()

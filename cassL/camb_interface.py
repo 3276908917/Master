@@ -50,6 +50,14 @@ styles = ["solid"] * 200
 redshift_column = re.compile("z.+")
 
 def default_cosmology():
+    r"""
+    Return a deep copy of a benchmark cosmology (in this case, Aletheia model
+    0, based on the Planck best fit for a flat LambdaCDM cosmology) such that
+    the user is free to modify the result without having to worry about making
+    a copy.
+
+    Returns: dictionary (a copy of the default cosmology)
+    """
     return cp.deepcopy(cosm.iloc[0])
 
 def parse_redshifts(model_num):

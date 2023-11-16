@@ -1,6 +1,18 @@
 from cassL import camb_interface as ci
 
-m0 = ci.specify_neutrino_mass(ci.cosm.iloc[0], 0)
+m0 = ci.specify_neutrino_mass(ci.default_cosmology(), 0)
+
+"""
+default_cosmology: untestable??
+"""
+def test_default_cosmology():
+    raise NotImplementedError
+
+    # make sure that modifying the result of this function does not impact
+    # future calls to the function
+    default_cosmology = 
+
+    pass
 
 def test_specify_neutrino_mass():
     m0_massless = ci.specify_neutrino_mass(m0, 0, 0)
@@ -9,8 +21,6 @@ def test_specify_neutrino_mass():
         "species in the massless case."
     assert m0_massless["omnuh2"] == 0, "There should be no physical " + \
         "density in neutrinos in the massless case."
-    #assert m0_massless["mnu"] == 0, "The neutrino masses should sum to " + \
-    #    "zero in the massless case."
 
     m0_massive = ci.specify_neutrino_mass(m0, 0.02)
 
@@ -18,10 +28,6 @@ def test_specify_neutrino_mass():
         "species in the unspecified case."
     assert m0_massive["omnuh2"] == 0.02, "The input omnuh2 does not " + \
         "match the recorded omnuh2."
-    #assert m0_massive["mnu"] == 0, "The sum of the neutrino masses was " + \
-    #    "incorrectly computed."
-
-    #m0_triMassive = ci.specify
 
 def test_input_cosmology_direct_values():
     """
