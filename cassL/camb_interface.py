@@ -58,7 +58,7 @@ def default_cosmology():
 
     Returns: dictionary (a copy of the default cosmology)
     """
-    return cp.deepcopy(cosm.iloc[0])
+    return specify_neutrino_mass(cosm.iloc[0], 0)
 
 def parse_redshifts(model_num):
     r"""

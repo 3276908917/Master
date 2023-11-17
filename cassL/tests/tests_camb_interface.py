@@ -6,6 +6,35 @@ m0 = ci.specify_neutrino_mass(ci.default_cosmology(), 0)
 default_cosmology: untestable??
 """
 def test_default_cosmology():
+    # First, check that it has all of the basic fields:
+    default_cosmology = ci.default_cosmology()
+    assert "ombh2" in default_cosmology, "The default cosmology does not " + \
+        "specify a physical density in baryons."
+
+    assert "omch2" in default_cosmology, "The default cosmology does not " + \
+        "specify a physical density in cold dark matter."
+        
+    assert "n_s" in default_cosmology, "The default cosmology does not " + \
+        "specify a spectral index."
+        
+    assert "A_s" in default_cosmology, "The default cosmology does not " + \
+        "specify a scalar mode amplitude."
+        
+    assert "h" in default_cosmology, "The default cosmology does not " + \
+        "specify the dimensionless Hubble constant."
+        
+    assert "w0" in default_cosmology, "The default cosmology does not " + \
+        "specify the constant term in the CPL DE EoS."
+        
+    assert "wa" in default_cosmology, "The default cosmology does not " + \
+        "specify the slope in the CPL DE EoS."
+
+    assert "omnuh2" in default_cosmology, "The default cosmology does not " + \
+        "specify a physical density in neutrinos."
+
+    assert "nnu_massive" in default_cosmology, "The default cosmology " + \
+        "does not specify the number of massive neutrino species."
+
     raise NotImplementedError
 
     # make sure that modifying the result of this function does not impact
