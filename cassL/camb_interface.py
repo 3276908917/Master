@@ -22,8 +22,17 @@ try:
     # the removal of number signs. Use the unaltered version will cause a
     # segfault.
     path_to_cosms = data_prefix + "cosmologies.dat"
-    cosm = pd.read_csv(path_to_cosms, sep=r'\s+')
-
+    full_cosm = pd.read_csv(path_to_cosms, sep=r'\s+')
+    
+    cosm = full_cosm[:8] # exclude model 8 always          
+    for series_name, series in cosm.items():
+        if series.dtype != float:
+            if series_name == "EOmDE" or series_name == "Name":
+                continue
+            else:
+                cosm[series_name] = pd.to_numeric(series)
+    
+    
 except FileNotFoundError:
     print("Failure to load table of Aletheia cosmologies.")
 
