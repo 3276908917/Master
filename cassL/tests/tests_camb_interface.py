@@ -2,24 +2,33 @@ from cassL import camb_interface as ci
 
 m0 = ci.specify_neutrino_mass(ci.default_cosmology(), 0)
 
+# Without these keys, a dictionary cannot qualify as a cosmology.
+essential_keys = ["h", "ombh2", "omch2", "OmK", "omnuh2", "A_s", "n_s", "w0",
+                  "wa"]
+
 def test_parsing():
     """
     Let's FINALLY kill that bug that keeps wa a string...
     """
-    for wa_value in ci.cosm["wa"]:
-        assert isinstance(wa_value, float), "At least one value in the"
-    raise NotImplementedError
+    for essential_key in essential_keys:
+        if essential_key == "omnuh2": # not specified by the cosm table
+            continue
+        for value in ci.cosm[essential_key]:
+            assert isinstance(value, float), "At least one value in the '" + \
+                essential_key + "' column of the 'cosm' table is not a float!"
+                
     
 def test_default_cosmology():
     # First, check that it has all of the basic fields:
     default_cosmology = ci.default_cosmology()
     
-    essential_keys = ["h", "ombh2", "omch2", "OmK", "omnuh2", "A_s", "n_s", \
-        "w0", "wa"]
     for essential_key in essential_keys:
         assert essential_key in default_cosmology, "The default cosmology " + \
             "does not specify a value for the necessary " + essential_key + \
             "field."
+    
+    assert "nnu_massive" in default_cosmology, "The default cosmology " + \
+            "does not specify a value for the necessary nnu_massive field."
 
     # make sure that modifying the result of this function does not impact
     # future calls to the function
@@ -33,6 +42,7 @@ def test_default_cosmology():
     assert default_cosmology2["wa"] == ci.default_cosmology()["wa"], \
         "default_cosmology is not returning a copy of the reference " + \
         "model, but the reference model itself!"
+
 
 def test_specify_neutrino_mass():
     m0_massless = ci.specify_neutrino_mass(m0, 0, 0)
@@ -49,6 +59,7 @@ def test_specify_neutrino_mass():
     assert m0_massive["omnuh2"] == 0.02, "The input omnuh2 does not " + \
         "match the recorded omnuh2."
 
+
 def test_input_cosmology_direct_values():
     """
     Unfinished: make sure that ALL values were correctly transcribed.
@@ -63,6 +74,7 @@ def test_input_cosmology_direct_values():
 
 
     # Now check to make sure mnu was computed correctly.
+    raise NotImplementedError
 
 def test_input_cosmology_indirect_vals():
     m0_copy = ci.specify_neutrino_mass(m0, 0)
@@ -81,13 +93,12 @@ def test_input_cosmology_indirect_vals():
     except Exception:
         pass
 
+
 def test_input_cosmology_err_handling():
     """
     Unfinished: make sure that input_cosmology throws an error when ANY of the
         necessary values is missing.
     """
-    essential_keys = ["h", "ombh2", "omch2", "OmK", "omnuh2", "A_s", "n_s", \
-        "w0", "wa"]
     for essential_key in essential_keys:
         dummy_model = ci.default_cosmology()
         del dummy_model[essential_key]
