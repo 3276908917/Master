@@ -622,10 +622,6 @@ def input_cosmology(cosmology):
     Helper function for kzps.
     Read entries from a dictionary representing a cosmological configuration.
     Then write these values to a CAMBparams object and return.
-
-    Possible mistakes:
-    A. We're setting "omk" with OmK * h ** 2. Should I have used OmK? If so,
-        the capitalization here is nonstandard.
     """
     # If the cosmology is underspecified, serve the user a clear complaint
     verify_cosmology(cosmology)    

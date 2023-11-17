@@ -1,7 +1,5 @@
 from cassL import camb_interface as ci
 
-m0 = ci.specify_neutrino_mass(ci.default_cosmology(), 0)
-
 # Without these keys, a dictionary cannot qualify as a cosmology.
 essential_keys = ["h", "ombh2", "omch2", "OmK", "omnuh2", "A_s", "n_s", "w0",
                   "wa"]
@@ -39,20 +37,20 @@ def test_default_cosmology():
     
     default_cosmology2 = ci.default_cosmology()
     default_cosmology2["wa"] = default_cosmology["wa"] - 1
-    assert default_cosmology2["wa"] == ci.default_cosmology()["wa"], \
+    assert default_cosmology2["wa"] != ci.default_cosmology()["wa"], \
         "default_cosmology is not returning a copy of the reference " + \
         "model, but the reference model itself!"
 
 
 def test_specify_neutrino_mass():
-    m0_massless = ci.specify_neutrino_mass(m0, 0, 0)
+    m0_massless = ci.specify_neutrino_mass(ci.default_cosmology(), 0, 0)
 
     assert m0_massless["nnu_massive"] == 0, "There should be no massive " + \
         "species in the massless case."
     assert m0_massless["omnuh2"] == 0, "There should be no physical " + \
         "density in neutrinos in the massless case."
 
-    m0_massive = ci.specify_neutrino_mass(m0, 0.02)
+    m0_massive = ci.specify_neutrino_mass(ci.default_cosmology(), 0.02)
 
     assert m0_massive["nnu_massive"] == 1, "There should be one massive " + \
         "species in the unspecified case."
@@ -64,21 +62,42 @@ def test_input_cosmology_direct_values():
     """
     Unfinished: make sure that ALL values were correctly transcribed.
     """
-    m0_copy = ci.specify_neutrino_mass(m0, 0)
-    pars = ci.input_cosmology(m0_copy)
+    default_cosmology = ci.default_cosmology()
+    pars = ci.input_cosmology(default_cosmology())
 
-    assert pars.H0 == 67, "incorrect Hubble constant"
-    assert pars.ombh2 == 0.022445, "incorrect physical density in b"
+    assert pars.H0 == 100 * default_cosmology["h"], "incorrect Hubble constant"
+    assert pars.ombh2 == default_cosmology["ombh2"], "incorrect physical " + \
+        "density in baryons transcribed."
+    assert pars.omch2 == default_cosmology["omch2"], "incorrect physical " + \
+        "density in cdm transcribed."
+    assert pars.omnuh2 == default_cosmology["omnuh2"], "incorrect " + \
+        "physical density in neutrinos transcribed."
+    assert pars.nnu_massive == default_cosmology["nnu_massive"], \
+        "incorrect number of massive neutrinos transcribed."
+        
+    assert pars.OmK == default_cosmology["OmK"], "incorrect fractional " + \
+        "density in curvature transcribed."
+    assert pars.InitPower.ns == default_cosmology["n_s"], "incorrect " + \
+        "spectral index transcribed."
+    assert pars.InitPower.ns == default_cosmology["A_s"], "incorrect " + \
+        "scalar mode amplitude transcribed."
+
+
+def test_input_dark_energy():
+    default_cosmology = ci.default_cosmology()
+    pars = ci.input_cosmology(default_cosmology)
     
-    # Columbus_0    0.022445  0.120567  0.96  2.12723788013000E-09  0.050000000  0.268584094  0.318584094  0.000  0.681415906  0.67  -1.00  0.00    -    2.000000  1.000000  0.570000  0.300000  0.000000  1000.00000  0.82755
+    new_wa = default_cosmology["wa"] - 2
+    new_w0 = default_cosmology["w0"] - 2
+    ci.input_dark_energy(pars, new_w0, new_wa)
+    
+    assert pars.DarkEnergy.w == new_w0, "incorrect w0 transcribed."
+    assert pars.DarkEnergy.wa == new_wa, "incorrect wa transcribed."
 
-
-    # Now check to make sure mnu was computed correctly.
-    raise NotImplementedError
 
 def test_input_cosmology_indirect_vals():
-    m0_copy = ci.specify_neutrino_mass(m0, 0)
-    pars = ci.input_cosmology(m0_copy)
+    default_cosmology = ci.default_cosmology()
+    pars = ci.input_cosmology(default_cosmology)
 
     try:
         pars.Omb
