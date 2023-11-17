@@ -39,7 +39,16 @@ def test_default_cosmology():
 
     # make sure that modifying the result of this function does not impact
     # future calls to the function
-    default_cosmology = 
+    del default_cosmology["omnuh2"]
+    assert "omnuh2" in ci.default_cosmology(), "default_cosmology is not " + \
+        "returning a copy of the reference model, but the reference model " + \
+        "itself!"
+    
+    default_cosmology2 = ci.default_cosmology()
+    default_cosmology2["wa"] = default_cosmology["wa"] - 1
+    assert default_cosmology2["wa"] == ci.default_cosmology()["wa"], \
+        "default_cosmology is not returning a copy of the reference " + \
+        "model, but the reference model itself!"
 
     pass
 
