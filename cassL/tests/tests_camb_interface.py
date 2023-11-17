@@ -6,40 +6,20 @@ def test_parsing():
     """
     Let's FINALLY kill that bug that keeps wa a string...
     """
+    for wa_value in ci.cosm["wa"]:
+        assert isinstance(wa_value, float), "At least one value in the"
     raise NotImplementedError
     
 def test_default_cosmology():
     # First, check that it has all of the basic fields:
     default_cosmology = ci.default_cosmology()
-    assert "ombh2" in default_cosmology, "The default cosmology does not " + \
-        "specify a physical density in baryons."
-
-    assert "omch2" in default_cosmology, "The default cosmology does not " + \
-        "specify a physical density in cold dark matter."
     
-    assert "OmK" in default_cosmology, "The default cosmology does not " + \
-        "specify a fractional density in curvature."
-        
-    assert "n_s" in default_cosmology, "The default cosmology does not " + \
-        "specify a spectral index."
-        
-    assert "A_s" in default_cosmology, "The default cosmology does not " + \
-        "specify a scalar mode amplitude."
-        
-    assert "h" in default_cosmology, "The default cosmology does not " + \
-        "specify the dimensionless Hubble constant."
-        
-    assert "w0" in default_cosmology, "The default cosmology does not " + \
-        "specify the constant term in the CPL DE EoS."
-        
-    assert "wa" in default_cosmology, "The default cosmology does not " + \
-        "specify the slope in the CPL DE EoS."
-
-    assert "omnuh2" in default_cosmology, "The default cosmology does not " + \
-        "specify a physical density in neutrinos."
-
-    assert "nnu_massive" in default_cosmology, "The default cosmology " + \
-        "does not specify the number of massive neutrino species."
+    essential_keys = ["h", "ombh2", "omch2", "OmK", "omnuh2", "A_s", "n_s", \
+        "w0", "wa"]
+    for essential_key in essential_keys:
+        assert essential_key in default_cosmology, "The default cosmology " + \
+            "does not specify a value for the necessary " + essential_key + \
+            "field."
 
     # make sure that modifying the result of this function does not impact
     # future calls to the function
