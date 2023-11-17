@@ -102,7 +102,7 @@ class Emulator_Trainer:
 
     class Emulator:
 
-        def __init__(self, name, xmin, xrange, ymu, ystdev):
+        def __init__(self, name, xmin, xrange, ymu, ystdev, ydim=None):
             # We're requiring all emulators to follow the same approach:
             # all mappings can be represented with just the two variables,
             # xmin and xrange
@@ -114,7 +114,8 @@ class Emulator_Trainer:
 
             self.ymu = ymu
             self.ystdev = ystdev
-            self.ydim = len(ymu)
+            if ydim is None:
+                self.ydim = len(self.ymu)
             
 
         def convert_to_normalized_params(self, config):
@@ -259,7 +260,7 @@ class Emulator_Trainer:
         # The deltas should already be well-behaved, so we don't need to
         # normalize y.
         self.delta_emu = self.Emulator(self.p_emu.name + "_uncertainties", xmin,
-            xrange, ymu=None, ystdev=None)
+            xrange, ymu=None, ystdev=None, ydim=self.p_emu.ydim)
         
         train_emu(self.delta_emu, self.X_val, uncertainties)
         print("Uncertainty emulator trained!")
