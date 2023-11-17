@@ -13,6 +13,9 @@ def test_default_cosmology():
 
     assert "omch2" in default_cosmology, "The default cosmology does not " + \
         "specify a physical density in cold dark matter."
+    
+    assert "OmK" in default_cosmology, "The default cosmology does not " + \
+        "specify a fractional density in curvature."
         
     assert "n_s" in default_cosmology, "The default cosmology does not " + \
         "specify a spectral index."
@@ -34,8 +37,6 @@ def test_default_cosmology():
 
     assert "nnu_massive" in default_cosmology, "The default cosmology " + \
         "does not specify the number of massive neutrino species."
-
-    raise NotImplementedError
 
     # make sure that modifying the result of this function does not impact
     # future calls to the function
@@ -104,28 +105,15 @@ def test_input_cosmology_err_handling():
     Unfinished: make sure that input_cosmology throws an error when ANY of the
         necessary values is missing.
     """
-
-    mA = ci.specify_neutrino_mass(m0, 0)
-    del mA["h"]
-    try:
-        pars = ci.input_cosmology(mA)
-    except Exception as err:
-        assert isinstance(err, ValueError), "When the value of h is " + \
-            "missing, input_cosmology crashes for the wrong reason."
-            
-    mB = ci.specify_neutrino_mass(m0, 0)
-    del mB["ombh2"]
-    try:
-        pars = ci.input_cosmology(mB)
-    except Exception as err:
-        assert isinstance(err, ValueError), "When the value of omega_b " + \
-            "is missing, input_cosmology crashes for the wrong reason." 
-
-    mC = ci.specify_neutrino_mass(m0, 0)
-    del mC["omch2"]
-    try:
-        pars = ci.input_cosmology(mC)
-    except Exception as err:
-        assert isinstance(err, ValueError), "When the value of omega_c " + \
-            "is missing, input_cosmology crashes for the wrong reason."  
+    essential_keys = ["h", "ombh2", "omch2", "OmK", "omnuh2", "A_s", "n_s", \
+        "w0", "wa"]
+    for essential_key in essential_keys:
+        dummy_model = ci.default_cosmology()
+        del dummy_model[essential_key]
+        try:
+            pars = ci.input_cosmology(dummy_model)
+        except Exception as err:
+            assert isinstance(err, ValueError), "When the value of " + \
+                essential_key + " is missing, input_cosmology crashes for " + \
+                "the wrong reason."
 
