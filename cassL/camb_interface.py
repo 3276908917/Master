@@ -596,6 +596,17 @@ def specify_neutrino_mass(cosmology, omnuh2_in, nnu_massive_in=None):
 
     return full_cosmology
 
+def verify_cosmology(cosmology):
+    """
+    Makes sure all of the essential keys are in place for CAMB usage.
+    """
+    essential_keys = ["h", "ombh2", "omch2", "OmK", "omnuh2", "A_s", "n_s", \
+        "w0", "wa"]
+    for essential_key in essential_keys:
+        if essential_key not in cosmology:
+            raise ValueError("The provided cosmology does not specify " + \
+                essential_key + "!")
+
 
 def input_cosmology(cosmology):
     """
@@ -607,8 +618,8 @@ def input_cosmology(cosmology):
     A. We're setting "omk" with OmK * h ** 2. Should I have used OmK? If so,
         the capitalization here is nonstandard.
     """
-    if "h" not in cosmology.keys():
-        raise ValueError("The provided cosmology does not specify h!")
+    # If the cosmology is underspecified, serve the user a clear complaint
+    verify_cosmology(cosmology)    
 
     h = cosmology["h"]
 

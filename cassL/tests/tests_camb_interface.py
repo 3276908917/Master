@@ -2,9 +2,12 @@ from cassL import camb_interface as ci
 
 m0 = ci.specify_neutrino_mass(ci.default_cosmology(), 0)
 
-"""
-default_cosmology: untestable??
-"""
+def test_parsing():
+    """
+    Let's FINALLY kill that bug that keeps wa a string...
+    """
+    raise NotImplementedError
+    
 def test_default_cosmology():
     # First, check that it has all of the basic fields:
     default_cosmology = ci.default_cosmology()
@@ -50,8 +53,6 @@ def test_default_cosmology():
     assert default_cosmology2["wa"] == ci.default_cosmology()["wa"], \
         "default_cosmology is not returning a copy of the reference " + \
         "model, but the reference model itself!"
-
-    pass
 
 def test_specify_neutrino_mass():
     m0_massless = ci.specify_neutrino_mass(m0, 0, 0)
