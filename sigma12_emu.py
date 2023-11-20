@@ -27,7 +27,7 @@ if False:
     np.save("sigma12_samples_test.npy", sigma12_test_samples)
     np.save("lhc_sigma12_test_final.npy", sigma12_test_lhs)
 
-if True:
+if False:
     lhs_train = np.load("lhc_sigma12_train_final.npy")
     samples_train = np.load("sigma12_samples_train.npy")
 
@@ -41,17 +41,17 @@ if True:
     trainer.save()
 else:
     trainer = np.load(te.path_to_emus + "sigma12_v1.cle", allow_pickle=True)
-    trainer.p_emu.ydim = 1
 
-lhs_test = np.load("lhc_sigma12_test_final.npy")
-samples_test = np.load("sigma12_samples_test.npy")
-X_test, Y_test = te.eliminate_unusable_entries(lhs_test, samples_test)
+if False:
+    lhs_test = np.load("lhc_sigma12_test_final.npy")
+    samples_test = np.load("sigma12_samples_test.npy")
+    X_test, Y_test = te.eliminate_unusable_entries(lhs_test, samples_test)
 
-Y_test2 = Y_test.reshape((len(Y_test), 1))
-trainer.test(X_test, Y_test2)
-trainer.save()
+    Y_test2 = Y_test.reshape((len(Y_test), 1))
+    trainer.test(X_test, Y_test2)
+    trainer.save()
 
 trainer.error_hist()
 
-trainer.error_hist(metric="delta_relative")
-trainer.error_hist(metric="delta_deltas")
+trainer.error_hist(metric="relative")
+trainer.error_hist(metric="deltas")

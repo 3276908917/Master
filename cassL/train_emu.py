@@ -131,8 +131,8 @@ class Emulator_Trainer:
             Using the originally input prior, convert a particular cosmological
             configuration into a set of unit-LHC coordinates.
             """
-            if len(config) != self.dim:
-                raise ValueError("This is a " + str(self.dim) + \
+            if len(config) != self.xdim:
+                raise ValueError("This is a " + str(self.xdim) + \
                     "-dimensional emulator. Input vector has " + \
                     len(config) + " dimensions.")
 
@@ -245,7 +245,9 @@ class Emulator_Trainer:
 
     def train_p_emu(self):
         train_emu(self.p_emu, self.X_train, self.normalized_Y)
-       
+        # Now collect training errors
+
+
     def validate(self, X_val, Y_val):
         """
         !
@@ -284,6 +286,8 @@ class Emulator_Trainer:
         train_emu(self.delta_emu, self.X_val, uncertainties)
         print("Uncertainty emulator trained!")
         
+        # But also compute validation training errors...
+        
     def test(self, X_test, Y_test):
         """
         This function can also be used to generate training-error curves,
@@ -302,19 +306,19 @@ class Emulator_Trainer:
         self.X_test = X_test
         self.Y_test = Y_test
 
-        self.test_predictions = np.zeros(Y_test.shape)
+        test_predictions = np.zeros(Y_test.shape)
 
         for i in range(len(X_test)):
-            self.test_predictions[i] = self.p_emu.predict(X_test[i])
+            test_predictions[i] = self.p_emu.predict(X_test[i])
 
-        self.deltas = self.test_predictions - Y_test
+        self.deltas = test_predictions - Y_test
         self.sq_errors = np.square(self.deltas)
         self.rel_errors = self.deltas / Y_test
         
         try:
-            self.delta_predictions = np.zeros(Y_test.shape)
+            delta_predictions = np.zeros(Y_test.shape)
             for i in range(len(X_test)):
-                self.delta_predictions[i] = self.delta_emu.predict(X_test[i])
+                delta_predictions[i] = self.delta_emu.predict(X_test[i])
             
             self.delta_deltas = self.delta_predictions - self.deltas
             self.delta_sq_errors = np.square(self.delta_deltas)
