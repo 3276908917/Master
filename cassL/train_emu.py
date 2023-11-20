@@ -72,6 +72,11 @@ def is_normalized_X(X):
 
 
 def train_emu(emu, X, Y):
+    """!!! Does it make sense that we're taking the variance across all Y? Not
+        just
+        across rows, but across different k bins. Wouldn't it make more sense to
+        have a variance array, where each element is the variance across Y for
+        that k bin? """
     # The dimension is automatically the length of an X element.
     remaining_variance = np.var(Y)
     
@@ -204,7 +209,9 @@ class Emulator_Trainer:
         emu_name = args[0]
         self.X_train = args[1]
         self.Y_train = args[2]
-        self.priors = args[3]
+        
+        xdim = len(self.X_train[0])
+        self.priors = args[3][:xdim]
         self.normalize = args[4]
         
         if not isinstance(self.X_train, np.ndarray):
@@ -229,7 +236,10 @@ class Emulator_Trainer:
         xmin = np.min(self.priors, axis=1)
         xrange = np.ptp(self.priors, axis=1)
 
-        self.p_emu = self.Emulator(emu_name, xmin, xrange, ymu, ystdev, ydim=1)
+        # in the 'None' case, the constructor will automatically compute the
+        # correct ydim.
+        ydim = 1 if len(utils.box(self.normalized_Y[0])) == 1 else None
+        self.p_emu = self.Emulator(emu_name, xmin, xrange, ymu, ystdev, ydim)
 
 
     def train_p_emu(self):
