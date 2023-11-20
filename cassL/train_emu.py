@@ -121,7 +121,8 @@ class Emulator_Trainer:
 
             self.ymu = ymu
             self.ystdev = ystdev
-            if ydim is None:
+            self.ydim = ydim
+            if self.ydim is None:
                 self.ydim = len(self.ymu)
             
 
