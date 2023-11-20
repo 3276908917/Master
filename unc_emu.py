@@ -23,11 +23,12 @@ if False: # Skip main emulator training since we've already completed that.
 else:
     trainer = np.load(te.path_to_emus + "Hnu2unc.cle", allow_pickle=True)
 
-trainer.validate(X_val, Y_val)
-trainer.save()
+if False:
+    trainer.validate(X_val, Y_val)
+    trainer.save()
 
-trainer.test(X_test, Y_test)
-trainer.save()
+    trainer.test(X_test, Y_test)
+    trainer.save()
 
 trainer.error_hist()
 

@@ -41,8 +41,10 @@ def eliminate_unusable_entries(X_raw, Y_raw,
     bad_row_numbers = np.array([], dtype=np.int64)
     
     for i in range(len(X_raw)):
-        row_x = X_raw[i]
-        row_y = Y_raw[i]
+        # We box here because the rows might be single sigma12 values.
+        row_x = utils.box(X_raw[i])
+        row_y = utils.box(Y_raw[i])
+        
         if unusable(row_x, bad_X_vals) or unusable(row_y, bad_Y_vals):
             bad_row_numbers = np.append(bad_row_numbers, i)
    
@@ -192,17 +194,19 @@ class Emulator_Trainer:
                 the log'ed spectra) becomes part of the emulator's prediction
                 pipeline!
         """
-        if len(args) != 4:
+        constructor_complaint = "To instantiate an emulator trainer, the " + \
+            "following parameters are required: name, X training data, Y " + \
+            "training data, priors, and (boolean) whether the Y's should " + \
+            "be log-normalized."        
+        if len(args) != 5:
             raise TypeError(constructor_complaint)
         
         emu_name = args[0]
         self.X_train = args[1]
         self.Y_train = args[2]
         self.priors = args[3]
-
-        constructor_complaint = "emu objects require either three " + \
-            "NumPy arrays (the two data sets + priors) or an emu " + \
-            "file handle."
+        self.normalize = args[4]
+        
         if not isinstance(self.X_train, np.ndarray):
             raise TypeError(constructor_complaint)
 
@@ -214,14 +218,18 @@ class Emulator_Trainer:
         
         if len(self.X_train) != len(self.Y_train):
             raise ValueError("X and Y are unequal in length!")
-            
-        self.normalized_Y, ymu, ystdev = _normalize_spectra(self.Y_train)
+         
+        if self.normalize:
+            self.normalized_Y, ymu, ystdev = _normalize_spectra(self.Y_train)
+        else:
+            self.normalized_Y = self.Y_train
+            ymu = ystdev = None
 
         # Should these be class attributes?
         xmin = np.min(self.priors, axis=1)
         xrange = np.ptp(self.priors, axis=1)
 
-        self.p_emu = self.Emulator(emu_name, xmin, xrange, ymu, ystdev)
+        self.p_emu = self.Emulator(emu_name, xmin, xrange, ymu, ystdev, ydim=1)
 
 
     def train_p_emu(self):
@@ -474,7 +482,7 @@ class Emulator_Trainer:
 
 
     def error_hist(self, metric="relative", error_aggregator=np.median,
-                   aggregator_description="Median", bins=None):
+                   aggregator_description="Median", bins=None, save=False):
         """
         Maybe this function, like error_curve, should include a parameter range
         constraint parameter.
@@ -497,7 +505,9 @@ class Emulator_Trainer:
         plt.xlabel(aggregator_description + " " + metric + \
                    " error between CAMB and Cassandra-L")
 
-        plt.savefig("plots/err_hist_" + self.p_emu.name + ".png")
+        if save:
+            plt.savefig(data_prefix + "plots/err_hist_" + self.p_emu.name + \
+                        ".png")
 
         plt.show()
 

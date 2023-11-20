@@ -1,6 +1,20 @@
 import numpy as np
 from scipy.interpolate import interp1d
 
+def box(item):
+    """
+    This utility fn is handy when passing an argument to a fn which expects a
+    list, but when the argument might be a scalar.
+    """
+    if isinstance(item, np.ndarray) or isinstance(item, list):
+        return item
+    
+    if not isinstance(item, int) and not isinstance(item, float):
+        raise Warning("Box was called on a single non-numeric item!")
+        
+    return np.array([item])
+    
+    
 def percent_error(trusted, tested):
     """
     I don't have a great place for this function, but I'm tired of copying and
