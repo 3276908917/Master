@@ -84,6 +84,12 @@ def test_input_cosmology_direct_values():
 
 
 def test_input_dark_energy():
+    """
+    These tests make sure that input_dark_energy() correctly transcribes
+    input dark energy values. Since the function accepts CAMBParams objects
+    rather than cosmologies, we use input_cosmology first and then call
+    input_dark_energy() again.
+    """
     default_cosmology = ci.default_cosmology()
     pars = ci.input_cosmology(default_cosmology)
     

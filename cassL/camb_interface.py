@@ -24,13 +24,27 @@ try:
     path_to_cosms = data_prefix + "cosmologies.dat"
     full_cosm = pd.read_csv(path_to_cosms, sep=r'\s+')
     
-    cosm = full_cosm[:8] # exclude model 8 always          
+    cosm = full_cosm[:8] # exclude model 8 always 
+    
+    # Eliminate unused columns which represent clutter in the pipeline that
+    # obstructs debugging.
+    cosm.drop("Name", axis=1)
+    cosm.drop("OmC", axis=1)
+    cosm.drop("OmB", axis=1)
+    cosm.drop("OmM", axis=1)
+    cosm.drop("OmL", axis=1)
+    cosm.drop("EOmDE", axis=1)
+    cosm.drop("Lbox", axis=1)
+    cosm.drop("sigma8", axis=1)
+    
+    
     for series_name, series in cosm.items():
         if series.dtype != float:
             if series_name == "EOmDE" or series_name == "Name":
                 continue
             else:
                 cosm[series_name] = pd.to_numeric(series)
+    
     
     
 except FileNotFoundError:
@@ -577,8 +591,8 @@ def specify_neutrino_mass(cosmology, omnuh2_in, nnu_massive_in=None):
     if nnu_massive_in is None:
         nnu_massive_in = 1
     if omnuh2_in == 0 and nnu_massive_in == 0:
-        print("WARNING: CAMB crashes with nnu_massive == 0, even if omnuh2",
-            "is zero. We're overriding and setting nnuMassive = 0...")
+        raise UserWarning("CAMB crashes with nnu_massive == 0, even if ",
+            "omnuh2 is zero. We're overriding and setting nnu_massive = 0...")
 
     full_cosmology = cp.deepcopy(cosmology)
 
