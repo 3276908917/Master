@@ -245,8 +245,16 @@ class Emulator_Trainer:
 
     def train_p_emu(self):
         train_emu(self.p_emu, self.X_train, self.normalized_Y)
-        # Now collect training errors
 
+        # Now collect training errors
+        train_predictions = np.zeros(self.normalized_Y.shape)
+
+        for i in range(len(self.X_train)):
+            train_predictions[i] = self.p_emu.predict(self.X_train[i])
+
+        self.train_deltas = train_predictions - self.Y_train
+        self.train_sq_errors = np.square(self.train_deltas)
+        self.train_rel_errors = self.train_deltas / self.Y_train
 
     def validate(self, X_val, Y_val):
         """
@@ -268,12 +276,12 @@ class Emulator_Trainer:
         self.X_val = X_val
         self.Y_val = Y_val
 
-        self.val_preds = np.zeros(Y_val.shape)
+        val_preds = np.zeros(Y_val.shape)
 
         for i in range(len(X_val)):
-            self.val_preds[i] = self.p_emu.predict(X_val[i])
+            val_preds[i] = self.p_emu.predict(X_val[i])
 
-        uncertainties = self.val_preds - self.Y_val
+        uncertainties = val_preds - self.Y_val
         
         xmin = np.min(self.priors, axis=1)
         xrange = np.ptp(self.priors, axis=1)
@@ -287,7 +295,11 @@ class Emulator_Trainer:
         print("Uncertainty emulator trained!")
         
         # But also compute validation training errors...
-        
+       val_predictions = np.zeros(Y_val.shape)
+
+       for i in range(len(self.X_val)):
+            raise NotImplementedError()
+
     def test(self, X_test, Y_test):
         """
         This function can also be used to generate training-error curves,
