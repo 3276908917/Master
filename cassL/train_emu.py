@@ -288,17 +288,22 @@ class Emulator_Trainer:
         
         # The deltas should already be well-behaved, so we don't need to
         # normalize y.
-        self.delta_emu = self.Emulator(self.p_emu.name + "_uncertainties", xmin,
-            xrange, ymu=None, ystdev=None, ydim=self.p_emu.ydim)
+        self.delta_emu = self.Emulator(self.p_emu.name + "_uncertainties",
+            xmin, xrange, ymu=None, ystdev=None, ydim=self.p_emu.ydim)
         
         train_emu(self.delta_emu, self.X_val, uncertainties)
         print("Uncertainty emulator trained!")
         
         # But also compute validation training errors...
-       val_predictions = np.zeros(Y_val.shape)
+        val_predictions = np.zeros(Y_val.shape)
+       
+        for i in range(len(self.X_val)):
+            val_predictions[i] = self.delta_emu.predict(X_val[i])
 
-       for i in range(len(self.X_val)):
-            raise NotImplementedError()
+        self.val_deltas = val_predictions - uncertainties
+        self.val_sq_errors = np.square(self.val_deltas)
+        self.val_rel_errors = self.val_deltas / uncertainties
+
 
     def test(self, X_test, Y_test):
         """
@@ -332,9 +337,9 @@ class Emulator_Trainer:
             for i in range(len(X_test)):
                 delta_predictions[i] = self.delta_emu.predict(X_test[i])
             
-            self.delta_deltas = self.delta_predictions - self.deltas
-            self.delta_sq_errors = np.square(self.delta_deltas)
-            self.delta_rel_errors = self.delta_deltas / self.deltas
+            self.unc_deltas = self.delta_predictions - self.deltas
+            self.unc_sq_errors = np.square(self.unc_deltas)
+            self.unc_rel_errors = self.unc_deltas / self.deltas
         except AttributeError:
             # If there's no validation set, the user should still be allowed to
             # produce basic error estimates with the emulator.
@@ -360,6 +365,17 @@ class Emulator_Trainer:
 
 
     def get_errors(self, metric):
+        # Training error for primary emulator
+        if metric == "train_deltas":
+            return self.train_deltas
+        elif metric == "train_relative":
+            return self.train_rel_errors
+        elif metric == "train_percent":
+            return 100 * self.train_rel_errors
+        elif metric == "train_sqerr":
+            return self.train_sq_errors
+    
+        # Training error for uncertainty emulator
         if metric == "deltas":
             return self.deltas
         elif metric == "relative":
@@ -368,14 +384,26 @@ class Emulator_Trainer:
             return 100 * self.rel_errors
         elif metric == "sqerr":
             return self.sq_errors
-        elif metric == "delta_deltas":
-            return self.delta_deltas
-        elif metric == "delta_sqerr":
-            return self.delta_sq_errors
-        elif metric == "delta_relative":
-            return self.delta_rel_errors
-        elif metric == "delta_percent":
-            return 100 * self.delta_rel_errors
+    
+        # Testing error for primary emulator
+        if metric == "val_deltas":
+            return self.val_deltas
+        elif metric == "val_relative":
+            return self.vel_rel_errors
+        elif metric == "val_percent":
+            return 100 * self.val_rel_errors
+        elif metric == "val_sqerr":
+            return self.val_sq_errors
+            
+        # Testing error for uncertainty emulator
+        elif metric == "unc_deltas":
+            return self.unc_deltas
+        elif metric == "unc_sqerr":
+            return self.unc_sq_errors
+        elif metric == "unc_relative":
+            return self.unc_rel_errors
+        elif metric == "unc_percent":
+            return 100 * self.unc_rel_errors
 
         raise ValueError("Unknown error metric specified. Available " + \
             "options are 'deltas', 'relative', 'percent', and 'sqerr'.")
