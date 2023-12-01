@@ -6,7 +6,8 @@ essential_keys = ["h", "ombh2", "omch2", "OmK", "omnuh2", "A_s", "n_s", "w0",
 
 def test_parsing():
     """
-    Let's FINALLY kill that bug that keeps wa a string...
+    This test confirms that all entries in the cosmologies table, which need
+    to be numerical entries, are indeed numerical.
     """
     for essential_key in essential_keys:
         if essential_key == "omnuh2": # not specified by the cosm table

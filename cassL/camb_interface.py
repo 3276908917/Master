@@ -15,6 +15,8 @@ data_prefix = os.path.dirname(os.path.abspath(__file__)) + "/"
 
 from cassL import utils
 
+# This isn't inside a function because it's annoying to edit global
+# variables...
 try:
     # Keep in mind that 'cosmologies.dat' is NOT the same file as the original
     # 'cosmology_Aletheia.dat' that Ariel provided. In order to facilitate the
@@ -674,7 +676,7 @@ def get_CAMB_sigma12(pars, redshifts=[0]):
     """
 
     pars.set_matter_power(redshifts=redshifts, kmax=10.0 / pars.h,
-                          nonlinear=False)
+                          nonlinear=False, k_per_logint=20)
     results = camb.get_results(pars)
     return results.get_sigmaR(12, hubble_units=False)
 
