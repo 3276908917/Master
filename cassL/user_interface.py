@@ -303,10 +303,34 @@ def build_and_test_emulator(scenario_name):
     trainer.save()
 
     return trainer
-    
+
 # This should be part of the new, separate, smaller repo:
-def scale_sigma12():
+
+def E2(z):
+    raise NotImplementedError
+
+    return omega_m0 * (1 + z) ** 3 + omega_k0 (1 + z) ** 2 + omega_de0
+
+
+def linear_growth_factor(z):
+    raise NotImplementedError
+
+    def integrand(zprime):
+        return (1 + zprime) / E2(z) ** 1.5
+
+    return 2.5 * omega_m0 * np.sqrt(E2(z)) * integrate(z, infinity, integrand)
+
+def scale_sigma12(**kwargs):
+    if h is not None:
+        assert Omega_DE 
+
+    # for key, item in kwargs:
+        
+
     default_sigma12 = def_cosm[""]
+
+    return old_sigma12 * linear_growth_factor(z) / linear_growth_factor(0)
+
     # We need to compute a ratio of the squares of the growth factors, right?
     
     # Evolution parameters to handle
@@ -317,3 +341,5 @@ def scale_sigma12():
     
     # The fitting formula that Andres gives applies to a FLAT LambdaCDM
     # cosmology... what should I do?
+    raise NotImplementedError
+

@@ -183,13 +183,13 @@ adopt a more general form called the Chevallier-Polarski-Linder (CPL)
 parameterization \cbib{Scherrer}:
 
 \begin{equation}
-w_\text{DE} = \eulw_0 + \eulw_a (1 - a)
+\eulw_\text{DE} = \eulw_0 + \eulw_a (1 - a)
 \end{equation}
 
-These $\eulw_0$ and $\eulw_a$ are cosmological parameters which also appear in our
-statistical analyses, although our observations so far appear to support
-a cosmological constant solution: $\eulw_0 = -1$ and $\eulw_a$ = 0. In the first
-Friedmann equation, this form of dark energy would appear as an added
+These $\eulw_0$ and $\eulw_a$ are cosmological parameters which also appear in
+our statistical analyses, although our observations so far appear to support
+a cosmological constant solution: $\eulw_0 = -1$ and $\eulw_a$ = 0. In the
+first Friedmann equation, this form of dark energy would appear as an added
 constant:
 
 \begin{equation}
@@ -667,19 +667,22 @@ Our incomplete understanding of $h$ complicates the comparison of results
 from different papers; if the quoted $h$ values differ even slightly, the same
 symbol $\sigma_8$ will refer to different concepts--that is, mass variances on
 different scales. Therefore, $\sigma_8$ comparisons will typically lead to
-confusion, such as the $\sigma_8$ tension, which may be resolved by using
-$\sigma_{12}$ instead.
+confusion. Using instead $\sigma_{12}$, it is easier to assess the consistency
+of different constraints, such as with the $\sigma_8$.
 For a fuller treatment of the advantages of $\sigma_{12}$, we
 refer the reader to \citet{San20}.
 
-For this work, the most relevant issue with $\sigma_8$ and the $\Omega_i$ 
-parameters is their incompatibility with evolution mapping. The $\Omega_i$
-parameters combine shape parameters like $\omega_b$ and $\omega_c$ with the
-evolution parameter $h$, violating a distinction that we rely on in order
-to simplify the parameter space. Although $\sigma_8$ behaves as an evolution
-parameter for a fixed $h$, a varying $h$ will cause the meaning of $\sigma_8$
-to change, and so we cannot rely on it to characterize the amplitude of the
-power spectrum.
+For this work, the most relevant issue with $\sigma_8$ and the $\Omega_i$
+parameters is their incompatibility with evolution mapping. Consider that
+$h = \sqrt{\Sum \omega_i}$ is a mixed parameter because it combines the shape
+parameters $\omega_b$ and $\omega_c$ with the evolution parameters $\omega_K$
+and $\omega_\text{DE}$. Consequently, the $\Omega_i$ parameters are mixed,
+because they depend on $h$. Mixed parameters violate a distinction that we
+rely on in order to simplify the parameter space, so they must be excluded
+from applications of evolution mapping. Although $\sigma_8$ behaves as an
+evolution parameter for a fixed $h$, a varying $h$ will cause the meaning of
+$\sigma_8$ to change, and so we cannot rely on it to characterize the amplitude
+of the power spectrum.
 
 
 \section{Boltzmann Solvers and CAMB}
@@ -797,7 +800,7 @@ order to illustrate the impact of $\sigma_{12}$, $z$, $h$, etc.
   	One counterexample is the shape of the BAO feature, which becomes more
   	pronounced for lower densities. A second counterexample is the location
   	of the turnover scale $k_s$, which is determined by the physical density
-  	in baryons. However, this effect is subtle since the $x$-axis is
+  	in matter. However, this effect is subtle since the $x$-axis is
   	logarithmic and since even extreme values (relative to modern confidence
   	intervals) of $\omega_b$ will only slightly shift $k_s$. This shift
   	cannot be easily seen with the values used here.} 
@@ -965,7 +968,7 @@ in evolution parameters.
   	cosmologies that agree in their shape parameters. This figure was
   	inspired by figure 2 from \citet{San21}. Aletheia model 0 was related in
   	table~\ref{tab: Aletheia_m0}. For details on the rest of the Aletheia
-  	models, please refer to the file
+  	models, refer to the file
   	\verb|cosmologies.dat|\footnotemark
   	\, in the CL GitHub repository.}
   \label{fig: ev_mapping_demo}
@@ -1045,7 +1048,7 @@ applications. Linear power spectra can be used to predict $P_\text{NL}(k)$,
 such as in perturbation theory approaches. Furthermore, most non-linear 
 emulators actually predict the ratio of the non-linear power spectrum to its 
 linear counterpart, so $P_\text{L}(k)$ is still necessary to evaluate
-$P_\text{NL}(k)$ (A. G. S\'{a}nchez, private communication, 2022).}
+$P_\text{NL}(k)$.}
 \verb|baccoemu| includes both nonlinear and linear power spectrum emulators 
 based on NNs. The quoted accuracies in the linear case are
 0.2\% for redshifts $z \lesssim 3$ and
