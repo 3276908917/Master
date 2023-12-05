@@ -10,12 +10,15 @@
 	* Uncertainty emulator
 	* sigma12 emulator
 	* Massive and massless emulators
-	? Or should I refer the reader to a README on the repo's page?? e.g. for which
+	? Or should I refer the reader to a README on the repo's page?? e.g. for
+	    which
 		functions do which things...
 * (Results) Training and testing errors
 	* Predicted uncertainties versus actual certainties: much noisier, probably
 		due to the strong performance of the main emulator.
 * Discussion, conclusion, future work
 	* Comparison to existing emulators with massive neutrino support.
-	* I'm still working on the no-wiggle, de-wiggled, and dimensionless power spectra.
-	* Limited priors -> it would be great if we could repeat this work on CLASS, for example.
+	* I'm still working on the no-wiggle, de-wiggled, and dimensionless power
+	    spectra.
+	* Limited priors -> it would be great if we could repeat this work on CLASS,
+	    for example.
