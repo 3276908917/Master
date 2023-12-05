@@ -303,4 +303,17 @@ def build_and_test_emulator(scenario_name):
     trainer.save()
 
     return trainer
-
+    
+# This should be part of the new, separate, smaller repo:
+def scale_sigma12():
+    default_sigma12 = def_cosm[""]
+    # We need to compute a ratio of the squares of the growth factors, right?
+    
+    # Evolution parameters to handle
+    # w_a
+    # w_0
+    # h, i.e. Omega_DE
+    # Omega_K
+    
+    # The fitting formula that Andres gives applies to a FLAT LambdaCDM
+    # cosmology... what should I do?
