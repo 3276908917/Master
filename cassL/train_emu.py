@@ -342,6 +342,7 @@ class Emulator_Trainer:
             self.unc_sq_errors = np.square(self.unc_deltas)
             self.unc_rel_errors = self.unc_deltas / self.deltas
         except AttributeError:
+            print("No validation set??")
             # If there's no validation set, the user should still be allowed to
             # produce basic error estimates with the emulator.
             pass

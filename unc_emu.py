@@ -16,21 +16,25 @@ X_train, Y_train = te.eliminate_unusable_entries(lhs_train, samples_train)
 X_val, Y_val = te.eliminate_unusable_entries(lhs_val, samples_val)
 X_test, Y_test = te.eliminate_unusable_entries(lhs_test, samples_test)
 
-if False: # Skip main emulator training since we've already completed that.
+if False: # False = skip main emulator training (if we've already completed it).
     trainer = te.Emulator_Trainer("Hnu2unc", X_train, Y_train, priors, True)
     trainer.train_p_emu()
     trainer.save()
+    print("Step 1 complete!")
 else:
     trainer = np.load(te.path_to_emus + "Hnu2unc.cle", allow_pickle=True)
 
 if False:
     trainer.validate(X_val, Y_val)
     trainer.save()
+    print("Step 2 complete!")
 
+if True:
     trainer.test(X_test, Y_test)
     trainer.save()
+    print("Step 3 complete!")
 
 trainer.error_hist()
 
-trainer.error_hist(metric="delta_relative")
-trainer.error_hist(metric="delta_deltas")
+trainer.error_hist(metric="unc_percent")
+trainer.error_hist(metric="unc_deltas")
