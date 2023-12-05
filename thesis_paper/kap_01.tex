@@ -697,8 +697,7 @@ stiff, which calls for different approaches in different regimes. Furthermore,
 its solutions are highly oscillatory and therefore susceptible to numerical
 errors \cbib{Seljak}. Full solutions consist of many different steps, whose
 descriptions fall outside of the scope of this work. We refer readers curious
-about these equations to the history in the introduction of \citet{Seljak},
-which cites papers important to their development. 
+about these equations to the history in the introduction of \citet{Seljak}.
 
 %s Equations are hard. Who can save us?
 
@@ -706,30 +705,31 @@ The so-called \textit{Boltzmann codes} have been
 developed in order to leverage modern computational power and automate the
 solution of these equations of evolution. Typically, Boltzmann codes offer as
 outputs CMB spectra and matter power spectra. The latter is the focus of this
-work.
+work. As of today, the two Boltzmann codes
+CAMB\footnote{\url{https://github.com/cmbant/CAMB}} and
+CLASS\footnote{\url{https://lesgourg.github.io/class_public/class.html}} offer
+the largest suites of features and are also actively developed.
 
 %s What can our savior do?
 
-As input, Boltzmann codes accept a set of values for different 
-cosmological parameters, many of which were defined in section~\ref{sec: 
-param_glossary}. Boltzmann codes enable us to pick from wide ranges of 
-accepted values for these parameters and to consider the power 
-spectrum for almost any combination of these parameters. Of course, there are 
-still limitations. For example, CAMB does not currently support negative 
-redshifts (which, we will later see, becomes a problem), and the minimum 
-allowed value of $H_0$ is 1 km s$^{-1}$ Mpc$^{-1}$, although slightly higher 
-values have 
-been observed to cause runtime errors in the presence of other extreme 
+As input, Boltzmann codes accept a set of values for different
+cosmological parameters, many of which were defined in section~\ref{sec:
+param_glossary}. Boltzmann codes enable us to pick from wide ranges of
+accepted values for these parameters and to consider the power
+spectrum for almost any combination of these parameters. Of course, there are
+still limitations. For example, CAMB does not currently support negative
+redshifts (which, we will later see, becomes a problem), and the minimum
+allowed value of $H_0$ is 1 km s$^{-1}$ Mpc$^{-1}$, although slightly higher
+values have
+been observed to cause runtime errors in the presence of other extreme
 parameters. CLASS and CAMB claim to be accurate at the 0.1\% level
 \cbib{Lesgourges}.
 
 %s Pics? Not so fast. Let's pick one.
 
 Before we proceed to concrete demonstrations, it will be expedient to settle
-on a single Boltzmann solver. As of today, the two Boltzmann codes
-CAMB\footnote{\url{https://github.com/cmbant/CAMB}} and
-CLASS\footnote{\url{https://lesgourg.github.io/class_public/class.html}} offer
-the largest suites of features and are also actively developed. CAMB and
+on a single Boltzmann solver.
+CAMB and
 CLASS were written in different languages (Fortran-90 and C, respectively)
 but both come with Python wrappers. These codes have been shown to be in 
 excellent agreement with each other, and their
@@ -761,11 +761,12 @@ via CAMB!}
 To connect this section with~\ref{sec: param_glossary}, we can visualize the
 impact of each of this work's core parameters on the power spectrum. One
 simple way to set this up for parameter $\Theta_i$ is to designate Aletheia 
-model 0 as a middle ground and to create two copies of model 0, with each
+model 0 (tab~\ref{tab: Aletheia_m0}) as a middle ground and to create two
+copies of model 0, with each
 copy tweaked to have an increased or decreased value of $\Theta_i$. This
 approach works for every parameter except for $\omega_\nu$, where one of the
 copy cosmologies describes the middle ground since the default value
-$\omega_nu = 0$ is already at a hard boundary.
+$\omega_\nu = 0$ is already at a hard boundary.
 
 When feeding these cosmologies into CAMB, our Boltzmann solver of choice, we
 obtain figures~\ref{fig: omega_b_dependence}, \ref{fig: omega_c_dependence}, 
@@ -779,17 +780,17 @@ parameter.
 
 It should be
 clear to the reader that each parameter has a special impact on the power
-spectrum. None of these parameters is completely degenerate in the others,
-although in the case of massless neutrinos $A_s$ and $\sigma_{12}$ are
-completely degenerate, which is why we have not included an analogous plot for
+spectrum. None of these parameters is completely degenerate in the others.
+However, in the case of massless neutrinos, $A_s$ and $\sigma_{12}$ are
+completely degenerate. Therefore, we do not include an analogous plot for
 $\sigma_{12}$ (the other reason being that CAMB does not accept $\sigma_{12}$
-as an input--see section~\ref{sec: generate_emu_data}.
+as an input--see section~\ref{sec: generate_emu_data}).
 
-The remaining parameters $\sigma_{12}$ and $A_s$, as well as the quantities 
-$z$ and $h$, all shift only the amplitude of the power spectrum. We show the 
-amplitude shift associated with various $A_s$ values in figure~\ref{fig: 
+The remaining parameters $\sigma_{12}$, $A_s$, and $\omega_\text{DE}$, as well
+as the redshift $z$, shift only the amplitude of the power spectrum. We show
+the amplitude shift associated with various $A_s$ values in figure~\ref{fig: 
 A_s_dependence} and stress that the same plot only needs to be relabeled in 
-order to illustrate the impact of $\sigma_{12}$, $z$, $h$, etc. 
+order to illustrate the impact of $\sigma_{12}$, $z$, etc. 
 
 \begin{figure}[ht!]
   \centering
@@ -869,7 +870,11 @@ order to illustrate the impact of $\sigma_{12}$, $z$, $h$, etc.
   \label{fig: omega_nu_dependence}
 \end{figure}
 
-%s Segue into the next section
+%%% We're sinking this section! It's not relevant enough and I don't know 
+%%% enough.
+\begin{comment}
+
+%s Segue into MCMC
 
 Since many of these parameters have fairly unique impacts on the power 
 spectrum, we can imagine building a collection of power spectra labeled by
@@ -879,10 +884,6 @@ observations most closely agree.
 In the next section, we will categorize parameters according to the
 kind of impact that they have on the power spectrum, which allows us to
 exploit a degeneracy and make our emulator more efficient. 
-
-%%% We're sinking this section! It's not relevant enough and I don't know 
-%%% enough.
-\begin{comment}
 
 \section{Monte Carlo Markov Chains}
 
