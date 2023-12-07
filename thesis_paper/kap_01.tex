@@ -183,13 +183,13 @@ adopt a more general form called the Chevallier-Polarski-Linder (CPL)
 parameterization \cbib{Scherrer}:
 
 \begin{equation}
-w_\text{DE} = \eulw_0 + \eulw_a (1 - a)
+\eulw_\text{DE} = \eulw_0 + \eulw_a (1 - a)
 \end{equation}
 
-These $\eulw_0$ and $\eulw_a$ are cosmological parameters which also appear in our
-statistical analyses, although our observations so far appear to support
-a cosmological constant solution: $\eulw_0 = -1$ and $\eulw_a$ = 0. In the first
-Friedmann equation, this form of dark energy would appear as an added
+These $\eulw_0$ and $\eulw_a$ are cosmological parameters which also appear in
+our statistical analyses, although our observations so far appear to support
+a cosmological constant solution: $\eulw_0 = -1$ and $\eulw_a$ = 0. In the
+first Friedmann equation, this form of dark energy would appear as an added
 constant:
 
 \begin{equation}
@@ -667,19 +667,22 @@ Our incomplete understanding of $h$ complicates the comparison of results
 from different papers; if the quoted $h$ values differ even slightly, the same
 symbol $\sigma_8$ will refer to different concepts--that is, mass variances on
 different scales. Therefore, $\sigma_8$ comparisons will typically lead to
-confusion, such as the $\sigma_8$ tension, which may be resolved by using
-$\sigma_{12}$ instead.
+confusion. Using instead $\sigma_{12}$, it is easier to assess the consistency
+of different constraints, such as with the $\sigma_8$.
 For a fuller treatment of the advantages of $\sigma_{12}$, we
 refer the reader to \citet{San20}.
 
-For this work, the most relevant issue with $\sigma_8$ and the $\Omega_i$ 
-parameters is their incompatibility with evolution mapping. The $\Omega_i$
-parameters combine shape parameters like $\omega_b$ and $\omega_c$ with the
-evolution parameter $h$, violating a distinction that we rely on in order
-to simplify the parameter space. Although $\sigma_8$ behaves as an evolution
-parameter for a fixed $h$, a varying $h$ will cause the meaning of $\sigma_8$
-to change, and so we cannot rely on it to characterize the amplitude of the
-power spectrum.
+For this work, the most relevant issue with $\sigma_8$ and the $\Omega_i$
+parameters is their incompatibility with evolution mapping. Consider that
+$h = \sqrt{\Sum \omega_i}$ is a mixed parameter because it combines the shape
+parameters $\omega_b$ and $\omega_c$ with the evolution parameters $\omega_K$
+and $\omega_\text{DE}$. Consequently, the $\Omega_i$ parameters are mixed,
+because they depend on $h$. Mixed parameters violate a distinction that we
+rely on in order to simplify the parameter space, so they must be excluded
+from applications of evolution mapping. Although $\sigma_8$ behaves as an
+evolution parameter for a fixed $h$, a varying $h$ will cause the meaning of
+$\sigma_8$ to change, and so we cannot rely on it to characterize the amplitude
+of the power spectrum.
 
 
 \section{Boltzmann Solvers and CAMB}
@@ -694,8 +697,7 @@ stiff, which calls for different approaches in different regimes. Furthermore,
 its solutions are highly oscillatory and therefore susceptible to numerical
 errors \cbib{Seljak}. Full solutions consist of many different steps, whose
 descriptions fall outside of the scope of this work. We refer readers curious
-about these equations to the history in the introduction of \citet{Seljak},
-which cites papers important to their development. 
+about these equations to the history in the introduction of \citet{Seljak}.
 
 %s Equations are hard. Who can save us?
 
@@ -703,30 +705,31 @@ The so-called \textit{Boltzmann codes} have been
 developed in order to leverage modern computational power and automate the
 solution of these equations of evolution. Typically, Boltzmann codes offer as
 outputs CMB spectra and matter power spectra. The latter is the focus of this
-work.
+work. As of today, the two Boltzmann codes
+CAMB\footnote{\url{https://github.com/cmbant/CAMB}} and
+CLASS\footnote{\url{https://lesgourg.github.io/class_public/class.html}} offer
+the largest suites of features and are also actively developed.
 
 %s What can our savior do?
 
-As input, Boltzmann codes accept a set of values for different 
-cosmological parameters, many of which were defined in section~\ref{sec: 
-param_glossary}. Boltzmann codes enable us to pick from wide ranges of 
-accepted values for these parameters and to consider the power 
-spectrum for almost any combination of these parameters. Of course, there are 
-still limitations. For example, CAMB does not currently support negative 
-redshifts (which, we will later see, becomes a problem), and the minimum 
-allowed value of $H_0$ is 1 km s$^{-1}$ Mpc$^{-1}$, although slightly higher 
-values have 
-been observed to cause runtime errors in the presence of other extreme 
+As input, Boltzmann codes accept a set of values for different
+cosmological parameters, many of which were defined in section~\ref{sec:
+param_glossary}. Boltzmann codes enable us to pick from wide ranges of
+accepted values for these parameters and to consider the power
+spectrum for almost any combination of these parameters. Of course, there are
+still limitations. For example, CAMB does not currently support negative
+redshifts (which, we will later see, becomes a problem), and the minimum
+allowed value of $H_0$ is 1 km s$^{-1}$ Mpc$^{-1}$, although slightly higher
+values have
+been observed to cause runtime errors in the presence of other extreme
 parameters. CLASS and CAMB claim to be accurate at the 0.1\% level
 \cbib{Lesgourges}.
 
 %s Pics? Not so fast. Let's pick one.
 
 Before we proceed to concrete demonstrations, it will be expedient to settle
-on a single Boltzmann solver. As of today, the two Boltzmann codes
-CAMB\footnote{\url{https://github.com/cmbant/CAMB}} and
-CLASS\footnote{\url{https://lesgourg.github.io/class_public/class.html}} offer
-the largest suites of features and are also actively developed. CAMB and
+on a single Boltzmann solver.
+CAMB and
 CLASS were written in different languages (Fortran-90 and C, respectively)
 but both come with Python wrappers. These codes have been shown to be in 
 excellent agreement with each other, and their
@@ -758,11 +761,12 @@ via CAMB!}
 To connect this section with~\ref{sec: param_glossary}, we can visualize the
 impact of each of this work's core parameters on the power spectrum. One
 simple way to set this up for parameter $\Theta_i$ is to designate Aletheia 
-model 0 as a middle ground and to create two copies of model 0, with each
+model 0 (tab~\ref{tab: Aletheia_m0}) as a middle ground and to create two
+copies of model 0, with each
 copy tweaked to have an increased or decreased value of $\Theta_i$. This
 approach works for every parameter except for $\omega_\nu$, where one of the
 copy cosmologies describes the middle ground since the default value
-$\omega_nu = 0$ is already at a hard boundary.
+$\omega_\nu = 0$ is already at a hard boundary.
 
 When feeding these cosmologies into CAMB, our Boltzmann solver of choice, we
 obtain figures~\ref{fig: omega_b_dependence}, \ref{fig: omega_c_dependence}, 
@@ -776,17 +780,17 @@ parameter.
 
 It should be
 clear to the reader that each parameter has a special impact on the power
-spectrum. None of these parameters is completely degenerate in the others,
-although in the case of massless neutrinos $A_s$ and $\sigma_{12}$ are
-completely degenerate, which is why we have not included an analogous plot for
+spectrum. None of these parameters is completely degenerate in the others.
+However, in the case of massless neutrinos, $A_s$ and $\sigma_{12}$ are
+completely degenerate. Therefore, we do not include an analogous plot for
 $\sigma_{12}$ (the other reason being that CAMB does not accept $\sigma_{12}$
-as an input--see section~\ref{sec: generate_emu_data}.
+as an input--see section~\ref{sec: generate_emu_data}).
 
-The remaining parameters $\sigma_{12}$ and $A_s$, as well as the quantities 
-$z$ and $h$, all shift only the amplitude of the power spectrum. We show the 
-amplitude shift associated with various $A_s$ values in figure~\ref{fig: 
+The remaining parameters $\sigma_{12}$, $A_s$, and $\omega_\text{DE}$, as well
+as the redshift $z$, shift only the amplitude of the power spectrum. We show
+the amplitude shift associated with various $A_s$ values in figure~\ref{fig: 
 A_s_dependence} and stress that the same plot only needs to be relabeled in 
-order to illustrate the impact of $\sigma_{12}$, $z$, $h$, etc. 
+order to illustrate the impact of $\sigma_{12}$, $z$, etc. 
 
 \begin{figure}[ht!]
   \centering
@@ -797,7 +801,7 @@ order to illustrate the impact of $\sigma_{12}$, $z$, $h$, etc.
   	One counterexample is the shape of the BAO feature, which becomes more
   	pronounced for lower densities. A second counterexample is the location
   	of the turnover scale $k_s$, which is determined by the physical density
-  	in baryons. However, this effect is subtle since the $x$-axis is
+  	in matter. However, this effect is subtle since the $x$-axis is
   	logarithmic and since even extreme values (relative to modern confidence
   	intervals) of $\omega_b$ will only slightly shift $k_s$. This shift
   	cannot be easily seen with the values used here.} 
@@ -866,7 +870,11 @@ order to illustrate the impact of $\sigma_{12}$, $z$, $h$, etc.
   \label{fig: omega_nu_dependence}
 \end{figure}
 
-%s Segue into the next section
+%%% We're sinking this section! It's not relevant enough and I don't know 
+%%% enough.
+\begin{comment}
+
+%s Segue into MCMC
 
 Since many of these parameters have fairly unique impacts on the power 
 spectrum, we can imagine building a collection of power spectra labeled by
@@ -876,10 +884,6 @@ observations most closely agree.
 In the next section, we will categorize parameters according to the
 kind of impact that they have on the power spectrum, which allows us to
 exploit a degeneracy and make our emulator more efficient. 
-
-%%% We're sinking this section! It's not relevant enough and I don't know 
-%%% enough.
-\begin{comment}
 
 \section{Monte Carlo Markov Chains}
 
@@ -965,7 +969,7 @@ in evolution parameters.
   	cosmologies that agree in their shape parameters. This figure was
   	inspired by figure 2 from \citet{San21}. Aletheia model 0 was related in
   	table~\ref{tab: Aletheia_m0}. For details on the rest of the Aletheia
-  	models, please refer to the file
+  	models, refer to the file
   	\verb|cosmologies.dat|\footnotemark
   	\, in the CL GitHub repository.}
   \label{fig: ev_mapping_demo}
@@ -1045,7 +1049,7 @@ applications. Linear power spectra can be used to predict $P_\text{NL}(k)$,
 such as in perturbation theory approaches. Furthermore, most non-linear 
 emulators actually predict the ratio of the non-linear power spectrum to its 
 linear counterpart, so $P_\text{L}(k)$ is still necessary to evaluate
-$P_\text{NL}(k)$ (A. G. S\'{a}nchez, private communication, 2022).}
+$P_\text{NL}(k)$.}
 \verb|baccoemu| includes both nonlinear and linear power spectrum emulators 
 based on NNs. The quoted accuracies in the linear case are
 0.2\% for redshifts $z \lesssim 3$ and

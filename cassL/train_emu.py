@@ -204,16 +204,17 @@ class Emulator_Trainer:
             "following parameters are required: name, X training data, Y " + \
             "training data, priors, and (boolean) whether the Y's should " + \
             "be log-normalized."        
-        if len(args) != 5:
+        if len(args) != 5 and len(args) != 4:
             raise TypeError(constructor_complaint)
-        
+
         emu_name = args[0]
         self.X_train = args[1]
         self.Y_train = args[2]
         
         xdim = len(self.X_train[0])
         self.priors = args[3][:xdim]
-        self.normalize = args[4]
+
+        self.normalize = args[4] if len(args) == 5 else True
         
         if not isinstance(self.X_train, np.ndarray):
             raise TypeError(constructor_complaint)
@@ -341,6 +342,7 @@ class Emulator_Trainer:
             self.unc_sq_errors = np.square(self.unc_deltas)
             self.unc_rel_errors = self.unc_deltas / self.deltas
         except AttributeError:
+            print("No validation set??")
             # If there's no validation set, the user should still be allowed to
             # produce basic error estimates with the emulator.
             pass

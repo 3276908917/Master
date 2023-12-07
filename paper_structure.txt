@@ -1,0 +1,24 @@
+* Introduction
+	* I need to incorporate Ariel's suggestions into my master's thesis,
+		then I can pull the paper's introduction from my thesis,
+		right?
+* (Methods??) Theoretical adjustments to evolution mapping
+	* sigma12 tilde
+	* A_s as a shape parameter
+	! Come up with a new name for the MEMNeC. It's unpopular...
+* (Methods) Usage of Cassandra-Linear, breakdown of features
+	* Uncertainty emulator
+	* sigma12 emulator
+	* Massive and massless emulators
+	? Or should I refer the reader to a README on the repo's page?? e.g. for
+	    which
+		functions do which things...
+* (Results) Training and testing errors
+	* Predicted uncertainties versus actual certainties: much noisier, probably
+		due to the strong performance of the main emulator.
+* Discussion, conclusion, future work
+	* Comparison to existing emulators with massive neutrino support.
+	* I'm still working on the no-wiggle, de-wiggled, and dimensionless power
+	    spectra.
+	* Limited priors -> it would be great if we could repeat this work on CLASS,
+	    for example.

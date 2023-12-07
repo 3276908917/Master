@@ -84,6 +84,7 @@ def default_cosmology():
     Returns: dictionary (a copy of the default cosmology)
     """
     return specify_neutrino_mass(cosm.iloc[0], 0)
+    
 
 def parse_redshifts(model_num):
     r"""
@@ -1075,3 +1076,4 @@ def compare_wrappers(k_list, p_list, sims, snap_index, canvas, massive,
     plot_area.set_title(title)
     plot_area.legend()
 
+default_sigma12 = evaluate_sigma12(default_cosmology())

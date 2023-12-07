@@ -27,7 +27,7 @@ if False:
     np.save("sigma12_samples_test.npy", sigma12_test_samples)
     np.save("lhc_sigma12_test_final.npy", sigma12_test_lhs)
 
-if False:
+if True:
     lhs_train = np.load("lhc_sigma12_train_final.npy")
     samples_train = np.load("sigma12_samples_train.npy")
 
@@ -39,10 +39,12 @@ if False:
                                   False)
     trainer.train_p_emu()
     trainer.save()
+    print("step 3 complete")
+
 else:
     trainer = np.load(te.path_to_emus + "sigma12_v1.cle", allow_pickle=True)
 
-if False:
+if True:
     lhs_test = np.load("lhc_sigma12_test_final.npy")
     samples_test = np.load("sigma12_samples_test.npy")
     X_test, Y_test = te.eliminate_unusable_entries(lhs_test, samples_test)
@@ -50,6 +52,8 @@ if False:
     Y_test2 = Y_test.reshape((len(Y_test), 1))
     trainer.test(X_test, Y_test2)
     trainer.save()
+
+    print("step 4 complete!")
 
 trainer.error_hist()
 
