@@ -9,3 +9,4 @@ setup(
     ]},
 )
 
+# numpy should be <= 1.23.5, otherwise GPy cannot be imported...

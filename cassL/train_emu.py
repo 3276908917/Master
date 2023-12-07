@@ -333,20 +333,14 @@ class Emulator_Trainer:
         self.sq_errors = np.square(self.deltas)
         self.rel_errors = self.deltas / Y_test
         
-        try:
-            delta_predictions = np.zeros(Y_test.shape)
-            for i in range(len(X_test)):
-                delta_predictions[i] = self.delta_emu.predict(X_test[i])
-            
-            self.unc_deltas = self.delta_predictions - self.deltas
-            self.unc_sq_errors = np.square(self.unc_deltas)
-            self.unc_rel_errors = self.unc_deltas / self.deltas
-        except AttributeError:
-            print("No validation set??")
-            # If there's no validation set, the user should still be allowed to
-            # produce basic error estimates with the emulator.
-            pass
-
+        delta_predictions = np.zeros(Y_test.shape)
+        for i in range(len(X_test)):
+            delta_predictions[i] = self.delta_emu.predict(X_test[i])
+        
+        self.unc_deltas = delta_predictions - self.deltas
+        self.unc_sq_errors = np.square(self.unc_deltas)
+        self.unc_rel_errors = self.unc_deltas / self.deltas
+ 
         print("Errors computed!")
         print("Sum of squared errors across all models:",
               sum(sum(self.sq_errors)))
