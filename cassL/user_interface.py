@@ -306,23 +306,31 @@ def build_and_test_emulator(scenario_name):
 
 # This should be part of the new, separate, smaller repo:
 
-def E2(z):
+def E2(OmM_0, OmK_0, OmDE_0, z):
     raise NotImplementedError
 
-    return omega_m0 * (1 + z) ** 3 + omega_k0 (1 + z) ** 2 + omega_de0
+    return OmM_0 * (1 + z) ** 3 + OmK_0 (1 + z) ** 2 + OmDE_0
 
 
-def linear_growth_factor(z):
+def linear_growth_factor(OmM_0, z):
     raise NotImplementedError
 
     def integrand(zprime):
         return (1 + zprime) / E2(z) ** 1.5
 
-    return 2.5 * omega_m0 * np.sqrt(E2(z)) * integrate(z, infinity, integrand)
+    return 2.5 * OmM_0 * np.sqrt(E2(z)) * integrate(z, infinity, integrand)
+
+spec_conflict_message = "Do not attempt to simultaneously set curvature, " + \
+    "dark energy, and the Hubble parameter. Set two of the three, and " + \
+    "Cassandra-Linear will automatically handle the third."
 
 def scale_sigma12(**kwargs):
-    if h is not None:
-        assert Omega_DE 
+    if "h" in kwargs:
+        if "OmDE" or "omDE"in kwargs:
+            if "OmK" or "omk" in kwargs:
+                raise ValueError(spec_conflict_message)
+
+    evolution_dictionary = {}
 
     # for key, item in kwargs:
         
