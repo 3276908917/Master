@@ -30,15 +30,14 @@ try:
     
     # Eliminate unused columns which represent clutter in the pipeline that
     # obstructs debugging.
-    cosm.drop("Name", axis=1)
-    cosm.drop("OmC", axis=1)
-    cosm.drop("OmB", axis=1)
-    cosm.drop("OmM", axis=1)
-    cosm.drop("OmL", axis=1)
-    cosm.drop("EOmDE", axis=1)
-    cosm.drop("Lbox", axis=1)
-    cosm.drop("sigma8", axis=1)
-    
+    cosm = cosm.drop("Name", axis=1)
+    cosm = cosm.drop("OmC", axis=1)
+    cosm = cosm.drop("OmB", axis=1)
+    cosm = cosm.drop("OmM", axis=1)
+    cosm = cosm.drop("OmL", axis=1)
+    cosm = cosm.drop("EOmDE", axis=1)
+    cosm = cosm.drop("Lbox", axis=1)
+    cosm = cosm.drop("sigma8", axis=1)  
     
     for series_name, series in cosm.items():
         if series.dtype != float:
@@ -46,9 +45,7 @@ try:
                 continue
             else:
                 cosm[series_name] = pd.to_numeric(series)
-    
-    
-    
+                
 except FileNotFoundError:
     print("Failure to load table of Aletheia cosmologies.")
 

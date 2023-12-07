@@ -2,6 +2,7 @@ import numpy as np
 from cassL import lhc
 from cassL import generate_emu_data as ged
 from cassL import train_emu as te
+from cassL import camb_interface as ci
 import os
 
 data_prefix = os.path.dirname(os.path.abspath(__file__)) + "/"
@@ -320,15 +321,66 @@ def linear_growth_factor(OmM_0, z):
 
     return 2.5 * OmM_0 * np.sqrt(E2(z)) * integrate(z, infinity, integrand)
 
+
 spec_conflict_message = "Do not attempt to simultaneously set curvature, " + \
     "dark energy, and the Hubble parameter. Set two of the three, and " + \
     "Cassandra-Linear will automatically handle the third."
 
+
 def scale_sigma12(**kwargs):
+    """
+    Ideally, the user wouldn't use this function, it would automatically be
+    called under the hood in the event that the user attempts to specify
+    evolution parameters in addition to the mandatory shape params.
+
+    Preferentially uses a specified 'h' to define omega_DE while leaving omega_K
+    as the default value.
+    :param kwargs:
+    :return:
+    """
+    cosmology = ci.default_cosmology()
+
+    # Make sure at most two of the three are defined: h, omega_curv, omega_DE
     if "h" in kwargs:
         if "OmDE" or "omDE"in kwargs:
             if "OmK" or "omk" in kwargs:
                 raise ValueError(spec_conflict_message)
+
+    # Make sure that h is specified, in the event that fractionals are given
+    fractional_keys = ["OmB", "OmC", "OmDE", "OmK"]
+    fractional_in_kwargs = False
+
+    for key in fractional_keys:
+        if key in kwargs:
+            fractional_in_kwargs = True
+            break
+
+    if fractional_in_kwargs and "h" not in kwargs:
+        raise ValueError("A fractional density parameter was specified, " + \
+            "but no value of 'h' was provided.")
+            
+    if "omB" in kwargs:
+        cosmology["ombh2"] = kwargs["omB"]
+    elif "OmB" in kwargs:
+        cosmology["ombh2"] = kwargs["OmB"] / h ** 2
+    else:
+        raise ValueError("OmB is a required ingredient.")
+    
+    if "omC" in kwargs:
+        cosmology["omch2"] = kwargs["omC"]
+    elif "OmC" in kwargs:
+        cosmology["omch2"] = kwargs["OmC"] / h ** 2
+    else:
+        raise ValueError("OmC is a required ingredient.")
+
+    # Do likewise for DE and curvature, but instead of throwing an error, apply
+    # the default value, i.e. that of Allie 0
+    
+    # Calculate h
+    if "h" not in kwargs:
+        cosmology["h"] = omB + omC + omDE + omK
+
+
 
     evolution_dictionary = {}
 

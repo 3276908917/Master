@@ -36,6 +36,9 @@ CAMB_demo/planck_2018.ini
 *.swo
 *~
 
+# IDE trash
+.idea
+
 ## Core latex/pdflatex auxiliary files:
 *.aux
 *.lof
