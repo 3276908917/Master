@@ -1,6 +1,7 @@
 import numpy as np
 from cassL import generate_emu_data as ged
 from cassL import user_interface as ui
+import warnings
 
 massive_neutrinos=True
 
@@ -31,7 +32,7 @@ if completed_index > -1:
     except FileNotFoundError:
         # Probably what happened is that we just didn't reach the end of the
         # first write interval. So, we have to start from the beginning.
-        raise UserWarning("The given completed_index did not match any files!")
+        warnings.warn("The given completed_index did not match any files!")
         completed_index = -1
 
 samples, rescalers = ged.fill_hypercube(

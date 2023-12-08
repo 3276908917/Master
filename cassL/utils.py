@@ -1,4 +1,5 @@
 import numpy as np
+import warnings
 from scipy.interpolate import interp1d
 
 def box(item):
@@ -10,7 +11,7 @@ def box(item):
         return item
     
     if not isinstance(item, int) and not isinstance(item, float):
-        raise Warning("Box was called on a single non-numeric item!")
+        warnings.warn("Box was called on a single non-numeric item!")
         
     return np.array([item])
     

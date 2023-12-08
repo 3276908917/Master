@@ -13,6 +13,8 @@ import copy as cp
 import os
 data_prefix = os.path.dirname(os.path.abspath(__file__)) + "/"
 
+import warnings
+
 from cassL import utils
 
 # This isn't inside a function because it's annoying to edit global
@@ -591,7 +593,7 @@ def specify_neutrino_mass(cosmology, omnuh2_in, nnu_massive_in=None):
     if nnu_massive_in is None:
         nnu_massive_in = 1
     if omnuh2_in == 0 and nnu_massive_in == 0:
-        raise UserWarning("CAMB crashes with nnu_massive == 0, even if ",
+        warnings.warn("CAMB crashes with nnu_massive == 0, even if ",
             "omnuh2 is zero. We're overriding and setting nnu_massive = 0...")
 
     full_cosmology = cp.deepcopy(cosmology)

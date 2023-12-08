@@ -11,6 +11,7 @@ from cassL import user_interface as ui
 from cassL import utils
 
 import os
+import warnings
 
 data_prefix = os.path.dirname(os.path.abspath(__file__)) + "/"
 path_to_emus = data_prefix + "emulators/"
@@ -444,7 +445,7 @@ class Emulator_Trainer:
             # Issue a warning if we weren't able to find the exact k value.
             if fixed_k not in self._scales:
                 k_index = utils.closest_index(self._scales, fixed_k)
-                raise UserWarning("No exact match was found for the given " + \
+                warnings.warn("No exact match was found for the given " + \
                     "fixed k (" + str(fixed_k) + "). Approximating to " + \
                     str(self._scales[k_index]))
             else:
