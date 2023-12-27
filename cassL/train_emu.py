@@ -462,7 +462,8 @@ class Emulator_Trainer:
         normalized_vals = utils.normalize(valid_vals)
 
         # the factor of 2 renormalizes
-        extremeness = lambda x: 2 * np.abs(0.5 - x)
+        extremeness = lambda x: (2 * np.abs(0.5 - x)) ** 10
+
 
         if param_index == -1: # extremeness A: maximum extremeness
             normalized_vals = np.max(extremeness(self.X_test), axis=1)
