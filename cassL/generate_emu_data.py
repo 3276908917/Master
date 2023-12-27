@@ -23,25 +23,9 @@ def denormalize_row(lhs_row, param_ranges):
     xmin = np.min(param_ranges, axis=1)
     return lhs_row * xrange + xmin
 
-    # Some outdated sigma12 nonlinear sampling code which was probably wrong
-    # even before it needed to be updated to the current setup
-
-    if "sigma12" in param_ranges:
-        prior = param_ranges["sigma12"]
-        cosmology["sigma12"] = cosmology["sigma12"] * \
-            (prior[1] - prior[0]) + prior[0]
-    elif "sigma12_2" in param_ranges:
-        #! Make the use of sigma12_2 more user-friendly
-        prior = param_ranges["sigma12_2"]
-        # sigma12_in actually describes a sigma12_2 value
-        sigma12_2 = sigma12_in * (prior[1] - prior[0]) + prior[0]
-        cosmology["sigma12"] = np.sqrt(sigma12_2)
-    elif "sigma12_root" in param_ranges:
-        #! Make the use of sigma12_2 more user-friendly
-        prior = param_ranges["sigma12_root"]
-        # sigma12_in actually describes a sigma12_2 value
-        sigma12_root = sigma12_in * (prior[1] - prior[0]) + prior[0]
-        cosmology["sigma12"] = np.square(sigma12_root)
+    prior = param_ranges["sigma12"]
+    cosmology["sigma12"] = cosmology["sigma12"] * \
+        (prior[1] - prior[0]) + prior[0]
 
 
 def build_cosmology(lhs_row, param_ranges=None):
@@ -75,7 +59,7 @@ def build_cosmology(lhs_row, param_ranges=None):
         return ci.specify_neutrino_mass(cosmology, lhs_row[5])
     else:
         cosmology["A_s"] = A_S_DEFAULT
-        return ci.specify_neutrino_mass(cosmology, 0)
+        return ci.specify_neutrino_mass(cosmology, 1)
 
 
 def direct_eval_cell(input_cosmology, standard_k_axis, debug=False):
@@ -90,12 +74,7 @@ def direct_eval_cell(input_cosmology, standard_k_axis, debug=False):
     # This allows us to roughly find the z corresponding to the sigma12 that
     # we want.
 
-    MEMNeC = cp.deepcopy(input_cosmology)
-    MEMNeC['omch2'] += MEMNeC['omnuh2']
-    MEMNeC['omnuh2'] = 0
-
-    MEMNeC = ci.specify_neutrino_mass(MEMNeC, MEMNeC['omnuh2'],
-        nnu_massive_in=0)
+    MEMNeC = ci.balance_neutrinos_with_CDM(input_cosmology, 0)
 
     _redshifts=np.flip(np.linspace(0, 10, 150))
 
@@ -169,12 +148,7 @@ def interpolate_cell(input_cosmology, standard_k_axis):
     # This allows us to roughly find the z corresponding to the sigma12 that we
     # want.
 
-    MEMNeC = cp.deepcopy(input_cosmology)
-    MEMNeC['omch2'] += MEMNeC['omnuh2']
-    MEMNeC['omnuh2'] = 0
-
-    MEMNeC = ci.specify_neutrino_mass(MEMNeC,
-        MEMNeC['omnuh2'], nnu_massive_in=0)
+    MEMNeC = ci.balance_neutrinos_with_CDM(input_cosmology, 0)
 
     _redshifts=np.flip(np.linspace(0, 10, 150))
 
@@ -223,7 +197,7 @@ def interpolate_cell(input_cosmology, standard_k_axis):
 
 def fill_hypercube(lhs, standard_k_axis, priors=None,
     eval_func=direct_eval_cell, cell_range=None, samples=None,
-    write_period=None, save_label="unlabeled"):
+    write_period=None, save_label="unlabeled", crash_when_unsolvable=False):
     """
     @lhs: this should be a list of tuples to
         evaluate kp at.
@@ -277,11 +251,16 @@ def fill_hypercube(lhs, standard_k_axis, priors=None,
                     eval_func(this_cosmology, standard_k_axis)
             elif len(lhs[0]) == 3: # we're emulating sigma12
                 samples[i] = eval_func(this_cosmology)
+
+            if this_p is None and crash_when_unsolvable:
+                raise ValueError("Cell unsolvable.")
         except camb.CAMBError:
             print("This cell is unsolvable. However, in this case, we " + \
                   "observed a CAMBError rather than a negative redshift. " + \
                   "This suggests that there is a problem with the input " + \
                   "hypercube.")
+            if crash_when_unsolvable:
+                raise ValueError("Cell unsolvable.")
 
         if rescaling_parameters_list is None:
             rescaling_parameters_list = these_rescaling_parameters
@@ -296,26 +275,10 @@ def fill_hypercube(lhs, standard_k_axis, priors=None,
             if this_actual_sigma12 is not None:
                 lhs[i][3] = this_actual_sigma12
 
-                if "sigma12" in priors: # we have to normalize
-                    prior = priors["sigma12"]
-                    this_normalized_actual_sigma12 = \
-                        (this_actual_sigma12 - prior[0]) / (prior[1] - prior[0])
-                    lhs[i][3] = this_normalized_actual_sigma12
-                #! Make the use of sigma12_2 more user-friendly
-                elif "sigma12_2" in priors: # we have to square and normalize
-                    this_actual_sigma12_2 = np.square(this_actual_sigma12)
-                    prior = priors["sigma12_2"]
-                    this_normalized_actual_sigma12_2 = \
-                        (this_actual_sigma12_2 - prior[0]) / (prior[1] - prior[0])
-                    lhs[i][3] = this_normalized_actual_sigma12_2
-                elif "sigma12_root" in priors: # we have to square and
-                    # normalize
-                    this_actual_sigma12_root = np.sqrt(this_actual_sigma12)
-                    prior = priors["sigma12_root"]
-                    this_normalized_actual_sigma12_root = \
-                        (this_actual_sigma12_root - prior[0]) / \
-                            (prior[1] - prior[0])
-                    lhs[i][3] = this_normalized_actual_sigma12_root
+                prior = priors[3]
+                this_normalized_actual_sigma12 = \
+                    (this_actual_sigma12 - prior[0]) / (prior[1] - prior[0])
+                lhs[i][3] = this_normalized_actual_sigma12
 
             samples[i] = this_p
 

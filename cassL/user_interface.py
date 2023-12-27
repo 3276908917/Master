@@ -28,7 +28,7 @@ def print_cosmology(cosmology):
         if key not in disregard_keys:
             print(key, cosmology[key])
 
-def prior_file_to_array(prior_name="COMET_with_nu"):
+def prior_file_to_array(prior_name="COMET"):
     """
     !
     """

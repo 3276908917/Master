@@ -1,5 +1,6 @@
 import numpy as np
 import matplotlib.pyplot as plt
+import matplotlib as mpl
 
 import GPy
 import copy as cp
@@ -457,7 +458,16 @@ class Emulator_Trainer:
                 self.X_test[:, param_index] < param_range[1],
                 self.X_test[:, param_index] > param_range[0]))[0]
         valid_vals = self.X_test[:, param_index][valid_indices]
+
         normalized_vals = utils.normalize(valid_vals)
+
+        # the factor of 2 renormalizes
+        extremeness = lambda x: 2 * np.abs(0.5 - x)
+
+        if param_index == -1: # extremeness A: maximum extremeness
+            normalized_vals = np.max(extremeness(self.X_test), axis=1)
+        elif param_index == -2: # extremeness B: average extremeness
+            normalized_vals = np.average(extremeness(self.X_test), axis=1) 
 
         colors = plt.cm.plasma(normalized_vals)
 
@@ -476,7 +486,7 @@ class Emulator_Trainer:
                 else:
                     if param_index:
                         plt.plot(self._scales, valid_errors[i],
-                                 color=colors[i], alpha=0.05,
+                                 color=colors[i], alpha=0.9,
                                  linewidth=linewidth)
                     else:
                         plt.plot(self._scales, valid_errors[i], alpha=0.05,

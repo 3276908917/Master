@@ -168,7 +168,9 @@ def balance_neutrinos_with_CDM(cosmology, new_omnuh2):
 
     #! It might be dangerous for us to keep assuming '1' when the neutrinos are
     # massive...
-    new_nnu_massive = 0 if new_omnuh2 == 0 else 1
+    #new_nnu_massive = 0 if new_omnuh2 == 0 else 1
+    new_nnu_massive = 1 # CAMB complains otherwise, even when nu massless
+
     return specify_neutrino_mass(new_cosmology, new_omnuh2, new_nnu_massive)
 
 def load_benchmark(relative_path, omnuh2_strs=None):
@@ -584,9 +586,9 @@ def input_dark_energy(pars, w0, wa):
 def specify_neutrino_mass(cosmology, omnuh2_in, nnu_massive_in=None):
     """
     Helper function for input_cosmology.
-    This returns modified copy (and therefore does not mutate the original) of
-    the input dictionary object, which corresponds to a cosmology with massive
-    neutrinos.
+    This returns a modified copy (and therefore does not mutate the original)
+    of the input dictionary object, which corresponds to a cosmology with
+    massive neutrinos.
     """
     # Default behavior: if no nnu_massive_in specified, take it to be 1 in the
     # massive-neutrino case, 0 otherwise
