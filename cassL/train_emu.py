@@ -258,6 +258,7 @@ class Emulator_Trainer:
         self.train_deltas = train_predictions - self.Y_train
         self.train_sq_errors = np.square(self.train_deltas)
         self.train_rel_errors = self.train_deltas / self.Y_train
+        
 
     def validate(self, X_val, Y_val):
         """
