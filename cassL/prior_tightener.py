@@ -22,6 +22,9 @@ for i in range(100):
     except ValueError:
         print("Conservatism level " + str(conservatism) + " has failed.")
         print("Increasing...")
+        continue
+
+    break
 
 print("Script has completed.")
 
