@@ -199,16 +199,16 @@ def fill_hypercube(lhs, standard_k_axis, priors=None,
     eval_func=direct_eval_cell, cell_range=None, samples=None,
     write_period=None, save_label="unlabeled", crash_when_unsolvable=False):
     """
-    @lhs: this should be a list of tuples to
-        evaluate kp at.
-        #! This is confusing with the param_ranges label. Maybe we can call it
-            cosmo_configs or something?
+    @lhs: this is a list of tuples with which @eval_func is to be evaluated.
 
-    @cell_range adjust this value in order to pick up from where you
-        left off, and to run this method in saveable chunks.
+    @cell_range: a range object specifying the indices of lhs which still need
+        to be evaluated. By default, it is None, which means that the entire
+        lhs will be evaluated. This parameter can be used to pick up from where
+        previous rusn left off, and to run this method in saveable chunks.
 
     BE CAREFUL! This function deliberately mutates the lhs object,
-        replacing the target sigma12 values with the actual sigma12 values used.
+        replacing the target sigma12 values with the actual sigma12 values
+        used.
     """
     if cell_range is None:
         cell_range = range(len(lhs))
