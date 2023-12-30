@@ -66,9 +66,10 @@ def broadcast_unsolvable(input_cosmology, list_sigma12):
     print("\nThis cell cannot be solved with a nonnegative redshift.")
     print("This is the failed cosmology:\n")
     ui.print_cosmology(input_cosmology)
-    print("\nThe closest feasible sigma_12 value is off by:",
-        abs(list_sigma12[len(list_sigma12) - 1] / \
-        input_cosmology["sigma12"]) * 100, "%\n")
+    print("\nThe closest feasible sigma12 value would yield an error of:",
+        utils.percent_error(input_cosmology["sigma12"],
+            list_sigma12[len(list_sigma12) - 1]), "%\n")
+
     return None, None, np.array([np.nan, np.nan])
 
 def direct_eval_cell(input_cosmology, standard_k_axis, debug=False):
