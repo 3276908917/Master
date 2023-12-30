@@ -17,7 +17,7 @@ file_particle = "val"
 lhc = np.load("data_sets/Hnu3/lhc_" + file_particle + "_initial.npy",
                   allow_pickle=True)
 samples, rescalers = ged.fill_hypercube(lhc, standard_k, priors=priors_at,
-        write_period=1000, save_label="Hnu3_" + file_particle,
+        write_period=300, save_label="Hnu3_" + file_particle,
         crash_when_unsolvable=True)
 
 np.save("data_sets/Hnu3/lhc_" + file_particle + "_final.npy", lhc)

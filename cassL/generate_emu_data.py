@@ -100,14 +100,24 @@ def direct_eval_cell(input_cosmology, standard_k_axis, debug=False):
         # we need to start playing with h.
         if input_cosmology['h'] > 0.1:
             input_cosmology['h'] -= 0.1
-        elif input_cosmology['h'] < 0.1:
+        elif input_cosmology['h'] >= 0.02:
             # Finer-grained decreases might save a couple of weird cosmologies
             input_cosmology['h'] -= 0.01
-        elif input_cosmology['h'] < 0.01:
+        else:
             return broadcast_unsolvable(input_cosmology, list_sigma12)
 
         try:
-            return direct_eval_cell(input_cosmology, standard_k_axis)
+            return direct_eval_cell(input_cosmology, standard_k_axis, debug)
+        except ValueError: # catch very very weird buy
+            if input_cosmology['h'] >= 0.02:
+                try:
+                    input_cosmology['h'] -= 0.01
+                    return direct_eval_cell(input_cosmology, standard_k_axis,
+                                            debug)
+                except Exception:
+                    return broadcast_unsolvable(input_cosmology, list_sigma12)
+            else:
+                return broadcast_unsolvable(input_cosmology, list_sigma12)
         except Exception: # this is triggered if we hit any other Exception
             # than a ValueError. This invariably means that the equations of
             # cosmological evolution are no longer solvable, so we should stop

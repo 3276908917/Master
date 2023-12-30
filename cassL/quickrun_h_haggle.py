@@ -4,7 +4,7 @@ from cassL import user_interface as ui
 
 # If a particular range of cells is already known to cause problems, it may be
 # more efficient to change this value away from None.
-special_cell_range = range(3247, 3250)
+special_cell_range = range(593, 594)
 
 standard_k = np.load("data_sets/k/300k.npy", allow_pickle=True)
 hc = np.load("data_sets/Hnu3/lhc_val_initial.npy", allow_pickle=True)
@@ -16,5 +16,5 @@ priors = lambda conservatism: conservatism * safe + (1 - conservatism) * \
          dangerous
 priors_at = priors(0.45)
 
-_, _ = ged.fill_hypercube(hc, standard_k, priors=priors_at,
-    crash_when_unsolvable=True, cell_range=special_cell_range)
+samples, _ = ged.fill_hypercube(hc, standard_k, priors=priors_at,
+    crash_when_unsolvable=False, cell_range=special_cell_range)
