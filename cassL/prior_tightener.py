@@ -19,9 +19,9 @@ lowest_successful_conservatism = 1.0
 
 # Keep testing values of conservatism until the discrepancy reaches percent
 while lowest_successful_conservatism - highest_failed_conservatism != 0.01:
-	average_bound = (highest_failed_conservatism + \
+    average_bound = (highest_failed_conservatism + \
                      lowest_successful_conservatism) / 2
-	conservatism = np.around(average_bound, 2)
+    conservatism = np.around(average_bound, 2)
 
     if conservatism == highest_failed_conservatism or \
         conservatism == lowest_successful_conservatism:

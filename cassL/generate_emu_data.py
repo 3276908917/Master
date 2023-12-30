@@ -62,7 +62,7 @@ def build_cosmology(lhs_row, param_ranges=None):
         return ci.specify_neutrino_mass(cosmology, 1)
 
 
-def broadcast_unsolvable(input_cosmology):
+def broadcast_unsolvable(input_cosmology, list_sigma12):
     print("\nThis cell cannot be solved with a nonnegative redshift.")
     print("This is the failed cosmology:\n")
     ui.print_cosmology(input_cosmology)
@@ -103,7 +103,7 @@ def direct_eval_cell(input_cosmology, standard_k_axis, debug=False):
             # Finer-grained decreases might save a couple of weird cosmologies
             input_cosmology['h'] -= 0.01
         elif input_cosmology['h'] < 0.01:
-            return broadcast_unsolvable(input_cosmology)
+            return broadcast_unsolvable(input_cosmology, list_sigma12)
 
         try:
             return direct_eval_cell(input_cosmology, standard_k_axis)
@@ -111,7 +111,7 @@ def direct_eval_cell(input_cosmology, standard_k_axis, debug=False):
             # than a ValueError. This invariably means that the equations of
             # cosmological evolution are no longer solvable, so we should stop
             # messing with h.
-            return broadcast_unsolvable(input_cosmology)
+            return broadcast_unsolvable(input_cosmology, list_sigma12)
 
     p = np.zeros(len(standard_k_axis))
 
@@ -184,15 +184,15 @@ def interpolate_cell(input_cosmology, standard_k_axis):
             # Finer-grained decreases might save a couple of weird cosmologies
             input_cosmology['h'] -= 0.01
         elif input_cosmology['h'] < 0.01:
-            return broadcast_unsolvable(input_cosmology)
+            return broadcast_unsolvable(input_cosmology, list_sigma12)
 
         try:
-            return direct_eval_cell(input_cosmology, standard_k_axis)
+            return interpolate_cell(input_cosmology, standard_k_axis)
         except Exception: # this is triggered if we hit any other Exception
             # than a ValueError. This invariably means that the equations of
             # cosmological evolution are no longer solvable, so we should stop
             # messing with h.
-            return broadcast_unsolvable(input_cosmology)
+            return broadcast_unsolvable(input_cosmology, list_sigma12)
 
     p = np.zeros(len(standard_k_axis))
 
