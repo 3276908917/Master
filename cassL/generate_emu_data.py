@@ -86,7 +86,7 @@ def direct_eval_cell(input_cosmology, standard_k_axis, debug=False):
 
     MEMNeC = ci.balance_neutrinos_with_CDM(input_cosmology, 0)
 
-    _redshifts=np.flip(np.linspace(0, 10, 150))
+    _redshifts=np.flip(np.geomspace(1, 11, 150) - 1)
 
     _, _, _, list_sigma12 = ci.evaluate_cosmology(MEMNeC, _redshifts,
         fancy_neutrinos=False, k_points=num_k_points, hubble_units=False)
@@ -164,7 +164,7 @@ def interpolate_cell(input_cosmology, standard_k_axis):
 
     MEMNeC = ci.balance_neutrinos_with_CDM(input_cosmology, 0)
 
-    _redshifts=np.flip(np.linspace(0, 10, 150))
+    _redshifts=np.flip(np.geomspace(1, 11, 150) - 1)
 
     MEMNeC_p_interpolator = ci.cosmology_to_PK_interpolator(MEMNeC,
             redshifts=_redshifts, kmax=10)

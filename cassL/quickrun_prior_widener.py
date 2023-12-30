@@ -9,7 +9,7 @@ dangerous = ui.prior_file_to_array("CLASSIC")
 
 priors = lambda conservatism: conservatism * safe + (1 - conservatism) * \
          dangerous
-priors_at = priors(0.39)
+priors_at = priors(0.45)
 
 # Modify this to change the data set you're building
 file_particle = "val"
