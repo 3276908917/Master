@@ -62,6 +62,15 @@ def build_cosmology(lhs_row, param_ranges=None):
         return ci.specify_neutrino_mass(cosmology, 1)
 
 
+def broadcast_unsolvable(input_cosmology):
+    print("\nThis cell cannot be solved with a nonnegative redshift.")
+    print("This is the failed cosmology:\n")
+    ui.print_cosmology(input_cosmology)
+    print("\nThe closest feasible sigma_12 value is off by:",
+        abs(list_sigma12[len(list_sigma12) - 1] / \
+        input_cosmology["sigma12"]) * 100, "%\n")
+    return None, None, np.array([np.nan, np.nan])
+
 def direct_eval_cell(input_cosmology, standard_k_axis, debug=False):
     """
     Returns the power spectrum in Mpc units and the actual sigma12_tilde value
@@ -88,17 +97,21 @@ def direct_eval_cell(input_cosmology, standard_k_axis, debug=False):
         z_best = interpolator(input_cosmology["sigma12"])
     except ValueError:
         # we need to start playing with h.
-        if input_cosmology['h'] <= 0.1:
-            print("\nThis cell cannot be solved with a nonnegative redshift.")
-            print("This is the failed cosmology:\n")
-            ui.print_cosmology(input_cosmology)
-            print("\nThe closest feasible sigma_12 value is off by:",
-                abs(list_sigma12[len(list_sigma12) - 1] / \
-                input_cosmology["sigma12"]) * 100, "%\n")
-            return None, None, np.array([np.nan, np.nan])
+        if input_cosmology['h'] > 0.1:
+            input_cosmology['h'] -= 0.1
+        elif input_cosmology['h'] < 0.1:
+            # Finer-grained decreases might save a couple of weird cosmologies
+            input_cosmology['h'] -= 0.01
+        elif input_cosmology['h'] < 0.01:
+            return broadcast_unsolvable(input_cosmology)
 
-        input_cosmology['h'] -= 0.1
-        return direct_eval_cell(input_cosmology, standard_k_axis, debug)
+        try:
+            return direct_eval_cell(input_cosmology, standard_k_axis)
+        except Exception: # this is triggered if we hit any other Exception
+            # than a ValueError. This invariably means that the equations of
+            # cosmological evolution are no longer solvable, so we should stop
+            # messing with h.
+            return broadcast_unsolvable(input_cosmology)
 
     p = np.zeros(len(standard_k_axis))
 
@@ -165,17 +178,21 @@ def interpolate_cell(input_cosmology, standard_k_axis):
         z_best = interpolator(input_cosmology["sigma12"])
     except ValueError:
         # we need to start playing with h.
-        if input_cosmology['h'] <= 0.1:
-            print("\nThis cell cannot be solved with a nonnegative redshift.")
-            print("This is the failed cosmology:\n")
-            ui.print_cosmology(input_cosmology)
-            print("\nThe closest feasible sigma_12 value is off by:",
-                abs(list_sigma12[len(list_sigma12) - 1] / \
-                input_cosmology["sigma12"]) * 100, "%\n")
-            return None, None, np.array([np.nan, np.nan])
+        if input_cosmology['h'] > 0.1:
+            input_cosmology['h'] -= 0.1
+        elif input_cosmology['h'] < 0.1:
+            # Finer-grained decreases might save a couple of weird cosmologies
+            input_cosmology['h'] -= 0.01
+        elif input_cosmology['h'] < 0.01:
+            return broadcast_unsolvable(input_cosmology)
 
-        input_cosmology['h'] -= 0.1
-        return interpolate_cell(input_cosmology, standard_k_axis)
+        try:
+            return direct_eval_cell(input_cosmology, standard_k_axis)
+        except Exception: # this is triggered if we hit any other Exception
+            # than a ValueError. This invariably means that the equations of
+            # cosmological evolution are no longer solvable, so we should stop
+            # messing with h.
+            return broadcast_unsolvable(input_cosmology)
 
     p = np.zeros(len(standard_k_axis))
 
@@ -235,11 +252,6 @@ def fill_hypercube(lhs, standard_k_axis, priors=None,
         this_p = None
         this_denormalized_row = denormalize_row(lhs[i], param_ranges=priors)
         this_cosmology = build_cosmology(this_denormalized_row)
-
-        # We're only making the following switch in order to test out the
-        # interpolator approach.
-        #this_p, this_actual_sigma12, these_rescaling_parameters = \
-        #    direct_eval_cell(this_cosmology, standard_k_axis)
 
         # As of 20.08.2023, this REALLY is a NECESSARY workaround.
         this_actual_sigma12 = None
