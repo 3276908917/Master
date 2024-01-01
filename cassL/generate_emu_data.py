@@ -81,68 +81,76 @@ def direct_eval_cell(input_cosmology, standard_k_axis, debug=False):
     statements littered all over the place.
     """
     num_k_points = len(standard_k_axis)
-    # This allows us to roughly find the z corresponding to the sigma12 that
-    # we want.
-
-    MEMNeC = ci.balance_neutrinos_with_CDM(input_cosmology, 0)
-
+    
+    # redshifts at which to test the cosmology, to best match desired sigma12
     _redshifts=np.flip(np.geomspace(1, 11, 150) - 1)
 
-    _, _, _, list_sigma12 = ci.evaluate_cosmology(MEMNeC, _redshifts,
-        fancy_neutrinos=False, k_points=num_k_points, hubble_units=False)
+    z_best = None
+    p = None
+    while True:
+        print("New iteration. h is", input_cosmology["h"])
+        MEMNeC = ci.balance_neutrinos_with_CDM(input_cosmology, 0)
 
-    interpolator = interp1d(np.flip(list_sigma12), np.flip(_redshifts),
-        kind='cubic')
-
-    try:
-        z_best = interpolator(input_cosmology["sigma12"])
-    except ValueError:
-        # we need to start playing with h.
-        if input_cosmology['h'] > 0.1:
-            input_cosmology['h'] -= 0.1
-        elif input_cosmology['h'] >= 0.02:
-            # Finer-grained decreases might save a couple of weird cosmologies
-            input_cosmology['h'] -= 0.01
-        else:
+        # Attempt to solve for the power spectrum at all test redshifts. This
+        # call to CAMB shouldn't throw an error on the first iteration of this
+        # loop, but as you'll see a few lines later, we may begin to decrease
+        # h in order to match the desired sigma12 value. This can sometimes
+        # cause CAMB to break even if we satisfy CAMB's nominal requirement
+        # that h >= 0.01.
+        try:
+            _, _, _, list_sigma12 = ci.evaluate_cosmology(MEMNeC, _redshifts,
+                fancy_neutrinos=False, k_points=num_k_points,
+                hubble_units=False)
+        except Exception:
             return broadcast_unsolvable(input_cosmology, list_sigma12)
+
+        interpolator = interp1d(np.flip(list_sigma12), np.flip(_redshifts),
+            kind='cubic')
 
         try:
-            return direct_eval_cell(input_cosmology, standard_k_axis, debug)
-        except ValueError: # catch very very weird buy
-            if input_cosmology['h'] >= 0.02:
-                try:
-                    input_cosmology['h'] -= 0.01
-                    return direct_eval_cell(input_cosmology, standard_k_axis,
-                                            debug)
-                except Exception:
-                    return broadcast_unsolvable(input_cosmology, list_sigma12)
-            else:
+            # In the vast majority of cases, the following line will generate
+            # the ValueError caught in the except clause. However, we have
+            # encountered one case where interpolating the power spectrum
+            # generated an error. We're including that code here, too, because
+            # the solution appears to be the same: just decrease h.
+            z_best = interpolator(input_cosmology["sigma12"])
+            
+            p = np.zeros(len(standard_k_axis))
+
+            
+            k, _, p, actual_sigma12 = ci.evaluate_cosmology(input_cosmology,
+                redshifts=np.array([z_best]), fancy_neutrinos=False,
+                k_points=num_k_points) 
+                
+            # If neutrinos are not massless, we have to run again in order to
+            # get the correct sigma12 value...
+            if input_cosmology['omnuh2'] != 0:
+                _, _, _, actual_sigma12 = ci.evaluate_cosmology(MEMNeC,
+                    redshifts=np.array([z_best]), fancy_neutrinos=False,
+                    k_points=num_k_points)
+            # De-nest
+            actual_sigma12 = actual_sigma12[0]
+
+            if input_cosmology['h'] != model0['h']: # we've touched h,
+                # we need to interpolate
+                print("We had to move h to",
+                    np.around(input_cosmology['h'], 3))
+
+                interpolator = interp1d(k, p, kind="cubic")
+                p = interpolator(standard_k_axis)
+            
+            break
+        except ValueError:
+            # we need to start playing with h.
+            if input_cosmology['h'] > 0.1:
+                input_cosmology['h'] -= 0.1
+            elif input_cosmology['h'] >= 0.02:
+                # Finer-grained decreases will save the most extreme
+                # cosmologies in our priors
+                input_cosmology['h'] -= 0.01
+            else: # We can't decrease h any further.
                 return broadcast_unsolvable(input_cosmology, list_sigma12)
-        except Exception: # this is triggered if we hit any other Exception
-            # than a ValueError. This invariably means that the equations of
-            # cosmological evolution are no longer solvable, so we should stop
-            # messing with h.
-            return broadcast_unsolvable(input_cosmology, list_sigma12)
-
-    p = np.zeros(len(standard_k_axis))
-
-    k, _, p, actual_sigma12 = ci.evaluate_cosmology(input_cosmology,
-        redshifts=np.array([z_best]), fancy_neutrinos=False,
-        k_points=num_k_points) 
-    if input_cosmology['omnuh2'] != 0:
-        _, _, _, actual_sigma12 = ci.evaluate_cosmology(MEMNeC,
-            redshifts=np.array([z_best]), fancy_neutrinos=False,
-            k_points=num_k_points)
-    # De-nest
-    actual_sigma12 = actual_sigma12[0]
-
-    if input_cosmology['h'] != model0['h']: # we've touched h,
-        # we need to interpolate
-        print("We had to move h to", np.around(input_cosmology['h'], 3))
-
-        interpolator = interp1d(k, p, kind="cubic")
-        p = interpolator(standard_k_axis)
-
+                
     if len(p) == 1: # then de-nest
         p = p[0]
 
