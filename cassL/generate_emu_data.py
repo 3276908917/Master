@@ -72,13 +72,10 @@ def broadcast_unsolvable(input_cosmology, list_sigma12):
 
     return None, None, np.array([np.nan, np.nan])
 
-def direct_eval_cell(input_cosmology, standard_k_axis, debug=False):
+def direct_eval_cell(input_cosmology, standard_k_axis):
     """
     Returns the power spectrum in Mpc units and the actual sigma12_tilde value
         to which it corresponds.
-
-    I concede that the function looks like a mess right now, with debug
-    statements littered all over the place.
     """
     num_k_points = len(standard_k_axis)
     
@@ -87,6 +84,7 @@ def direct_eval_cell(input_cosmology, standard_k_axis, debug=False):
 
     z_best = None
     p = None
+    
     while True:
         print("New iteration. h is", input_cosmology["h"])
         MEMNeC = ci.balance_neutrinos_with_CDM(input_cosmology, 0)
@@ -115,22 +113,10 @@ def direct_eval_cell(input_cosmology, standard_k_axis, debug=False):
             # the solution appears to be the same: just decrease h.
             z_best = interpolator(input_cosmology["sigma12"])
             
-            p = np.zeros(len(standard_k_axis))
-
-            
             k, _, p, actual_sigma12 = ci.evaluate_cosmology(input_cosmology,
                 redshifts=np.array([z_best]), fancy_neutrinos=False,
                 k_points=num_k_points) 
                 
-            # If neutrinos are not massless, we have to run again in order to
-            # get the correct sigma12 value...
-            if input_cosmology['omnuh2'] != 0:
-                _, _, _, actual_sigma12 = ci.evaluate_cosmology(MEMNeC,
-                    redshifts=np.array([z_best]), fancy_neutrinos=False,
-                    k_points=num_k_points)
-            # De-nest
-            actual_sigma12 = actual_sigma12[0]
-
             if input_cosmology['h'] != model0['h']: # we've touched h,
                 # we need to interpolate
                 print("We had to move h to",
@@ -150,9 +136,18 @@ def direct_eval_cell(input_cosmology, standard_k_axis, debug=False):
                 input_cosmology['h'] -= 0.01
             else: # We can't decrease h any further.
                 return broadcast_unsolvable(input_cosmology, list_sigma12)
-                
-    if len(p) == 1: # then de-nest
+    
+    if len(p) == 1: # de-nest the power spectrum
         p = p[0]
+    
+    # If neutrinos are not massless, we have to run again in order to
+    # get the correct sigma12 value...
+    if input_cosmology['omnuh2'] != 0:
+        _, _, _, actual_sigma12 = ci.evaluate_cosmology(MEMNeC,
+            redshifts=np.array([z_best]), fancy_neutrinos=False,
+            k_points=num_k_points)
+    # De-nest
+    actual_sigma12 = actual_sigma12[0]
 
     # We don't need to return k because we take for granted that all
     # runs will have the same k axis.
@@ -253,15 +248,8 @@ def fill_hypercube(lhs, standard_k_axis, priors=None,
             samples = np.zeros((len(lhs), len(standard_k_axis)))
         elif len(lhs[0]) == 3:
             samples = np.zeros(len(lhs))
-
-    # Recent change: now omega_nu comes last
     
     bundle_parameters = None
-    
-    # We don't need this check because we can always just truncate the prior
-    # array.
-    #if len(lhs[0]) != len(priors):
-    #    raise ValueError("Dimension disagreement between priors and LHS.")
 
     # This just provides debugging information
     rescaling_parameters_list = None
@@ -283,7 +271,9 @@ def fill_hypercube(lhs, standard_k_axis, priors=None,
             elif len(lhs[0]) == 3: # we're emulating sigma12
                 samples[i] = eval_func(this_cosmology)
 
-            if this_p is None and crash_when_unsolvable:
+            # We make sure that len(lhs[0] > 3) because this_p is *supposed* to
+            # be None in the event that we're emulating sigma12.
+            if (this_p is None and len(lhs[0] > 3)) and crash_when_unsolvable:
                 raise ValueError("Cell unsolvable.")
         except camb.CAMBError:
             print("This cell is unsolvable. However, in this case, we " + \
