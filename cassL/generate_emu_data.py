@@ -251,7 +251,10 @@ def fill_hypercube(lhs, standard_k_axis, priors=None,
     
     bundle_parameters = None
 
-    # This just provides debugging information
+    # The rescaling parameters are h and z, so this will be an array of shape
+    # (num_spectra, 2). These parameters are not used to train the emu but
+    # rather provide debugging information and sure that the output spectra
+    # are easily reproducible.
     rescaling_parameters_list = None
 
     unwritten_cells = 0
