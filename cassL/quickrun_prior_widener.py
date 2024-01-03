@@ -12,15 +12,15 @@ priors = lambda conservatism: conservatism * safe + (1 - conservatism) * \
 priors_at = priors(0.45)
 
 # Modify this to change the data set you're building
-file_particle = "val"
+file_particle = "train"
 
 lhc = np.load("data_sets/Hnu3/lhc_" + file_particle + "_initial.npy",
                   allow_pickle=True)
 samples, rescalers = ged.fill_hypercube(lhc, standard_k, priors=priors_at,
-        write_period=300, save_label="Hnu3_" + file_particle,
+        write_period=500, save_label="Hnu3_" + file_particle,
         crash_when_unsolvable=True)
 
 np.save("data_sets/Hnu3/lhc_" + file_particle + "_final.npy", lhc)
-np.save("data_sets/Hnu3/samples_" + file_particle + ".npy", sample)
+np.save("data_sets/Hnu3/samples_" + file_particle + ".npy", samples)
 np.save("data_sets/Hnu3/rescalers_" + file_particle + ".npy", rescalers)
 

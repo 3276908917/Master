@@ -86,7 +86,6 @@ def direct_eval_cell(input_cosmology, standard_k_axis):
     p = None
     
     while True:
-        print("New iteration. h is", input_cosmology["h"])
         MEMNeC = ci.balance_neutrinos_with_CDM(input_cosmology, 0)
 
         # Attempt to solve for the power spectrum at all test redshifts. This
