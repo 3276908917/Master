@@ -336,13 +336,16 @@ class Emulator_Trainer:
         self.sq_errors = np.square(self.deltas)
         self.rel_errors = self.deltas / Y_test
         
-        delta_predictions = np.zeros(Y_test.shape)
-        for i in range(len(X_test)):
-            delta_predictions[i] = self.delta_emu.predict(X_test[i])
-        
-        self.unc_deltas = delta_predictions - self.deltas
-        self.unc_sq_errors = np.square(self.unc_deltas)
-        self.unc_rel_errors = self.unc_deltas / self.deltas
+        try:
+            delta_predictions = np.zeros(Y_test.shape)
+            for i in range(len(X_test)):
+                delta_predictions[i] = self.delta_emu.predict(X_test[i])
+            
+            self.unc_deltas = delta_predictions - self.deltas
+            self.unc_sq_errors = np.square(self.unc_deltas)
+            self.unc_rel_errors = self.unc_deltas / self.deltas
+        except AttributeError:
+            pass
  
         print("Errors computed!")
         print("Sum of squared errors across all models:",
@@ -464,8 +467,7 @@ class Emulator_Trainer:
 
         # the factor of 2 renormalizes
         extremeness = lambda x: (2 * np.abs(0.5 - x)) ** 10
-
-
+        
         if param_index == -1: # extremeness A: maximum extremeness
             normalized_vals = np.max(extremeness(self.X_test), axis=1)
         elif param_index == -2: # extremeness B: average extremeness
