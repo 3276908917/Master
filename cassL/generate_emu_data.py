@@ -118,13 +118,11 @@ def direct_eval_cell(input_cosmology, standard_k_axis):
                 
             if input_cosmology['h'] != model0['h']: # we've touched h,
                 # we need to interpolate
-                print("We had to move h to",
-                    np.around(input_cosmology['h'], 3))
-
                 interpolator = interp1d(k, p, kind="cubic")
                 p = interpolator(standard_k_axis)
             
             break
+            
         except ValueError:
             # we need to start playing with h.
             if input_cosmology['h'] > 0.1:
@@ -147,6 +145,9 @@ def direct_eval_cell(input_cosmology, standard_k_axis):
             k_points=num_k_points)
     # De-nest
     actual_sigma12 = actual_sigma12[0]
+
+    if input_cosmology['h'] != model0['h']: # announce that we've touched h
+        print("We had to move h to", np.around(input_cosmology['h'], 3))
 
     # We don't need to return k because we take for granted that all
     # runs will have the same k axis.
