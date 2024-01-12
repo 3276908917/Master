@@ -64,6 +64,9 @@ OMNUH2_STRS = np.array(["0.0006", "0.002", "0.006", "0.01"])
 
 ALETHEIA_SNAPS = np.array([0, 1, 2, 3, 4])
 
+K_MIN = 7.0E-5 # absolute units
+K_MAX = 7.0 # absolute units
+
 # ! Just some standard colors and styles for when I plot several models
 # together. We should figure out a way to get rid of this.
 colors = ["green", "blue", "brown", "red", "black", "orange", "purple",
@@ -569,7 +572,7 @@ def apply_universal_output_settings(pars):
     pars.Accuracy.AccuracyBoost = 3
     
     # Transfer.kmax describes an absolute k
-    pars.Transfer.kmax = 10.0
+    pars.Transfer.kmax = K_MAX
 
 def input_dark_energy(pars, w0, wa):
     """
@@ -646,7 +649,6 @@ def input_cosmology(cosmology):
 
     h = cosmology["h"]
 
-    # tau is a desperation argument
     # Why are we using the degenerate hierarchy? Isn't that wrong?
     pars = camb.set_params(
         H0=h * 100,
@@ -655,17 +657,14 @@ def input_cosmology(cosmology):
         omk=cosmology["OmK"],
         omnuh2=cosmology["omnuh2"],
         #num_massive_neutrinos=cosmology["nnu_massive"],
-        tau=0.0952,  # for justification, ask Matteo
+        tau=0.0952,  # Desperation. The value comes from Matteo's code.
         neutrino_hierarchy="degenerate"  # 1 eigenstate approximation; our
-        # neutrino setup (see below) is not valid for inverted/normal
-        # hierarchies.
+        # neutrino setup is not valid for inverted/normal hierarchies.
     )
 
     # the last three are desperation arguments
     pars.InitPower.set_params(As=cosmology["A_s"], ns=cosmology["n_s"],
                               r=0, nt=0.0, ntrun=0.0)
-
-    #print(cosmology["A_s"], cosmology["mnu"])
 
     input_dark_energy(pars, cosmology["w0"], float(cosmology["wa"]))
 
@@ -677,7 +676,7 @@ def get_CAMB_sigma12(pars, redshifts=[0]):
     Given a fully set-up pars function, return the sigma12 values.
     """
 
-    pars.set_matter_power(redshifts=redshifts, kmax=10.0 / pars.h,
+    pars.set_matter_power(redshifts=redshifts, kmax=K_MAX / pars.h,
                           nonlinear=False, k_per_logint=20)
     results = camb.get_results(pars)
     return results.get_sigmaR(12, hubble_units=False)
@@ -703,7 +702,7 @@ def get_CAMB_pspectrum(pars, redshifts=[0], k_points=100000,
 
     # To change the the extent of the k-axis, change the following line as
     # well as the "get_matter_power_spectrum" call.
-    pars.set_matter_power(redshifts=redshifts, kmax=10.0 / pars.h,
+    pars.set_matter_power(redshifts=redshifts, kmax=K_MAX,
                           nonlinear=False)
 
     results = camb.get_results(pars)
@@ -714,7 +713,7 @@ def get_CAMB_pspectrum(pars, redshifts=[0], k_points=100000,
     # flag did not appear to significantly alter the outcome.
 
     k, z, p = results.get_matter_power_spectrum(
-        minkh=1e-4 / pars.h, maxkh=10.0 / pars.h, npoints=k_points,
+        minkh=K_MIN / pars.h, maxkh=K_MAX / pars.h, npoints=k_points,
         var1='delta_nonu', var2='delta_nonu'
     )
 

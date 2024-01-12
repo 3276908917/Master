@@ -198,9 +198,12 @@ class Emulator_Trainer:
             IMPORTANT: the X and Y sets should not contain any unusable entries
                 (when in doubt, use eliminate_unusable_entries). Furthermore,
                 the Y set should not already be normalized, because the
-                normalization information (i.e. mean and standard deviation of
+                normalization information (mean and standard deviation of
                 the log'ed spectra) becomes part of the emulator's prediction
                 pipeline!
+
+            The Y's should be log-normalized when emulating power spectra, but
+            not when emulating values for sigma12.
         """
         constructor_complaint = "To instantiate an emulator trainer, the " + \
             "following parameters are required: name, X training data, Y " + \
