@@ -66,7 +66,6 @@ ALETHEIA_SNAPS = np.array([0, 1, 2, 3, 4])
 
 K_MIN = 7.0E-5 # absolute units
 K_MAX = 7.0 # absolute units
-H_MIN = 0.01
 
 # ! Just some standard colors and styles for when I plot several models
 # together. We should figure out a way to get rid of this.
