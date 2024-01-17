@@ -572,8 +572,6 @@ def apply_universal_output_settings(pars):
     pars.Accuracy.lAccuracyBoost = 3
     pars.Accuracy.AccuracyBoost = 3
     
-    # Transfer.kmax describes an absolute k
-    pars.Transfer.kmax = K_MAX
 
 def input_dark_energy(pars, w0, wa):
     """
@@ -677,7 +675,7 @@ def get_CAMB_sigma12(pars, redshifts=[0]):
     Given a fully set-up pars function, return the sigma12 values.
     """
 
-    pars.set_matter_power(redshifts=redshifts, kmax=K_MAX / pars.h,
+    pars.set_matter_power(redshifts=redshifts, kmax=K_MAX,
                           nonlinear=False, k_per_logint=20)
     results = camb.get_results(pars)
     return results.get_sigmaR(12, hubble_units=False)
@@ -704,7 +702,13 @@ def get_CAMB_pspectrum(pars, redshifts=[0], k_points=100000,
     # To change the the extent of the k-axis, change the following line as
     # well as the "get_matter_power_spectrum" call.
     pars.set_matter_power(redshifts=redshifts, kmax=K_MAX,
-                          nonlinear=False)
+                          nonlinear=False, k_per_logint=20)
+    # Transfer.kmax describes an absolute k, but for numerical reasons, we
+    # inflate it slightly to ensure that it is higher than the maximum k value
+    # we want to evaluate. We need to have this line here rather than in
+    # apply_universal_output_settings because set_matter_power messes up this
+    # field.
+    pars.Transfer.kmax = 1.01 * K_MAX
 
     results = camb.get_results(pars)
 
