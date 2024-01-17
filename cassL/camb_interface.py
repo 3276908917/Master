@@ -64,6 +64,7 @@ OMNUH2_STRS = np.array(["0.0006", "0.002", "0.006", "0.01"])
 
 ALETHEIA_SNAPS = np.array([0, 1, 2, 3, 4])
 
+#! These really shouldn't be constants, but parameters...
 K_MIN = 7.0E-5 # absolute units
 K_MAX = 7.0 # absolute units
 
