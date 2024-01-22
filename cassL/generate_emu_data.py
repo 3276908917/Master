@@ -83,7 +83,7 @@ def direct_eval_cell(input_cosmology, standard_k_axis):
 
     z_best = None
     p = None
-    list_sigma12 = None
+    list_sigma12 = [None]
     
     while True:
         MEMNeC = ci.balance_neutrinos_with_CDM(input_cosmology, 0)
@@ -177,23 +177,23 @@ def interpolate_cell(input_cosmology, standard_k_axis):
     _redshifts=np.flip(np.geomspace(1, 11, 150) - 1)
     z_best = None
     p = None
-    list_sigma12 = None
+    list_sigma12 = [None]
     #! Hard code
     k_max = 1.01 * max(standard_k_axis)
 
     while True:
         MEMNeC = ci.balance_neutrinos_with_CDM(input_cosmology, 0)
        
-        try:
-            #! Hard code
-            MEMNeC_p_interpolator = ci.cosmology_to_PK_interpolator(MEMNeC,
-                    redshifts=_redshifts, kmax=k_max)
-            
-            s12intrp = ci.sigma12_from_interpolator
-            sigma12 = lambda z: s12intrp(MEMNEC_p_interpolator, z)
-            list_sigma12 = np.array([sigma12(z) for z in _redshifts])
-        except Exception:
-            return broadcast_unsolvable(input_cosmology, list_sigma12)
+        #try:
+        #! Hard code
+        MEMNeC_p_interpolator = ci.cosmology_to_PK_interpolator(MEMNeC,
+                redshifts=_redshifts, kmax=k_max)
+        
+        s12intrp = ci.sigma12_from_interpolator
+        sigma12 = lambda z: s12intrp(MEMNeC_p_interpolator, z)
+        list_sigma12 = np.array([sigma12(z) for z in _redshifts])
+        #except Exception:
+        #    return broadcast_unsolvable(input_cosmology, list_sigma12)
 
         interpolator = interp1d(np.flip(list_sigma12), np.flip(_redshifts),
             kind='cubic')
@@ -221,10 +221,10 @@ def interpolate_cell(input_cosmology, standard_k_axis):
     actual_sigma12 = None
 
     if input_cosmology['omnuh2'] != 0:
-        actual_sigma12 = ci.s12_from_interpolator(
+        actual_sigma12 = ci.sigma12_from_interpolator(
             MEMNeC_p_interpolator, z_best)
     else:
-        actual_sigma12 = ci.s12_from_interpolator(p_interpolator, z_best)
+        actual_sigma12 = ci.sigma12_from_interpolator(p_interpolator, z_best)
 
 
     if input_cosmology['h'] != model0['h']: # announce that we've touched h
