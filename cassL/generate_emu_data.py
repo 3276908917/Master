@@ -83,6 +83,7 @@ def direct_eval_cell(input_cosmology, standard_k_axis):
 
     z_best = None
     p = None
+    list_sigma12 = None
     
     while True:
         MEMNeC = ci.balance_neutrinos_with_CDM(input_cosmology, 0)
@@ -173,52 +174,62 @@ def interpolate_cell(input_cosmology, standard_k_axis):
     """
     # This allows us to roughly find the z corresponding to the sigma12 that we
     # want.
-
-    MEMNeC = ci.balance_neutrinos_with_CDM(input_cosmology, 0)
-
     _redshifts=np.flip(np.geomspace(1, 11, 150) - 1)
+    z_best = None
+    p = None
+    list_sigma12 = None
+    #! Hard code
+    k_max = 1.01 * max(standard_k_axis)
 
-    MEMNeC_p_interpolator = ci.cosmology_to_PK_interpolator(MEMNeC,
-            redshifts=_redshifts, kmax=10)
-    list_sigma12 = np.array([
-        ci.s12_from_interpolator(MEMNeC_p_interpolator, z) for z in _redshifts
-    ])
-
-    interpolator = interp1d(np.flip(list_sigma12), np.flip(_redshifts),
-        kind='cubic')
-
-    try:
-        z_best = interpolator(input_cosmology["sigma12"])
-    except ValueError:
-        # we need to start playing with h.
-        if input_cosmology['h'] > 0.1:
-            input_cosmology['h'] -= 0.1
-        elif input_cosmology['h'] < 0.1:
-            # Finer-grained decreases might save a couple of weird cosmologies
-            input_cosmology['h'] -= 0.01
-        elif input_cosmology['h'] < 0.01:
+    while True:
+        MEMNeC = ci.balance_neutrinos_with_CDM(input_cosmology, 0)
+       
+        try:
+            #! Hard code
+            MEMNeC_p_interpolator = ci.cosmology_to_PK_interpolator(MEMNeC,
+                    redshifts=_redshifts, kmax=k_max)
+            
+            s12intrp = ci.sigma12_from_interpolator
+            sigma12 = lambda z: s12intrp(MEMNEC_p_interpolator, z)
+            list_sigma12 = np.array([sigma12(z) for z in _redshifts])
+        except Exception:
             return broadcast_unsolvable(input_cosmology, list_sigma12)
+
+        interpolator = interp1d(np.flip(list_sigma12), np.flip(_redshifts),
+            kind='cubic')
 
         try:
-            return interpolate_cell(input_cosmology, standard_k_axis)
-        except Exception: # this is triggered if we hit any other Exception
-            # than a ValueError. This invariably means that the equations of
-            # cosmological evolution are no longer solvable, so we should stop
-            # messing with h.
-            return broadcast_unsolvable(input_cosmology, list_sigma12)
+            z_best = interpolator(input_cosmology["sigma12"])
+            p_interpolator = ci.cosmology_to_PK_interpolator(input_cosmology,
+                redshifts=np.array([z_best]), kmax=k_max)
+            # The [0] is a de-nesting step, for cleaner formatting.
+            p_at_k = lambda k: p_interpolator.P(z_best, k)[0]
+            p = np.array([p_at_k(k) for k in standard_k_axis])
 
-    p = np.zeros(len(standard_k_axis))
+            break
 
-    p_interpolator = ci.cosmology_to_PK_interpolator(input_cosmology,
-            redshifts=np.array([z_best]), kmax=10)
+        except ValueError:
+            # we need to start playing with h.
+            if input_cosmology['h'] > 0.1:
+                input_cosmology['h'] -= 0.1
+            elif input_cosmology['h'] >= 0.02:
+                # Finer-grained decreases might save a couple of weird cosmologies
+                input_cosmology['h'] -= 0.01
+            else: # We can't decrease any further.
+                return broadcast_unsolvable(input_cosmology, list_sigma12)
 
-    actual_sigma12 = ci.s12_from_interpolator(p_interpolator, z_best)
+    actual_sigma12 = None
 
     if input_cosmology['omnuh2'] != 0:
         actual_sigma12 = ci.s12_from_interpolator(
             MEMNeC_p_interpolator, z_best)
+    else:
+        actual_sigma12 = ci.s12_from_interpolator(p_interpolator, z_best)
 
-    p = np.array([p_interpolator.P(z_best, k)[0] for k in standard_k_axis])
+
+    if input_cosmology['h'] != model0['h']: # announce that we've touched h
+        print("We had to move h to", np.around(input_cosmology['h'], 3))
+
     # We don't need to return k because we take for granted that all
     # runs will have the same k axis.
 
@@ -259,7 +270,7 @@ def fill_hypercube(lhs, standard_k_axis, priors=None,
     unwritten_cells = 0
     for i in cell_range:
         this_p = None
-        this_denormalized_row = denormalize_row(lhs[i], param_ranges=priors)
+        this_denormalized_row = denormalize_row(lhs[i], priors)
         this_cosmology = build_cosmology(this_denormalized_row)
 
         # As of 20.08.2023, this REALLY is a NECESSARY workaround.

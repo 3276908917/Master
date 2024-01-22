@@ -794,7 +794,8 @@ def get_CAMB_interpolator(pars, redshifts=[0], kmax=1, hubble_units=False):
     """
     # To change the the extent of the k-axis, change the following line as well
     # as the "get_matter_power_spectrum" call.
-    pars.set_matter_power(redshifts=redshifts, kmax=kmax, nonlinear=False)
+    pars.set_matter_power(redshifts=redshifts, kmax=kmax, nonlinear=False,
+                          k_per_logint=20)
 
     # In some cursory tests, the accurate_massive_neutrino_transfers
     # flag did not appear to significantly alter the outcome.
@@ -818,9 +819,10 @@ def cosmology_to_PK_interpolator(cosmology, redshifts=[0],
     mind that CAMB only allows nz_step as large as 150, so the @redshifts
     array should not exceed 150 in length!
     """
-    assert isinstance(redshifts, list) or isinstance(redshifts, np.ndarray), \
-        "If you want to use a single redshift, you must still nest it in" + \
-        " an array."
+    if not isinstance(redshifts, list) and \
+        not isinstance(redshifts, np.ndarray):
+        raise TypeError("If you want to use a single redshift, you must " \
+                        "still nest it in an array.")
 
     pars = input_cosmology(cosmology)
 
@@ -875,9 +877,9 @@ def andrea_interpolator(cosmology):
         kmax=20.0, zmax=20.0, var1='delta_nonu', var2='delta_nonu')
 
 
-def s12_from_interpolator(PK, z):
+def sigma12_from_interpolator(PK, z):
     """
-    This, too, is Andrea's code. It would be ideal, to remove this entirely.
+    This, too, is Andrea's code. It would be ideal to remove this entirely.
     """
 
     def W(x):
