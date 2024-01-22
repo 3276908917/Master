@@ -14,6 +14,9 @@ def bundle(row):
 lhc_train = np.load("data_sets/Hnu4c/lhc_train_final.npy")
 
 p_good_intrp, _, _ = ged.interpolate_cell(bundle(lhc_train[0]), lil_k)
+p_good, _, _ = ged.direct_eval_cell(bundle(lhc_train[0]), lil_k)
 
-plt.loglog(lil_k, p_good_intrp)
+plt.loglog(lil_k, p_good)
+# Why do we need to de-nest here?...
+plt.loglog(lil_k, p_good_intrp[0], linestyle="dashed")
 plt.show()
