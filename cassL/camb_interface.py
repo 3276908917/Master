@@ -796,6 +796,12 @@ def get_CAMB_interpolator(pars, redshifts=[0], kmax=1, hubble_units=False):
     # as the "get_matter_power_spectrum" call.
     pars.set_matter_power(redshifts=redshifts, kmax=kmax, nonlinear=False,
                           k_per_logint=20)
+    # Transfer.kmax describes an absolute k, but for numerical reasons, we
+    # inflate it slightly to ensure that it is higher than the maximum k value
+    # we want to evaluate. We need to have this line here rather than in
+    # apply_universal_output_settings because set_matter_power messes up this
+    # field.
+    pars.Transfer.kmax = 1.01 * K_MAX
 
     # In some cursory tests, the accurate_massive_neutrino_transfers
     # flag did not appear to significantly alter the outcome.

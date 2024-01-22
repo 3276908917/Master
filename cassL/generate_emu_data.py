@@ -200,11 +200,11 @@ def interpolate_cell(input_cosmology, standard_k_axis):
 
         try:
             z_best = interpolator(input_cosmology["sigma12"])
-            p_interpolator = ci.cosmology_to_PK_interpolator(input_cosmology,
-                redshifts=np.array([z_best]), kmax=k_max)
-            # The [0] is a de-nesting step, for cleaner formatting.
-            p_at_k = lambda k: p_interpolator.P(z_best, k)[0]
-            p = np.array([p_at_k(k) for k in standard_k_axis])
+
+            get_intrp = ci.cosmology_to_PK_interpolator
+            p_intrp = get_intrp(input_cosmology, redshifts=np.array([z_best]),
+                                kmax=k_max, hubble_units=False)
+            p = p_intrp.P(z_best, standard_k_axis)
 
             break
 
