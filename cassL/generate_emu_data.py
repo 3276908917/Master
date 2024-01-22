@@ -17,18 +17,17 @@ model0 = ci.cosm.loc[0]
 
 A_S_DEFAULT = 2.12723788013E-09
 
-def denormalize_row(lhs_row, param_ranges):
-    param_ranges = param_ranges[:len(lhs_row)]
-    xrange = np.ptp(param_ranges, axis=1)
-    xmin = np.min(param_ranges, axis=1)
+def denormalize_row(lhs_row, priors):
+    # Truncate the prior if this is a massless-neutrino cosmology, so that we
+    # don't receive NumPy dimensionality complaints.
+    priors = priors[:len(lhs_row)]
+    
+    xrange = np.ptp(priors, axis=1)
+    xmin = np.min(priors, axis=1)
     return lhs_row * xrange + xmin
+    
 
-    prior = param_ranges["sigma12"]
-    cosmology["sigma12"] = cosmology["sigma12"] * \
-        (prior[1] - prior[0]) + prior[0]
-
-
-def build_cosmology(lhs_row, param_ranges=None):
+def build_cosmology(lhs_row):
     """
     Intended behavior:
         if len(lhs_row) == 3 we're building a sigma12 emulator
