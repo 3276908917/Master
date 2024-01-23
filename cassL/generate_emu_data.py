@@ -187,7 +187,7 @@ def interpolate_cell(input_cosmology, standard_k_axis):
         #try:
         #! Hard code
         MEMNeC_p_interpolator = ci.cosmology_to_PK_interpolator(MEMNeC,
-                redshifts=_redshifts, kmax=k_max)
+                redshifts=_redshifts, kmax=k_max, hubble_units=False)
         
         s12intrp = ci.sigma12_from_interpolator
         sigma12 = lambda z: s12intrp(MEMNeC_p_interpolator, z)
@@ -205,7 +205,7 @@ def interpolate_cell(input_cosmology, standard_k_axis):
             p_intrp = get_intrp(input_cosmology, redshifts=np.array([z_best]),
                                 kmax=k_max, hubble_units=False)
             p = p_intrp.P(z_best, standard_k_axis)
-
+            
             break
 
         except ValueError:
