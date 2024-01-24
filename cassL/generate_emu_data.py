@@ -205,6 +205,10 @@ def interpolate_cell(input_cosmology, standard_k_axis):
             p_intrp = get_intrp(input_cosmology, redshifts=np.array([z_best]),
                                 kmax=k_max, hubble_units=False)
             p = p_intrp.P(z_best, standard_k_axis)
+
+            print("Input cosmology\n", input_cosmology)
+            print("Redshift is", z_best)
+            print("Number of k values", len(standard_k_axis))
             
             break
 

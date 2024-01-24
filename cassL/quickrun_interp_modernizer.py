@@ -3,7 +3,7 @@ import numpy as np
 from cassL import user_interface as ui
 import matplotlib.pyplot as plt
 
-lil_k = np.load("data_sets/k/300k.npy")
+lil_k = np.load("data_sets/k/300k2.npy")
 big_k = np.load("data_sets/k/65k_k.npy")
 priors = ui.prior_file_to_array("COMET_PLUS")
 
