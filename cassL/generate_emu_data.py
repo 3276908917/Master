@@ -184,16 +184,15 @@ def interpolate_cell(input_cosmology, standard_k_axis):
     while True:
         MEMNeC = ci.balance_neutrinos_with_CDM(input_cosmology, 0)
        
-        #try:
-        #! Hard code
-        MEMNeC_p_interpolator = ci.cosmology_to_PK_interpolator(MEMNeC,
-                redshifts=_redshifts, kmax=k_max, hubble_units=False)
-        
-        s12intrp = ci.sigma12_from_interpolator
-        sigma12 = lambda z: s12intrp(MEMNeC_p_interpolator, z)
-        list_sigma12 = np.array([sigma12(z) for z in _redshifts])
-        #except Exception:
-        #    return broadcast_unsolvable(input_cosmology, list_sigma12)
+        try:
+            MEMNeC_p_interpolator = ci.cosmology_to_PK_interpolator(MEMNeC,
+                    redshifts=_redshifts, kmax=k_max, hubble_units=False)
+
+            s12intrp = ci.sigma12_from_interpolator
+            sigma12 = lambda z: s12intrp(MEMNeC_p_interpolator, z)
+            list_sigma12 = np.array([sigma12(z) for z in _redshifts])
+        except Exception:
+            return broadcast_unsolvable(input_cosmology, list_sigma12)
 
         interpolator = interp1d(np.flip(list_sigma12), np.flip(_redshifts),
             kind='cubic')
@@ -206,10 +205,6 @@ def interpolate_cell(input_cosmology, standard_k_axis):
                                 kmax=k_max, hubble_units=False)
             p = p_intrp.P(z_best, standard_k_axis)
 
-            print("Input cosmology\n", input_cosmology)
-            print("Redshift is", z_best)
-            print("Number of k values", len(standard_k_axis))
-            
             break
 
         except ValueError:

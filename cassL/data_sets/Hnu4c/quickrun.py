@@ -12,8 +12,8 @@ file_particle = "train"
 lhc = np.load("lhc_" + file_particle + "_initial.npy",
                   allow_pickle=True)
 samples, rescalers = ged.fill_hypercube(lhc, standard_k, priors=priors_at,
-        write_period=500, save_label="Hnu4_" + file_particle,
-        crash_when_unsolvable=True)
+        write_period=500, eval_func=ged.interpolate_cell,
+        save_label="Hnu4c_" + file_particle, crash_when_unsolvable=True)
 
 np.save("lhc_" + file_particle + "_final.npy", lhc)
 np.save("samples_" + file_particle + ".npy", samples)
