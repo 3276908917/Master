@@ -13,7 +13,7 @@ from cassL import camb_interface as ci
 from cassL import user_interface as ui
 from cassL import utils
 
-model0 = ci.cosm.loc[0]
+MODEL0 = ci.cosm.loc[0]
 
 A_S_DEFAULT = 2.12723788013E-09
 
@@ -43,7 +43,7 @@ def build_cosmology(lhs_row):
             "the docstring.")
 
     # Use Aletheia model 0 as a base
-    cosmology = cp.deepcopy(model0)
+    cosmology = cp.deepcopy(MODEL0)
 
     cosmology["ombh2"] = lhs_row[0]
     cosmology["omch2"] = lhs_row[1]
@@ -58,7 +58,7 @@ def build_cosmology(lhs_row):
         return ci.specify_neutrino_mass(cosmology, lhs_row[5])
     else:
         cosmology["A_s"] = A_S_DEFAULT
-        return ci.specify_neutrino_mass(cosmology, 1)
+        return ci.specify_neutrino_mass(cosmology, 0, 1)
 
 
 def broadcast_unsolvable(input_cosmology, list_sigma12):
@@ -116,7 +116,7 @@ def direct_eval_cell(input_cosmology, standard_k_axis):
                 redshifts=np.array([z_best]), fancy_neutrinos=False,
                 k_points=num_k_points) 
                 
-            if input_cosmology['h'] != model0['h']: # we've touched h,
+            if input_cosmology['h'] != MODEL0['h']: # we've touched h,
                 # we need to interpolate
                 interpolator = interp1d(k, p, kind="cubic")
                 p = interpolator(standard_k_axis)
@@ -146,7 +146,7 @@ def direct_eval_cell(input_cosmology, standard_k_axis):
     # De-nest
     actual_sigma12 = actual_sigma12[0]
 
-    if input_cosmology['h'] != model0['h']: # announce that we've touched h
+    if input_cosmology['h'] != MODEL0['h']: # announce that we've touched h
         print("We had to move h to", np.around(input_cosmology['h'], 3))
 
     # We don't need to return k because we take for granted that all
@@ -217,16 +217,10 @@ def interpolate_cell(input_cosmology, standard_k_axis):
             else: # We can't decrease any further.
                 return broadcast_unsolvable(input_cosmology, list_sigma12)
 
-    actual_sigma12 = None
+    actual_sigma12 = ci.sigma12_from_interpolator(MEMNeC_p_interpolator,
+                                                  z_best)
 
-    if input_cosmology['omnuh2'] != 0:
-        actual_sigma12 = ci.sigma12_from_interpolator(
-            MEMNeC_p_interpolator, z_best)
-    else:
-        actual_sigma12 = ci.sigma12_from_interpolator(p_interpolator, z_best)
-
-
-    if input_cosmology['h'] != model0['h']: # announce that we've touched h
+    if input_cosmology['h'] != MODEL0['h']: # announce that we've touched h
         print("We had to move h to", np.around(input_cosmology['h'], 3))
 
     # We don't need to return k because we take for granted that all
