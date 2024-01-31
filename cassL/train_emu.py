@@ -136,13 +136,13 @@ class Emulator_Trainer:
             if len(config) != self.xdim:
                 raise ValueError("This is a " + str(self.xdim) + \
                     "-dimensional emulator. Input vector has " + \
-                    len(config) + " dimensions.")
+                    int(len(config)) + " dimensions.")
 
             for i in range(len(config)):
                 if config[i] < self.xmin[i] or \
                     config[i] > self.xmin[i] + self.xrange[i]:
                     raise ValueError("Parameter at index " + str(i) + \
-                        "is outside of the range defined by the prior!")
+                        " is outside of the range defined by the prior!")
 
             return (config - self.xmin) / self.xrange
 
