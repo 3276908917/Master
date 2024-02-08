@@ -262,14 +262,14 @@ def interpolate_nosigma12(input_cosmology, standard_k_axis):
     # want.
     #! Hard code
     k_max = 1.01 * max(standard_k_axis)
+    z = input_cosmology["z"]
 
     try:
-        z_best = interpolator(input_cosmology["sigma12"])
 
         get_intrp = ci.cosmology_to_PK_interpolator
-        p_intrp = get_intrp(input_cosmology, redshifts=np.array([z_best]),
+        p_intrp = get_intrp(input_cosmology, redshifts=np.array([z]),
                             kmax=k_max, hubble_units=False)
-        p = p_intrp.P(input_cosmology["z"], standard_k_axis)
+        p = p_intrp.P(z, standard_k_axis)
 
     except ValueError:
         return broadcast_unsolvable(input_cosmology, None)
@@ -370,6 +370,6 @@ def fill_hypercube(lhs, standard_k_axis, priors=None,
                 np.save("hc_backup_i" + str(i) + "_" + save_label + ".npy",
                         lhs, allow_pickle=True)
 
-                unwritten_cells = 0
+            unwritten_cells = 0
 
     return samples, rescaling_parameters_list
