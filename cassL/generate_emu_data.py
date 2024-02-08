@@ -33,13 +33,14 @@ def build_cosmology(lhs_row):
         if len(lhs_row) == 3 we're building a sigma12 emulator
         if len(lhs_row) == 4 we're building a massless neutrino emulator
         if len(lhs_row) == 6 we're building a massive neutrino emulator
+        if len(lhs_row) == 10 we're testing the full pipeline
     """
     # We should replace this function with a function that assumes, e.g.
     # index 0 is om_b, index 1 is om_c, etc.
 
-    if len(lhs_row) not in [3, 4, 6]:
+    if len(lhs_row) not in [3, 4, 6, 10]:
         raise ValueError("The length of the input lhs row does not" + \
-            "correspond to any of the three known cases. Please refer to " + \
+            "correspond to any of the four known cases. Please refer to " + \
             "the docstring.")
 
     # Use Aletheia model 0 as a base
@@ -51,7 +52,10 @@ def build_cosmology(lhs_row):
 
     # Incomplete
     if len(lhs_row) > 3:
-        cosmology["sigma12"] = lhs_row[3]
+        if len(lhs_row) == 10:
+            cosmology["z"] = lhs_row[3]
+        else:
+            cosmology["sigma12"] = lhs_row[3]
 
     if len(lhs_row) > 4:
         cosmology["A_s"] = lhs_row[4]
@@ -59,15 +63,23 @@ def build_cosmology(lhs_row):
     else:
         cosmology["A_s"] = A_S_DEFAULT
         return ci.specify_neutrino_mass(cosmology, 0, 1)
+        
+    if len(lhs_row > 6):
+        cosmology["h"] = lhs_row[6]
+        cosmology["OmK"] = lhs_row[7] / cosmology["h"] ** 2
+        cosmology["w_0"] = lhs_row[8]
+        cosmology["w_a"] = lhs_row[9]
 
 
-def broadcast_unsolvable(input_cosmology, list_sigma12):
+def broadcast_unsolvable(input_cosmology, list_sigma12=None):
     print("\nThis cell cannot be solved with a nonnegative redshift.")
     print("This is the failed cosmology:\n")
     ui.print_cosmology(input_cosmology)
-    print("\nThe closest feasible sigma12 value would yield an error of:",
-        utils.percent_error(input_cosmology["sigma12"],
-            list_sigma12[len(list_sigma12) - 1]), "%\n")
+    
+    if list_sigma12 is not None:
+        print("\nThe closest feasible sigma12 value would yield an error of:",
+            utils.percent_error(input_cosmology["sigma12"],
+                list_sigma12[len(list_sigma12) - 1]), "%\n")
 
     return None, None, np.array([np.nan, np.nan])
 
@@ -227,6 +239,44 @@ def interpolate_cell(input_cosmology, standard_k_axis):
     # runs will have the same k axis.
 
     return p, actual_sigma12, np.array((input_cosmology['h'], float(z_best)))
+    
+
+def interpolate_nosigma12(input_cosmology, standard_k_axis):
+    """
+    Returns the power spectrum in Mpc units and the actual sigma12_tilde value
+        to which it corresponds.
+
+    I concede that the function looks like a mess right now, with debug
+    statements littered all over the place.
+
+    This is a demo function until we figure out how to apply the interpolation
+    approach to the generation of emu data. Once we have that, we can figure
+    out how to re-combine this function with the previous one.
+
+    Possible issues:
+    * Should we regenerate the MEMNeC interpolator at the end (i.e., with just
+        one redshift value rather than 150), to get better resolution? Or is it
+        fine to re-use?
+    """
+    # This allows us to roughly find the z corresponding to the sigma12 that we
+    # want.
+    #! Hard code
+    k_max = 1.01 * max(standard_k_axis)
+
+    try:
+        z_best = interpolator(input_cosmology["sigma12"])
+
+        get_intrp = ci.cosmology_to_PK_interpolator
+        p_intrp = get_intrp(input_cosmology, redshifts=np.array([z_best]),
+                            kmax=k_max, hubble_units=False)
+        p = p_intrp.P(input_cosmology["z"], standard_k_axis)
+
+    except ValueError:
+        return broadcast_unsolvable(input_cosmology, None)
+
+    # We don't need to return k because we take for granted that all
+    # runs will have the same k axis.
+    return p, None, None
 
 
 def fill_hypercube(lhs, standard_k_axis, priors=None,
@@ -246,13 +296,11 @@ def fill_hypercube(lhs, standard_k_axis, priors=None,
     """
     if cell_range is None:
         cell_range = range(len(lhs))
-    if samples is None:
-        if len(lhs[0]) == 4 or len(lhs[0]) == 6:
-            samples = np.zeros((len(lhs), len(standard_k_axis)))
-        elif len(lhs[0]) == 3:
+    if samples is None:            
+        if len(lhs[0]) == 3:
             samples = np.zeros(len(lhs))
-    
-    bundle_parameters = None
+        else:
+            samples = np.zeros((len(lhs), len(standard_k_axis)))
 
     # The rescaling parameters are h and z, so this will be an array of shape
     # (num_spectra, 2). These parameters are not used to train the emu but
@@ -270,12 +318,11 @@ def fill_hypercube(lhs, standard_k_axis, priors=None,
         this_actual_sigma12 = None
         these_rescaling_parameters = np.array([np.nan, np.nan])
         try:
-            if len(lhs[0]) == 4 or len(lhs[0]) == 6:
-                # we're emulating power spectra
+            if len(lhs[0]) == 3: # we're emulating sigma12
+                samples[i] = eval_func(this_cosmology)
+            else: # we're emulating power spectra
                 this_p, this_actual_sigma12, these_rescaling_parameters = \
                     eval_func(this_cosmology, standard_k_axis)
-            elif len(lhs[0]) == 3: # we're emulating sigma12
-                samples[i] = eval_func(this_cosmology)
 
             # We make sure that len(lhs[0] > 3) because this_p is *supposed* to
             # be None in the event that we're emulating sigma12.
@@ -298,7 +345,7 @@ def fill_hypercube(lhs, standard_k_axis, priors=None,
         # We may actually want to remove this if-condition. For now, though, it
         # allows us to repeatedly evaluate a cosmology with the same
         # deterministic result.
-        if len(lhs[0]) == 4 or len(lhs[0]) == 6:
+        if len(lhs[0]) != 3:
             if this_actual_sigma12 is not None:
                 lhs[i][3] = this_actual_sigma12
 
@@ -315,7 +362,9 @@ def fill_hypercube(lhs, standard_k_axis, priors=None,
             np.save("samples_backup_i" + str(i) + "_" + save_label + ".npy",
                 samples, allow_pickle=True)
 
-            if len(lhs[0]) != 3:
+            if len(lhs[0]) == 4 or len(lhs[0]) == 6:
+                # Rescaling and sigma12 matching only apply in the case of the
+                # massless\ and massive-neutrino power spectra data sets.
                 np.save("rescalers_backup_i" + str(i) + "_" + save_label + \
                         ".npy", rescaling_parameters_list, allow_pickle=True)
                 np.save("hc_backup_i" + str(i) + "_" + save_label + ".npy",

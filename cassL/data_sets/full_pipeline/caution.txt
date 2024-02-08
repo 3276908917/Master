@@ -1,0 +1,12 @@
+32GB systems seem to be unable to handle generation of 10D hypercubes of 18000 samples. The true limit is somewhere between 17000 and 18000, but I'll stop at 17000 because the difference of 1000 samples shouldn't be too great.
+
+Let's play with batch size. If we use a batch size of 1, we should theoretically be able to handle hypercubes with 49 times as many entries.
+If we furthermore use just one thread, we should be able to handle hypercubes with 6 * 49 = 294 times as many entries.
+
+# entries = dimension * num_samples
+
+294 times as many entries threefore means 29.4 times as many samples. Let's round down to 29 to be safe.
+
+493000 samples would be allowed. But we're only interested in 100,000, or 5.88 times as many samples.
+
+in other words, 58.8 times as many entries. If we go back to using all 6 threads, that would mean a batch size reduced by a factor of ten. We'll use batches of four, then.

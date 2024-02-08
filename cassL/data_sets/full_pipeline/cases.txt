@@ -1,0 +1,6 @@
+[omega_b, omega_c, n_s]
+[omega_b, omega_c, n_s, sigma12]
+[omega_b, omega_c, n_s, sigma12, A_s, omega_nu]
+[omega_b, omega_c, n_s, z, A_s, omega_nu, h, omega_k, w_0, w_a]
+
+I need to modify eval_cell and interpolate_cell so that they accept a single redshift... then, we can skip all of the sigma12 matching. But, excising the sigma12 stuff may mean we should just introduce a different function.
