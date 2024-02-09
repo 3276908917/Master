@@ -64,7 +64,7 @@ def build_cosmology(lhs_row):
         cosmology["A_s"] = A_S_DEFAULT
         return ci.specify_neutrino_mass(cosmology, 0, 1)
         
-    if len(lhs_row > 6):
+    if len(lhs_row) > 6:
         cosmology["h"] = lhs_row[6]
         cosmology["OmK"] = lhs_row[7] / cosmology["h"] ** 2
         cosmology["w_0"] = lhs_row[8]
