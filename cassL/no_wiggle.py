@@ -20,8 +20,8 @@ def get_istart_istop(file_name):
     for seg in str_segments:
         if seg[0] == 'i': # start index
             if istart is None:
-                istart = int(seg[0][1:])
-        if is_numeric(seg[0]): # stop index
+                istart = int(seg[1:])
+        if is_numeric(seg): # stop index
             return istart, int(seg)
     
     raise ValueError("Not enough indices found in string... make sure that" \
@@ -52,7 +52,7 @@ def crunch_and_sew_stable_LHC(lhc, big_k_arr, small_k_arr, priors):
         j_stop += 1 # we want to use this in a list splice
         
         samples = np.load(samples_files[i])
-        next_w, next_nw = crunch_spectra(lhc[jstart:jstop], big_k_arr,
+        next_w, next_nw = crunch_spectra(lhc[j_start:j_stop], big_k_arr,
                                          small_k_arr, samples, priors)
         if wiggle is None:
             wiggle = next_w
@@ -60,6 +60,8 @@ def crunch_and_sew_stable_LHC(lhc, big_k_arr, small_k_arr, priors):
         else:
             wiggle = np.vstack((wiggle, next_w))
             nowiggle = np.vstack((nowiggle, next_nw))
+    
+        print('\n')
     
     return wiggle, nowiggle
 
