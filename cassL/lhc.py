@@ -11,7 +11,7 @@ import concurrent.futures
 import time
 
 
-def batch(n_params, n_samples=5000, batch_size=49, comparator=np.greater):
+def batch(n_params, n_samples=5000, batch_size=50, comparator=np.greater):
     """
     Parameters
     ----------
@@ -30,7 +30,8 @@ def batch(n_params, n_samples=5000, batch_size=49, comparator=np.greater):
     dist = cdist(samples, samples, metric='euclidean')
     min_dist = np.amin(dist[dist > 0])
     # Iterating this for n_trials times
-    for i in range(batch_size):
+    for i in range(batch_size - 1):
+        print(i + 1)
         samples_new = lhs(n=n_params, samples=n_samples, criterion='center')
         dist = cdist(samples_new, samples_new, metric='euclidean')
         min_dist_new = np.amin(dist[dist > 0])
@@ -45,7 +46,7 @@ def batch(n_params, n_samples=5000, batch_size=49, comparator=np.greater):
 
 
 def multithread_unit_LHC_builder(dim, n_samples, label="unlabeled",
-    batch_size=49, num_workers=12, previous_record=0, comparator=np.greater,
+    batch_size=50, num_workers=12, previous_record=0, comparator=np.greater,
     track_performance=False):
     """
     Use more CPU to compute more random LHCs, periodically saving the one with
