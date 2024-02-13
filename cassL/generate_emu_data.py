@@ -359,16 +359,24 @@ def fill_hypercube(lhs, standard_k_axis, priors=None,
         print(i, "complete")
         unwritten_cells += 1
         if write_period is not None and unwritten_cells >= write_period:
-            np.save("samples_backup_i" + str(i) + "_" + save_label + ".npy",
-                samples, allow_pickle=True)
+            # We add one because the current cell is also unwritten
+            save_start = i - unwritten_cells + 1
+            save_end = i + 1
+
+            file_suffix = "_backup_i" + str(save_start) + "_through_" + \
+                    str(i) + "_" + save_label + ".npy"
+
+            np.save("samples" + file_suffix, samples[save_start:save_end],
+                    allow_pickle=True)
 
             if len(lhs[0]) == 4 or len(lhs[0]) == 6:
                 # Rescaling and sigma12 matching only apply in the case of the
                 # massless\ and massive-neutrino power spectra data sets.
-                np.save("rescalers_backup_i" + str(i) + "_" + save_label + \
-                        ".npy", rescaling_parameters_list, allow_pickle=True)
-                np.save("hc_backup_i" + str(i) + "_" + save_label + ".npy",
-                        lhs, allow_pickle=True)
+                np.save("rescalers" + file_suffix,
+                        rescaling_parameters_list[save_start:save_end],
+                        allow_pickle=True)
+                np.save("hc" + file_suffix, lhs[save_start:save_end],
+                        allow_pickle=True)
 
             unwritten_cells = 0
 

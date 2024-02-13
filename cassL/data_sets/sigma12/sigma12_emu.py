@@ -4,16 +4,16 @@ from cassL import camb_interface as ci
 from cassL import train_emu as te
 import numpy as np
 
-PATH_BASE = "cassL/data_sets/sigma12/"
+PATH_BASE = ""
 
 # Emulator version.
-version = "2"
-priors = ui.prior_file_to_array("MEGA")
+version = "3"
+priors = ui.prior_file_to_array("MASSLESS")
 
 def eval_func(cosmology):
     return ci.evaluate_sigma12(cosmology, [1])
     
-checkpoint = 3 # which phase of this script we're on    
+checkpoint = 4 # which phase of this script we're on    
     
 if checkpoint < 1: # skip already-computed stuff
     sigma12_train_lhs = np.load(PATH_BASE + "lhc_train_initial.npy")

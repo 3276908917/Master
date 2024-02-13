@@ -1,7 +1,7 @@
 # What is the point of this emulator?
 
 $priors
-CLASSIC_with_nu
+CLASSIC
 $paired_with
 None
 $num_spectra_points
