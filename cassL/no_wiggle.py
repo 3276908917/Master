@@ -5,6 +5,14 @@ import glob
 
 from cassL import generate_emu_data as ged
 
+def is_numeric(string):
+    try:
+        int(string)
+        return True
+    except ValueError:
+        return False
+    
+
 def get_istart_istop(file_name):
     str_segments = file_name.split('_')
     istart = None
@@ -13,7 +21,7 @@ def get_istart_istop(file_name):
         if seg[0] == 'i': # start index
             if istart is None:
                 istart = int(seg[0][1:])
-        if seg[0].isalnum(): # stop index
+        if is_numeric(seg[0]): # stop index
             return istart, int(seg)
     
     raise ValueError("Not enough indices found in string... make sure that" \
