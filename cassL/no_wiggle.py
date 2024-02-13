@@ -2,6 +2,43 @@ from scipy.interpolate import UnivariateSpline
 import scipy.fft as fft
 import generate_emu_data as ged
 import numpy as np
+import glob
+
+def crunch_and_sew(big_k_arr, small_k_arr, priors):
+    """
+    Read in individual backup files, crunch them (i.e. interpolate to get
+    values only at the scales in small_k_arr--see the later functions), and
+    sew each batch of crunched results into a single array.
+    
+    BE CAREFUL! This function returns three values (sewn LHC, sewn wiggle power
+        spectra, sewn no-wiggle power spectra), not two like the other
+        functions.
+    """
+    # First, we need to identify the first file in the sequence:
+    lhc_files = glob.glob("hc*")
+    grand_lhc = None
+    samples_files = glob.glob("samples*")
+    
+    wiggle = None
+    nowiggle = None
+    
+    # We need some way of matching hc files to samples files.
+    # We're assuming that they're already in order!! This might be wrong
+    for i in range(len(lhc_files)):
+        lhc = np.load(lhc_files[i])
+        samples = np.load(samples_files[i])
+        next_w, next_nw = crunch_spectra(lhc, big_k_arr, small_k_arr, samples,
+                                         priors)
+        if wiggle is None:
+            grand_lhc = lhc
+            wiggle = next_w
+            nowiggle = next_nw
+        else:
+            grand_lhc = np.vstack((grand_lhc, lhc))
+            wiggle = np.vstack((wiggle, next_w))
+            nowiggle = np.vstack((nowiggle, next_nw))
+    
+    return grand_lhc, wiggle, nowiggle
 
 def crunch_spectra(lhc, big_k_arr, small_k_arr, samples, priors):
     if len(lhc) != len(samples):
