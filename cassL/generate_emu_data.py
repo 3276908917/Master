@@ -59,10 +59,10 @@ def build_cosmology(lhs_row):
 
     if len(lhs_row) > 4:
         cosmology["A_s"] = lhs_row[4]
-        ci.specify_neutrino_mass(cosmology, lhs_row[5])
+        cosmology = ci.specify_neutrino_mass(cosmology, lhs_row[5])
     else:
         cosmology["A_s"] = A_S_DEFAULT
-        ci.specify_neutrino_mass(cosmology, 0, 1)
+        cosmology = ci.specify_neutrino_mass(cosmology, 0, 1)
         
     if len(lhs_row) > 6:
         cosmology["h"] = lhs_row[6]
@@ -212,9 +212,12 @@ def interpolate_cell(input_cosmology, standard_k_axis):
 
         try:
             z_best = interpolator(input_cosmology["sigma12"])
+            interpolation_redshifts = np.flip(np.linspace(max(0, z_best - 1),
+                                                          z_best + 1, 150))
 
             get_intrp = ci.cosmology_to_PK_interpolator
-            p_intrp = get_intrp(input_cosmology, redshifts=np.array([z_best]),
+            p_intrp = get_intrp(input_cosmology,
+                                redshifts=interpolation_redshifts,
                                 kmax=k_max, hubble_units=False)
             p = p_intrp.P(z_best, standard_k_axis)
 
@@ -262,18 +265,15 @@ def interpolate_nosigma12(input_cosmology, standard_k_axis):
     # This allows us to roughly find the z corresponding to the sigma12 that we
     # want.
     #! Hard code
-    k_max = 1.01 * max(standard_k_axis)
+    k_max = 1.01 * np.max(standard_k_axis)
     z = input_cosmology["z"]
 
-    try:
-
-        get_intrp = ci.cosmology_to_PK_interpolator
-        p_intrp = get_intrp(input_cosmology, redshifts=np.array([z]),
-                            kmax=k_max, hubble_units=False)
-        p = p_intrp.P(z, standard_k_axis)
-
-    except ValueError:
-        return broadcast_unsolvable(input_cosmology, None)
+    get_intrp = ci.cosmology_to_PK_interpolator
+    
+    interpolation_redshifts = np.flip(np.linspace(max(0, z - 1), z + 1, 150))
+    p_intrp = get_intrp(input_cosmology, redshifts=interpolation_redshifts,
+                        kmax=k_max, hubble_units=False)
+    p = p_intrp.P(z, standard_k_axis)
 
     # We don't need to return k because we take for granted that all
     # runs will have the same k axis.
