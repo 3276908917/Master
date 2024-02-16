@@ -52,7 +52,7 @@ def build_cosmology(lhs_row):
 
     # Incomplete
     if len(lhs_row) > 3:
-        if len(lhs_row) == 10:
+        if len(lhs_row) > 8:
             cosmology["z"] = lhs_row[3]
         else:
             cosmology["sigma12"] = lhs_row[3]
