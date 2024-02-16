@@ -28,7 +28,7 @@ def get_istart_istop(file_name):
                       "the formatting has not been corrupted.")
             
 
-def crunch_and_sew_stable_LHC(lhc, big_k_arr, small_k_arr, priors):
+def crunch_and_sew_samples(lhc, big_k_arr, small_k_arr, priors):
     """
     Read in individual backup files, crunch them (i.e. interpolate to get
     values only at the scales in small_k_arr--see the later functions), and
@@ -65,7 +65,7 @@ def crunch_and_sew_stable_LHC(lhc, big_k_arr, small_k_arr, priors):
     
     return wiggle, nowiggle
 
-def crunch_and_sew(big_k_arr, small_k_arr, priors):
+def crunch_and_sew_all(big_k_arr, small_k_arr, priors):
     """
     Read in individual backup files, crunch them (i.e. interpolate to get
     values only at the scales in small_k_arr--see the later functions), and
