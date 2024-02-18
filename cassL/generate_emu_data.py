@@ -61,25 +61,20 @@ def build_cosmology(lhs_row):
     if len(lhs_row) > 4:
         cosmology["A_s"] = lhs_row[4]
         if len(lhs_row) != 9:
-            cosmology = ci.specify_neutrino_mass(cosmology, lhs_row[5])
+            last_i = len(lhs_row) - 1
+            cosmology = ci.specify_neutrino_mass(cosmology, lhs_row[last_i], 1)
     else:
         cosmology["A_s"] = A_S_DEFAULT
 
     if "omnuh2" not in cosmology: 
-        cosmology = ci.specify_neutrino_mass(cosmology, lhs_row[5])
+        cosmology = ci.specify_neutrino_mass(cosmology, 0, 1)
 
-    if len(lhs_row) == 9:
+    if len(lhs_row) > 8:
         cosmology["h"] = lhs_row[5]
         cosmology["OmK"] = lhs_row[6] / cosmology["h"] ** 2
         cosmology["w0"] = lhs_row[7]
         cosmology["wa"] = lhs_row[8]
     
-    if len(lhs_row) == 10:
-        cosmology["h"] = lhs_row[6]
-        cosmology["OmK"] = lhs_row[7] / cosmology["h"] ** 2
-        cosmology["w0"] = lhs_row[8]
-        cosmology["wa"] = lhs_row[9]
-
     return cosmology
 
 def broadcast_unsolvable(input_cosmology, list_sigma12=None):
