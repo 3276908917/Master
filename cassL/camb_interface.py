@@ -685,6 +685,10 @@ def evaluate_sigma12(cosmology, redshifts=[0]):
         not isinstance(redshifts, np.ndarray):
         raise TypeError("If you want to use a single redshift, you must " + \
             "still nest it in an array.")
+            
+    if cosmology['omnuh2'] != 0.:
+        warnings.warn("Input cosmology features massive neutrinos. You " + \
+            "probably meant to pass in the MEMNeC instead!")
 
     pars = input_cosmology(cosmology)
     apply_universal_output_settings(pars)
