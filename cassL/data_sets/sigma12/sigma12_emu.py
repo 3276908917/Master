@@ -7,37 +7,33 @@ import numpy as np
 PATH_BASE = ""
 
 # Emulator version.
-version = "3"
+version = "99"
 priors = ui.prior_file_to_array("MASSLESS")
 
 def eval_func(cosmology):
     return ci.evaluate_sigma12(cosmology, [1])
+
+train_lhs = np.load(PATH_BASE + "lhc_train_initial.npy")
+test_lhs = np.load(PATH_BASE + "lhc_test_initial.npy")
     
-checkpoint = 4 # which phase of this script we're on    
+checkpoint = 2 # which phase of this script we're on    
     
 if checkpoint < 1: # skip already-computed stuff
-    sigma12_train_lhs = np.load(PATH_BASE + "lhc_train_initial.npy")
-
-    sigma12_train_samples, _ = ged.fill_hypercube(sigma12_train_lhs, None,
+    sigma12_train_samples, _ = ged.fill_hypercube(train_lhs, None,
         priors, eval_func, save_label = "sigma12_train")
 
     np.save(PATH_BASE + "samples_train.npy", sigma12_train_samples)
-    np.save(PATH_BASE + "lhc_train_final.npy", sigma12_train_lhs)
 
 if checkpoint < 2:
-    sigma12_test_lhs = np.load(PATH_BASE + "lhc_test_initial.npy")
-
-    sigma12_test_samples, _ = ged.fill_hypercube(sigma12_test_lhs, None,
+    sigma12_test_samples, _ = ged.fill_hypercube(test_lhs, None,
         priors, eval_func, save_label = "sigma12_test")
         
     np.save(PATH_BASE + "samples_test.npy", sigma12_test_samples)
-    np.save(PATH_BASE + "lhc_test_final.npy", sigma12_test_lhs)
 
 if checkpoint < 3:
-    lhs_train = np.load(PATH_BASE + "lhc_train_final.npy")
     samples_train = np.load(PATH_BASE + "samples_train.npy")
 
-    X_train, Y_train = te.eliminate_unusable_entries(lhs_train, samples_train)
+    X_train, Y_train = te.eliminate_unusable_entries(train_lhs, samples_train)
     Y_train2 = Y_train.reshape((len(Y_train), 1))
 
     trainer = te.Emulator_Trainer("sigma12_v" + version, X_train, Y_train2,
@@ -50,9 +46,8 @@ else:
                       allow_pickle=True)
 
 if checkpoint < 4:
-    lhs_test = np.load(PATH_BASE + "lhc_test_final.npy")
     samples_test = np.load(PATH_BASE + "samples_test.npy")
-    X_test, Y_test = te.eliminate_unusable_entries(lhs_test, samples_test)
+    X_test, Y_test = te.eliminate_unusable_entries(test_lhs, samples_test)
 
     Y_test2 = Y_test.reshape((len(Y_test), 1))
     trainer.test(X_test, Y_test2)
