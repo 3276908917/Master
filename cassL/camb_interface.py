@@ -819,10 +819,11 @@ def get_CAMB_interpolator(pars, redshifts=[0], kmax=1, hubble_units=False):
     return PK
 
 
-def cosmology_to_PK_interpolator(cosmology, redshifts=[0],
+def cosmology_to_Pk_interpolator(cosmology, redshifts=[0],
     fancy_neutrinos=False, kmax=1, hubble_units=False):
     """
-    This is a really rough function, I'm just trying to test out an idea.
+    evaluate_cosmology is slightly easier to use, but this fn is more powerful
+    because it does not insist on a logarithmic spacing on the k points.
     
     The input array @redshifts describes the space over which to build the
     interpolator. For more accuracy, more redshifts should be used. Keep in

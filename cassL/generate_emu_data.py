@@ -203,7 +203,7 @@ def interpolate_cell(input_cosmology, standard_k_axis):
         MEMNeC = ci.balance_neutrinos_with_CDM(input_cosmology, 0)
        
         try:
-            MEMNeC_p_interpolator = ci.cosmology_to_PK_interpolator(MEMNeC,
+            MEMNeC_p_interpolator = ci.cosmology_to_Pk_interpolator(MEMNeC,
                     redshifts=_redshifts, kmax=k_max, hubble_units=False)
 
             s12intrp = ci.sigma12_from_interpolator
@@ -220,7 +220,7 @@ def interpolate_cell(input_cosmology, standard_k_axis):
             interpolation_redshifts = np.flip(np.linspace(max(0, z_best - 1),
                                                           z_best + 1, 150))
 
-            get_intrp = ci.cosmology_to_PK_interpolator
+            get_intrp = ci.cosmology_to_Pk_interpolator
             p_intrp = get_intrp(input_cosmology,
                                 redshifts=interpolation_redshifts,
                                 kmax=k_max, hubble_units=False)
@@ -255,9 +255,6 @@ def interpolate_nosigma12(input_cosmology, standard_k_axis):
     Returns the power spectrum in Mpc units and the actual sigma12_tilde value
         to which it corresponds.
 
-    I concede that the function looks like a mess right now, with debug
-    statements littered all over the place.
-
     This is a demo function until we figure out how to apply the interpolation
     approach to the generation of emu data. Once we have that, we can figure
     out how to re-combine this function with the previous one.
@@ -273,7 +270,7 @@ def interpolate_nosigma12(input_cosmology, standard_k_axis):
     k_max = 1.01 * np.max(standard_k_axis)
     z = input_cosmology["z"]
 
-    get_intrp = ci.cosmology_to_PK_interpolator
+    get_intrp = ci.cosmology_to_Pk_interpolator
     
     interpolation_redshifts = np.flip(np.linspace(max(0, z - 1), z + 1, 150))
     p_intrp = get_intrp(input_cosmology, redshifts=interpolation_redshifts,
@@ -326,6 +323,7 @@ def fill_hypercube(lhs, standard_k_axis, priors=None,
         try:
             if len(lhs[0]) == 3: # we're emulating sigma12
                 samples[i] = eval_func(this_cosmology)
+                ui.print_cosmology(this_cosmology)
             else: # we're emulating power spectra
                 this_p, this_actual_sigma12, these_rescaling_parameters = \
                     eval_func(this_cosmology, standard_k_axis)
