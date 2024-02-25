@@ -204,9 +204,9 @@ def evolution_matched_cosmology(fixed_cosmology, moving_cosmology,
     z_hi = str(np.flip(z_space)[index_of_highest_low_sigma12])
     
     estimate = ci.evaluate_sigma12(moving_cosmology, [z_best])[0]
-    error = utils.percent_error(target, estimate)
+    error = percent_error(target, estimate)
     
-    print("Evaluate the second cosmology at a redshift of {}.", z_best)
+    print("Evaluate the second cosmology at a redshift of {}.".format(z_best))
     print("The error is {}. If you'd like a closer match, re-run the fn. " \
            "with the z_bounds: (".format(error) + z_lo + ", " + z_hi + ").")
            
