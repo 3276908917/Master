@@ -2,6 +2,8 @@ import numpy as np
 import warnings
 from scipy.interpolate import interp1d
 
+from cassL import camb_interface as ci
+
 def box(item):
     """
     This utility fn is handy when passing an argument to a fn which expects a
@@ -169,3 +171,43 @@ def verify_LHS_dim(lhc_dim, priors):
         print("The LHS ought to have either three, four or six parameters" + \
                 "per row! If you are trying to expand the parameter set, " + \
                "you will have to directly access the other scripts yourself.")
+
+
+def evolution_matched_cosmology(fixed_cosmology, moving_cosmology,
+    z_bounds=None):
+    """
+    Returns the redshift at which @moving_cosmology needs to be evaluated in
+    order to have the same sigma12 value as @fixed_cosmology.
+    
+    This fn does not error check to make sure these are compatible cosmologies.
+    """
+    if z_bounds is None:
+        z_bounds = (0, 10)
+    
+    # 150 is the maximum number of z points CAMB will accept at once
+    z_space = np.flip(np.linspace(z_bounds[0], z_bounds[1], 150))
+    arr_sigma12 = np.flip(ci.evaluate_sigma12(moving_cosmology, z_space))
+    
+    interpolator = interp1d(arr_sigma12, np.flip(z_space),
+                            kind='cubic')
+    target = ci.evaluate_sigma12(fixed_cosmology, [fixed_cosmology['z']])[0]
+    try:
+        z_best = interpolator(target)
+    except ValueError:
+        raise ValueError("These cosmologies are too dissimilar in " \
+                          "amplitude...")
+    
+    index_of_highest_low_sigma12 = np.min(np.where(arr_sigma12 < target))
+    index_of_lowest_high_sigma12 = np.max(np.where(arr_sigma12 > target))
+    
+    z_lo = str(np.flip(z_space)[index_of_lowest_high_sigma12])
+    z_hi = str(np.flip(z_space)[index_of_highest_low_sigma12])
+    
+    estimate = ci.evaluate_sigma12(moving_cosmology, [z_best])[0]
+    error = utils.percent_error(target, estimate)
+    
+    print("Evaluate the second cosmology at a redshift of {}.", z_best)
+    print("The error is {}. If you'd like a closer match, re-run the fn. " \
+           "with the z_bounds: (".format(error) + z_lo + ", " + z_hi + ").")
+           
+# evolution_matched_cosmology(qis[2], flattened2)
