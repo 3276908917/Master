@@ -855,54 +855,11 @@ def cosmology_to_Pk_interpolator(cosmology, redshifts=[0],
     return get_CAMB_interpolator(pars, redshifts, kmax, hubble_units)
 
 
-def andrea_interpolator(cosmology):
-    """
-    It's dangerous to have this function floating around when we're also
-    closely testing the andreap.py script in the emulator folder of the
-    CAMB_notebooks dir.
-
-    We should consider putting Andrea's code into a special script which
-    will be temporarily included in the cassL code to be pip-installed.
-    """
-    H0 = cosmology['h'] * 100
-    ombh2 = cosmology['ombh2']
-    omch2 = cosmology['omch2']
-    omnuh2 = cosmology['omnuh2']
-    As = cosmology['A_s']
-    ns = cosmology['n_s']
-    omk = cosmology['OmK']
-    w0 = cosmology["w0"]
-    wa = float(cosmology["wa"])
-
-    #pars = camb.CAMBparams()
-    #pars.set_cosmology(H0=H0, ombh2=ombh2, omch2=omch2, mnu=mnu, omk=omk)
-    pars = camb.set_params(H0=H0, ombh2=ombh2, omch2=omch2, omnuh2=omnuh2,
-        omk=omk)
-    print("nnu_massive:", cosmology['nnu_massive'])
-    pars.num_nu_massive = 1#cosmology['nnu_massive']
-    #omnuh2 = np.copy(pars.omnuh2)
-    #print (omnuh2)
-    pars.InitPower.set_params(ns=ns, As=As)
-    pars.set_dark_energy(w=w0, wa=wa, dark_energy_model='fluid')
-    pars.NonLinear = model.NonLinear_none
-    pars.Accuracy.AccuracyBoost = 3
-    pars.Accuracy.lAccuracyBoost = 3
-    pars.Accuracy.AccuratePolarization = False
-    pars.Transfer.kmax = 20.0
-    pars.set_matter_power(redshifts=[0.0], kmax=20.0)
-
-    #print (pars.num_nu_massive)
-
-    return camb.get_matter_power_interpolator(
-        pars, nonlinear=False, hubble_units=False, k_hunit=False,
-        kmax=20.0, zmax=20.0, var1='delta_nonu', var2='delta_nonu')
-
-
 def sigma12_from_interpolator(PK, z):
     """
-    This, too, is Andrea's code. It would be ideal to remove this entirely.
+    
+    Credit goes to Andrea Pezzotta for this function.
     """
-
     def W(x):
         return 3.0 * (np.sin(x) - x*np.cos(x)) / x**3
     def integrand(x):
