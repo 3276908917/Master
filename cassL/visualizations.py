@@ -2,6 +2,12 @@ from cassL import camb_interface as ci
 from cassL import utils
 import matplotlib.pyplot as plt
 
+# ! Just some standard colors and styles for when I plot several models
+# together. We should figure out a way to get rid of this.
+colors = ["green", "blue", "brown", "red", "black", "orange", "purple",
+          "magenta", "cyan"] * 200
+styles = ["solid"] * 200
+
 def pairwise_errors(lhc, errors, x_index, y_index, x_label, y_label):
     if x_index == y_index:
         raise ValueError("The two parameter indices are the same!")
@@ -23,7 +29,7 @@ def pairwise_errors(lhc, errors, x_index, y_index, x_label, y_label):
 
 def model_ratios(snap_index, sims, canvas, massive=True, skips=[],
                  subplot_indices=None, active_labels=['x', 'y'],
-                 title="Ground truth", omnuh2_str="0.002", cosm=cosm,
+                 title="Ground truth", omnuh2_str="0.002",
                  suppress_legend=False, linewidth=1):
     """
     There are a couple of annoying formatting differences with the power nu
@@ -62,7 +68,7 @@ def model_ratios(snap_index, sims, canvas, massive=True, skips=[],
     for i in range(1, len(sims)):
         if i in skips:
             continue  # Don't know what's going on with model 8
-        this_h = cosm.loc[i]["h"]
+        this_h = ci.cosm.loc[i]["h"]
         this_k = sims[i][snap_index]["k"]
 
         this_p = sims[i][snap_index]["P_nu"] / \
@@ -130,7 +136,7 @@ def compare_wrappers(k_list, p_list, sims, snap_index, canvas, massive,
     # Whereas snapshot indices run from older to newer
     z_index = 4 - snap_index
 
-    baseline_h = cosm.loc[0]["h"]
+    baseline_h = ci.cosm.loc[0]["h"]
 
     baseline_k_py = k_list[0] * baseline_h
 
@@ -155,11 +161,11 @@ def compare_wrappers(k_list, p_list, sims, snap_index, canvas, massive,
     else:
         plot_area = canvas[subplot_indices[0], subplot_indices[1]]
 
-    # k_list is the LCD because Ariel has more working cosm than I do
+    # k_list is the LCD because Ariel has more working ci.cosm than I do
     for i in range(1, len(k_list)):
         if i in skips:
             continue
-        this_h = cosm.loc[i]["h"]
+        this_h = ci.cosm.loc[i]["h"]
 
         this_k_py = k_list[i] * this_h
         this_p_py = None

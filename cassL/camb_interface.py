@@ -68,12 +68,6 @@ ALETHEIA_SNAPS = np.array([0, 1, 2, 3, 4])
 K_MIN = 7.0E-5 # absolute units
 K_MAX = 7.0 # absolute units
 
-# ! Just some standard colors and styles for when I plot several models
-# together. We should figure out a way to get rid of this.
-colors = ["green", "blue", "brown", "red", "black", "orange", "purple",
-          "magenta", "cyan"] * 200
-styles = ["solid"] * 200
-
 # This regex expression powers the parse_redshifts function.
 redshift_column = re.compile("z.+")
 
@@ -177,6 +171,7 @@ def balance_neutrinos_with_CDM(cosmology, new_omnuh2):
 
     return specify_neutrino_mass(new_cosmology, new_omnuh2, new_nnu_massive)
 
+
 def load_benchmark(relative_path, omnuh2_strs=None):
     r"""
     Return a nested dictionary containing the power spectra that Ariel computed
@@ -274,12 +269,6 @@ def get_As_matched_random_cosmology(omega_nu, A_s=2.12723788013000E-09):
     omKh2 = np.random.uniform(-0.05, 0.05)
 
     row['h'] = np.sqrt(row["ombh2"] + row["omch2"] + omdeh2 + omKh2)
-    
-    # These fields are not used anywhere
-    # Given h, the following are now fixed:
-    # row['OmB'] = row['ombh2'] / row['h'] ** 2
-    # row['OmC'] = row['omch2'] / row['h'] ** 2
-    # row['OmM'] = row['OmB'] + row['OmC']
 
     row['OmK'] = omKh2 / row['h'] ** 2
     row['w0'] = np.random.uniform(-2., -.5)
@@ -579,7 +568,7 @@ def input_cosmology(cosmology):
     return pars
 
 #! The code should automatically nest input scalars into length-one arrays.
-#! It's a little rediculuous that we don't already handle this.
+#! It's a little ridiculous that we don't already handle this.
 #! However... should this fn automatically de-nest? The other fn.s that use
 #! this one automatically de-nest, so the logic in those places would need to
 #! be more complicated to conform to such a change.
