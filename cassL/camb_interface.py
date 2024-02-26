@@ -669,31 +669,41 @@ def input_cosmology(cosmology):
 
     return pars
 
-def get_CAMB_sigma12(pars, redshifts=[0]):
+#! The code should automatically nest input scalars into length-one arrays.
+#! It's a little rediculuous that we don't already handle this.
+#! However... should this fn automatically de-nest? The other fn.s that use
+#! this one automatically de-nest, so the logic in those places would need to
+#! be more complicated to conform to such a change.
+def evaluate_sigmaR(cosmology, radii, redshifts=[0]):
     """
-    Helper function for evaluate_sigma12.
-    Given a fully set-up pars function, return the sigma12 values.
+    :return: A two-dimensional array where each index in the first dimension
+        corresponds to a different sphere radius, and where each index in the
+        second dimension corresponds to a different redshift.
+    :rtype: np.ndarray of dimension 2
     """
-
-    pars.set_matter_power(redshifts=redshifts, kmax=K_MAX,
-                          nonlinear=False, k_per_logint=20)
-    results = camb.get_results(pars)
-    return results.get_sigmaR(12, hubble_units=False)
-
-def evaluate_sigma12(cosmology, redshifts=[0]):
+    if not isinstance(radii, list) and \
+        not isinstance(radii, np.ndarray):
+        raise TypeError("If you want to use a single radius, you must " + \
+            "still nest it in an array.")
+    
     if not isinstance(redshifts, list) and \
         not isinstance(redshifts, np.ndarray):
         raise TypeError("If you want to use a single redshift, you must " + \
             "still nest it in an array.")
             
-    if cosmology['omnuh2'] != 0.:
-        warnings.warn("Input cosmology features massive neutrinos. You " + \
-            "probably meant to pass in the MEMNeC instead!")
+    if cosmology['omnuh2'] != 0. and radii[0] == 12. and len(radii) == 1:
+        warnings.warn("Input cosmology features massive neutrinos, but " + \
+                      "only the radius 12 Mpc was requested. You " + \
+                      "probably meant to pass in the MEMNeC!")
 
     pars = input_cosmology(cosmology)
     apply_universal_output_settings(pars)
+    pars.set_matter_power(redshifts=redshifts, kmax=K_MAX,
+                          nonlinear=False, k_per_logint=20)
+    results = camb.get_results(pars)
 
-    return get_CAMB_sigma12(pars, redshifts)
+    return results.get_sigmaR(radii, hubble_units=False)
+
 
 def get_CAMB_pspectrum(pars, redshifts=[0], k_points=100000,
                        hubble_units=False):
