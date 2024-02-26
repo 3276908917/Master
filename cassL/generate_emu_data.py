@@ -87,7 +87,7 @@ def broadcast_unsolvable(input_cosmology, list_sigma12=None):
             utils.percent_error(input_cosmology["sigma12"],
                 list_sigma12[len(list_sigma12) - 1]), "%\n")
 
-    return None, None, np.array([np.nan, np.nan])
+    return None, np.array([np.nan, np.nan, np.nan])
 
 def direct_eval_cell(input_cosmology, standard_k_axis):
     """
@@ -170,7 +170,7 @@ def direct_eval_cell(input_cosmology, standard_k_axis):
     # We don't need to return k because we take for granted that all
     # runs will have the same k axis.
 
-    return p, actual_sigma12, np.array((input_cosmology['h'], float(z_best)))
+    return p, np.array((actual_sigma12, input_cosmology['h'], float(z_best)))
 
 
 def interpolate_cell(input_cosmology, standard_k_axis):
@@ -247,7 +247,7 @@ def interpolate_cell(input_cosmology, standard_k_axis):
     # We don't need to return k because we take for granted that all
     # runs will have the same k axis.
 
-    return p, actual_sigma12, np.array((input_cosmology['h'], float(z_best)))
+    return p, np.array((actual_sigma12, input_cosmology['h'], float(z_best)))
     
 
 def interpolate_nosigma12(input_cosmology, standard_k_axis):
@@ -279,7 +279,7 @@ def interpolate_nosigma12(input_cosmology, standard_k_axis):
 
     # We don't need to return k because we take for granted that all
     # runs will have the same k axis.
-    return p, None, None
+    return p, None
 
 
 def fill_hypercube_with_sigma12(lhs, priors=None, samples=None,
