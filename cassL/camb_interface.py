@@ -677,8 +677,8 @@ def input_cosmology(cosmology):
 def evaluate_sigmaR(cosmology, radii, redshifts=[0]):
     """
     :return: A two-dimensional array where each index in the first dimension
-        corresponds to a different sphere radius, and where each index in the
-        second dimension corresponds to a different redshift.
+        corresponds to a different redshift, and where each index in the
+        second dimension corresponds to a different sphere radius.
     :rtype: np.ndarray of dimension 2
     """
     if not isinstance(radii, list) and \
@@ -1104,4 +1104,3 @@ def compare_wrappers(k_list, p_list, sims, snap_index, canvas, massive,
     plot_area.set_title(title)
     plot_area.legend()
 
-default_sigma12 = evaluate_sigma12(default_cosmology())

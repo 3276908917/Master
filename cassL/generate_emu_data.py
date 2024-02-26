@@ -282,7 +282,51 @@ def interpolate_nosigma12(input_cosmology, standard_k_axis):
     return p, None, None
 
 
-def fill_hypercube(lhs, standard_k_axis, priors=None,
+def fill_hypercube_with_sigma12(lhs, priors=None, samples=None,
+                                write_period=None, save_label="unlabeled",
+                                crash_when_unsolvable=False):
+    def eval_func(cosmology):
+        # De-nesting
+        return ci.evaluate_sigma12(cosmology, [12.], [1.])[0][0]
+
+    if cell_range is None:
+        cell_range = range(len(lhs))
+    if samples is None:            
+        samples = np.zeros(len(lhs))
+
+    unwritten_cells = 0
+    for i in cell_range:
+        this_denormalized_row = denormalize_row(lhs[i], priors)
+        this_cosmology = build_cosmology(this_denormalized_row)
+
+        try:
+            samples[i] = eval_func(this_cosmology)
+        except camb.CAMBError:
+            print("This cell is unsolvable. Since this function requires " + \
+                  "no rescaling, your priors are probably extreme.")
+            if crash_when_unsolvable:
+                raise ValueError("Cell unsolvable.")
+
+        print(i, "complete")
+        unwritten_cells += 1
+
+        if write_period is not None and unwritten_cells >= write_period:
+            # We add one because the current cell is also unwritten
+            save_start = i - unwritten_cells + 1
+            save_end = i + 1
+
+            file_suffix = "_backup_i" + str(save_start) + "_through_" + \
+                    str(i) + "_" + save_label + ".npy"
+
+            np.save("samples" + file_suffix, samples[save_start:save_end],
+                    allow_pickle=True)
+
+            unwritten_cells = 0
+
+    return samples
+
+
+def fill_hypercube_with_Pk(lhs, standard_k_axis, priors=None,
     eval_func=direct_eval_cell, cell_range=None, samples=None,
     write_period=None, save_label="unlabeled", crash_when_unsolvable=False):
     """
@@ -291,25 +335,17 @@ def fill_hypercube(lhs, standard_k_axis, priors=None,
     @cell_range: a range object specifying the indices of lhs which still need
         to be evaluated. By default, it is None, which means that the entire
         lhs will be evaluated. This parameter can be used to pick up from where
-        previous rusn left off, and to run this method in saveable chunks.
-
-    BE CAREFUL! This function deliberately mutates the lhs object,
-        replacing the target sigma12 values with the actual sigma12 values
-        used.
+        previous runs left off, and to run this method in saveable chunks.
     """
     if cell_range is None:
         cell_range = range(len(lhs))
-    if samples is None:            
-        if len(lhs[0]) == 3:
-            samples = np.zeros(len(lhs))
-        else:
-            samples = np.zeros((len(lhs), len(standard_k_axis)))
+    if samples is None:
+        samples = np.zeros((len(lhs), len(standard_k_axis)))
 
-    # The rescaling parameters are h and z, so this will be an array of shape
-    # (num_spectra, 2). These parameters are not used to train the emu but
-    # rather provide debugging information and sure that the output spectra
-    # are easily reproducible.
-    rescaling_parameters_list = None
+    # The rescaling parameters are true_sigma12, h and z. Only the sigma12
+    # value is used to train the emu but the rest provide debugging information
+    # and sure that the output spectra are easily reproducible.
+    rescalers_arr = np.zeros((len(lhs), 3))
 
     unwritten_cells = 0
     for i in cell_range:
@@ -317,20 +353,11 @@ def fill_hypercube(lhs, standard_k_axis, priors=None,
         this_denormalized_row = denormalize_row(lhs[i], priors)
         this_cosmology = build_cosmology(this_denormalized_row)
 
-        # As of 20.08.2023, this REALLY is a NECESSARY workaround.
-        this_actual_sigma12 = None
-        these_rescaling_parameters = np.array([np.nan, np.nan])
         try:
-            if len(lhs[0]) == 3: # we're emulating sigma12
-                samples[i] = eval_func(this_cosmology)
-                ui.print_cosmology(this_cosmology)
-            else: # we're emulating power spectra
-                this_p, this_actual_sigma12, these_rescaling_parameters = \
-                    eval_func(this_cosmology, standard_k_axis)
+            samples[i], rescalers_arr[i] = \
+                eval_func(this_cosmology, standard_k_axis)
 
-            # We make sure that len(lhs[0] > 3) because this_p is *supposed* to
-            # be None in the event that we're emulating sigma12.
-            if (this_p is None and len(lhs[0] > 3)) and crash_when_unsolvable:
+            if samples[i] is None and crash_when_unsolvable:
                 raise ValueError("Cell unsolvable.")
         except camb.CAMBError:
             print("This cell is unsolvable. However, in this case, we " + \
@@ -340,25 +367,11 @@ def fill_hypercube(lhs, standard_k_axis, priors=None,
             if crash_when_unsolvable:
                 raise ValueError("Cell unsolvable.")
 
-        if rescaling_parameters_list is None:
-            rescaling_parameters_list = these_rescaling_parameters
-        else:
-            rescaling_parameters_list = np.vstack((rescaling_parameters_list,
-                these_rescaling_parameters))
-
-        # We may actually want to remove this if-condition. For now, though, it
-        # allows us to repeatedly evaluate a cosmology with the same
-        # deterministic result.
-        if len(lhs[0]) != 3:
-            if this_actual_sigma12 is not None:
-                lhs[i][3] = this_actual_sigma12
-
-                prior = priors[3]
-                this_normalized_actual_sigma12 = \
-                    (this_actual_sigma12 - prior[0]) / (prior[1] - prior[0])
-                lhs[i][3] = this_normalized_actual_sigma12
-
-            samples[i] = this_p
+        actual_sigma12 = rescalers_arr[i][0]
+        if not np.isnan(actual_sigma12): # we need to re-normalize
+            prior = priors[3]
+            normalized = (actual_sigma12 - prior[0]) / (prior[1] - prior[0])
+            rescalers_arr[i][0] = normalized
 
         print(i, "complete")
         unwritten_cells += 1
@@ -372,16 +385,9 @@ def fill_hypercube(lhs, standard_k_axis, priors=None,
 
             np.save("samples" + file_suffix, samples[save_start:save_end],
                     allow_pickle=True)
-
-            if len(lhs[0]) == 4 or len(lhs[0]) == 6:
-                # Rescaling and sigma12 matching only apply in the case of the
-                # massless\ and massive-neutrino power spectra data sets.
-                np.save("rescalers" + file_suffix,
-                        rescaling_parameters_list[save_start:save_end],
-                        allow_pickle=True)
-                np.save("hc" + file_suffix, lhs[save_start:save_end],
-                        allow_pickle=True)
+            np.save("rescalers" + file_suffix,
+                    rescalers_arr[save_start:save_end], allow_pickle=True)
 
             unwritten_cells = 0
 
-    return samples, rescaling_parameters_list
+    return samples, rescalers_arr
