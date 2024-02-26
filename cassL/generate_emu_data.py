@@ -283,7 +283,8 @@ def interpolate_nosigma12(input_cosmology, standard_k_axis):
 
 
 def fill_hypercube_with_sigma12(lhs, priors=None, samples=None,
-                                write_period=None, save_label="unlabeled",
+                                write_period=None,
+                                save_label="sigma12_backup_i{}",
                                 crash_when_unsolvable=False):
     def eval_func(cosmology):
         # De-nesting
@@ -312,23 +313,16 @@ def fill_hypercube_with_sigma12(lhs, priors=None, samples=None,
 
         if write_period is not None and unwritten_cells >= write_period:
             # We add one because the current cell is also unwritten
-            save_start = i - unwritten_cells + 1
-            save_end = i + 1
-
-            file_suffix = "_backup_i" + str(save_start) + "_through_" + \
-                    str(i) + "_" + save_label + ".npy"
-
-            np.save("samples" + file_suffix, samples[save_start:save_end],
-                    allow_pickle=True)
-
+            np.save(save_label.format(i), samples)
             unwritten_cells = 0
 
     return samples
 
 
 def fill_hypercube_with_Pk(lhs, standard_k_axis, priors=None,
-    eval_func=direct_eval_cell, cell_range=None, samples=None,
-    write_period=None, save_label="unlabeled", crash_when_unsolvable=False):
+                           eval_func=direct_eval_cell, cell_range=None,
+                           write_period=None, save_label="Pk",
+                           crash_when_unsolvable=False):
     """
     @lhs: this is a list of tuples with which @eval_func is to be evaluated.
 
@@ -339,8 +333,8 @@ def fill_hypercube_with_Pk(lhs, standard_k_axis, priors=None,
     """
     if cell_range is None:
         cell_range = range(len(lhs))
-    if samples is None:
-        samples = np.zeros((len(lhs), len(standard_k_axis)))
+
+    samples = np.zeros((len(lhs), len(standard_k_axis)))
 
     # The rescaling parameters are true_sigma12, h and z. Only the sigma12
     # value is used to train the emu but the rest provide debugging information
@@ -380,14 +374,62 @@ def fill_hypercube_with_Pk(lhs, standard_k_axis, priors=None,
             save_start = i - unwritten_cells + 1
             save_end = i + 1
 
-            file_suffix = "_backup_i" + str(save_start) + "_through_" + \
-                    str(i) + "_" + save_label + ".npy"
+            file_suffix = "_backup_i{}_through_{}_{}.npy"
+            file_suffix = file_suffix.format(save_start, i, save_label)
 
-            np.save("samples" + file_suffix, samples[save_start:save_end],
-                    allow_pickle=True)
+            np.save("Pk" + file_suffix, samples[save_start:save_end])
             np.save("rescalers" + file_suffix,
-                    rescalers_arr[save_start:save_end], allow_pickle=True)
+                    rescalers_arr[save_start:save_end])
 
             unwritten_cells = 0
 
     return samples, rescalers_arr
+
+
+def fill_hypercube_with_sigmaR(lhs, R_axis, priors=None, cell_range=None,
+                               write_period=None, save_label="unlabeled",
+                               crash_when_unsolvable=False):
+    """
+    @lhs: this is a list of tuples with which @eval_func is to be evaluated.
+
+    @cell_range: a range object specifying the indices of lhs which still need
+        to be evaluated. By default, it is None, which means that the entire
+        lhs will be evaluated. This parameter can be used to pick up from where
+        previous runs left off, and to run this method in saveable chunks.
+    """
+    if cell_range is None:
+        cell_range = range(len(lhs))
+
+    samples = np.zeros((len(lhs), len(R_axis)))
+
+    unwritten_cells = 0
+    for i in cell_range:
+        this_denormalized_row = denormalize_row(lhs[i], priors)
+        this_cosmology = build_cosmology(this_denormalized_row)
+
+        try:
+            samples[i] = ci.evaluate_sigmaR(this_cosmology, R_axis, [1.])[0]
+
+            if samples[i] is None and crash_when_unsolvable:
+                raise ValueError("Cell unsolvable.")
+        except camb.CAMBError:
+            print("This cell is unsolvable. Since this function requires " + \
+                  "no rescaling, your priors are probably extreme.")
+            if crash_when_unsolvable:
+                raise ValueError("Cell unsolvable.")
+
+        print(i, "complete")
+        unwritten_cells += 1
+        if write_period is not None and unwritten_cells >= write_period:
+            # We add one because the current cell is also unwritten
+            save_start = i - unwritten_cells + 1
+            save_end = i + 1
+
+            file_suffix = "_backup_i{}_through_{}_{}.npy"
+            file_suffix = file_suffix.format(save_start, i, save_label)
+
+            np.save("sigmaR" + file_suffix, samples[save_start:save_end])
+
+            unwritten_cells = 0
+
+    return samples
