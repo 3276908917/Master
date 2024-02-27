@@ -280,9 +280,11 @@ def interpolate_nosigma12(input_cosmology, standard_k_axis):
                         kmax=k_max, hubble_units=False)
     p = p_intrp.P(z, standard_k_axis)
 
+    actual_sigma12 = ci.sigma12_from_interpolator(p_intrp, z)
+
     # We don't need to return k because we take for granted that all
     # runs will have the same k axis.
-    return p, None
+    return p, np.array([actual_sigma12, np.nan, np.nan])
 
 
 def fill_hypercube_with_sigma12(lhs, priors=None, samples=None,
