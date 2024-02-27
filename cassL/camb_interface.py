@@ -48,11 +48,11 @@ try:
             else:
                 cosm[series_name] = pd.to_numeric(series)
                 
-    compact_cosm = cosm.drop("z(4)")
-    compact_cosm = compact_cosm.drop("z(3)")
-    compact_cosm = compact_cosm.drop("z(2)")
-    compact_cosm = compact_cosm.drop("z(1)")
-    compact_cosm = compact_cosm.drop("z(0)")
+    compact_cosm = cosm.drop("z(4)", axis=1)
+    compact_cosm = compact_cosm.drop("z(3)", axis=1)
+    compact_cosm = compact_cosm.drop("z(2)", axis=1)
+    compact_cosm = compact_cosm.drop("z(1)", axis=1)
+    compact_cosm = compact_cosm.drop("z(0)", axis=1)
 
 except FileNotFoundError:
     print("Failure to load table of Aletheia cosmologies.")

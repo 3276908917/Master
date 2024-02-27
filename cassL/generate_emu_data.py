@@ -56,11 +56,10 @@ def build_cosmology(lhs_row, mapping):
         # Two special cases: omega_K and omega_nu
         par_label = COSMO_PARS_INDICES[mapping[i]]
         if par_label == 'omnuh2':
-            cosmology[par_label] = ci.specify_neutrino_mass(cosmology,
-                                                            lhs_row[i], 1)
+            cosmology = ci.specify_neutrino_mass(cosmology, lhs_row[i], 1)
         elif par_label == 'omkh2':
             # h should have already been specified by now
-            cosmology[par_label] = lhs_row[i] / cosmology['h'] ** 2
+            cosmology['OmK'] = lhs_row[i] / cosmology['h'] ** 2
         else:
             cosmology[COSMO_PARS_INDICES[mapping[i]]] = lhs_row[i]
     
