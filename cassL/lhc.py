@@ -31,7 +31,6 @@ def batch(n_params, n_samples=5000, batch_size=50, comparator=np.greater):
     min_dist = np.amin(dist[dist > 0])
     # Iterating this for n_trials times
     for i in range(batch_size - 1):
-        print(i + 1)
         samples_new = lhs(n=n_params, samples=n_samples, criterion='center')
         dist = cdist(samples_new, samples_new, metric='euclidean')
         min_dist_new = np.amin(dist[dist > 0])

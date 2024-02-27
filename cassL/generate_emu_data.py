@@ -31,17 +31,18 @@ def build_cosmology(lhs_row):
     """
     Intended behavior:
         if len(lhs_row) == 3 we're building a sigma12 emulator
-        if len(lhs_row) == 4 we're building a massless neutrino emulator
-        if len(lhs_row) == 6 we're building a massive neutrino emulator
-        if len(lhs_row) == 9 we're testing the full massless pipeline
-        if len(lhs_row) == 10 we're testing the full massive pipeline
+        if 4 we're building a massless neutrino emulator
+        if 6 we're building a massive neutrino emulator
+        if 8, we're testing the full massive pipeline without w_a and w_0
+        if 9, we're testing the full massless pipeline
+        if 10, we're testing the full massive pipeline
     """
     # We should replace this function with a function that assumes, e.g.
     # index 0 is om_b, index 1 is om_c, etc.
 
-    if len(lhs_row) not in [3, 4, 6, 9, 10]:
-        raise ValueError("The length of the input lhs row does not" + \
-            "correspond to any of the four known cases. Please refer to " + \
+    if len(lhs_row) not in [3, 4, 6, 8, 9, 10]:
+        raise ValueError("The length of the input lhs row does not " + \
+            "correspond to any of the known cases. Please refer to " + \
             "the docstring.")
 
     # Use Aletheia model 0 as a base
@@ -53,7 +54,7 @@ def build_cosmology(lhs_row):
 
     # Incomplete
     if len(lhs_row) > 3:
-        if len(lhs_row) > 8:
+        if len(lhs_row) > 7:
             cosmology["z"] = lhs_row[3]
         else:
             cosmology["sigma12"] = lhs_row[3]
@@ -69,11 +70,13 @@ def build_cosmology(lhs_row):
     if "omnuh2" not in cosmology: 
         cosmology = ci.specify_neutrino_mass(cosmology, 0, 1)
 
-    if len(lhs_row) > 8:
+    if len(lhs_row) > 7:
         cosmology["h"] = lhs_row[5]
         cosmology["OmK"] = lhs_row[6] / cosmology["h"] ** 2
-        cosmology["w0"] = lhs_row[7]
-        cosmology["wa"] = lhs_row[8]
+        
+        if len(lhs_row) > 8:
+            cosmology["w0"] = lhs_row[7]
+            cosmology["wa"] = lhs_row[8]
     
     return cosmology
 
