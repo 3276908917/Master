@@ -48,6 +48,12 @@ try:
             else:
                 cosm[series_name] = pd.to_numeric(series)
                 
+    compact_cosm = cosm.drop("z(4)", axis=1)
+    compact_cosm = compact_cosm.drop("z(3)", axis=1)
+    compact_cosm = compact_cosm.drop("z(2)", axis=1)
+    compact_cosm = compact_cosm.drop("z(1)", axis=1)
+    compact_cosm = compact_cosm.drop("z(0)", axis=1)
+
 except FileNotFoundError:
     print("Failure to load table of Aletheia cosmologies.")
 
@@ -71,7 +77,7 @@ K_MAX = 7.0 # absolute units
 # This regex expression powers the parse_redshifts function.
 redshift_column = re.compile("z.+")
 
-def default_cosmology():
+def default_cosmology(z_comparisons=True):
     r"""
     Return a deep copy of a benchmark cosmology (in this case, Aletheia model
     0, based on the Planck best fit for a flat LambdaCDM cosmology) such that
@@ -80,7 +86,8 @@ def default_cosmology():
 
     Returns: dictionary (a copy of the default cosmology)
     """
-    return specify_neutrino_mass(cosm.iloc[0], 0)
+    base = cosm.iloc[0] if z_comparisons else compact_cosm.iloc[0]
+    return specify_neutrino_mass(base, 0)
     
 
 def parse_redshifts(model_num):
