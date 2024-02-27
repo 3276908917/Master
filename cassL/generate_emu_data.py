@@ -15,64 +15,54 @@ from cassL import utils
 
 h_DEFAULT = ci.default_cosmology()["h"]
 
-def denormalize_row(lhs_row, priors):
-    # Truncate the prior if this is a massless-neutrino cosmology, so that we
-    # don't receive NumPy dimensionality complaints.
-    priors = priors[:len(lhs_row)]
+COSMO_PARS_INDICES = [
+    'ombh2',
+    'omch2',
+    'n_s',
+    'sigma12',
+    'A_s',
+    'omnuh2',
+    'h',
+    'omkh2',
+    'w0',
+    'wa',
+    'z'
+]
+
+def denormalize_row(lhs_row, priors, mapping):
+    """
+    priors: array of priors as output by ui.prior_file_to_array
+    mapping: array mapping lhs_row indices to priors indices.
+        The priors indices always correspond to the same parameters, but the
+        lhs_row may not contain all such parameters. That's why this mapping
+        is important. The keys are are lhs row indices, the values are prior
+        indices.
+    """
+    tailored_priors = []
+    for i in range(len(lhs_row)):
+        tailored_priors.append(priors[mapping[i]])
     
-    xrange = np.ptp(priors, axis=1)
-    xmin = np.min(priors, axis=1)
+    tailored_priors = np.array(tailored_priors)
+    xrange = np.ptp(tailored_priors, axis=1)
+    xmin = np.min(tailored_priors, axis=1)
     return lhs_row * xrange + xmin
     
 
-def build_cosmology(lhs_row):
-    """
-    Intended behavior:
-        if len(lhs_row) == 3 we're building a sigma12 emulator
-        if 4 we're building a massless neutrino emulator
-        if 6 we're building a massive neutrino emulator
-        if 8, we're testing the full massive pipeline without w_a and w_0
-        if 9, we're testing the full massless pipeline
-        if 10, we're testing the full massive pipeline
-    """
-    # We should replace this function with a function that assumes, e.g.
-    # index 0 is om_b, index 1 is om_c, etc.
-
-    if len(lhs_row) not in [3, 4, 6, 8, 9, 10]:
-        raise ValueError("The length of the input lhs row does not " + \
-            "correspond to any of the known cases. Please refer to " + \
-            "the docstring.")
-
+def build_cosmology(lhs_row, mapping):
     # Use Aletheia model 0 as a base
     cosmology = ci.default_cosmology(z_comparisons=False)
-
-    cosmology["ombh2"] = lhs_row[0]
-    cosmology["omch2"] = lhs_row[1]
-    cosmology["n_s"] = lhs_row[2]
-
-    # Incomplete
-    if len(lhs_row) > 3:
-        if len(lhs_row) > 7:
-            cosmology["z"] = lhs_row[3]
+    
+    for i in range(len(lhs_row)):
+        # Two special cases: omega_K and omega_nu
+        par_label = COSMO_PARS_INDICES[mapping[i]]
+        if par_label == 'omnuh2':
+            cosmology[par_label] = ci.specify_neutrino_mass(cosmology,
+                                                            lhs_row[i], 1)
+        elif par_label == 'omkh2':
+            # h should have already been specified by now
+            cosmology[par_label] = lhs_row[i] / cosmology['h'] ** 2
         else:
-            cosmology["sigma12"] = lhs_row[3]
-
-    if len(lhs_row) > 4:
-        cosmology["A_s"] = lhs_row[4]
-        if len(lhs_row) != 9:
-            last_i = len(lhs_row) - 1
-            cosmology = ci.specify_neutrino_mass(cosmology, lhs_row[last_i], 1)
-
-    if "omnuh2" not in cosmology: 
-        cosmology = ci.specify_neutrino_mass(cosmology, 0, 1)
-
-    if len(lhs_row) > 7:
-        cosmology["h"] = lhs_row[5]
-        cosmology["OmK"] = lhs_row[6] / cosmology["h"] ** 2
-        
-        if len(lhs_row) > 8:
-            cosmology["w0"] = lhs_row[7]
-            cosmology["wa"] = lhs_row[8]
+            cosmology[COSMO_PARS_INDICES[mapping[i]]] = lhs_row[i]
     
     return cosmology
 
