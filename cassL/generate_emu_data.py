@@ -29,6 +29,27 @@ COSMO_PARS_INDICES = [
     'z'
 ]
 
+
+def labels_to_mapping(labels):
+    """
+    Return a mapping array (for use with denormalize_row and build_cosmology)
+    based on the order of the parameters in the provided array.
+    
+    @labels: an array of labels in the format exemplified by
+    COSMO_PARS_INDICES.
+    """
+    mapping = []
+    for label in labels:
+        if label not in COSMO_PARS_INDICES:
+            raise ValueError("Unrecognized column: " + label)
+        mapping.append(COSMO_PARS_INDICES.index(label))
+
+    if len(mapping) != len(np.unique(mapping)):
+        raise ValueError("Duplicate labels detected!")
+
+    return mapping
+
+
 def denormalize_row(lhs_row, priors, mapping):
     """
     priors: array of priors as output by ui.prior_file_to_array
@@ -272,7 +293,7 @@ def interpolate_nosigma12(input_cosmology, standard_k_axis):
     return p, np.array([actual_sigma12, np.nan, np.nan])
 
 
-def fill_hypercube_with_sigma12(lhs, priors=None, samples=None,
+def fill_hypercube_with_sigma12(lhs, mapping, priors, samples=None,
                                 write_period=None,
                                 save_label="sigma12_backup_i{}",
                                 crash_when_unsolvable=False):
@@ -287,8 +308,8 @@ def fill_hypercube_with_sigma12(lhs, priors=None, samples=None,
 
     unwritten_cells = 0
     for i in cell_range:
-        this_denormalized_row = denormalize_row(lhs[i], priors)
-        this_cosmology = build_cosmology(this_denormalized_row)
+        this_denormalized_row = denormalize_row(lhs[i], priors, mapping)
+        this_cosmology = build_cosmology(this_denormalized_row, mapping)
 
         try:
             samples[i] = eval_func(this_cosmology)
@@ -309,7 +330,7 @@ def fill_hypercube_with_sigma12(lhs, priors=None, samples=None,
     return samples
 
 
-def fill_hypercube_with_Pk(lhs, standard_k_axis, priors=None,
+def fill_hypercube_with_Pk(lhs, standard_k_axis, mapping, priors,
                            eval_func=direct_eval_cell, cell_range=None,
                            write_period=None, save_label="Pk",
                            crash_when_unsolvable=False):
@@ -334,8 +355,8 @@ def fill_hypercube_with_Pk(lhs, standard_k_axis, priors=None,
     unwritten_cells = 0
     for i in cell_range:
         this_p = None
-        this_denormalized_row = denormalize_row(lhs[i], priors)
-        this_cosmology = build_cosmology(this_denormalized_row)
+        this_denormalized_row = denormalize_row(lhs[i], priors, mapping)
+        this_cosmology = build_cosmology(this_denormalized_row, mapping)
 
         try:
             samples[i], rescalers_arr[i] = \
@@ -376,7 +397,7 @@ def fill_hypercube_with_Pk(lhs, standard_k_axis, priors=None,
     return samples, rescalers_arr
 
 
-def fill_hypercube_with_sigmaR(lhs, R_axis, priors=None, cell_range=None,
+def fill_hypercube_with_sigmaR(lhs, R_axis, mapping, priors, cell_range=None,
                                write_period=None, save_label="unlabeled",
                                crash_when_unsolvable=False):
     """
@@ -394,8 +415,8 @@ def fill_hypercube_with_sigmaR(lhs, R_axis, priors=None, cell_range=None,
 
     unwritten_cells = 0
     for i in cell_range:
-        this_denormalized_row = denormalize_row(lhs[i], priors)
-        this_cosmology = build_cosmology(this_denormalized_row)
+        this_denormalized_row = denormalize_row(lhs[i], priors, mapping)
+        this_cosmology = build_cosmology(this_denormalized_row, mapping)
 
         try:
             samples[i] = ci.evaluate_sigmaR(this_cosmology, R_axis, [1.])[0]
